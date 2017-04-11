@@ -11,9 +11,10 @@ function [TA_final,E0_final,t,f2xint,meanT,pipmass,sc,ta,e0] ...
 % Use function CalkCRM to generate <acidmolar> input from CRM data.
 % See end of main function for citation list & reference codes.
 % === Please cite as: ===
-% Humphreys, M.P. & Achterberg, E.P. (2016). Calkulate: seawater total
-%  alkalinity from open-cell, non-purged, stepwise, potentiometric
-%  titration data. Submitted manuscript.
+% Humphreys, M. P. (2015). Calculating seawater total alkalinity from open-
+%  cell titration data using a modified Gran plot technique, in: Measurements
+%  and Concepts in Marine Carbonate Chemistry. PhD Thesis, Ocean and Earth
+%  Science, University of Southampton, UK, pp. 25-44
 
 %% === 0 === USER INPUTS and example values === 0 ===
 % datfile = '0-0  1  (0)CRM-134-1085-A.dat'; % 'filename.dat' from VINDTA
@@ -291,13 +292,13 @@ end %if
 %  WLD69: Wooster et al., 1969, Limnol Oceanogr 14(3). doi:10.4319/lo.1969.14.3.0437
 %    W71: Warner, 1971, Deep-Sea Res 18(12). doi:10.1016/0011-7471(71)90030-1
 %   HJ73: Hansson & Jagner, 1973, Anal Chim Acta 65(2). doi:10.1016/S0003-2670(01)82503-4
-%    U74: Uppström, 1974, Deep-Sea Res 21(2). doi:10.1016/0011-7471(74)90074-6
+%    U74: UppstrÃ¶m, 1974, Deep-Sea Res 21(2). doi:10.1016/0011-7471(74)90074-6
 %   BM76: Baes & Mesmer, 1976, The Hydrolysis of Cations. Wiley
 %   DR79: Dickson & Riley, 1979, Mar Chem 7(2). doi:10.1016/0304-4203(79)90002-1
 %   JW79: Johansson & Wedborg, 1979, Mar Chem 8(1). doi:10.1016/0304-4203(79)90032-X
 % BBSW81: Bradshaw et al., 1981, Earth Planet Sci Lett 55(1). doi:10.1016/0012-821X(81)90090-X
 %   MP81: Millero & Poisson, 1981, Deep-Sea Res Pt A 28(6). doi:10.1016/0198-0149(81)90122-9
-%  SNI81: Sjöberg et al., 1981, Mar Chem 10(6). doi:10.1016/0304-4203(81)90005-0
+%  SNI81: SjÃ¶berg et al., 1981, Mar Chem 10(6). doi:10.1016/0304-4203(81)90005-0
 %   PF87: Perez & Fraga, 1987, Mar Chem 21(2). doi:10.1016/0304-4203(87)90036-3
 %   GP89: Goyet & Poisson, 1989, Deep-Sea Res Pt A 36(11). doi:10.1016/0198-0149(89)90064-2
 %   D90a: Dickson, 1990, Deep-Sea Res Pt A 37(5). doi:10.1016/0198-0149(90)90004-F
@@ -569,7 +570,7 @@ function TB = calk_LKB10(sal)
 % Input <sal> = salinity; output <TB> = total boron / mol/kg
 % Total boron = [boric acid] + [borate(-)]
 
-B_sal = 0.1336;     % = boron/salinity / (mg/kg)/‰ (LKB10)
+B_sal = 0.1336;     % = boron/salinity / (mg/kg)/Â‰ (LKB10)
 B = B_sal * sal;    % = boron / mg/kg
 B_RAM = 10.811e3;   % = relative atomic mass of boron / mg/mol (DSC07)
 TB = B/B_RAM;       % = total boron / mol/kg
