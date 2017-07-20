@@ -37,9 +37,10 @@ function [acidmolar,g_acidmolar,g_ta] = CalkCRM(datfile, ...
 % 
 % Written by Matthew P. Humphreys, 2015-01-21. Last updated 2016-07-07.
 % === Please cite as: ===
-% Humphreys, M.P. & Achterberg, E.P. (2016). Calkulate: seawater total
-%  alkalinity from open-cell, non-purged, stepwise, potentiometric
-%  titration data. Submitted manuscript.
+% Humphreys, M.P. (2015), "Calculating seawater total alkalinity from
+%  open-cell titration data using a modified Gran plot technique", in
+%  "Measurements and Concepts in Marine Carbonate Chemistry", PhD thesis,
+%  Ocean and Earth Science, University of Southampton, UK, pp. 25-44.
 
 %% Test inputs
 % datfile = vcrm_datfile{C};

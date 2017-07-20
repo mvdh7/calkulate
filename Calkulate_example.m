@@ -6,6 +6,11 @@
 % If all goes well, then the values returned in the variable "ta" should
 %  be: [2154.8; 2153.5].
 % Written by Matthew P. Humphreys. Last updated 2016-06-28.
+% === Please cite as: ===
+% Humphreys, M.P. (2015), "Calculating seawater total alkalinity from
+%  open-cell titration data using a modified Gran plot technique", in
+%  "Measurements and Concepts in Marine Carbonate Chemistry", PhD thesis,
+%  Ocean and Earth Science, University of Southampton, UK, pp. 25-44.
 
 %% CalkCRM: inputs
 % Filename from VINDTA:

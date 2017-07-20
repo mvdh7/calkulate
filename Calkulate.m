@@ -11,9 +11,10 @@ function [TA_final,E0_final,t,f2xint,meanT,pipmass,sc,ta,e0] ...
 % Use function CalkCRM to generate <acidmolar> input from CRM data.
 % See end of main function for citation list & reference codes.
 % === Please cite as: ===
-% Humphreys, M.P. & Achterberg, E.P. (2016). Calkulate: seawater total
-%  alkalinity from open-cell, non-purged, stepwise, potentiometric
-%  titration data. Submitted manuscript.
+% Humphreys, M.P. (2015), "Calculating seawater total alkalinity from
+%  open-cell titration data using a modified Gran plot technique", in
+%  "Measurements and Concepts in Marine Carbonate Chemistry", PhD thesis,
+%  Ocean and Earth Science, University of Southampton, UK, pp. 25-44.
 
 %% === 0 === USER INPUTS and example values === 0 ===
 % datfile = '0-0  1  (0)CRM-134-1085-A.dat'; % 'filename.dat' from VINDTA
