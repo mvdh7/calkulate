@@ -33,9 +33,6 @@ function [Macid,pH,Tk,Msamp,Cacid,S,XT,KX] = calk_Dickson1981
 Dickson1981 = cell(py.calkulate.gettit.Dickson1981());
 
 % Convert from Python to MATLAB
-
-
-
 Macid = double(py.array.array('d',Dickson1981{1}));
 pH    = double(py.array.array('d',Dickson1981{2}));
 Tk    = double(py.array.array('d',Dickson1981{3}));
