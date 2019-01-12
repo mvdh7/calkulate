@@ -1,6 +1,8 @@
 from . import calib, conc, dens, dissoc, gettit, solve
+from numpy import logical_and
+from numpy import max as np_max
 
-# ===== INPUTS AND THEIR UNITS ================================================
+# ================================================ INPUTS AND THEIR UNITS =====
 
 
 # Vsamp    = sample volume                    / ml
@@ -13,7 +15,7 @@ from . import calib, conc, dens, dissoc, gettit, solve
 # Tk_force = titration temperature (optional) / K
 
 
-# ===== PREPARATORY FUNCTION ==================================================
+# ================================================== PREPARATORY FUNCTION =====
 
 
 def prep(datfile,Vsamp,S,CT,PT,SiT, burette_cx=1, Tk_force=None):
@@ -32,7 +34,7 @@ def prep(datfile,Vsamp,S,CT,PT,SiT, burette_cx=1, Tk_force=None):
     return Macid, EMF, Tk, Msamp, XT, KX
 
 
-# ===== HALF-GRAN FUNCTIONS ===================================================
+# =================================================== HALF-GRAN FUNCTIONS =====
 
 
 def halfGran(datfile,Vsamp,Cacid,S,CT,PT, burette_cx=1, Tk_force=None):
@@ -55,7 +57,29 @@ def halfGran_CRM(datfile,Vsamp,AT_cert,S,CT,PT, burette_cx=1, Tk_force=None):
     return Cacid, AT, EMF0
 
 
-# ===== MPH FUNCTIONS =========================================================
+# ================================================ PLOT THE LOT FUNCTIONS =====
+
+
+def guessGran(datfile,Vsamp,Cacid,S, burette_cx=1, Tk_force=None):
+    
+    Macid,EMF,Tk,Msamp,_,_ = prep(datfile,Vsamp,S,0,0,0,burette_cx,Tk_force)
+
+    # Evaluate F1 function and corresponding logical
+    F1g = solve.F1(Macid,EMF,Tk,Msamp)
+
+    Lg = logical_and(F1g > 0.1*np_max(F1g), F1g < 0.9*np_max(F1g))
+
+    # Get first guesses
+    ATg,EMF0g,_,pHg = solve.guessGran(Macid,EMF,Tk,Msamp,Cacid)
+    EMF0gvec = solve.Gran_EMF0(Macid,EMF,Tk,Msamp,Cacid,ATg)
+    
+    # Select data for fitting
+    L = logical_and(pHg > 3, pHg < 4)
+    
+    return Macid,EMF,Tk,Msamp, F1g,Lg,EMF0gvec, ATg,EMF0g,pHg,L
+
+
+# ========================================================= MPH FUNCTIONS =====
 
 
 def MPH(datfile,Vsamp,Cacid,S,CT,PT,SiT, burette_cx=1, Tk_force=None):
