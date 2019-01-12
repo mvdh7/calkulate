@@ -1,4 +1,4 @@
-from . import calib, conc, dens, dissoc, gettit, solve
+from . import calib, conc, dens, dissoc, gettit, sim, solve
 from numpy import logical_and
 from numpy import max as np_max
 
@@ -77,6 +77,25 @@ def guessGran(datfile,Vsamp,Cacid,S, burette_cx=1, Tk_force=None):
     L = logical_and(pHg > 3, pHg < 4)
     
     return Macid,EMF,Tk,Msamp, F1g,Lg,EMF0gvec, ATg,EMF0g,pHg,L
+
+
+def simH(Macid,Tk,Msamp,Cacid,S,AT,CT=0,PT=0,SiT=0):
+    
+    XT = conc.XT(S,CT,PT,SiT)          # total concentrations  / mol/kg-sw
+    XT[0] = AT
+    KX = dissoc.KX_F(Tk,S,XT[3],XT[4]) # dissociation constants
+    
+    return sim.H(Macid,Msamp,Cacid,XT,KX)
+
+
+def simAT(Macid,Tk,H,Msamp,S,CT=0,PT=0,SiT=0):
+    
+    mu = Msamp / (Msamp + Macid)
+    
+    XT = conc.XT(S,CT,PT,SiT)          # total concentrations  / mol/kg-sw
+    KX = dissoc.KX_F(Tk,S,XT[3],XT[4]) # dissociation constants
+    
+    return sim.AT(H,mu,*XT,*KX)
 
 
 # ========================================================= MPH FUNCTIONS =====

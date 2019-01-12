@@ -29,8 +29,12 @@ KX = calk.dissoc.KX_F(Tk,S,XT[3],XT[4])
 
 Cacid = 0.1
 
-Macid,EMF,Tk,Msamp, F1g,Lg, ATg,EMF0g,pHg,L = calk.VINDTA.guessGran(datfile,
-    Vsamp,Cacid,S)
+#Macid,EMF,Tk,Msamp, F1g,Lg, ATg,EMF0g,pHg,L = calk.VINDTA.guessGran(datfile,
+#    Vsamp,Cacid,S)
+
+#test1 = calk.sim.H(Macid,Msamp,Cacid,XT,KX)
+
+test2 = calk.VINDTA.simH(Macid,Tk,Msamp,Cacid,S,AT_cert,CT,PT,SiT)
 
 #test = calk.VINDTA.MPH(datfile,Vsamp,Cacid,S,CT,PT,SiT,1,None)
 

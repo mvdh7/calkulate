@@ -16,18 +16,27 @@ SiT     = SiT     * 1e-6;
 burette_cx = 1;
 Tk_force = [];
 
-% Import guessGran
+% Get initial Gran guesses
 clear t
 [t.Macid,t.EMF,t.Tk,Msamp, t.F1g,t.Lg,t.EMF0g, ATg,EMF0g,t.pHg,t.L] ...
     = calk_guessGran(datfile,Vsamp,Cacid,S);
 t = struct2table(t);
 
-% [Macid,EMF,Tk,Msamp,F1g,Lg, ATg,EMF0g,pHg,L]
- 
+% Solve for TA fully
+[AT,EMF0,AT_RMS,AT_Npts] = calk_VINDTA(datfile,Vsamp,Cacid, ...
+    S,CT,PT,SiT,burette_cx,Tk_force);
+
+[t.H,t.pH] = calk_EMF2H(t.EMF,EMF0,t.Tk);
+
+% Calculate simulated TA
+test = cell(py.calkulate.VINDTA.simAT(py.numpy.array(t.Macid'), ...
+    py.numpy.array(t.Tk'),py.numpy.array(t.H'),Msamp,S,CT,PT,SiT));
+t.AT = double(py.array.array('d',test{1}))';
+
 % ----------------------------------------------------- Plot the lot! -----
 
-fvars = {'EMF' 'F1g' 'EMF0g'};
-flabels = {'EMF / mV' 'F1' 'EMF0 guess / mV'};
+fvars = {'EMF' 'F1g' 'EMF0g' 'AT'};
+flabels = {'EMF / mV' 'F1' 'EMF0 guess / mV' 'AT'};
 
 fxlim = minmax(t.Macid');
 
