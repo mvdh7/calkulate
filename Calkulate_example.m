@@ -14,7 +14,7 @@
 
 %% CalkCRM: inputs
 % Filename from VINDTA:
-datfile = 'calk_file_CRM142.dat';
+datfile = 'datfiles/calk_file_CRM142.dat';
 % Approximate acid molarity / mol/l:
 acidmolar_approx = 0.1;
 % Acid density / kg/l:
@@ -69,6 +69,6 @@ ta = NaN(size(sal));
 % To speed up calculations on large datasets by using parallel computing,
 %  simply change the "for" in the following line to "parfor":
 for M = 1:length(ta)
-    ta(M) = Calkulate(datfile{M},acidmolar,acidrho,pipvol, ...
-        sal(M),dic(M),phos(M),burette_cxn,sc,tforce);
+    ta(M) = Calkulate(['datfiles/' datfile{M}],acidmolar,acidrho, ...
+        pipvol,sal(M),dic(M),phos(M),burette_cxn,sc,tforce);
 end %for/parfor M
