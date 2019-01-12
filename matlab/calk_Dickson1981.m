@@ -47,7 +47,7 @@ end %for K
 
 KX = NaN(10,1);
 for K = 1:numel(KX)
-    KKX = numpy2double(Dickson1981{8}{K});
+    KKX = double(py.array.array('d',Dickson1981{8}{K}));
     KX(K) = KKX(1);
 end %for K
 KX(10) = NaN;
