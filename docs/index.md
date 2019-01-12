@@ -85,7 +85,7 @@ Update instructions for MATLAB:
 
 You could quickly test that Calkulate is working in MATLAB by running the following, with `python_exe` first changed to the correct string:
 
-`calk_initpy(python_exe)``
+`calk_initpy(python_exe)`
 `[Macid,pH,Tk,Msamp,Cacid,S,XT,KX] = calk_Dickson1981;`
 
 This should import the simulated titration data from Table 1 of Dickson (1981). A plot of the Free scale pH (`pH`) against the acid mass (`Macid`) should appear as follows.
