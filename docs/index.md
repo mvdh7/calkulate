@@ -6,7 +6,7 @@
 
 Installation instructions for Python (steps 1 to 6) and MATLAB (1 to end):
 
-  1. (Download and install Anaconda)[https://www.anaconda.com/download/]. Choose the Python 3.X version (although the 2.X should work too, if you already have it)
+  1. [Download and install Anaconda](https://www.anaconda.com/download/). Choose the Python 3.X version (although the 2.X should work too, if you already have it)
 
   2. Open the Anaconda Prompt (Windows) or Terminal (Mac/Linux)
 
@@ -39,7 +39,7 @@ Installation instructions for Python (steps 1 to 6) and MATLAB (1 to end):
   8. Find the location of this environment's Python executable by entering the following 2 lines:
 
   `from sys import executable`
-  
+
   `print(executable)`
 
   9. Copy the string that appears. It should look something like:
