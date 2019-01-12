@@ -1,0 +1,40 @@
+# This file may be used to create an environment using:
+# $ conda create --name <env> --file <this file>
+# platform: win-64
+@EXPLICIT
+https://repo.anaconda.com/pkgs/main/win-64/blas-1.0-mkl.tar.bz2
+https://repo.anaconda.com/pkgs/main/win-64/ca-certificates-2018.03.07-0.tar.bz2
+https://repo.continuum.io/pkgs/main/win-64/icc_rt-2017.0.4-h97af966_0.tar.bz2
+https://repo.anaconda.com/pkgs/main/win-64/intel-openmp-2019.1-144.tar.bz2
+https://repo.anaconda.com/pkgs/main/win-64/vs2015_runtime-14.15.26706-h3a45250_0.tar.bz2
+https://repo.anaconda.com/pkgs/main/win-64/mkl-2018.0.3-1.tar.bz2
+https://repo.anaconda.com/pkgs/main/win-64/vc-14.1-h0510ff6_4.tar.bz2
+https://repo.continuum.io/pkgs/main/win-64/icu-58.2-ha66f8fd_1.tar.bz2
+https://repo.continuum.io/pkgs/main/win-64/jpeg-9b-hb83a4c4_2.tar.bz2
+https://repo.anaconda.com/pkgs/main/win-64/openssl-1.0.2p-hfa6e2cd_0.tar.bz2
+https://repo.anaconda.com/pkgs/main/win-64/python-3.6.7-h33f27b4_1.tar.bz2
+https://repo.anaconda.com/pkgs/main/win-64/sqlite-3.25.3-he774522_0.tar.bz2
+https://repo.anaconda.com/pkgs/main/win-64/zlib-1.2.11-h62dcd97_3.tar.bz2
+https://repo.anaconda.com/pkgs/main/win-64/certifi-2018.10.15-py36_0.tar.bz2
+https://repo.anaconda.com/pkgs/main/win-64/kiwisolver-1.0.1-py36h6538335_0.tar.bz2
+https://repo.anaconda.com/pkgs/main/win-64/libpng-1.6.35-h2a8f88b_0.tar.bz2
+https://repo.anaconda.com/pkgs/main/win-64/numpy-base-1.15.4-py36h8128ebf_0.tar.bz2
+https://repo.anaconda.com/pkgs/main/win-64/pyparsing-2.3.0-py36_0.tar.bz2
+https://repo.anaconda.com/pkgs/main/win-64/pytz-2018.7-py36_0.tar.bz2
+https://repo.anaconda.com/pkgs/main/win-64/sip-4.19.8-py36h6538335_0.tar.bz2
+https://repo.anaconda.com/pkgs/main/win-64/six-1.11.0-py36_1.tar.bz2
+https://repo.anaconda.com/pkgs/main/win-64/tornado-5.1.1-py36hfa6e2cd_0.tar.bz2
+https://repo.continuum.io/pkgs/main/win-64/wincertstore-0.2-py36h7fe50ca_0.tar.bz2
+https://repo.continuum.io/pkgs/main/win-64/cycler-0.10.0-py36h009560c_0.tar.bz2
+https://repo.anaconda.com/pkgs/main/win-64/freetype-2.9.1-ha9979f8_1.tar.bz2
+https://repo.anaconda.com/pkgs/main/win-64/python-dateutil-2.7.5-py36_0.tar.bz2
+https://repo.anaconda.com/pkgs/main/win-64/qt-5.9.6-vc14h1e9a669_2.tar.bz2
+https://repo.anaconda.com/pkgs/main/win-64/setuptools-40.6.2-py36_0.tar.bz2
+https://repo.anaconda.com/pkgs/main/win-64/pyqt-5.9.2-py36h6538335_2.tar.bz2
+https://repo.anaconda.com/pkgs/main/win-64/wheel-0.32.3-py36_0.tar.bz2
+https://repo.anaconda.com/pkgs/main/win-64/pip-18.1-py36_0.tar.bz2
+https://repo.anaconda.com/pkgs/main/win-64/matplotlib-2.2.3-py36hd159220_0.tar.bz2
+https://repo.anaconda.com/pkgs/main/win-64/mkl_fft-1.0.6-py36hdbbee80_0.tar.bz2
+https://repo.anaconda.com/pkgs/main/win-64/mkl_random-1.0.1-py36h77b88f5_1.tar.bz2
+https://repo.anaconda.com/pkgs/main/win-64/numpy-1.15.4-py36ha559c80_0.tar.bz2
+https://repo.anaconda.com/pkgs/main/win-64/scipy-1.1.0-py36h4f6bf74_1.tar.bz2

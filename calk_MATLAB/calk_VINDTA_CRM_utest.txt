@@ -1,0 +1,15 @@
+function calk_VINDTA_CRM_utest(datfile,Vsamp,AT_cert,S,CT,PT,SiT, ...
+    burette_cx,Tk_force)
+
+disp('TEST RESULTS:')
+disp(datfile)
+disp(Vsamp)
+disp(AT_cert)
+disp(S)
+disp(CT)
+disp(PT)
+disp(SiT)
+disp(burette_cx)
+disp(Tk_force)
+
+end
