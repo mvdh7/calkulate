@@ -39,6 +39,7 @@ Installation instructions for Python (steps 1 to 6) and MATLAB (1 to end):
   8. Find the location of this environment's Python executable by entering the following 2 lines:
 
   `from sys import executable`
+  
   `print(executable)`
 
   9. Copy the string that appears. It should look something like:
@@ -86,6 +87,7 @@ Update instructions for MATLAB:
 You could quickly test that Calkulate is working in MATLAB by running the following, with `python_exe` first changed to the correct string:
 
 `calk_initpy(python_exe)`
+
 `[Macid,pH,Tk,Msamp,Cacid,S,XT,KX] = calk_Dickson1981;`
 
 This should import the simulated titration data from Table 1 of Dickson (1981). A plot of the Free scale pH (`pH`) against the acid mass (`Macid`) should appear as follows.
