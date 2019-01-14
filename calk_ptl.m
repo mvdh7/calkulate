@@ -1,9 +1,9 @@
 %% Import data
 
 % Initialise Python
-% calk_initpy('//anaconda/envs/spritzer/bin/python') % Mac
-calk_initpy( ... Windows
-    'C:\Users\yau17reu\anaconda\Anaconda3\envs\spritzer\pythonw.exe')
+calk_initpy('//anaconda/envs/spritzer/bin/python') % Mac
+% calk_initpy( ... Windows
+%     'C:\Users\yau17reu\anaconda\Anaconda3\envs\spritzer\pythonw.exe')
 % calk = py.importlib.import_module('calkulate');
 
 % Settings
@@ -43,64 +43,212 @@ t.estAT = (t.simAT + t.Macid*Cacid ./ (t.Macid + Msamp)) ./ t.mu;
 fvars = {'EMF' 'estAT' 'F1g' [] 'EMF0g'};
 flabels = {'EMF / mV' [] 'F1' 'estAT' 'EMF0 guess / mV'};
 
+fclr_guess = [0.96 0.86 0.04];
+fclr_final = [0.21 0.46 1];
+fclr_both = [0.27 0.8 0.54];
+mksz = 20;
+
+ffsz = 8;
+
 fxlim = minmax(1e3*t.Macid');
 
+freg = regstats(1e-6*t.F1g(t.Lg),1e3*t.Macid(t.Lg),'linear','beta');
+fxint = -freg.beta(1)/freg.beta(2);
+
+ftxt_mu     = char(956);
+ftxt_endash = char(8211);
+
 figure(1); clf
+
+set(gcf, 'color','w', 'paperunits','centimeters', 'units','centimeters')
+set(gcf, 'papersize',[18 18])
+set(gcf, 'paperposition',[0 0 get(gcf,'papersize')])
 
 for V = 1:numel(fvars)
 if ~isempty(fvars{V})
     
 subplot(3,2,V); hold on
 
-    xlim(fxlim)
+xlim(fxlim)
 
-    scatter(1e3*t.Macid(t.Lg),t.(fvars{V})(t.Lg),'c','filled')
-    scatter(1e3*t.Macid,t.(fvars{V}),'k')
-    
-    if ismember(fvars{V},'EMF')
-        scatter(1e3*t.Macid(t.L),t.(fvars{V})(t.L),'r')
-    end %if
-    
-    switch fvars{V}
-        
-        case 'EMF'
-            
-            ylim(minmax(t.EMF')+30*[-1 1])
-            set(gca, 'ytick',0:100:800)
-        
-        case 'F1g'
-            % plot regression line
-            % plot ATg
-        
-        case 'EMF0g' 
-            plot(fxlim,EMF0g*[1 1],'b')
-            
-        case 'estAT'
-            plot(fxlim,AT*[1 1])
-            
-    end %switch
+switch fvars{V}
 
-    xlabel('Acid mass / g')
-    ylabel(flabels{V})
-    
-    set(gca, 'box','on', 'tickdir','out', 'xcolor','k', 'ycolor','k', ...
-        'fontname','arial', 'fontsize',8, 'xtick',0:10)
+    case 'EMF'
+
+        ylim(minmax(t.(fvars{V})')+30*[-1 1])
+        set(gca, 'ytick',0:100:800)
+        
+        VLg = t.Lg & ~t.L;
+        VL  = t.L & ~t.Lg;
+        VLb = t.Lg & t.L;
+        VLn = ~t.Lg & ~t.L;
+        
+        nl = plot(1e3*AT*Msamp/Cacid*[1 1],get(gca,'ylim'), ...
+            'color',fclr_final, 'linewidth',1); calk_nolegend(nl)
+        
+        nl = plot(fxint*[1 1],get(gca,'ylim'), ...
+            'color',fclr_guess, 'linestyle','--', 'linewidth',1); 
+        calk_nolegend(nl)
+        
+        scatter(1e3*t.Macid(VLg),t.(fvars{V})(VLg),mksz,fclr_guess, ...
+            'filled', 'markeredgecolor','k')
+        scatter(1e3*t.Macid(VL) ,t.(fvars{V})(VL) ,mksz,fclr_final, ...
+            'filled', 'markeredgecolor','k')
+        scatter(1e3*t.Macid(VLb),t.(fvars{V})(VLb),mksz,fclr_both, ...
+            'filled', 'markeredgecolor','k')
+        scatter(1e3*t.Macid(VLn),t.(fvars{V})(VLn),mksz,'k')
+        
+        ylabel('EMF / mV')
+        
+        legend('First guess','Final result','Both', 'location','nw')
+        
+        text(0,1.1,['(a) Final EMF° = ' num2str(EMF0,'%.1f') ...
+            ' mV'], 'fontname','arial', ...
+            'fontsize',ffsz, 'color','k', 'units','normalized')
+
+    case 'F1g'
+        
+        ylim([0 max(1e-6*t.(fvars{V}))*1.1])
+        set(gca, 'ytick',0:4:50)
+
+        ylabel('\itF\rm_1')
+        
+        plot(fxint*[1 1],get(gca,'ylim'), ...
+            'color',fclr_guess, 'linestyle','--', 'linewidth',1)
+        
+        plot(fxlim,x2fx(fxlim','linear')*freg.beta, 'color',fclr_guess, ...
+            'linewidth',1)
+        
+        scatter(1e3*t.Macid(t.Lg),1e-6*t.(fvars{V})(t.Lg),mksz, ...
+            fclr_guess,'filled', 'markeredgecolor','k')
+        scatter(1e3*t.Macid(~t.Lg),1e-6*t.(fvars{V})(~t.Lg),mksz,'k')
+        
+        text(0,1.1,['(b) First guess \itA\rm_T = ' ...
+            num2str(1e3*fxint*Cacid/Msamp,'%.1f') ...
+            ' ' ftxt_mu 'mol\cdotkg^{' ftxt_endash '1}'], ...
+            'fontname','arial', 'fontsize',ffsz, ...
+            'color','k', 'units','normalized')
+        
+        
+    case 'EMF0g'
+        
+        ylim(minmax(t.(fvars{V})') .* [0.999 1.001])
+        set(gca, 'ytick',600:700)
+        
+        ylabel('First guess EMF° / mV')
+        
+        plot(fxint*[1 1],get(gca,'ylim'), ...
+            'color',fclr_guess, 'linestyle','--', 'linewidth',1)
+        
+        plot(fxlim,EMF0g*[1 1], 'color',fclr_guess, 'linewidth',1)
+
+        scatter(1e3*t.Macid(t.Lg),t.(fvars{V})(t.Lg),mksz,fclr_guess, ...
+            'filled', 'markeredgecolor','k')
+        scatter(1e3*t.Macid(~t.Lg),t.(fvars{V})(~t.Lg),mksz,'k')
+
+        text(0,1.1,['(c) First guess EMF° = ' num2str(EMF0g,'%.1f') ...
+            ' mV'], 'fontname','arial', 'fontsize',ffsz, ...
+            'color','k', 'units','normalized')
+        
+        
+    case 'estAT'
+        
+        plot(fxlim,AT*[1 1]*1e6, 'color',fclr_final, 'linewidth',1)
+        
+        scatter(1e3*t.Macid(t.L),t.(fvars{V})(t.L)*1e6,mksz,fclr_final, ...
+            'filled', 'markeredgecolor','k')
+        scatter(1e3*t.Macid(~t.L),t.(fvars{V})(~t.L)*1e6,mksz,'k')
+        
+        ylim(minmax(t.(fvars{V})') .* [0.995 1.005] * 1e6)
+        
+        ylabel(['\itA\rm_T from pH / ' ftxt_mu 'mol\cdotkg^{' ...
+            ftxt_endash '1}'])
+        
+        text(0,1.1,['(d) Final \itA\rm_T = ' num2str(1e6*AT,'%.1f') ...
+            ' ± ' num2str(1e6*AT_RMS,'%.1f') ' ' ftxt_mu ...
+            'mol\cdotkg^{' ftxt_endash '1} (\itn\rm = ' ...
+            num2str(AT_Npts) ')'], ...
+            'fontname','arial', 'fontsize',ffsz, ...
+            'color','k', 'units','normalized')
+        
+
+end %switch
+
+xlabel('Acid mass / g')
+
+set(gca, 'box','on', 'tickdir','out', 'xcolor','k', 'ycolor','k', ...
+    'fontname','arial', 'fontsize',ffsz, 'xtick',0:10, ...
+    'labelfontsizemultiplier',1)
 
 end %if
 end %for V
 
 subplot(3,2,[4 6]); hold on
-        
-    plot(1e3*t.Macid,t.estAT)
 
-    for V = 1:numel(cvars)
+Jmol = Jmol_colours;
 
-        plot(1e3*t.Macid,abs(t.(cvars{V})))
+cvars_names = { ...
+    ['+[HCO_3^' ftxt_endash ']'] ...
+    ['+2[CO_3^{2' ftxt_endash '}]'] ...
+    ['+[B(OH)_4^' ftxt_endash ']'] ...
+    ['+[OH^' ftxt_endash ']'] ...
+    [ftxt_endash '[HSO_4^' ftxt_endash ']'] ... ...
+    [ftxt_endash '[HF]'] ...
+    [ftxt_endash '[H_3PO_4]'] ...
+    ['+[HPO_4^{2' ftxt_endash '}]'] ...
+    ['+2[PO_4^{3' ftxt_endash '}]'] ...
+    ['+[SiO(OH)_3^' ftxt_endash ']'] ...
+    [ftxt_endash '[H^+]']};
+cvars_clrs = { ...
+    0.4*[1 1 1] ...
+    0.4*[1 1 1] ...
+    [0.19 0.31 0.97] ...
+    [1 0.05 0.05] ...
+    [0.95 0.8 0.14] ...
+    [0.12 0.74 0.12] ...
+    [1 0.5 0] ...
+    [1 0.5 0] ...
+    [1 0.5 0] ...
+    [0.94 0.56 0.63] ...
+    [1 0.05 0.05]};
+
+fcvars = [cvars; 'H'];
+
+clr_AT = 'k';
+
+    plot(1e3*t.Macid,t.estAT*1e6, 'color',clr_AT, 'linewidth',1)
+    text(max(1e3*t.Macid)*1.02,t.estAT(end)*1e6,'\itA\rm_T', ...
+        'fontname','arial', 'fontsize',ffsz, 'color',clr_AT)
+
+    for V = 1:numel(fcvars)
+
+        plot(1e3*t.Macid,abs(t.(fcvars{V}))*1e6, ...
+            'color',cvars_clrs{V})
+        text(max(1e3*t.Macid)*1.02,abs(t.(fcvars{V})(end))*1e6, ...
+            cvars_names{V}, 'fontname','arial', 'fontsize',ffsz, ...
+            'color',cvars_clrs{V})
 
     end %for V
 
-    legend(['estAT'; cvars], 'location','eastoutside')
+%     legend(['estAT'; cvars], 'location','eastoutside')
 
-    set(gca, 'yscale','log')
+    set(gca, 'box','on', 'tickdir','out', 'xcolor','k', 'ycolor','k', ...
+        'fontname','arial', 'fontsize',ffsz, 'xtick',0:10, ...
+        'yscale','log', 'labelfontsizemultiplier',1)
 
     xlim(fxlim)
+    ylim([1e-10 1e4])
+    set(gca, 'ytick',10.^(-10:2:4))
+    
+    xlabel('Acid mass / g')
+    ylabel(['Concentration / ' ftxt_mu 'mol\cdotkg^{' ftxt_endash '1}'])
+    
+    text(0,1.04,'(e) \itA\rm_T components', 'fontname','arial', ...
+        'fontsize',ffsz, 'color','k', 'units','normalized')
+    
+annotation('textbox',[0.005 0.9 0.1 0.1], 'string',datfile, ...
+    'fontname','arial', 'fontsize',ffsz*1.1, 'edgecolor','none', ...
+    'fontweight','bold')
+
+print('-r300','figures/calk_ptl','-dpng')
+    
