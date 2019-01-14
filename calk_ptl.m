@@ -40,8 +40,8 @@ t.estAT = (t.simAT + t.Macid*Cacid ./ (t.Macid + Msamp)) ./ t.mu;
 
 % ----------------------------------------------------- Plot the lot! -----
 
-fvars = {'EMF' 'estAT' 'EMF0g' [] 'F1g'};
-flabels = {'EMF / mV' [] 'EMF0 guess / mV' 'estAT' 'F1'};
+fvars = {'EMF' 'estAT' 'F1g' [] 'EMF0g'};
+flabels = {'EMF / mV' [] 'F1' 'estAT' 'EMF0 guess / mV'};
 
 fxlim = minmax(1e3*t.Macid');
 
