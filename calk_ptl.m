@@ -1,33 +1,16 @@
-%% Import data
-
-% Initialise Python
-calk_initpy('//anaconda/envs/spritzer/bin/python') % Mac
-% calk_initpy( ... Windows
-%     'C:\Users\yau17reu\anaconda\Anaconda3\envs\spritzer\pythonw.exe')
-% calk = py.importlib.import_module('calkulate');
-
-% Settings
-datfile = 'datfiles/0-0  0  (0)CRM-144-0435-4.dat';
-Vsamp = 100;
-Cacid = 0.1;
-[CT,AT_cert,S,PT,SiT] = dicksonCRM(144);
-CT      = CT      * 1e-6;
-AT_cert = AT_cert * 1e-6;
-PT      = PT      * 1e-6;
-SiT     = SiT     * 1e-6;
-burette_cx = 1;
-Tk_force = [];
+function calk_ptl(datpath,datfile,Vsamp,Cacid,CT,S,PT,SiT, ...
+    burette_cx,Tk_force,printpath)
 
 % Get initial Gran guesses
 clear t
-[t.Macid,t.EMF,t.Tk,Msamp, t.F1g,t.Lg,t.EMF0g, ATg,EMF0g,t.pHg,t.L] ...
-    = calk_guessGran(datfile,Vsamp,Cacid,S);
+[t.Macid,t.EMF,t.Tk,Msamp, t.F1g,t.Lg,t.EMF0g, ~,EMF0g,t.pHg,t.L] ...
+    = calk_guessGran([datpath datfile],Vsamp,Cacid,S);
 t = struct2table(t);
 
 t.mu = Msamp ./ (Msamp + t.Macid);
 
 % Solve for TA fully
-[AT,EMF0,AT_RMS,AT_Npts] = calk_VINDTA(datfile,Vsamp,Cacid, ...
+[AT,EMF0,AT_RMS,AT_Npts] = calk_VINDTA([datpath datfile],Vsamp,Cacid, ...
     S,CT,PT,SiT,burette_cx,Tk_force);
 
 [t.H,t.pH] = calk_EMF2H(t.EMF,EMF0,t.Tk);
@@ -41,7 +24,6 @@ t.estAT = (t.simAT + t.Macid*Cacid ./ (t.Macid + Msamp)) ./ t.mu;
 % ----------------------------------------------------- Plot the lot! -----
 
 fvars = {'EMF' 'estAT' 'F1g' [] 'EMF0g'};
-flabels = {'EMF / mV' [] 'F1' 'estAT' 'EMF0 guess / mV'};
 
 fclr_guess = [0.96 0.86 0.04];
 fclr_final = [0.21 0.46 1];
@@ -102,7 +84,7 @@ switch fvars{V}
         
         legend('First guess','Final result','Both', 'location','nw')
         
-        text(0,1.1,['(a) Final EMF° = ' num2str(EMF0,'%.1f') ...
+        text(0,1.1,['(a) Final EMF° = ' num2str(EMF0,'%.2f') ...
             ' mV'], 'fontname','arial', ...
             'fontsize',ffsz, 'color','k', 'units','normalized')
 
@@ -111,7 +93,7 @@ switch fvars{V}
         ylim([0 max(1e-6*t.(fvars{V}))*1.1])
         set(gca, 'ytick',0:4:50)
 
-        ylabel('\itF\rm_1')
+        ylabel(['\itF\rm_1 \times 10^{' ftxt_endash '6}'])
         
         plot(fxint*[1 1],get(gca,'ylim'), ...
             'color',fclr_guess, 'linestyle','--', 'linewidth',1)
@@ -185,8 +167,6 @@ end %for V
 
 subplot(3,2,[4 6]); hold on
 
-Jmol = Jmol_colours;
-
 cvars_names = { ...
     ['+[HCO_3^' ftxt_endash ']'] ...
     ['+2[CO_3^{2' ftxt_endash '}]'] ...
@@ -216,14 +196,15 @@ fcvars = [cvars; 'H'];
 
 clr_AT = 'k';
 
-    plot(1e3*t.Macid,t.estAT*1e6, 'color',clr_AT, 'linewidth',1)
+    plot(1e3*t.Macid,t.estAT*1e6, 'color',clr_AT, 'linewidth',1, ...
+        'marker','o', 'markersize',2)
     text(max(1e3*t.Macid)*1.02,t.estAT(end)*1e6,'\itA\rm_T', ...
         'fontname','arial', 'fontsize',ffsz, 'color',clr_AT)
 
     for V = 1:numel(fcvars)
 
         plot(1e3*t.Macid,abs(t.(fcvars{V}))*1e6, ...
-            'color',cvars_clrs{V})
+            'color',cvars_clrs{V}, 'marker','o', 'markersize',2)
         text(max(1e3*t.Macid)*1.02,abs(t.(fcvars{V})(end))*1e6, ...
             cvars_names{V}, 'fontname','arial', 'fontsize',ffsz, ...
             'color',cvars_clrs{V})
@@ -241,14 +222,19 @@ clr_AT = 'k';
     set(gca, 'ytick',10.^(-10:2:4))
     
     xlabel('Acid mass / g')
-    ylabel(['Concentration / ' ftxt_mu 'mol\cdotkg^{' ftxt_endash '1}'])
+    ylabel(['Concentration from pH / ' ftxt_mu ...
+        'mol\cdotkg^{' ftxt_endash '1}'])
     
     text(0,1.04,'(e) \itA\rm_T components', 'fontname','arial', ...
         'fontsize',ffsz, 'color','k', 'units','normalized')
     
-annotation('textbox',[0.005 0.9 0.1 0.1], 'string',datfile, ...
+annotation('textbox',[0.25 0.9 0.5 0.1], 'string',datfile, ...
     'fontname','arial', 'fontsize',ffsz*1.1, 'edgecolor','none', ...
-    'fontweight','bold')
+    'fontweight','bold', 'horizontalalignment','center')
 
-print('-r300','figures/calk_ptl','-dpng')
+datnodat = datfile(1:end-4);
+if ~isempty(printpath)
+    print('-r300',[printpath 'calk_ptl_' datnodat],'-dpng')
+end %if
     
+end %function calk_ptl
