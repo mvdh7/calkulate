@@ -34,9 +34,16 @@ Cacid = 0.1
 
 #test1 = calk.sim.H(Macid,Msamp,Cacid,XT,KX)
 
-test2 = calk.VINDTA.simH(Macid,Tk,Msamp,Cacid,S,AT_cert,CT,PT,SiT)
+#test2 = calk.VINDTA.simH(Macid,Tk,Msamp,Cacid,S,AT_cert,CT,PT,SiT)
 
-#test = calk.VINDTA.MPH(datfile,Vsamp,Cacid,S,CT,PT,SiT,1,None)
+
+test = calk.VINDTA.MPH(datfile,Vsamp,Cacid,S,CT,PT,SiT)['x']
+
+H = calk.solve.EMF2H(EMF,test[1],Tk)
+
+simAT = calk.VINDTA.simAT(Macid,Tk,H,Msamp,S,CT,PT,SiT)[0]
+
+
 
 ##%% Solve for acid molarity
 #Cacid = calk.solve.Gran_CRM(Macid,EMF,Tk,Msamp,AT_cert,XT,KX)
