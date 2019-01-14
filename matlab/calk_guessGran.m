@@ -3,7 +3,7 @@ function [Macid,EMF,Tk,Msamp, F1g,Lg,EMF0gvec, ATg,EMF0g,pHg,L] ...
 
 guessGran = cell(py.calkulate.VINDTA.guessGran(datfile,Vsamp,Cacid,S));
 
-Macid    =  double(py.array.array('d',guessGran{ 1}))' * 1e3;
+Macid    =  double(py.array.array('d',guessGran{ 1}))';
 EMF      =  double(py.array.array('d',guessGran{ 2}))';
 Tk       =  double(py.array.array('d',guessGran{ 3}))';
 Msamp    =                            guessGran{ 4}   ;
