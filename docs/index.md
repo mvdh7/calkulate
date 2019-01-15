@@ -1,112 +1,79 @@
-# Introduction
+# Installation
 
-# Software set-up
+## Python
 
-## Installation
+[Download and install Anaconda](https://www.anaconda.com/download/). Choose the Python 3.X version (although the 2.X should work too, if you already have it). Open the Anaconda Prompt (Windows) or Terminal (Mac/Linux).
 
-Installation instructions for Python (steps 1 to 6) and MATLAB (1 to end):
-
-  1. [Download and install Anaconda](https://www.anaconda.com/download/). Choose the Python 3.X version (although the 2.X should work too, if you already have it)
-
-  2. Open the Anaconda Prompt (Windows) or Terminal (Mac/Linux)
-
-  3. Update conda and Anaconda:
+Update conda and Anaconda:
 
 ```
 conda update conda
 conda update anaconda
 ```
 
-  4. Create a new Python 3.6 environment by entering the following:
+Next, create a new Python 3.6 environment by entering the following:
 
 ```
 conda create -n calkenv python=3.6 numpy scipy
 ```
 
-  5. Activate the new environment
+Activate the new environment:
 
-  Mac/Linux:
+*Mac/Linux:*
 
 ```
 source activate calkenv
 ```
 
-  Windows:
+*Windows:*
 
 ```
 activate calkenv
 ```
 
-  You should now see the environment's name (i.e. `calkenv`) appear in brackets at the start of each line in the Anaconda Prompt/Terminal
-
-  6. Install the Calkulate package into the environment using pip:
+You should now see the environment's name (i.e. `calkenv`) appear in brackets at the start of each line in the Anaconda Prompt/Terminal. Install the Calkulate package into the environment using pip:
 
 ```
 pip install calkulate
 ```
 
-  7. You should now be able to use Calkulate in this Python environment. If you wish to also use Calkulate in MATLAB, continue to step 7 onwards
+You should now be able to use Calkulate in this Python environment.
 
-  8. Still within the Anaconda Prompt/Terminal (making sure that the calkenv environment is active), run Python:
+## MATLAB
+
+If you wish to also use Calkulate in MATLAB, then after completing the steps above, and still within the Anaconda Prompt/Terminal (with the `calkenv` environment active), run Python:
 
 ```
 python
 ```
 
-  9. Find the location of this environment's Python executable by entering the following 2 lines:
+Find the location of this environment's Python executable by entering the following 2 lines:
 
 ```python
 from sys import executable
 print(executable)
 ```
 
-  10. Copy the string that appears. It should look something like (on Windows):
+Copy the string that appears. It should look something like (on Windows):
 
 ```
 C:\Users\username\anaconda\Anaconda3\envs\calkenv\python.exe
 ```
 
-  This string is the value for the `python_exe` variable that goes into the MATLAB function `calk_initpy()`
-
-  11. Exit python
+This string is the value for the `python_exe` variable that goes into the MATLAB function `calk_initpy()`. Exit python:
 
 ```python
 exit()
 ```
 
-  12. [Download the MATLAB function wrappers](https://github.com/mvdh7/calkulate/tree/master/matlab). These are a set a functions that make it easier for you to use some parts of Calkulate within MATLAB, although they are just for convenience -- it's possible to use the entire program without them.
+[Download the MATLAB function wrappers](https://github.com/mvdh7/calkulate/tree/master/matlab). These are a set a functions that make it easier for you to use some parts of Calkulate within MATLAB, although they are just for convenience -- it's possible to use the entire program without them. Move the downloaded folder to a sensible location, and add it (plus all subfolders) to your MATLAB search path.
 
-  13. Move the downloaded folder to a sensible location, and add it (plus all subfolders) to your MATLAB search path
+Before you can execute the MATLAB functions you must first run the `calk_initpy()` function at least once (per MATLAB session), with the input `python_exe` string that you found using `sys.executable`.
 
-  14. Before you can execute the MATLAB functions you must first run the `calk_initpy()` function at least once (per MATLAB session), with the input `calk_initpy()` string obtained in step 9
 
-## Updates
+# Testing
 
-### Python
-
-Update instructions for Python:
-
-  1. Open the Anaconda Prompt
-
-  2. Activate the calkenv environment (installation instructions, step 4)
-
-  3. Upgrade the Calkulate package using pip:
-
-```
-pip install calkulate --upgrade --no-cache-dir
-```
-
-### MATLAB
-
-Update instructions for MATLAB:
-
-  1. Delete your original Calkulate scripts
-
-  2. Replace them in full with the new versions
-
-## Testing
-
-### MATLAB
+## MATLAB
 
 First, check that MATLAB and Python are talking to each other properly by entering the following into the MATLAB Command Window (with `python_exe` set to the value of the string you identified using `sys.executable` during the installation process):
 
@@ -139,6 +106,32 @@ Finally, test out the MATLAB functions as follows:
 ```
 
 This should import the simulated titration data from Table 1 of Dickson (1981). A plot of the Free scale pH (`pH`) against the acid mass (`Macid`) should appear as follows.
+
+
+# Updates
+
+## Python
+
+Update instructions for Python:
+
+  123. Open the Anaconda Prompt
+
+  123. Activate the calkenv environment (installation instructions, step 4)
+
+  123. Upgrade the Calkulate package using pip:
+
+```
+pip install calkulate --upgrade --no-cache-dir
+```
+
+## MATLAB
+
+Update instructions for MATLAB:
+
+  123. Delete your original Calkulate scripts
+
+  123. Replace them in full with the new versions
+
 
 # References
 
