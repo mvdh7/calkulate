@@ -55,8 +55,8 @@ print(executable)
 
   9. Copy the string that appears. It should look something like:
 
-```python
-C:/Users/username/anaconda/Anaconda3/envs/calkenv/python.exe
+```
+C:\Users\username\anaconda\Anaconda3\envs\calkenv\python.exe
 ```
 
   This string is the value for the `python_exe` variable that goes into the MATLAB function `calk_initpy()`
