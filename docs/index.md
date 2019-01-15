@@ -67,11 +67,11 @@ C:\Users\username\anaconda\Anaconda3\envs\calkenv\python.exe
 exit()
 ```
 
-  11. Download the MATLAB function wrappers (LINK). These are a set a functions that make it easier for you to use some parts of Calkulate within MATLAB, although they are just for convenience -- it's possible to use the entire program without them.
+  11. [Download the MATLAB function wrappers](https://github.com/mvdh7/calkulate/tree/master/matlab). These are a set a functions that make it easier for you to use some parts of Calkulate within MATLAB, although they are just for convenience -- it's possible to use the entire program without them.
 
   12. Move the downloaded folder to a sensible location, and add it (plus all subfolders) to your MATLAB search path
 
-  13. Before you can execute the MATLAB functions you must first run the `callk_initpy()` function at least once (per MATLAB session), with the input `callk_initpy()` string obtained in step 9
+  13. Before you can execute the MATLAB functions you must first run the `calk_initpy()` function at least once (per MATLAB session), with the input `calk_initpy()` string obtained in step 9
 
 ## Updates
 
