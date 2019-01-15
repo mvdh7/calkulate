@@ -74,15 +74,15 @@ switch fvars{V}
         
         scatter(1e3*t.Macid(VLg),t.(fvars{V})(VLg),mksz,fclr_guess, ...
             'filled', 'markeredgecolor','k')
-        scatter(1e3*t.Macid(VL) ,t.(fvars{V})(VL) ,mksz,fclr_final, ...
-            'filled', 'markeredgecolor','k')
         scatter(1e3*t.Macid(VLb),t.(fvars{V})(VLb),mksz,fclr_both, ...
+            'filled', 'markeredgecolor','k')
+        scatter(1e3*t.Macid(VL) ,t.(fvars{V})(VL) ,mksz,fclr_final, ...
             'filled', 'markeredgecolor','k')
         scatter(1e3*t.Macid(VLn),t.(fvars{V})(VLn),mksz,'k')
         
         ylabel('EMF / mV')
         
-        legend('First guess','Final result','Both', 'location','nw')
+        legend('First guess','Both','Final result', 'location','nw')
         
         text(0,1.1,['(a) Final EMF° = ' num2str(EMF0,'%.2f') ...
             ' mV'], 'fontname','arial', ...
@@ -198,7 +198,6 @@ clr_AT = 'k';
 
     xlim(fxlim)
     ylim([1e-16 1e-2])
-    set(gca, 'ytick',10.^(-16:2:4))
     
     fpxL = t.pHg >=3 & t.pHg <= 4;
     fpx = [min(t.Macid(fpxL)) max(t.Macid(fpxL))]*1e3;
@@ -221,20 +220,25 @@ clr_AT = 'k';
 
     end %for V
 
-%     legend(['estAT'; cvars], 'location','eastoutside')
-
     set(gca, 'box','on', 'tickdir','out', 'xcolor','k', 'ycolor','k', ...
         'fontname','arial', 'fontsize',ffsz, 'xtick',0:10, ...
-        'yscale','log', 'labelfontsizemultiplier',1)
+        'yscale','log', 'labelfontsizemultiplier',1, 'ytick',10.^(-16:4))
+    set(gca, 'yticklabel',num2str(-log10(get(gca,'ytick'))','%.0f'))
     
     xlabel('Acid mass / g')
-    ylabel(['Concentration from pH / mol\cdotkg^{' ftxt_endash '1}'])
+    ylabel([ftxt_endash ...
+        'log_{10} (Concentration from pH / mol\cdotkg^{' ...
+        ftxt_endash '1})'])
     
     text(0,1.04,'(e) \itA\rm_T components', 'fontname','arial', ...
         'fontsize',ffsz, 'color','k', 'units','normalized')
 
     
 annotation('textbox',[0.25 0.9 0.5 0.1], 'string',datfile, ...
+    'fontname','arial', 'fontsize',ffsz*1.1, 'edgecolor','none', ...
+    'fontweight','bold', 'horizontalalignment','center')
+
+annotation('textbox',[0.25 0 0.5 0.04], 'string',datfile, ...
     'fontname','arial', 'fontsize',ffsz*1.1, 'edgecolor','none', ...
     'fontweight','bold', 'horizontalalignment','center')
 
