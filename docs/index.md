@@ -53,7 +53,7 @@ from sys import executable
 print(executable)
 ```
 
-  9. Copy the string that appears. It should look something like:
+  9. Copy the string that appears. It should look something like (on Windows):
 
 ```
 C:\Users\username\anaconda\Anaconda3\envs\calkenv\python.exe
