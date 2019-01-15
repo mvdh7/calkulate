@@ -1,7 +1,7 @@
 % Initialise Python
-calk_initpy('//anaconda/envs/spritzer/bin/python') % Mac
-% calk_initpy( ... Windows
-%     'C:\Users\yau17reu\anaconda\Anaconda3\envs\spritzer\pythonw.exe')
+% calk_initpy('//anaconda/envs/spritzer/bin/python') % Mac
+calk_initpy( ... Windows
+    'C:\Users\yau17reu\anaconda\Anaconda3\envs\spritzer\pythonw.exe')
 
 % Settings
 datpath = 'datfiles/';
