@@ -1,7 +1,8 @@
 import calkulate as calk
 
 # Do a real VINDTA .dat file
-datfile = 'datfiles/0-0  0  (0)CRM-144-0435-4.dat'
+#datfile = 'datfiles/0-0  0  (0)CRM-144-0435-4.dat'
+datfile = 'datfiles/calk_simtit.dat'
 Vacid,EMF,Tk = calk.gettit.VINDTA(datfile)
 
 Dacid = calk.dens.acid(Tk[0]) # kg/l
