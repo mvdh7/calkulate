@@ -11,10 +11,10 @@ conda update conda
 conda update anaconda
 ```
 
-Next, create a new Python 3.6 environment by entering the following:
+[Download the spec-file.txt](https://github.com/mvdh7/calkulate/blob/master/spec-file.txt) and navigate to its parent folder using `cd`. Then, create a new Python environment with the following:
 
 ```
-conda create -n calkenv python=3.6 numpy scipy
+conda create -n calkenv --file spec-file.txt
 ```
 
 Activate the new environment:
