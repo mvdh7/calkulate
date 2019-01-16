@@ -1,3 +1,13 @@
-site_name: calkulate
+site_name  : calkulate
 site_author: Matthew P. Humphreys
-repo_url: https://github.com/mvdh7/calkulate.git
+
+site_url: https://calkulate.readthedocs.io/en/latest/
+repo_url: https://github.com/mvdh7/calkulate
+
+lang : en
+#theme: readthedocs
+
+nav:
+    - Setup :  index.md
+    - Python: python.md
+    - MATLAB: matlab.md
