@@ -8,6 +8,6 @@ lang : en
 #theme: readthedocs
 
 nav:
-    - Setup :  index.md
-    - Python: python.md
-    - MATLAB: matlab.md
+- Setup :  index.md
+- Python: python.md
+- MATLAB: matlab.md
