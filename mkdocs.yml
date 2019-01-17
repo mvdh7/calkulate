@@ -5,7 +5,7 @@ site_url: https://calkulate.readthedocs.io/en/latest/
 repo_url: https://github.com/mvdh7/calkulate
 
 lang : en
-#theme: readthedocs
+theme: readthedocs
 
 nav:
 - Setup :  index.md
