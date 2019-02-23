@@ -5,7 +5,8 @@ calk_initpy( ... Windows
 
 % Input settings
 datpath = 'datfiles/';
-datfile = '0-0  0  (0)CRM-144-0435-4.dat';
+% datfile = '0-0  0  (0)CRM-144-0435-4.dat';
+datfile = 'Ruth/9999_20190205_7_0_0_2.dat';
 Vsamp = 100.0123; % ml
 [CT,AT_cert,S,PT,SiT] = dicksonCRM(144);
 CT      = CT      * 1e-6;
@@ -25,4 +26,4 @@ Cacid = calk_VINDTA_CRM([datpath datfile],Vsamp,AT_cert,S,CT,PT,SiT, ...
 
 % Plot the figure!
 t = calk_ptl(datpath,datfile,Vsamp,Cacid,CT,S,PT,SiT, ...
-    burette_cx,Tk_force,printpath);
+    burette_cx,Tk_force,[]);
