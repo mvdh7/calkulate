@@ -1,4 +1,4 @@
-from . import calib, conc, dens, dissoc, gettit, sim, solve
+from . import calib, conc, dens, dissoc, io, sim, solve
 from numpy import logical_and
 from numpy import max as np_max
 
@@ -20,7 +20,7 @@ from numpy import max as np_max
 
 def prep(datfile, Vsamp, S, CT, PT, SiT, burette_cx=1, Tk_force=None):
 
-    Vacid, EMF, Tk = gettit.VINDTA(datfile)
+    Vacid, EMF, Tk = io.VINDTA(datfile)
 
     if Tk_force is not None:
         Tk[:] = Tk_force

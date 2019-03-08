@@ -1,4 +1,4 @@
-__all__ = ['calib', 'conc', 'const', 'dens', 'dissoc', 'gettit', 'sim', 
+__all__ = ['calib', 'conc', 'const', 'dens', 'dissoc', 'io', 'sim',
            'solve', 'VINDTA']
 
-from . import calib, conc, const, dens, dissoc, gettit, sim, solve, VINDTA
+from . import calib, conc, const, dens, dissoc, io, sim, solve, VINDTA
