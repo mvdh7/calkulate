@@ -1,108 +1,60 @@
-# Density
+# Fluid densities
 
-Functions to estimate the densities of various fluids.
+Contains functions of temperature and salinity that estimate the densities of [1] seawater and [2] mixtures of hydrochloric acid (HCl) and sodium chloride (NaCl).
 
 
+<hr />
 
-## calkulate.dens.sw
+## .sw - seawater at 1 atm
 
-### Description
+Calculates the density of seawater as a function of its temperature `Tk` in K and practical salinity `S`, at a pressure of 1 atm, following Millero and Poisson (1981).
 
-Calculates the density of seawater as a function of its temperature and practical salinity, at a pressure of 1 atm, following Millero and Poisson (1981).
-
-### Syntax
+**Syntax:**
 
 ```python
-dens_sw = calk.dens.sw(Tk,S)
+rho_sw = calk.density.sw(Tk, S)
 ```
 
-### Inputs
+**Inputs:**
 
-<table><tr>
+  * `Tk`: seawater temperature in K;
+  * `S`: practical salinity.
 
-<td><strong>Variable</strong></td>
-<td><strong>Description</strong></td>
-<td><strong>Unit</strong></td>
+**Output:**
 
-</tr><tr>
-
-<td><code>Tk</code></td>
-<td>Seawater temperature</td>
-<td>K</td>
-
-</tr><tr>
-
-<td><code>S</code></td>
-<td>Practical salinity</td>
-<td>none</td>
-
-</tr></table>
-
-### Output
-
-<table><tr>
-
-<td><strong>Variable</strong></td>
-<td><strong>Description</strong></td>
-<td><strong>Unit</strong></td>
-
-</tr><tr>
-
-<td><code>dens_sw</code></td>
-<td>Seawater density at atmospheric pressure</td>
-<td>kg·ℓ<sup>−1</sup></td>
-
-</tr></table>
+  * `rho_sw`: seawater density in kg·dm<sup>−3</sup>.
 
 
+<hr />
 
-## calkulate.dens.acid
-
-### Description
+## .acid - 0.1 M HCl in 0.7 M NaCl
 
 Calculates the density of a mixed solution of HCl and NaCl as a function of its temperature, at a pressure of 1 atm.
 
-Uses a second-order polynomial fit through a series of temperature-density pairs, from 288.15 to 308.15 K, calculated using [E-AIM](http://www.aim.env.uea.ac.uk/aim/density/density_electrolyte.php) (Clegg and Wexler, 2011a, 2011b) with option 'rho, at the total solute mass fraction' and the concentrations: [H<sup>+</sup>] = 0.1 mol·ℓ<sup>−1</sup>; [Na<sup>+</sup>] = 0.6 mol·ℓ<sup>−1</sup>; [Cl<sup>−</sup>] = 0.7 mol·ℓ<sup>−1</sup>. This represents a 0.1 mol·ℓ<sup>−1</sup> HCl titrant mixed with NaCl, with total ionic strength equal to that of typical open ocean seawater (Dickson et al., 2003).
+The function uses a second-order polynomial fit through a series of temperature-density pairs, from 288.15 to 308.15 K, calculated using [E-AIM](http://www.aim.env.uea.ac.uk/aim/density/density_electrolyte.php) (Clegg and Wexler, 2011a, 2011b) with option 'rho, at the total solute mass fraction' and the concentrations:
 
-### Syntax
+  * [H<sup>+</sup>] = 0.1 mol·dm<sup>−3</sup>;
+  * [Na<sup>+</sup>] = 0.6 mol·dm<sup>−3</sup>;
+  * [Cl<sup>−</sup>] = 0.7 mol·dm<sup>−3</sup>.
+
+This represents a 0.1 mol·dm<sup>−3</sup> HCl titrant mixed with NaCl, with total ionic strength equal to that of typical open ocean seawater (Dickson et al., 2003).
+
+**Syntax:**
 
 ```python
-dens_acid = calk.dens.acid(Tk)
+rho_acid = calk.density.acid(Tk)
 ```
 
-### Input
+**Input:**
 
-<table><tr>
+  * `Tk`: acid temperature in K.
 
-<td><strong>Variable</strong></td>
-<td><strong>Description</strong></td>
-<td><strong>Unit</strong></td>
+**Output:**
 
-</tr><tr>
-
-<td><code>Tk</code></td>
-<td>Acid temperature</td>
-<td>K</td>
-
-</tr></table>
-
-### Output
-
-<table><tr>
-
-<td><strong>Variable</strong></td>
-<td><strong>Description</strong></td>
-<td><strong>Unit</strong></td>
-
-</tr><tr>
-
-<td><code>dens_acid</code></td>
-<td>Acid density</td>
-<td>kg·ℓ<sup>−1</sup></td>
-
-</tr></table>
+  * `rho_acid`: acid density in kg·dm<sup>−3</sup>.
 
 
+<hr />
 
 # References
 

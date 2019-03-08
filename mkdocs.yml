@@ -13,5 +13,5 @@ nav:
   - Overview: index.md
   - Quick-start guide: quick-start.md
   - Calkulate modules:
-      - .density: modules/density.md
+      - .density - seawater and acid densities: modules/density.md
   - MATLAB: matlab.md
