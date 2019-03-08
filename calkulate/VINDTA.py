@@ -18,104 +18,108 @@ from numpy import max as np_max
 # ================================================== PREPARATORY FUNCTION =====
 
 
-def prep(datfile,Vsamp,S,CT,PT,SiT, burette_cx=1, Tk_force=None):
-    
+def prep(datfile, Vsamp, S, CT, PT, SiT, burette_cx=1, Tk_force=None):
+
     Vacid, EMF, Tk = gettit.VINDTA(datfile)
 
     if Tk_force is not None:
         Tk[:] = Tk_force
 
-    Msamp =              Vsamp * dens.sw(Tk[0],S) * 1e-3 # sample mass / kg    
-    Macid = burette_cx * Vacid * dens.acid(Tk)    * 1e-3 # acid mass   / kg
-    
-    XT = conc.XT(S,CT,PT,SiT)          # total concentrations  / mol/kg-sw
-    KX = dissoc.KX_F(Tk,S,XT[3],XT[4]) # dissociation constants
-    
+    Msamp = Vsamp * dens.sw(Tk[0], S) * 1e-3 # sample mass / kg
+    Macid = burette_cx * Vacid * dens.acid(Tk) * 1e-3 # acid mass / kg
+
+    XT = conc.XT(S, CT, PT, SiT) # total concentrations  / mol/kg-sw
+    KX = dissoc.KX_F(Tk, S, XT[3], XT[4]) # dissociation constants
+
     return Macid, EMF, Tk, Msamp, XT, KX
 
 
 # =================================================== HALF-GRAN FUNCTIONS =====
 
 
-def halfGran(datfile,Vsamp,Cacid,S,CT,PT, burette_cx=1, Tk_force=None):
-    
-    Macid,EMF,Tk,Msamp,XT,KX = prep(datfile,Vsamp,S,CT,PT,0,
-                                    burette_cx,Tk_force)
-    
-    return solve.halfGran(Macid,EMF,Tk,Msamp,Cacid,*XT,*KX)
+def halfGran(datfile, Vsamp, Cacid, S, CT, PT, burette_cx=1, Tk_force=None):
+
+    Macid, EMF, Tk, Msamp, XT, KX = \
+        prep(datfile, Vsamp, S, CT, PT, 0, burette_cx, Tk_force)
+
+    return solve.halfGran(Macid, EMF, Tk, Msamp, Cacid, *XT, *KX)
 
 
-def halfGran_CRM(datfile,Vsamp,AT_cert,S,CT,PT, burette_cx=1, Tk_force=None):
-    
-    Macid,EMF,Tk,Msamp,XT,KX = prep(datfile,Vsamp,S,CT,PT,0,
-                                    burette_cx,Tk_force)
-    
-    Cacid = calib.halfGran(Macid,EMF,Tk,Msamp,AT_cert,XT,KX)['x'][0]
-    
-    AT,EMF0,_,_,_,_ = solve.halfGran(Macid,EMF,Tk,Msamp,Cacid,*XT,*KX)
-    
+def halfGran_CRM(datfile, Vsamp, AT_cert, S, CT, PT, burette_cx=1,
+    Tk_force=None):
+
+    Macid, EMF, Tk, Msamp, XT, KX = \
+        prep(datfile, Vsamp, S, CT, PT, 0, burette_cx, Tk_force)
+
+    Cacid = calib.halfGran(Macid, EMF, Tk, Msamp, AT_cert, XT, KX)['x'][0]
+
+    AT, EMF0, _, _, _, _ = solve.halfGran(Macid, EMF, Tk, Msamp, Cacid,
+        *XT, *KX)
+
     return Cacid, AT, EMF0
 
 
 # ================================================ PLOT THE LOT FUNCTIONS =====
 
 
-def guessGran(datfile,Vsamp,Cacid,S, burette_cx=1, Tk_force=None):
-    
-    Macid,EMF,Tk,Msamp,_,_ = prep(datfile,Vsamp,S,0,0,0,burette_cx,Tk_force)
+def guessGran(datfile, Vsamp, Cacid, S, burette_cx=1, Tk_force=None):
+
+    Macid, EMF, Tk, Msamp, _, _ = \
+        prep(datfile, Vsamp, S, 0, 0, 0, burette_cx, Tk_force)
 
     # Evaluate F1 function and corresponding logical
-    F1g = solve.F1(Macid,EMF,Tk,Msamp)
+    F1g = solve.F1(Macid, EMF, Tk, Msamp)
 
-    Lg = logical_and(F1g > 0.1*np_max(F1g), F1g < 0.9*np_max(F1g))
+    Lg = logical_and(F1g > 0.1 * np_max(F1g), F1g < 0.9 * np_max(F1g))
 
     # Get first guesses
-    ATg,EMF0g,_,pHg = solve.guessGran(Macid,EMF,Tk,Msamp,Cacid)
-    EMF0gvec = solve.Gran_EMF0(Macid,EMF,Tk,Msamp,Cacid,ATg)
-    
+    ATg, EMF0g, _, pHg = solve.guessGran(Macid, EMF, Tk, Msamp, Cacid)
+    EMF0gvec = solve.Gran_EMF0(Macid, EMF, Tk, Msamp, Cacid, ATg)
+
     # Select data for fitting
     L = logical_and(pHg > 3, pHg < 4)
-    
-    return Macid,EMF,Tk,Msamp, F1g,Lg,EMF0gvec, ATg,EMF0g,pHg,L
+
+    return Macid, EMF, Tk, Msamp,  F1g, Lg, EMF0gvec, ATg, EMF0g, pHg, L
 
 
-def simH(Macid,Tk,Msamp,Cacid,S,AT,CT=0,PT=0,SiT=0):
-    
-    XT = conc.XT(S,CT,PT,SiT)          # total concentrations  / mol/kg-sw
+def simH(Macid, Tk, Msamp, Cacid, S, AT, CT=0, PT=0, SiT=0):
+
+    XT = conc.XT(S, CT, PT, SiT) # total concentrations  / mol/kg-sw
     XT[0] = AT
-    KX = dissoc.KX_F(Tk,S,XT[3],XT[4]) # dissociation constants
-    
-    return sim.H(Macid,Msamp,Cacid,XT,KX)
+    KX = dissoc.KX_F(Tk, S, XT[3], XT[4]) # dissociation constants
+
+    return sim.H(Macid, Msamp, Cacid, XT, KX)
 
 
 def simAT(Macid,Tk,H,Msamp,S,CT=0,PT=0,SiT=0):
-    
+
     mu = Msamp / (Msamp + Macid)
-    
-    XT = conc.XT(S,CT,PT,SiT)          # total concentrations  / mol/kg-sw
-    KX = dissoc.KX_F(Tk,S,XT[3],XT[4]) # dissociation constants
-    
-    return sim.AT(H,mu,*XT,*KX)
+
+    XT = conc.XT(S, CT, PT, SiT) # total concentrations  / mol/kg-sw
+    KX = dissoc.KX_F(Tk, S, XT[3], XT[4]) # dissociation constants
+
+    return sim.AT(H, mu, *XT, *KX)
 
 
 # ========================================================= MPH FUNCTIONS =====
 
 
-def MPH(datfile,Vsamp,Cacid,S,CT,PT,SiT, burette_cx=1, Tk_force=None):
-    
-    Macid,EMF,Tk,Msamp,XT,KX = prep(datfile,Vsamp,S,CT,PT,SiT,
-                                    burette_cx,Tk_force)
-        
-    return solve.MPH(Macid,EMF,Tk,Msamp,Cacid,*XT,KX)
+def MPH(datfile, Vsamp, Cacid, S, CT, PT, SiT, burette_cx=1, Tk_force=None):
+
+    Macid, EMF, Tk, Msamp, XT, KX = \
+        prep(datfile, Vsamp,S, CT, PT, SiT, burette_cx, Tk_force)
+
+    return solve.MPH(Macid, EMF, Tk, Msamp, Cacid,*XT, KX)
 
 
-def MPH_CRM(datfile,Vsamp,AT_cert,S,CT,PT,SiT, burette_cx=1, Tk_force=None):
-    
-    Macid,EMF,Tk,Msamp,XT,KX = prep(datfile,Vsamp,S,CT,PT,SiT,
-                                    burette_cx,Tk_force)
-    
-    Cacid = calib.MPH(Macid,EMF,Tk,Msamp,AT_cert,XT,KX)['x'][0]
-    
-    AT,EMF0 = solve.MPH(Macid,EMF,Tk,Msamp,Cacid,*XT,KX)['x']
-    
+def MPH_CRM(datfile, Vsamp, AT_cert, S, CT, PT, SiT,
+    burette_cx=1, Tk_force=None):
+
+    Macid, EMF, Tk, Msamp, XT, KX = \
+        prep(datfile, Vsamp,S, CT, PT, SiT, burette_cx, Tk_force)
+
+    Cacid = calib.MPH(Macid, EMF, Tk, Msamp, AT_cert, XT, KX)['x'][0]
+
+    AT, EMF0 = solve.MPH(Macid, EMF, Tk, Msamp, Cacid, *XT, KX)['x']
+
     return Cacid, AT, EMF0

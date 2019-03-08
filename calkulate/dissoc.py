@@ -5,20 +5,20 @@ from numpy import exp, log
 
 # --- DSC07 best practice, Free scale -----------------------------------------
 
-def KX_F(Tk,S,ST,FT):
-    
+def KX_F(Tk, S, ST, FT):
+
     # Evaluate dissociation coefficients
-    KC1_T,KC2_T       = KC_T_LDK00  (Tk,S) # Total
-    KB_T              = KB_T_D90a   (Tk,S) # Total
-    KH2O_T            = KH2O_T_DSC07(Tk,S) # Total
-    KHSO4_F           = KHSO4_F_D90b(Tk,S) # Free
-    KHF_T             = KHF_T_PF87  (Tk,S) # Total
-    KP1_T,KP2_T,KP3_T = KP_T_DSC07  (Tk,S) # Total
-    KSi_T             = KSi_T_M95   (Tk,S) # Total
-    
+    KC1_T,KC2_T       = KC_T_LDK00  (Tk, S) # Total
+    KB_T              = KB_T_D90a   (Tk, S) # Total
+    KH2O_T            = KH2O_T_DSC07(Tk, S) # Total
+    KHSO4_F           = KHSO4_F_D90b(Tk, S) # Free
+    KHF_T             = KHF_T_PF87  (Tk, S) # Total
+    KP1_T,KP2_T,KP3_T = KP_T_DSC07  (Tk, S) # Total
+    KSi_T             = KSi_T_M95   (Tk, S) # Total
+
     # Get pH scale conversion factors
-    T2F = 1 / (1 + ST/KHSO4_F)
-    
+    T2F = 1 / (1 + ST / KHSO4_F)
+
     # Convert everything to Free pH scale
     KC1_F  = KC1_T  * T2F
     KC2_F  = KC2_T  * T2F
@@ -29,8 +29,8 @@ def KX_F(Tk,S,ST,FT):
     KP2_F  = KP2_T  * T2F
     KP3_F  = KP3_T  * T2F
     KSi_F  = KSi_T  * T2F
-    
-    return [KC1_F,KC2_F, KB_F, KH2O_F, KHSO4_F, KHF_F, KP1_F,KP2_F,KP3_F,
+
+    return [KC1_F, KC2_F, KB_F, KH2O_F, KHSO4_F, KHF_F, KP1_F, KP2_F, KP3_F,
             KSi_F]
 
 
@@ -52,7 +52,7 @@ def Istr(S):
 #  2 < T < 35 degC
 # 19 < S < 43
 
-def KC_T_LDK00(Tk,S):
+def KC_T_LDK00(Tk, S):
 
     # LDK00 Eq. (16)
     pK_T_C1 = 3633.86      /     Tk  \
@@ -78,11 +78,11 @@ def KC_T_LDK00(Tk,S):
 # Deep-Sea Res Pt A 37(5), 755-766, doi:10.1016/0198-0149(90)90004-F
 #
 # Total pH scale
-# 
+#
 #  0 < T < 45 degC
 #  5 < S < 45
-    
-def KB_T_D90a(Tk,S):
+
+def KB_T_D90a(Tk, S):
 
     # D90a Eq. (23)
     ln_KB =   ( - 8966.90                        \
@@ -109,7 +109,7 @@ def KB_T_D90a(Tk,S):
 #
 # Total pH scale
 
-def KH2O_T_DSC07(Tk,S):
+def KH2O_T_DSC07(Tk, S):
 
     ln_KH2O =     148.9652                        \
               - 13847.26    /     Tk              \
@@ -129,11 +129,11 @@ def KH2O_T_DSC07(Tk,S):
 # J Chem Thermodyn 22(2), 113-127, doi:10.1016/0021-9614(90)90074-Z
 #
 # Free pH scale
-# 
+#
 #  0 < T < 45 degC
 #  5 < S < 45
 
-def KHSO4_F_D90b(Tk,S):
+def KHSO4_F_D90b(Tk, S):
 
     # Ionic strength
     I = Istr(S)
@@ -162,41 +162,41 @@ def KHSO4_F_D90b(Tk,S):
 # Mar Chem 21(2), 161-168, doi:10.1016/0304-4203(87)90036-3
 #
 # Total pH scale
-# 
+#
 #  9 < T < 33 degC
 # 10 < S < 40
 
-def KHF_T_PF87(Tk,S):
-    
+def KHF_T_PF87(Tk, S):
+
     ln_KHF = - ( - 874     / Tk        \
                  -   0.111 * S **0.5   \
                  +   9.68            )
-             
+
     return exp(ln_KHF)
-             
+
 
 # --- Dickson & Riley (1979) --------------------------------------------------
 #
 # Mar Chem 7(2), 101-109, doi:10.1016/0304-4203(79)90002-1
 #
 # Free pH scale
-# 
+#
 #  5 < T < 35 degC
 # 10 < S < 48
 
-def KHF_F_DR79(Tk,S):
-    
+def KHF_F_DR79(Tk, S):
+
     # Ionic strength
     I = Istr(S)
-    
+
     # Evaluate HF dissociation constant
     ln_KF =   1590.2   / Tk       \
             -   12.641            \
             +    1.525 * I **0.5  \
             + log(1 - 0.001005*S)
-            
+
     return exp(ln_KF)
-    
+
 
 # ===== PHOSPHORIC ACID =======================================================
 
@@ -206,8 +206,8 @@ def KHF_F_DR79(Tk,S):
 #
 # Total pH scale
 
-def KP_T_DSC07(Tk,S):
-    
+def KP_T_DSC07(Tk, S):
+
     # KP1 = [H+][H2PO4-]/[H3PO4]
     ln_KP1 = - 4576.752 /     Tk            \
             +  115.525                     \
@@ -238,18 +238,18 @@ def KP_T_DSC07(Tk,S):
 
 
 # ===== SILICIC ACID ==========================================================
-    
+
 # --- Millero (1995) ----------------------------------------------------------
 #
 #
 #
 # via Dickson et al. (2007)
 
-def KSi_T_M95(Tk,S):
-    
+def KSi_T_M95(Tk, S):
+
     # Ionic strength
     I = 19.924 * S / (1000 - 1.005 * S)
-    
+
     #  KSi = [SiO((OH)3)-] [H+] / [Si(OH)4]
     ln_KSi = - 8904.2   /     Tk   \
              +  117.385            \
@@ -261,25 +261,25 @@ def KSi_T_M95(Tk,S):
              + ( -  12.1652  / Tk            \
                  +   0.07871      ) * I**2   \
              + log(1 - 0.001005 * S)
-             
+
     return exp(ln_KSi)
 
 
 # ===== AMMONIUM ==============================================================
-    
+
 # --- Bell et al. (2008) ------------------------------------------------------
-#    
+#
 # Environ Chem 5, 258, doi:10.1071/EN07032_CO
 #
 # pH scale unclear
 
-def KNH4_X_BJJL08(Tk,S):
-    
+def KNH4_X_BJJL08(Tk, S):
+
     # BJJL08 Eq. (3)
     pKNH4 = 10.0423         \
           -  0.0315536 * Tk \
           +  0.003071  * S
-          
+
     return 10**-pKNH4
 
 
@@ -292,11 +292,11 @@ def KNH4_X_BJJL08(Tk,S):
 # Stoichiometric dissociation constant
 #
 # Seawater pH scale
-# 
+#
 #  5 < T < 40 degC
 # 30 < S < 40
 
-def K2AMP_S_BE86(Tk,S):
+def K2AMP_S_BE86(Tk, S):
 
     # BE86 Eq. (10)
     pK_S_2AMP =   2498.31   /     Tk        \

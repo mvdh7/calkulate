@@ -1,15 +1,15 @@
 from .const import Tzero
 
-# Seawater density in kg/l   
+# Seawater density in kg/l
 # Inputs: T (temperature / deg C), S (practical salinity)
 # Valid ranges: 0 < T < 40 degC & 0.5 < S < 43
 # Source: Millero & Poisson (1981) DSR-A 28(6).
 #          doi:10.1016/0198-0149(81)90122-9
 
-def sw(Tk,S):
-    
+def sw(Tk, S):
+
     Tc = Tk - Tzero
-    
+
     return (999.842594                       \
           +   6.793952e-2 * Tc               \
           -   9.095290e-3 * Tc**2            \
@@ -31,10 +31,10 @@ def sw(Tk,S):
 # --- Estimate HCl titrant density --------------------------------------------
 #
 # Output in kg/l
-#      
+#
 # Uses a second-order polynomial, fit through temperature/density points:
-#    
-# Tk = [288.15, 290.65, 293.15, 295.65, 298.15, 300.65, 
+#
+# Tk = [288.15, 290.65, 293.15, 295.65, 298.15, 300.65,
 #       303.15, 305.65, 308.15] # K
 # D  = [1.025664, 1.025079, 1.024442, 1.023754, 1.023018, 1.022235,
 #       1.021408, 1.020538, 1.019627] # kg/l
@@ -48,10 +48,9 @@ def sw(Tk,S):
 #   Cl- : 0.7 mol/l
 # This represents (approximately) a 0.1 molar HCl titrant in an NaCl solution
 #  with ionic strength equal to that of seawater (cf. DAA03)
-    
+
 def acid(Tk):
 
     return - 3.7239826839826254e-06 * Tk**2 \
            + 1.9182242077921724e-03 * Tk    \
            + 7.8213696227965890e-01
-      
