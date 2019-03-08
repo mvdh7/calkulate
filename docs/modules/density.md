@@ -1,6 +1,6 @@
 # Fluid densities
 
-Contains functions of temperature and salinity that estimate the densities of [1] seawater and [2] mixtures of hydrochloric acid (HCl) and sodium chloride (NaCl).
+Functions of temperature and salinity that estimate the densities of [1] seawater and [2] mixtures of hydrochloric acid (HCl) and sodium chloride (NaCl).
 
 
 <hr />
