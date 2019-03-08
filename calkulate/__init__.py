@@ -14,7 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-__all__ = ['calib', 'conc', 'const', 'density', 'dissoc', 'io', 'sim',
-           'solve', 'VINDTA']
+__all__ = ['calib', 'conc', 'const', 'density', 'dissoc', 'io', 'meta',
+    'sim', 'solve', 'VINDTA']
 
-from . import calib, conc, const, density, dissoc, io, sim, solve, VINDTA
+from . import calib, conc, const, density, dissoc, io, meta, sim, solve, VINDTA
+
+__version__ = meta.version

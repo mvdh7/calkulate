@@ -27,7 +27,7 @@ rho_sw = calk.density.sw(tempK, psal)
 
 <hr />
 
-## .acid - 0.1 M HCl in 0.7 M NaCl
+## .acid - 0.1 M HCl in 0.6 M NaCl
 
 Calculates the density of a mixed solution of HCl and NaCl as a function of its temperature, at a pressure of 1 atm.
 
@@ -37,7 +37,7 @@ The function uses a second-order polynomial fit through a series of temperature-
   * [Na<sup>+</sup>] = 0.6 mol·dm<sup>−3</sup>;
   * [Cl<sup>−</sup>] = 0.7 mol·dm<sup>−3</sup>.
 
-This represents a 0.1 mol·dm<sup>−3</sup> HCl titrant mixed with NaCl, with total ionic strength equal to that of typical open ocean seawater (Dickson et al., 2003).
+This represents a 0.1 mol·dm<sup>−3</sup> HCl titrant mixed with NaCl, with total ionic strength like that of typical open ocean seawater (Dickson et al., 2003).
 
 **Syntax:**
 

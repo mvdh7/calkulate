@@ -1,6 +1,6 @@
 site_name: Calkulate
 site_author: Matthew P. Humphreys
-site_description: Calkulate: seawater total alkalinity from titration data
+site_description: Seawater total alkalinity from titration data
 copyright: Copyright &copy; 2019 Matthew P. Humphreys (GNU GPLv3).
 
 site_url: https://calkulate.readthedocs.io/
@@ -13,5 +13,15 @@ nav:
   - Overview: index.md
   - Quick-start guide: quick-start.md
   - Calkulate modules:
-      - .density - seawater and acid densities: modules/density.md
-  - MATLAB: matlab.md
+    - .io - data import and export: modules/io.md
+    - .solve - alkalinity solvers: modules/solve.md
+    - .sim - alkalinity and pH simulator: modules/sim.md
+    - .calib - calibration methods: modules/calib.md
+    - .dissoc - dissociation constants: modules/dissoc.md
+    - .conc - solute concentrations: modules/conc.md
+    - .density - fluid densities: modules/density.md
+    - .const - physical constants: modules/const.md
+    - .meta - package metadata: modules/meta.md
+    - .VINDTA - VINDTA functions: modules/VINDTA.md
+  - Version history: version-history.md
+  - References: references.md
