@@ -1,6 +1,7 @@
 <!--<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>-->
 
-# pytzer
+
+# Calkulate
 
 **Calkulate** is a Python 3.6+ package for determining total alkalinity from seawater titration data.
 
@@ -32,6 +33,7 @@ Its ongoing development has been funded by the [Natural Environment Research Cou
   * originally through a PhD studentship to Matthew P. Humphreys (NE/J500112/1),
   * followed by *CaNDyFloSS: Carbon and Nutrient Dynamics and Fluxes over Shelf Systems* (NE/K00185X/1) and *RAGNARoCC: Radiatively active gases from the North Atlantic Region and Climate Change* (NE/K002546/1),
   * and now through *NSFGEO-NERC: A Thermodynamic Chemical Speciation Model for the Oceans, Seas, and Estuaries* (NE/P012361/1).
+
 
 # License
 
