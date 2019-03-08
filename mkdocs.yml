@@ -1,13 +1,17 @@
-site_name  : calkulate
+site_name: calkulate
 site_author: Matthew P. Humphreys
+site_description: Seawater total alkalinity from open-cell, non-purged, stepwise, potentiometric titration data
+copyright: Copyright &copy; 2019 Matthew P. Humphreys (GNU GPLv3).
 
-site_url: https://calkulate.readthedocs.io/en/latest/
+site_url: https://calkulate.readthedocs.io/
 repo_url: https://github.com/mvdh7/calkulate
 
-lang : en
+lang: en
 theme: readthedocs
 
 nav:
-- Setup :  index.md
-- Python: python.md
-- MATLAB: matlab.md
+  - Overview: index.md
+  - Quick-start guide: quick-start.md
+  - Calkulate modules:
+      - .density: modules/density.md
+  - MATLAB: matlab.md

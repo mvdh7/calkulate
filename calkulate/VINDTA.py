@@ -1,4 +1,4 @@
-from . import calib, conc, dens, dissoc, io, sim, solve
+from . import calib, conc, density, dissoc, io, sim, solve
 from numpy import logical_and
 from numpy import max as np_max
 

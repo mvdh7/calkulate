@@ -1,6 +1,4 @@
-title: Python
-
-# calkulate.dens
+# Density
 
 Functions to estimate the densities of various fluids.
 
