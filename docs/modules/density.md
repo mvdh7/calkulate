@@ -7,18 +7,18 @@ Contains functions of temperature and salinity that estimate the densities of [1
 
 ## .sw - seawater at 1 atm
 
-Calculates the density of seawater as a function of its temperature `Tk` in K and practical salinity `S`, at a pressure of 1 atm, following Millero and Poisson (1981).
+Calculates the density of seawater as a function of its temperature `tempK` in K and practical salinity `psal`, at a pressure of 1 atm, following Millero and Poisson (1981).
 
 **Syntax:**
 
 ```python
-rho_sw = calk.density.sw(Tk, S)
+rho_sw = calk.density.sw(tempK, psal)
 ```
 
 **Inputs:**
 
-  * `Tk`: seawater temperature in K;
-  * `S`: practical salinity.
+  * `tempK`: seawater temperature in K;
+  * `psal`: practical salinity.
 
 **Output:**
 
@@ -42,12 +42,12 @@ This represents a 0.1 mol·dm<sup>−3</sup> HCl titrant mixed with NaCl, with t
 **Syntax:**
 
 ```python
-rho_acid = calk.density.acid(Tk)
+rho_acid = calk.density.acid(tempK)
 ```
 
 **Input:**
 
-  * `Tk`: acid temperature in K.
+  * `tempK`: acid temperature in K.
 
 **Output:**
 
