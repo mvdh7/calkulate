@@ -1,3 +1,6 @@
+# Calkulate: seawater total alkalinity from titration data
+# Copyright (C) 2019  Matthew Paul Humphreys  (GNU GPLv3)
+
 from numpy import arange, float_, full_like, genfromtxt
 from .const import Tzero
 

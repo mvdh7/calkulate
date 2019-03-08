@@ -1,3 +1,6 @@
+# Calkulate: seawater total alkalinity from titration data
+# Copyright (C) 2019  Matthew Paul Humphreys  (GNU GPLv3)
+
 from numpy import exp, full, isnan, log, log10, logical_and, mean, nan, \
                   nanmean, size, std, zeros
 from numpy import abs as np_abs

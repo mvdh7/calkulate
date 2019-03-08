@@ -1,3 +1,6 @@
+# Calkulate: seawater total alkalinity from titration data
+# Copyright (C) 2019  Matthew Paul Humphreys  (GNU GPLv3)
+
 from .const import S_Cl, RMM_B, RMM_F
 
 def XT(S, CT=0, PT=0, SiT=0):

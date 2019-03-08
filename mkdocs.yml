@@ -1,6 +1,6 @@
-site_name: calkulate
+site_name: Calkulate
 site_author: Matthew P. Humphreys
-site_description: Seawater total alkalinity from open-cell, non-purged, stepwise, potentiometric titration data
+site_description: Calkulate: seawater total alkalinity from titration data
 copyright: Copyright &copy; 2019 Matthew P. Humphreys (GNU GPLv3).
 
 site_url: https://calkulate.readthedocs.io/

@@ -1,3 +1,6 @@
+# Calkulate: seawater total alkalinity from titration data
+# Copyright (C) 2019  Matthew Paul Humphreys  (GNU GPLv3)
+
 from scipy.optimize import least_squares as olsq
 from . import solve
 

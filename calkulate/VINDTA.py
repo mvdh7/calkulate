@@ -1,3 +1,6 @@
+# Calkulate: seawater total alkalinity from titration data
+# Copyright (C) 2019  Matthew Paul Humphreys  (GNU GPLv3)
+
 from . import calib, conc, density, dissoc, io, sim, solve
 from numpy import logical_and
 from numpy import max as np_max
