@@ -2,6 +2,7 @@
 
 Functions to import titration data and export results in various formats.
 
+
 ## .VINDTA - import VINDTA-style .dat files
 
 Imports titration data in the .dat file format output by VINDTA instruments. This format is easy to replicate with any other sort of data that you may have.
@@ -21,6 +22,7 @@ Vacid, EMF, Tk = calk.io.VINDTA(datfile)
   * `Vacid`: volume of acid titrant added in ml;
   * `EMF`: titration cell potential in mV;
   * `tempK`: titre temperature in K.
+
 
 ## .Dickson1981 - load simulated titration
 
