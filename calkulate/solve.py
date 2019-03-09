@@ -2,12 +2,12 @@
 # Copyright (C) 2019  Matthew Paul Humphreys  (GNU GPLv3)
 
 from numpy import exp, full, isnan, log, log10, logical_and, mean, nan, \
-                  nanmean, size, std, zeros
+    nanmean, size, std, zeros
 from numpy import abs as np_abs
 from numpy import max as np_max
 from scipy.optimize import least_squares as olsq
-from scipy.stats    import linregress
-from .      import sim
+from scipy.stats import linregress
+from . import sim
 from .const import F, R
 
 
@@ -15,26 +15,26 @@ from .const import F, R
 #====== EMF to [H+] CONVERSIONS ===============================================
 
 
-def EMF2H(EMF, EMF0, Tk):
+def EMF2H(EMF, EMF0, tempK):
     # DAA03 Eq. (13) with typo corrected (EMF and EMF0 switched)
-    return exp((EMF - EMF0) * F / (R * Tk))
+    return exp((EMF - EMF0) * F / (R * tempK))
 
 
-def H2EMF(H, EMF0, Tk):
-    return EMF0 + log(H) * R * Tk / F
+def H2EMF(H, EMF0, tempK):
+    return EMF0 + log(H) * R * tempK / F
 
 
-def f2dEMF0(Tk, f):
-    return (R * Tk / F) * log(f)
+def f2dEMF0(tempK, f):
+    return (R * tempK / F) * log(f)
 
 
 #==============================================================================
 #====== GRAN ESTIMATOR FUNCTIONS ==============================================
 
 
-def F1(Macid, EMF, Tk, Msamp):
+def F1(Macid, EMF, tempK, Msamp):
     # DAA03 Eq. (10)
-    return (Msamp + Macid) * exp(EMF * F / (R * Tk))
+    return (Msamp + Macid) * exp(EMF * F / (R * tempK))
 
 
 def Gran_guess_AT(Macid, F1, Msamp, Cacid):

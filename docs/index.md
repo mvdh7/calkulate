@@ -30,9 +30,9 @@ Calkulate is maintained by [Dr Matthew P. Humphreys](https://mvdh.xyz) at the Ce
 
 Its ongoing development has been funded by the [Natural Environment Research Council](https://nerc.ukri.org/) (NERC, UK):
 
-  * originally through a PhD studentship to Matthew P. Humphreys (NE/J500112/1),
-  * followed by *CaNDyFloSS: Carbon and Nutrient Dynamics and Fluxes over Shelf Systems* (NE/K00185X/1) and *RAGNARoCC: Radiatively active gases from the North Atlantic Region and Climate Change* (NE/K002546/1),
-  * and now through *NSFGEO-NERC: A Thermodynamic Chemical Speciation Model for the Oceans, Seas, and Estuaries* (NE/P012361/1).
+  * Originally through a PhD studentship to Matthew P. Humphreys (NE/J500112/1),
+  * Followed by *CaNDyFloSS: Carbon and Nutrient Dynamics and Fluxes over Shelf Systems* (NE/K00185X/1) and *RAGNARoCC: Radiatively active gases from the North Atlantic Region and Climate Change* (NE/K002546/1),
+  * And now through *NSFGEO-NERC: A Thermodynamic Chemical Speciation Model for the Oceans, Seas, and Estuaries* (NE/P012361/1).
 
 
 # License
