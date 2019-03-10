@@ -85,21 +85,21 @@ def KC_T_LDK00(tempK, psal):
 #  0 < T < 45 degC
 #  5 < S < 45
 
-def KB_T_D90a(Tk, S):
+def KB_T_D90a(tempK, psal):
 
     # D90a Eq. (23)
     ln_KB =   ( - 8966.90                        \
-                - 2890.53   * S**0.5             \
-                -   77.942  * S                  \
-                +    1.728  * S**1.5             \
-                -    0.0996 * S**2   ) /     Tk  \
+                - 2890.53   * psal**0.5             \
+                -   77.942  * psal                  \
+                +    1.728  * psal**1.5             \
+                -    0.0996 * psal**2   ) / tempK  \
             + 148.0248                           \
-            + 137.1942  * S**0.5                 \
-            +   1.62142 * S                      \
+            + 137.1942  * psal**0.5                 \
+            +   1.62142 * psal                      \
             - (     24.4344                      \
-                +   25.085  * S**0.5             \
-                +    0.2474 * S      ) * log(Tk) \
-            +   0.053105    * S**0.5   *     Tk
+                +   25.085  * psal**0.5             \
+                +    0.2474 * psal      ) * log(tempK) \
+            +   0.053105    * psal**0.5   *     tempK
 
     return exp(ln_KB)
 
@@ -112,15 +112,15 @@ def KB_T_D90a(Tk, S):
 #
 # Total pH scale
 
-def KH2O_T_DSC07(Tk, S):
+def KH2O_T_DSC07(tempK, psal):
 
     ln_KH2O =     148.9652                        \
-              - 13847.26    /     Tk              \
-              -    23.6521  * log(Tk)             \
-              + (   118.67   /     Tk             \
+              - 13847.26    /     tempK              \
+              -    23.6521  * log(tempK)             \
+              + (   118.67   /     tempK             \
                   -   5.977                       \
-                  +   1.0495 * log(Tk) ) * S**0.5 \
-              - 0.01615                 * S
+                  +   1.0495 * log(tempK) ) * psal**0.5 \
+              - 0.01615 * psal
 
     return exp(ln_KH2O)
 

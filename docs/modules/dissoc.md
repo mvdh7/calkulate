@@ -3,6 +3,8 @@
 Functions of temperature and salinity that estimate the stoichiometric dissociation constants required to model seawater equilibria.
 
 
+<!-- Add chemistry with https://mhchem.github.io/MathJax-mhchem/ -->
+
 <hr />
 
 
@@ -72,3 +74,43 @@ K1, K2 = calk.dissoc.KC_T_LDK00(tempK, psal)
 
   * `K1`: first dissociation constant for carbonic acid on the Total pH scale in mol·kg-sw<sup>−1</sup>;
   * `K2`: second dissociation constant for carbonic acid on the Total pH scale in mol·kg-sw<sup>−1</sup>.
+
+
+## .KB_T_D90a - boric acid
+
+Estimates the boric acid stoichiometric dissociation constant KB from temperature and salinity on the Total pH scale following Dickson (1990a). Valid for temperature from 0 to 45 degC and practical salinity from 5 to 45.
+
+**Syntax:**
+
+```python
+KB = calk.dissoc.KB_T_D90a(tempK, psal)
+```
+
+**Inputs:**
+
+  * `tempK`: temperature in K;
+  * `psal`: practical salinity.
+
+**Outputs:**
+
+  * `KB`: dissociation constant for boric acid on the Total pH scale in mol·kg-sw<sup>−1</sup>.
+
+
+## .KH2O_T_DSC07 - water
+
+Estimates the water stoichiometric dissociation constant KH2O from temperature and salinity on the Total pH scale following Dickson et al. (2007).
+
+**Syntax:**
+
+```python
+KH2O = calk.dissoc.KH2O_T_DSC07(tempK, psal)
+```
+
+**Inputs:**
+
+  * `tempK`: temperature in K;
+  * `psal`: practical salinity.
+
+**Outputs:**
+
+  * `KH2O`: dissociation constant for water acid on the Total pH scale in mol·kg-sw<sup>−1</sup>.
