@@ -8,40 +8,40 @@ from numpy import exp, log
 
 # --- DSC07 best practice, Free scale -----------------------------------------
 
-def KX_F(Tk, S, ST, FT):
+def KX_F(tempK, psal, ST, FT):
 
     # Evaluate dissociation coefficients
-    KC1_T,KC2_T       = KC_T_LDK00  (Tk, S) # Total
-    KB_T              = KB_T_D90a   (Tk, S) # Total
-    KH2O_T            = KH2O_T_DSC07(Tk, S) # Total
-    KHSO4_F           = KHSO4_F_D90b(Tk, S) # Free
-    KHF_T             = KHF_T_PF87  (Tk, S) # Total
-    KP1_T,KP2_T,KP3_T = KP_T_DSC07  (Tk, S) # Total
-    KSi_T             = KSi_T_M95   (Tk, S) # Total
+    KC1_T, KC2_T = KC_T_LDK00(tempK, psal) # Total
+    KB_T = KB_T_D90a(tempK, psal) # Total
+    KH2O_T = KH2O_T_DSC07(tempK, psal) # Total
+    KHSO4_F = KHSO4_F_D90b(tempK, psal) # Free
+    KHF_T = KHF_T_PF87(tempK, psal) # Total
+    KP1_T, KP2_T, KP3_T = KP_T_DSC07(tempK, psal) # Total
+    KSi_T = KSi_T_M95(tempK, psal) # Total
 
     # Get pH scale conversion factors
     T2F = 1 / (1 + ST / KHSO4_F)
 
     # Convert everything to Free pH scale
-    KC1_F  = KC1_T  * T2F
-    KC2_F  = KC2_T  * T2F
-    KB_F   = KB_T   * T2F
+    KC1_F  = KC1_T * T2F
+    KC2_F = KC2_T * T2F
+    KB_F = KB_T * T2F
     KH2O_F = KH2O_T * T2F
-    KHF_F  = KHF_T  * T2F
-    KP1_F  = KP1_T  * T2F
-    KP2_F  = KP2_T  * T2F
-    KP3_F  = KP3_T  * T2F
-    KSi_F  = KSi_T  * T2F
+    KHF_F = KHF_T * T2F
+    KP1_F = KP1_T * T2F
+    KP2_F = KP2_T * T2F
+    KP3_F = KP3_T * T2F
+    KSi_F = KSi_T * T2F
 
     return [KC1_F, KC2_F, KB_F, KH2O_F, KHSO4_F, KHF_F, KP1_F, KP2_F, KP3_F,
-            KSi_F]
+        KSi_F]
 
 
 # ===== IONIC STRENGTH ========================================================
 
 
-def Istr(S):
-    return 19.924 * S / (1000 - 1.005 * S)
+def Istr(psal):
+    return 19.924 * psal / (1000 - 1.005 * psal)
 
 
 # ===== CARBONIC ACID =========================================================
@@ -55,21 +55,21 @@ def Istr(S):
 #  2 < T < 35 degC
 # 19 < S < 43
 
-def KC_T_LDK00(Tk, S):
+def KC_T_LDK00(tempK, psal):
 
     # LDK00 Eq. (16)
-    pK_T_C1 = 3633.86      /     Tk  \
-            -   61.2172              \
-            +    9.6777    * log(Tk) \
-            -    0.011555  * S       \
-            +    0.0001152 * S**2
+    pK_T_C1 = 3633.86 / tempK \
+            -   61.2172 \
+            +    9.6777 * log(tempK) \
+            -    0.011555 * psal \
+            +    0.0001152 * psal**2
 
     # LDK00 Eq. (17)
-    pK_T_C2 =  471.78      /     Tk  \
-            +   25.929               \
-            -    3.16967   * log(Tk) \
-            -    0.01781   * S       \
-            +    0.0001122 * S**2
+    pK_T_C2 =  471.78 / tempK \
+            +   25.929 \
+            -    3.16967 * log(tempK) \
+            -    0.01781 * psal \
+            +    0.0001122 * psal**2
 
     return 10**-pK_T_C1, 10**-pK_T_C2
 

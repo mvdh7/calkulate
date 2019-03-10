@@ -10,7 +10,7 @@ Imports titration data in the .dat file format output by VINDTA instruments. Thi
 **Syntax:**
 
 ```python
-Vacid, EMF, Tk = calk.io.VINDTA(datfile)
+Vacid, EMF, tempK = calk.io.VINDTA(datfile)
 ```
 
 **Input:**

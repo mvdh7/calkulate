@@ -5,3 +5,5 @@ Dickson, A. G. (1981). An exact definition of total alkalinity and a procedure f
 Humphreys, M. P. (2015). "Calculating seawater total alkalinity from open-cell titration data using a modified Gran plot technique," in *Measurements and Concepts in Marine Carbonate Chemistry* (PhD Thesis, Ocean and Earth Science, University of Southampton, UK), 25–44.
 
 Lee et al. (2010)
+
+Lueker et al. (2000)

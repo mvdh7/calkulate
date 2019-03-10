@@ -6,7 +6,7 @@ Functions of salinity to estimate the total concentrations of the dissolved comp
 <hr />
 
 
-## .XT - create concentration list
+## .XT - list of concentrations
 
 Assembles a list of concentrations in the order required by other Calkulate functions.
 
