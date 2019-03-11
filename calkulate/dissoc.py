@@ -136,24 +136,24 @@ def KH2O_T_DSC07(tempK, psal):
 #  0 < T < 45 degC
 #  5 < S < 45
 
-def KHSO4_F_D90b(Tk, S):
+def KHSO4_F_D90b(tempK, psal):
 
     # Ionic strength
-    I = Istr(S)
+    I = Istr(psal)
 
     # D90b Eqs. (22) & (23)
-    ln_KHSO4 = - 4276.1   /     Tk                  \
+    ln_KHSO4 = - 4276.1   /     tempK                  \
                +  141.328                           \
-               -   23.093 * log(Tk)                 \
-               + ( - 13856     /     Tk             \
+               -   23.093 * log(tempK)                 \
+               + ( - 13856     /     tempK             \
                    +   324.57                       \
-                   -    47.986 * log(Tk) ) * I**0.5 \
-               + (   35474     /     Tk             \
+                   -    47.986 * log(tempK) ) * I**0.5 \
+               + (   35474     /     tempK             \
                    -   771.54                       \
-                   +   114.723 * log(Tk) ) * I      \
-               - (    2698     /     Tk)   * I**1.5 \
-               + (    1776     /     Tk)   * I**2   \
-               + log(1 - 0.001005 * S)
+                   +   114.723 * log(tempK) ) * I      \
+               - (    2698     /     tempK)   * I**1.5 \
+               + (    1776     /     tempK)   * I**2   \
+               + log(1 - 0.001005 * psal)
 
     return exp(ln_KHSO4)
 
@@ -169,10 +169,10 @@ def KHSO4_F_D90b(Tk, S):
 #  9 < T < 33 degC
 # 10 < S < 40
 
-def KHF_T_PF87(Tk, S):
+def KHF_T_PF87(tempK, psal):
 
-    ln_KHF = - ( - 874     / Tk        \
-                 -   0.111 * S **0.5   \
+    ln_KHF = - ( - 874     / tempK        \
+                 -   0.111 * psal**0.5   \
                  +   9.68            )
 
     return exp(ln_KHF)
@@ -187,16 +187,16 @@ def KHF_T_PF87(Tk, S):
 #  5 < T < 35 degC
 # 10 < S < 48
 
-def KHF_F_DR79(Tk, S):
+def KHF_F_DR79(tempK, psal):
 
     # Ionic strength
-    I = Istr(S)
+    I = Istr(psal)
 
     # Evaluate HF dissociation constant
-    ln_KF =   1590.2   / Tk       \
+    ln_KF =   1590.2   / tempK       \
             -   12.641            \
             +    1.525 * I **0.5  \
-            + log(1 - 0.001005*S)
+            + log(1 - 0.001005*psal)
 
     return exp(ln_KF)
 
@@ -209,33 +209,33 @@ def KHF_F_DR79(Tk, S):
 #
 # Total pH scale
 
-def KP_T_DSC07(Tk, S):
+def KP_T_DSC07(tempK, psal):
 
     # KP1 = [H+][H2PO4-]/[H3PO4]
-    ln_KP1 = - 4576.752 /     Tk            \
+    ln_KP1 = - 4576.752 /     tempK            \
             +  115.525                     \
-            -   18.453 * log(Tk)           \
-            + (- 106.736    / Tk           \
-               +   0.69171      ) * S**0.5 \
-            + (-   0.65643 / Tk            \
-               -   0.01844      ) * S
+            -   18.453 * log(tempK)           \
+            + (- 106.736    / tempK           \
+               +   0.69171      ) * psal**0.5 \
+            + (-   0.65643 / tempK            \
+               -   0.01844      ) * psal
 
     # KP2 = [H+][HPO42-]/[H2PO4-]
-    ln_KP2 = - 8814.715 /     Tk           \
+    ln_KP2 = - 8814.715 /     tempK           \
             +  172.0883                   \
-            -   27.927 * log(Tk)          \
-            + (- 160.34    / Tk           \
-               +   1.3566      ) * S**0.5 \
-            + (    0.37335 / Tk           \
-               -   0.05778     ) * S
+            -   27.927 * log(tempK)          \
+            + (- 160.34    / tempK           \
+               +   1.3566      ) * psal**0.5 \
+            + (    0.37335 / tempK           \
+               -   0.05778     ) * psal
 
     # KP3 = [H+][PO43-]/[HPO42-]
-    ln_KP3 = - 3070.75 / Tk               \
+    ln_KP3 = - 3070.75 / tempK               \
             - 18.141                     \
-            + (  17.27039 / Tk           \
-               +  2.81197     ) * S**0.5 \
-            + (- 44.99486 / Tk           \
-               -  0.09984     ) * S
+            + (  17.27039 / tempK           \
+               +  2.81197     ) * psal**0.5 \
+            + (- 44.99486 / tempK           \
+               -  0.09984     ) * psal
 
     return exp(ln_KP1), exp(ln_KP2), exp(ln_KP3)
 
@@ -248,22 +248,22 @@ def KP_T_DSC07(Tk, S):
 #
 # via Dickson et al. (2007)
 
-def KSi_T_M95(Tk, S):
+def KSi_T_M95(tempK, psal):
 
     # Ionic strength
-    I = 19.924 * S / (1000 - 1.005 * S)
+    I = 19.924 * psal / (1000 - 1.005 * psal)
 
     #  KSi = [SiO((OH)3)-] [H+] / [Si(OH)4]
-    ln_KSi = - 8904.2   /     Tk   \
+    ln_KSi = - 8904.2   /     tempK   \
              +  117.385            \
-             -   19.334 * log(Tk)  \
-             + ( - 458.79    / Tk   \
+             -   19.334 * log(tempK)  \
+             + ( - 458.79    / tempK   \
                  +   3.5913       ) * I**0.5 \
-             + (   188.74    / Tk            \
+             + (   188.74    / tempK            \
                  -   1.5998       ) * I      \
-             + ( -  12.1652  / Tk            \
+             + ( -  12.1652  / tempK            \
                  +   0.07871      ) * I**2   \
-             + log(1 - 0.001005 * S)
+             + log(1 - 0.001005 * psal)
 
     return exp(ln_KSi)
 
@@ -276,12 +276,12 @@ def KSi_T_M95(Tk, S):
 #
 # pH scale unclear
 
-def KNH4_X_BJJL08(Tk, S):
+def KNH4_X_BJJL08(tempK, psal):
 
     # BJJL08 Eq. (3)
-    pKNH4 = 10.0423         \
-          -  0.0315536 * Tk \
-          +  0.003071  * S
+    pKNH4 = 10.0423 - \
+        0.0315536 * tempK + \
+        0.003071 * psal
 
     return 10**-pKNH4
 
@@ -299,13 +299,13 @@ def KNH4_X_BJJL08(Tk, S):
 #  5 < T < 40 degC
 # 30 < S < 40
 
-def K2AMP_S_BE86(Tk, S):
+def K2AMP_S_BE86(tempK, psal):
 
     # BE86 Eq. (10)
-    pK_S_2AMP =   2498.31   /     Tk        \
+    pK_S_2AMP =   2498.31   /     tempK        \
                 -   15.3274                 \
-                +    2.4050 * log(Tk)       \
+                +    2.4050 * log(tempK)       \
                 + (   0.012929              \
-                    - 2.9417e-5 * Tk  ) * S
+                    - 2.9417e-5 * tempK  ) * psal
 
     return 10**-pK_S_2AMP
