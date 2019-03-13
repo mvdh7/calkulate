@@ -13,7 +13,7 @@ MathJax.Hub.Config({
 
 # Dissociation constants
 
-Functions of temperature and salinity that estimate the stoichiometric dissociation constants required to model seawater equilibria.
+Functions of temperature and salinity that estimate the stoichiometric dissociation constants required to model seawater equilibria. All are valid at a pressure of 1 atm.
 
 
 <!-- Add chemistry with https://mhchem.github.io/MathJax-mhchem/ -->
@@ -68,7 +68,7 @@ Istr = calk.dissoc.Istr(psal)
 
 <hr />
 
-# Carbonic acid
+## Carbonic acid
 
 After dissolving into seawater, $\ce{CO2}$ reacts to form carbonic acid ($\ce{H2CO3}$), which totally dissociates into bicarbonate and carbonate ions ($\ce{HCO3-}$ and $\ce{CO3^2-}$). The relevant equilibria are:
 
@@ -82,7 +82,7 @@ $$K_1^\* = \frac{[\ce{HCO3-}] [\ce{H+}]}{[\ce{CO2(aq)}]}$$
 
 $$K_2^\* = \frac{[\ce{CO3^2-}] [\ce{H+}]}{[\ce{HCO3-}]}$$
 
-## `.KC_T_LDK00`: Lueker et al. (2000)
+### `.KC_T_LDK00`: Lueker et al. (2000)
 
 Estimates the carbonic acid stoichiometric dissociation constants $K_1^\*$ and $K_2^\*$ from temperature and salinity on the Total pH scale following Lueker et al. (2000).
 
@@ -109,7 +109,7 @@ K1, K2 = calk.dissoc.KC_T_LDK00(tempK, psal)
 
 <hr />
 
-# Boric acid
+## Boric acid
 
 The equilibrium reaction is:
 
@@ -119,7 +119,7 @@ with the stoichiometric dissociation constant:
 
 $$K_\text{B}^\* = \frac{[\ce{B(OH)4-}] [\ce{H+}]}{[\ce{B(OH)3}]}$$
 
-## `.KB_T_D90a`: Dickson (1990a)
+### `.KB_T_D90a`: Dickson (1990a)
 
 Estimates the boric acid stoichiometric dissociation constant $K_\text{B}^\*$ from temperature and salinity on the Total pH scale following Dickson (1990a).
 
@@ -145,7 +145,7 @@ KB = calk.dissoc.KB_T_D90a(tempK, psal)
 
 <hr />
 
-# Water
+## Water
 
 The equilibrium reaction is:
 
@@ -155,7 +155,7 @@ with the stoichiometric dissociation constant:
 
 $$K_\text{w}^\* = [\ce{OH-}] [\ce{H+}]$$
 
-## `.KH2O_T_DSC07`: Dickson et al. (2007)
+### `.KH2O_T_DSC07`: Dickson et al. (2007)
 
 Estimates the water stoichiometric dissociation constant $K_\text{w}^\*$ from temperature and salinity on the Total pH scale following Dickson et al. (2007).
 
@@ -176,7 +176,7 @@ KH2O = calk.dissoc.KH2O_T_DSC07(tempK, psal)
 
 <hr />
 
-# Bisulfate
+## Bisulfate
 
 The equilibrium reaction is:
 
@@ -186,7 +186,7 @@ with the stoichiometric dissociation constant:
 
 $$K_\text{S}^\* = \frac{[\ce{SO4^2-}] [\ce{H+}]}{[\ce{HSO4-}]}$$
 
-## `.KHSO4_F_D90b`: Dickson (1990b)
+### `.KHSO4_F_D90b`: Dickson (1990b)
 
 Estimates the bisulfate stoichiometric dissociation constant $K_\text{w}^\*$ from temperature and salinity on the Free pH scale following Dickson (1990b).
 
@@ -212,7 +212,7 @@ KHSO4 = calk.dissoc.KHSO4_F_D90b(tempK, psal)
 
 <hr />
 
-# Hydrofluoric acid
+## Hydrofluoric acid
 
 The equilibrium reaction is:
 
@@ -222,7 +222,7 @@ with the stoichiometric dissociation constant:
 
 $$K_\text{HF}^\* = \frac{[\ce{F-}] [\ce{H+}]}{[\ce{HF}]}$$
 
-## `.KHF_T_PF87`: Perez and Fraga (1987)
+### `.KHF_T_PF87`: Perez and Fraga (1987)
 
 Estimates the hydrogen fluoride stoichiometric dissociation constant $K_\text{HF}^\*$ from temperature and salinity on the Total pH scale following Perez and Fraga (1987).
 
@@ -247,7 +247,7 @@ KHF = calk.dissoc.KHF_T_PF87(tempK, psal)
   * `KHF`: stoichiometric dissociation constant for hydrogen fluoride ($K_\text{HF}^\*$), on the Total pH scale, in mol·kg-sw<sup>−1</sup>.
 
 
-## `.KHF_F_DR79`: Dickson and Riley (1979)
+### `.KHF_F_DR79`: Dickson and Riley (1979)
 
 Estimates the hydrogen fluoride stoichiometric dissociation constant $K_\text{HF}^\*$ from temperature and salinity on the Free pH scale following Dickson and Riley (1979).
 
@@ -273,7 +273,7 @@ KHF = calk.dissoc.KHF_F_DR79(tempK, psal)
 
 <hr />
 
-# Phosphoric acid
+## Phosphoric acid
 
 The equilibrium reactions are:
 
@@ -291,7 +291,7 @@ $$K_\text{P2}^\* = \frac{[\ce{HPO4^2-}] [\ce{H+}]}{[\ce{H2PO4-}]}$$
 
 $$K_\text{P3}^\* = \frac{[\ce{PO4^3-}] [\ce{H+}]}{[\ce{HPO4^2-}]}$$
 
-## `.KP_T_DSC07 `: Dickson et al. (2007)
+### `.KP_T_DSC07 `: Dickson et al. (2007)
 
 Estimates the phosphoric acid stoichiometric dissociation constants $K_\text{P1}^\*$, $K_\text{P2}^\*$ and $K_\text{P3}^\*$ from temperature and salinity on the Total pH scale following Dickson et al. (2007).
 
@@ -314,7 +314,7 @@ KP1, KP2, KP3 = calk.dissoc.KP_T_DSC07(tempK, psal)
 
 <hr />
 
-# Orthosilicic acid
+## Orthosilicic acid
 
 The equilibrium reaction is:
 
@@ -324,7 +324,7 @@ with the stoichiometric dissociation constant:
 
 $$K_\text{Si}^\* = \frac{[\ce{Si(OH)3O-}] [\ce{H+}]}{[\ce{Si(OH)4}]}$$
 
-## `.KSi_T_M95`: Millero (1995)
+### `.KSi_T_M95`: Millero (1995)
 
 Estimates the orthosilicic acid stoichiometric dissociation constant $K_\text{Si}^\*$ from temperature and salinity on the Total pH scale following Millero (1995).
 
