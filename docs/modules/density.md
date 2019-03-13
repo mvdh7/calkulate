@@ -5,7 +5,7 @@ Functions of temperature and salinity that estimate the densities of [1] seawate
 
 <hr />
 
-## .sw - seawater at 1 atm
+## `.sw`: seawater at 1 atm
 
 Calculates the density of seawater as a function of its temperature `tempK` in K and practical salinity `psal`, at a pressure of 1 atm, following Millero and Poisson (1981).
 
@@ -27,7 +27,7 @@ rho_sw = calk.density.sw(tempK, psal)
 
 <hr />
 
-## .acid - 0.1 M HCl in 0.6 M NaCl
+## `.acid`: 0.1 M HCl in 0.6 M NaCl
 
 Calculates the density of a mixed solution of HCl and NaCl as a function of its temperature, at a pressure of 1 atm.
 

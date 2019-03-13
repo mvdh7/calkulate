@@ -21,7 +21,7 @@ Functions of temperature and salinity that estimate the stoichiometric dissociat
 <hr />
 
 
-## .KX_F - list of constants
+## `.KX_F`: list of constants
 
 Assembles a list of dissociation constants on the Free pH scale in the order required by other Calkulate functions.
 

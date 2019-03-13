@@ -6,7 +6,7 @@ Functions of salinity to estimate the total concentrations of the dissolved comp
 <hr />
 
 
-## .XT - list of concentrations
+## `.XT`: list of concentrations
 
 Assembles a list of concentrations in the order required by other Calkulate functions.
 
@@ -35,7 +35,7 @@ XT = calk.conc.XT(psal, CT=0, PT=0, SiT=0)
 <hr />
 
 
-## .BT - total borate
+## `.BT`: total borate
 
 Estimates total borate, i.e. [B(OH)<sub>3</sub>] + [B(OH)<sub>4</sub><sup>−</sup>], from practical salinity following Lee et al. (2010).
 
@@ -54,7 +54,7 @@ BT = calk.conc.BT(psal)
   * `BT`: total borate in mol·kg-sw<sup>−1</sup>.
 
 
-## .FT - total fluoride
+## `.FT`: total fluoride
 
 Estimates total fluoride, i.e. [HF] + [F<sup>−</sup>], from practical salinity following **?????**.
 
@@ -73,7 +73,7 @@ FT = calk.conc.FT(psal)
   * `FT`: total fluoride in mol·kg-sw<sup>−1</sup>.
 
 
-## .ST - total sulfate
+## `.ST`: total sulfate
 
 Estimates total sulfate, i.e. [HSO<sub>4</sub><sup>−</sup>] + [SO<sub>4</sub><sup>2−</sup>], from practical salinity following **?????**. Note that the concentration of undissociated H<sub>2</sub>SO<sub>4</sub> is assumed to be zero.
 
