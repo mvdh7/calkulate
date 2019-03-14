@@ -1,7 +1,8 @@
 <!--<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>-->
 
-
-# Calkulate
+<div style="text-align: center; padding-bottom: 4%">
+<img src="img/logo_transparent.png" width="50%" />
+</div>
 
 **Calkulate** is a Python 3.6+ package for determining total alkalinity from seawater titration data.
 
