@@ -4,7 +4,7 @@
 [![pypi badge](https://img.shields.io/pypi/v/calkulate.svg?style=popout)](https://pypi.org/project/calkulate/)
 
 <div style="text-align: center; padding-bottom: 4%">
-<img src="img/logo_transparent.png" width="50%" />
+<img src="docs/img/logo_transparent.png" width="50%" />
 </div>
 
 Seawater total alkalinity from open-cell, non-purged, stepwise, potentiometric titration data.
