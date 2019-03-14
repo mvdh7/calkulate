@@ -3,9 +3,9 @@ import calkulate as calk
 # Do a real VINDTA .dat file
 #datfile = 'datfiles/0-0  0  (0)CRM-144-0435-4.dat'
 datfile = 'datfiles/calk_simtit.dat'
-Vacid,EMF,Tk = calk.gettit.VINDTA(datfile)
+Vacid,EMF,Tk = calk.io.VINDTA(datfile)
 
-Dacid = calk.dens.acid(Tk[0]) # kg/l
+Dacid = calk.density.acid(Tk[0]) # kg/l
 
 Macid = Vacid * Dacid * 1e-3 # kg
 
@@ -13,7 +13,7 @@ Vsamp = 100. # ml
 
 S = 33.571
 
-Msamp = Vsamp * calk.dens.sw(Tk[0],S) / 1e6 # kg
+Msamp = Vsamp * calk.density.sw(Tk[0],S) / 1e6 # kg
 
 # Get *XT and *KX
 AT_cert = 0.00223860
@@ -40,7 +40,7 @@ Cacid = 0.1
 
 test = calk.VINDTA.MPH(datfile,Vsamp,Cacid,S,CT,PT,SiT)['x']
 
-H = calk.solve.EMF2H(EMF,test[1],Tk)
+H = calk.solve.emf2h(EMF,test[1],Tk)
 
 simAT = calk.VINDTA.simAT(Macid,Tk,H,Msamp,S,CT,PT,SiT)[0]
 

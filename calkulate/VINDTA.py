@@ -28,8 +28,8 @@ def prep(datfile, Vsamp, S, CT, PT, SiT, burette_cx=1, Tk_force=None):
     if Tk_force is not None:
         Tk[:] = Tk_force
 
-    Msamp = Vsamp * dens.sw(Tk[0], S) * 1e-3 # sample mass / kg
-    Macid = burette_cx * Vacid * dens.acid(Tk) * 1e-3 # acid mass / kg
+    Msamp = Vsamp * density.sw(Tk[0], S) * 1e-3 # sample mass / kg
+    Macid = burette_cx * Vacid * density.acid(Tk) * 1e-3 # acid mass / kg
 
     XT = conc.XT(S, CT, PT, SiT) # total concentrations  / mol/kg-sw
     KX = dissoc.KX_F(Tk, S, XT[3], XT[4]) # dissociation constants

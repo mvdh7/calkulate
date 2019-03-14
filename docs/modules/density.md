@@ -7,17 +7,17 @@ Functions of temperature and salinity that estimate the densities of [1] seawate
 
 ## `.sw`: seawater at 1 atm
 
-Calculates the density of seawater as a function of its temperature `tempK` in K and practical salinity `psal`, at a pressure of 1 atm, following Millero and Poisson (1981).
+Calculates the density of seawater as a function of its temperature and practical salinity at a pressure of 1 atm, following Millero and Poisson (1981).
 
 **Syntax:**
 
 ```python
-rho_sw = calk.density.sw(tempK, psal)
+rho_sw = calk.density.sw(tempk, psal)
 ```
 
 **Inputs:**
 
-  * `tempK`: seawater temperature in K;
+  * `tempk`: seawater temperature in K;
   * `psal`: practical salinity.
 
 **Output:**
@@ -29,7 +29,7 @@ rho_sw = calk.density.sw(tempK, psal)
 
 ## `.acid`: 0.1 M HCl in 0.6 M NaCl
 
-Calculates the density of a mixed solution of HCl and NaCl as a function of its temperature, at a pressure of 1 atm.
+Calculates the density of a mixed solution of 0.1 M HCl and 0.6 M NaCl as a function of its temperature, at a pressure of 1 atm.
 
 The function uses a second-order polynomial fit through a series of temperature-density pairs, from 288.15 to 308.15 K, calculated using [E-AIM](http://www.aim.env.uea.ac.uk/aim/density/density_electrolyte.php) (Clegg and Wexler, 2011a, 2011b) with option 'rho, at the total solute mass fraction' and the concentrations:
 
@@ -42,27 +42,36 @@ This represents a 0.1 mol·dm<sup>−3</sup> HCl titrant mixed with NaCl, with t
 **Syntax:**
 
 ```python
-rho_acid = calk.density.acid(tempK)
+rho_acid = calk.density.acid(tempk)
 ```
 
 **Input:**
 
-  * `tempK`: acid temperature in K.
+  * `tempk`: acid temperature in K.
 
 **Output:**
 
   * `rho_acid`: acid density in kg·dm<sup>−3</sup>.
 
-
 <hr />
 
-# References
+## `.acid25`: HCl in NaCl at 25 °C
 
-Clegg, S. L., and Wexler, A. S. (2011a). Densities and Apparent Molar Volumes of Atmospherically Important Electrolyte Solutions. 1. The Solutes H<sub>2</sub>SO<sub>4</sub>, HNO<sub>3</sub>, HCl, Na<sub>2</sub>SO<sub>4</sub>, NaNO<sub>3</sub>, NaCl, (NH<sub>4</sub>)<sub>2</sub>SO<sub>4</sub>, NH<sub>4</sub>NO<sub>3</sub>, and NH<sub>4</sub>Cl from 0 to 50 °C, Including Extrapolations to Very Low Temperature and to the Pure Liquid State, and NaHSO<sub>4</sub>, NaOH, and NH<sub>3</sub> at 25 °C. *J. Phys. Chem. A* 115, 3393–3460. [doi:10.1021/jp108992a](https://doi.org/10.1021/jp108992a).
+Calculates the density of a mixed solution of HCl and NaCl as a function of its composition, at a pressure of 1 atm and temperature of 25 °C, following Dickson et al. (2007).
 
-Clegg, S. L., and Wexler, A. S. (2011b). Densities and Apparent Molar Volumes of Atmospherically Important Electrolyte Solutions. 2. The Systems H<sup>+</sup>−HSO<sub>4</sub><sup>−</sup>−SO<sub>4</sub><sup>2−</sup>−H<sub>2</sub>O from 0 to 3 mol kg<sup>−1</sup> as a Function of Temperature and H<sup>+</sup>−NH4<sup>+</sup>−HSO<sub>4</sub><sup>−</sup>−SO<sub>4</sub><sup>2−</sup>−H<sub>2</sub>O from 0 to 6 mol kg<sup>−1</sup> at 25 °C Using a Pitzer Ion Interaction Model, and NH<sub>4</sub>HSO<sub>4</sub>−H<sub>2</sub>O and (NH<sub>4</sub>)<sub>3</sub>H(SO<sub>4</sub>)<sub>2</sub>−H<sub>2</sub>O over the Entire Concentration Range. *J. Phys. Chem. A* 115, 3461–3474. [doi:10.1021/jp1089933](https://doi.org/10.1021/jp1089933).
+Note that the result from this function does not quite agree with the check value provided by Dickson et al. (2007). They declare it should give 1.02056 kg·dm<sup>−3</sup> for HCl and NaCl concentrations of 0.2 and 0.5 mol·kg-H<sub>2</sub>O<sup>−1</sup> respectively. However, this function returns 1.02035 kg·dm<sup>−3</sup> instead. The reason for this discrepancy is unclear.
 
+**Syntax:**
 
-Dickson, A. G., Afghan, J. D., and Anderson, G. C. (2003). Reference materials for oceanic CO<sub>2</sub> analysis: a method for the certification of total alkalinity. *Mar. Chem.* 80, 185–197. <a href="https://doi.org/10.1016/S0304-4203(02)00133-0">doi:10.1016/S0304-4203(02)00133-0</a>.
+```python
+rho25 = calk.density.acid25(mHCl, mNaCl)
+```
 
-Millero, F. J., and Poisson, A. (1981). International one-atmosphere equation of state of seawater. *Deep-Sea Res. Pt. A* 28, 625–629. <a href="https://doi.org/10.1016/0198-0149(81)90122-9">doi:10.1016/0198-0149(81)90122-9</a>.
+**Input:**
+
+  * `mHCl`: HCl concentration in mol·kg-H<sub>2</sub>O<sup>−1</sup>;
+  * `mNaCl`: NaCl concentration in mol·kg-H<sub>2</sub>O<sup>−1</sup>.
+
+**Output:**
+
+  * `rho25`: acid density in kg·dm<sup>−3</sup>.
