@@ -15,31 +15,31 @@ from .const import F, R
 #====== EMF to [H+] CONVERSIONS ===============================================
 
 
-def EMF2H(EMF, EMF0, tempK):
+def emf2h(emf, emf0, tempk):
     # DAA03 Eq. (13) with typo corrected (EMF and EMF0 switched)
-    return exp((EMF - EMF0) * F / (R * tempK))
+    return exp((emf - emf0) * F / (R * tempk))
 
 
-def H2EMF(H, EMF0, tempK):
-    return EMF0 + log(H) * R * tempK / F
+def h2emf(h, emf0, tempk):
+    return emf0 + log(h) * R * tempk / F
 
 
-def f2dEMF0(tempK, f):
-    return (R * tempK / F) * log(f)
+def f2demf0(tempk, f):
+    return (R * tempk / F) * log(f)
 
 
 #==============================================================================
 #====== GRAN ESTIMATOR FUNCTIONS ==============================================
 
 
-def F1(Macid, EMF, tempK, Msamp):
+def f1(Macid, EMF, tempk, Msamp):
     # DAA03 Eq. (10)
-    return (Msamp + Macid) * exp(EMF * F / (R * tempK))
+    return (Msamp + Macid) * exp(EMF * F / (R * tempk))
 
 
-def Gran_guess_AT(Macid, F1, Msamp, Cacid):
+def Gran_guess_AT(Macid, f1, Msamp, Cacid):
 
-    grad, inty, _, _, _ = linregress(Macid, F1)
+    grad, inty, _, _, _ = linregress(Macid, f1)
     intx = -inty / grad
 
     AT0 = intx * Cacid / Msamp
@@ -56,14 +56,14 @@ def Gran_EMF0(Macid, EMF, Tk, Msamp, Cacid, AT, HSO4=0, HF=0):
 # Get first guesses of AT and EMF0
 def guessGran(Macid, EMF, Tk, Msamp, Cacid):
 
-    F1g = F1(Macid, EMF, Tk, Msamp)
+    f1g = f1(Macid, EMF, Tk, Msamp)
 
-    Lg = logical_and(F1g > 0.1 * np_max(F1g), F1g < 0.9 * np_max(F1g))
+    Lg = logical_and(f1g > 0.1 * np_max(f1g), f1g < 0.9 * np_max(f1g))
 
-    ATg = Gran_guess_AT(Macid[Lg], F1g[Lg], Msamp, Cacid)
+    ATg = Gran_guess_AT(Macid[Lg], f1g[Lg], Msamp, Cacid)
     EMF0g = mean(Gran_EMF0(Macid[Lg], EMF[Lg], Tk[Lg], Msamp, Cacid, ATg))
 
-    Hg = EMF2H(EMF, EMF0g, Tk)
+    Hg = emf2h(EMF, EMF0g, Tk)
     pHg = -log10(Hg)
 
     return ATg, EMF0g, Hg, pHg
@@ -81,7 +81,7 @@ def lsqfun_MPH(Macid, EMF, Tk, Msamp, Cacid, EMF0,
 
     mu = Msamp / (Msamp + Macid)
 
-    H = EMF2H(EMF, EMF0, Tk)
+    H = emf2h(EMF, EMF0, Tk)
 
     return sim.AT(H, mu, AT, CT, BT, ST, FT, PT, SiT, *KX)[0] \
         - AT * mu + Macid * Cacid / (Macid + Msamp)
@@ -107,7 +107,7 @@ def MPH(Macid, EMF, Tk, Msamp, Cacid, xATx, CT, BT, ST, FT, PT, SiT, KX):
 
 def MPH_E0(Macid, EMF, Tk, EMF0, Msamp, Cacid, XT, KX):
 
-    H  = EMF2H(EMF, EMF0, Tk)
+    H  = emf2h(EMF, EMF0, Tk)
     pH = -log10(H)
 
     L = logical_and(pH > 3, pH < 4)
@@ -212,7 +212,7 @@ def halfGran(Macid, EMF, Tk, Msamp, Cacid, xATx, CT, BT, ST, FT, PT, xSiTx,
     for i in range(Gran_reps):
 
         if i == 0:
-            Gran_G[i] = F1(Macid, EMF, Tk, Msamp)
+            Gran_G[i] = f1(Macid, EMF, Tk, Msamp)
             LG = Gran_G[i] > 0.1 * np_max(Gran_G[i])
         else:
             LG = logical_and(Gran_pH[i - 1] > pHrange[0],
@@ -231,7 +231,7 @@ def halfGran(Macid, EMF, Tk, Msamp, Cacid, xATx, CT, BT, ST, FT, PT, xSiTx,
 
         step_E0[i] = nanmean(Gran_E0[i])
 
-        Gran_H[i] = EMF2H(EMF, step_E0[i], Tk)
+        Gran_H[i] = emf2h(EMF, step_E0[i], Tk)
         Gran_pH[i] = -log10(Gran_H[i])
 
         Gran_bicarb = mu * CT / (Gran_H[i] / KC1 + 1)
