@@ -10,7 +10,7 @@ Contains values for some universal constants.
 
 ## Salinity ratios
 
-  * `psal2Cl`: salinity/chlorinity following **WLD69**.
+  * `psal2Cl`: salinity/chlorinity following Wooster et al. (1969).
 
 ## Relative molecular masses
 

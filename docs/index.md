@@ -25,6 +25,15 @@ See the [quick-start guide](quick-start) for more detailed instructions and exam
 Calkulate v2.0 is in beta. Tests of the accuracy of its coefficients and equations are underway, so results may change. API may change and functions may be added or removed. Use at your own peril!
 
 
+# Citation
+
+A paper describing Calkulate v2 is in preparation. For now, if you use Calkulate in your research, please cite it as:
+
+  * Humphreys, M. P. (2015). "Calculating seawater total alkalinity from open-cell titration data using a modified Gran plot technique," in *Measurements and Concepts in Marine Carbonate Chemistry* (PhD Thesis, Ocean and Earth Science, University of Southampton, UK), 25–44.
+
+But please do check back here for any updates first (or [get in touch](https://mvdh.xyz/contact/))!
+
+
 # Acknowledgements
 
 Calkulate is maintained by [Dr Matthew P. Humphreys](https://mvdh.xyz) at the Centre for Ocean and Atmospheric Sciences, School of Environmental Sciences, University of East Anglia, Norwich, UK.
