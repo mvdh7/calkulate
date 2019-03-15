@@ -2,7 +2,9 @@ import calkulate as calk
 
 # Do a real VINDTA .dat file
 #datfile = 'datfiles/0-0  0  (0)CRM-144-0435-4.dat'
-datfile = 'datfiles/calk_simtit.dat'
+#datfile = 'datfiles/calk_simtit.dat'
+datfile = 'Ruth Pre-Locate/2019_0305_67_0_0_1.dat'
+
 Vacid,EMF,Tk = calk.io.VINDTA(datfile)
 
 Dacid = calk.density.acid(Tk[0]) # kg/l

@@ -70,10 +70,10 @@ def guessGran(datfile, Vsamp, Cacid, S, burette_cx=1, Tk_force=None):
     Macid, EMF, Tk, Msamp, _, _ = \
         prep(datfile, Vsamp, S, 0, 0, 0, burette_cx, Tk_force)
 
-    # Evaluate F1 function and corresponding logical
-    F1g = solve.F1(Macid, EMF, Tk, Msamp)
+    # Evaluate f1 function and corresponding logical
+    f1g = solve.f1(Macid, EMF, Tk, Msamp)
 
-    Lg = logical_and(F1g > 0.1 * np_max(F1g), F1g < 0.9 * np_max(F1g))
+    Lg = logical_and(f1g > 0.1 * np_max(f1g), f1g < 0.9 * np_max(f1g))
 
     # Get first guesses
     ATg, EMF0g, _, pHg = solve.guessGran(Macid, EMF, Tk, Msamp, Cacid)
@@ -82,7 +82,7 @@ def guessGran(datfile, Vsamp, Cacid, S, burette_cx=1, Tk_force=None):
     # Select data for fitting
     L = logical_and(pHg > 3, pHg < 4)
 
-    return Macid, EMF, Tk, Msamp,  F1g, Lg, EMF0gvec, ATg, EMF0g, pHg, L
+    return Macid, EMF, Tk, Msamp,  f1g, Lg, EMF0gvec, ATg, EMF0g, pHg, L
 
 
 def simH(Macid, Tk, Msamp, Cacid, S, AT, CT=0, PT=0, SiT=0):
