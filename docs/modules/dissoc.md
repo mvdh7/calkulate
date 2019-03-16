@@ -16,8 +16,6 @@ MathJax.Hub.Config({
 Functions of temperature and salinity that estimate the stoichiometric dissociation constants required to model seawater equilibria. All are valid at a pressure of 1 atm.
 
 
-<!-- Add chemistry with https://mhchem.github.io/MathJax-mhchem/ -->
-
 <hr />
 
 

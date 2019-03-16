@@ -1,6 +1,8 @@
 # Calkulate: seawater total alkalinity from titration data
 # Copyright (C) 2019  Matthew Paul Humphreys  (GNU GPLv3)
 
+"""Estimate seawater and acid densities from temperature and salinity."""
+
 from numpy import sqrt
 
 # Seawater density in kg/l
@@ -10,9 +12,10 @@ from numpy import sqrt
 #          doi:10.1016/0198-0149(81)90122-9
 
 def sw(tempK, S):
-
+    """Estimate seawater density from temperature and practical salinity
+    at 1 atm pressure, following Millero and Poisson (1981).
+    """
     tempC = tempK - 273.15
-
     return (999.842594 \
           +   6.793952e-2 * tempC \
           -   9.095290e-3 * tempC**2 \
@@ -53,7 +56,7 @@ def sw(tempK, S):
 #  with ionic strength equal to that of seawater (cf. DAA03)
 
 def acid(tempK):
-
+    
     return - 3.7239826839826254e-06 * tempK**2 \
            + 1.9182242077921724e-03 * tempK \
            + 7.8213696227965890e-01

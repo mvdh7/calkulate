@@ -1,6 +1,8 @@
 # Calkulate: seawater total alkalinity from titration data
 # Copyright (C) 2019  Matthew Paul Humphreys  (GNU GPLv3)
 
+"""Solve a titration dataset for total alkalinity."""
+
 from numpy import exp, full, isnan, log, log10, logical_and, mean, nan, \
     nanmean, size, std, zeros
 from numpy import abs as np_abs
@@ -15,16 +17,16 @@ from .const import F, R
 #====== EMF to [H+] CONVERSIONS ===============================================
 
 
-def emf2h(emf, emf0, tempk):
+def EMF2H(EMF, EMF0, tempk):
     # DAA03 Eq. (13) with typo corrected (EMF and EMF0 switched)
-    return exp((emf - emf0) * F / (R * tempk))
+    return exp((EMF - EMF0) * F / (R * tempk))
 
 
-def h2emf(h, emf0, tempk):
-    return emf0 + log(h) * R * tempk / F
+def H2EMF(H, EMF0, tempk):
+    return EMF0 + log(H) * R * tempk / F
 
 
-def f2demf0(tempk, f):
+def f2dEMF0(tempk, f):
     return (R * tempk / F) * log(f)
 
 
@@ -63,7 +65,7 @@ def guessGran(Macid, EMF, Tk, Msamp, Cacid):
     ATg = Gran_guess_AT(Macid[Lg], f1g[Lg], Msamp, Cacid)
     EMF0g = mean(Gran_EMF0(Macid[Lg], EMF[Lg], Tk[Lg], Msamp, Cacid, ATg))
 
-    Hg = emf2h(EMF, EMF0g, Tk)
+    Hg = EMF2H(EMF, EMF0g, Tk)
     pHg = -log10(Hg)
 
     return ATg, EMF0g, Hg, pHg
@@ -81,7 +83,7 @@ def lsqfun_MPH(Macid, EMF, Tk, Msamp, Cacid, EMF0,
 
     mu = Msamp / (Msamp + Macid)
 
-    H = emf2h(EMF, EMF0, Tk)
+    H = EMF2H(EMF, EMF0, Tk)
 
     return sim.AT(H, mu, AT, CT, BT, ST, FT, PT, SiT, *KX)[0] \
         - AT * mu + Macid * Cacid / (Macid + Msamp)
@@ -107,7 +109,7 @@ def MPH(Macid, EMF, Tk, Msamp, Cacid, xATx, CT, BT, ST, FT, PT, SiT, KX):
 
 def MPH_E0(Macid, EMF, Tk, EMF0, Msamp, Cacid, XT, KX):
 
-    H  = emf2h(EMF, EMF0, Tk)
+    H  = EMF2H(EMF, EMF0, Tk)
     pH = -log10(H)
 
     L = logical_and(pH > 3, pH < 4)
@@ -166,7 +168,7 @@ def lsqfun_Dickson1981(Macid, H, Msamp, Cacid, f,
         - Macid * Cacid
 
 
-def Dickson1981(Macid, EMF, Tk, Msamp, Cacid, XT,KX):
+def Dickson1981(Macid, EMF, Tk, Msamp, Cacid, XT, KX):
 
     # Get first guesses
     ATg, EMF0g, Hg, pHg = guessGran(Macid, EMF, Tk, Msamp, Cacid)
@@ -202,9 +204,9 @@ def halfGran(Macid, EMF, Tk, Msamp, Cacid, xATx, CT, BT, ST, FT, PT, xSiTx,
     Gran_HSO4 = zeros(size(EMF))
     Gran_HF = zeros(size(EMF))
 
-    Gran_G  = full((Gran_reps, size(EMF)), nan)
+    Gran_G = full((Gran_reps, size(EMF)), nan)
+    Gran_H = full((Gran_reps, size(EMF)), nan)
     Gran_E0 = full((Gran_reps, size(EMF)), nan)
-    Gran_H  = full((Gran_reps, size(EMF)), nan)
     Gran_pH = full((Gran_reps, size(EMF)), nan)
 
     converged = False
@@ -231,7 +233,7 @@ def halfGran(Macid, EMF, Tk, Msamp, Cacid, xATx, CT, BT, ST, FT, PT, xSiTx,
 
         step_E0[i] = nanmean(Gran_E0[i])
 
-        Gran_H[i] = emf2h(EMF, step_E0[i], Tk)
+        Gran_H[i] = EMF2H(EMF, step_E0[i], Tk)
         Gran_pH[i] = -log10(Gran_H[i])
 
         Gran_bicarb = mu * CT / (Gran_H[i] / KC1 + 1)
