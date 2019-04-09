@@ -4,8 +4,7 @@
 from .constants import psal2Cl, RMM_B, RMM_F
 
 def XT(psal, CT=0, PT=0, SiT=0):
-    """Assemble a dict of concentrations."""
-#    return [None, CT, BT(psal), ST(psal), FT(psal), PT, SiT]
+    """Assemble a dict of concentrations in mol/kg-sw."""
     return {
         'C': CT,
         'B': BT(psal),
@@ -13,7 +12,7 @@ def XT(psal, CT=0, PT=0, SiT=0):
         'F': FT(psal),
         'P': PT,
         'Si': SiT,
-    }
+    } # all in mol/kg-sw
 
 def BT(psal):
     """Estimate total borate from practical salinity in mol/kg-sw [LKB10]."""

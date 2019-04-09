@@ -26,7 +26,7 @@ Assembles a dict of concentrations as required by other Calkulate functions.
 **Syntax:**
 
 ```python
-XT = calk.conc.XT(psal, CT=0, PT=0, SiT=0)
+XT = calk.concentrations.XT(psal, CT=0, PT=0, SiT=0)
 ```
 
 **Inputs:**
@@ -55,7 +55,7 @@ Estimates total borate, i.e. $[\ce{B(OH)3}] + [\ce{B(OH)4−}]$, from practical 
 **Syntax:**
 
 ```python
-BT = calk.conc.BT(psal)
+BT = calk.concentrations.BT(psal)
 ```
 
 **Input:**
@@ -74,7 +74,7 @@ Estimates total fluoride, i.e. $[\ce{HF}] + [\ce{F−}]$, from practical salinit
 **Syntax:**
 
 ```python
-FT = calk.conc.FT(psal)
+FT = calk.concentrations.FT(psal)
 ```
 
 **Input:**
@@ -93,7 +93,7 @@ Estimates total sulfate, i.e. $[\ce{HSO4−}] + [\ce{SO4^2−}]$, from practical
 **Syntax:**
 
 ```python
-ST = calk.conc.ST(psal)
+ST = calk.concentrations.ST(psal)
 ```
 
 **Input:**

@@ -3,29 +3,22 @@
 
 from numpy import exp, log, sqrt
 
-def KX_F(tempK, psal, ST, FT):
-    """Assemble a list of dissociation constants on the Free pH scale."""
-    # Evaluate dissociation coefficients
-    KC1_T, KC2_T = KC_T_LDK00(tempK, psal)
-    KB_T = KB_T_D90a(tempK, psal)
-    KH2O_T = KH2O_T_DSC07(tempK, psal)
-    KHSO4_F = KHSO4_F_D90b(tempK, psal)
-    KHF_T = KHF_T_PF87(tempK, psal)
-    KP1_T, KP2_T, KP3_T = KP_T_DSC07(tempK, psal)
-    KSi_T = KSi_T_M95(tempK, psal)
-    # Get pH scale conversion factors and convert to Free pH scale
-    T2F = 1 / (1 + ST/KHSO4_F)
-    KC1_F  = KC1_T * T2F
-    KC2_F = KC2_T * T2F
-    KB_F = KB_T * T2F
-    KH2O_F = KH2O_T * T2F
-    KHF_F = KHF_T * T2F
-    KP1_F = KP1_T * T2F
-    KP2_F = KP2_T * T2F
-    KP3_F = KP3_T * T2F
-    KSi_F = KSi_T * T2F
-    return [KC1_F, KC2_F, KB_F, KH2O_F, KHSO4_F, KHF_F, KP1_F, KP2_F, KP3_F,
-        KSi_F]
+def KXF(tempK, psal, XT):
+    """Assemble a dict of dissociation constants on the Free pH scale."""
+    KXT = {} # for Total scale dissociation constants
+    KXF = {} # for Free scale dissociation constants
+    # Evaluate dissociation coefficients:
+    KXT['C1'], KXT['C2'] = KC_T_LDK00(tempK, psal)
+    KXT['B'] = KB_T_D90a(tempK, psal)
+    KXT['w'] = KH2O_T_DSC07(tempK, psal)
+    KXF['S'] = KHSO4_F_D90b(tempK, psal)
+    KXT['F'] = KHF_T_PF87(tempK, psal)
+    KXT['P1'], KXT['P2'], KXT['P3'] = KP_T_DSC07(tempK, psal)
+    KXT['Si'] = KSi_T_M95(tempK, psal)
+    # Get pH scale conversion factor(s) and convert all to Free pH scale:
+    T2F = 1 / (1 + XT['S']/KXF['S'])
+    KXF.update({k: v*T2F for k, v in KXT.items()})
+    return KXF
 
 def Istr(psal):
     """Estimate ionic strength from salinity."""

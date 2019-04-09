@@ -31,7 +31,7 @@ Determines total alkalinity from pH and a set of total concentrations and stoich
 **Syntax:**
 
 ```python
-AT, ATcomponents = calk.sim.AT(H, mu, XT, *KX)
+AT, ATcomponents = calk.simulate.AT(H, mu, XT, *KX)
 ```
 
 **Inputs:**
@@ -56,7 +56,7 @@ Determines pH from alkalinity, a given amount of acid addition, and a set of tot
 **Syntax:**
 
 ```python
-H = calk.sim.H(Macid, Msamp, Cacid, XT, KX)
+H = calk.simulate.H(Macid, Msamp, Cacid, XT, KX)
 ```
 
 **Inputs:**

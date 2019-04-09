@@ -27,8 +27,8 @@ def prep(datfile, Vsamp, psal, CT, PT, SiT, burette_cx=1, tempKforce=None):
     Msamp = Vsamp * density.sw(tempK[0], psal) * 1e-3 # sample mass / kg
     Macid = burette_cx * Vacid * density.acid(tempK) * 1e-3 # acid mass / kg
     XT = concentrations.XT(psal, CT, PT, SiT)
-    KX = dissociation.KX_F(tempK, psal, XT['S'], XT['F'])
-    return Macid, EMF, tempK, Msamp, XT, KX
+    KXF = dissociation.KXF(tempK, psal, XT)
+    return Macid, EMF, tempK, Msamp, XT, KXF
 
 
 # =================================================== HALF-GRAN FUNCTIONS =====
