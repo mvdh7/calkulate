@@ -12,7 +12,8 @@ Despite the version number, Calkulate v2.0 is in beta, as the original MATLAB pr
   * Converted lists of solute concentrations (`XT`) and dissociation constants (`KX`) to dicts;
   * Renamed *MPH* functions to *complete*;
   * Updated various aspects of nomenclature throughout;
-  * Switched pH simulator to solve for pH, not [H<sup>+</sup>].
+  * Switched pH simulator to solve for pH, not [H<sup>+</sup>];
+  * Active efforts towards MATLAB integration paused.
 
 
 ## 2.0.21
