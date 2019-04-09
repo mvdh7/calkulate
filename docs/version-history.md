@@ -9,7 +9,7 @@ Despite the version number, Calkulate v2.0 is in beta, as the original MATLAB pr
 
   * Added full outline documentation and function docstrings;
   * Added **meta** module, with single-source-of-truth version number;
-  * Converted list of solute concentrations (`XT`) to dict;
+  * Converted lists of solute concentrations (`XT`) and dissociation constants (`KX`) to dicts;
   * Renamed *MPH* functions to *complete*;
   * Updated various aspects of nomenclature throughout.
 
