@@ -21,7 +21,6 @@ def AT(H, mu, xATx, CT, BT, ST, FT, PT, SiT,
     AT = bicarb + 2*carb + B4 + OH - H - HSO4 - HF - P0 + P2 + 2*P3 + SiOOH3
     return AT, [bicarb, 2*carb, B4, OH, -H, -HSO4, -HF, -P0, P2, 2*P3, SiOOH3]
 
-
 def H(Macid, Msamp, Cacid, XT, KX):
     """Simulate pH from known total alkalinity and total concentrations."""
     H = full_like(Macid, nan)
