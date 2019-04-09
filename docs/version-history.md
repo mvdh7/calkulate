@@ -5,7 +5,7 @@ Despite the version number, Calkulate v2.0 is in beta, as the original MATLAB pr
 
 ## 2.0.22
 
-**Release date:** forthcoming
+**Release date:** 2019-04-09
 
   * Added full outline documentation and function docstrings;
   * Added **meta** module, with single-source-of-truth version number;
