@@ -2,10 +2,10 @@
 # Copyright (C) 2019  Matthew Paul Humphreys  (GNU GPLv3)
 
 from numpy import arange, array, full_like, genfromtxt
-from .const import Tzero
+from .constants import Tzero
 
 
-def VINDTA(datfile):
+def vindta(datfile):
 
     tdata = genfromtxt(datfile, delimiter='\t', skip_header=2)
 

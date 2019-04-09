@@ -7,8 +7,8 @@ from numpy import abs as np_abs
 from numpy import max as np_max
 from scipy.optimize import least_squares as olsq
 from scipy.stats import linregress
-from . import sim
-from .const import F, R
+from . import simulate
+from .constants import F, R
 
 
 #==============================================================================
@@ -83,7 +83,7 @@ def lsqfun_MPH(Macid, EMF, Tk, Msamp, Cacid, EMF0,
 
     H = emf2h(EMF, EMF0, Tk)
 
-    return sim.AT(H, mu, AT, CT, BT, ST, FT, PT, SiT, *KX)[0] \
+    return simulate.AT(H, mu, AT, CT, BT, ST, FT, PT, SiT, *KX)[0] \
         - AT * mu + Macid * Cacid / (Macid + Msamp)
 
 
@@ -114,7 +114,7 @@ def MPH_E0(Macid, EMF, Tk, EMF0, Msamp, Cacid, XT, KX):
 
     mu = Msamp / (Msamp + Macid)
 
-    AT = (sim.AT(H, mu, *XT, *KX)[0] + Macid * Cacid / (Macid + Msamp)) / mu
+    AT = (simulate.AT(H, mu, *XT, *KX)[0] + Macid*Cacid / (Macid + Msamp)) / mu
 
     return mean(AT[L]), std(AT[L])
 

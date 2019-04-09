@@ -1,7 +1,8 @@
 # Calkulate: seawater total alkalinity from titration data
 # Copyright (C) 2019  Matthew Paul Humphreys  (GNU GPLv3)
 
-from . import calib, conc, density, dissoc, io, sim, solve
+from . import calibrate, concentrations, density, dissociation, io, \
+    simulate, solve
 from numpy import logical_and
 from numpy import max as np_max
 
@@ -23,7 +24,7 @@ from numpy import max as np_max
 
 def prep(datfile, Vsamp, S, CT, PT, SiT, burette_cx=1, Tk_force=None):
 
-    Vacid, EMF, Tk = io.VINDTA(datfile)
+    Vacid, EMF, Tk = io.vindta(datfile)
 
     if Tk_force is not None:
         Tk[:] = Tk_force
@@ -31,8 +32,8 @@ def prep(datfile, Vsamp, S, CT, PT, SiT, burette_cx=1, Tk_force=None):
     Msamp = Vsamp * density.sw(Tk[0], S) * 1e-3 # sample mass / kg
     Macid = burette_cx * Vacid * density.acid(Tk) * 1e-3 # acid mass / kg
 
-    XT = conc.XT(S, CT, PT, SiT) # total concentrations  / mol/kg-sw
-    KX = dissoc.KX_F(Tk, S, XT[3], XT[4]) # dissociation constants
+    XT = concentrations.XT(S, CT, PT, SiT) # total concentrations  / mol/kg-sw
+    KX = dissociation.KX_F(Tk, S, XT[3], XT[4]) # dissociation constants
 
     return Macid, EMF, Tk, Msamp, XT, KX
 
@@ -54,7 +55,7 @@ def halfGran_CRM(datfile, Vsamp, AT_cert, S, CT, PT, burette_cx=1,
     Macid, EMF, Tk, Msamp, XT, KX = \
         prep(datfile, Vsamp, S, CT, PT, 0, burette_cx, Tk_force)
 
-    Cacid = calib.halfGran(Macid, EMF, Tk, Msamp, AT_cert, XT, KX)['x'][0]
+    Cacid = calibrate.halfGran(Macid, EMF, Tk, Msamp, AT_cert, XT, KX)['x'][0]
 
     AT, EMF0, _, _, _, _ = solve.halfGran(Macid, EMF, Tk, Msamp, Cacid,
         *XT, *KX)
@@ -87,21 +88,21 @@ def guessGran(datfile, Vsamp, Cacid, S, burette_cx=1, Tk_force=None):
 
 def simH(Macid, Tk, Msamp, Cacid, S, AT, CT=0, PT=0, SiT=0):
 
-    XT = conc.XT(S, CT, PT, SiT) # total concentrations  / mol/kg-sw
+    XT = concentrations.XT(S, CT, PT, SiT) # total concentrations  / mol/kg-sw
     XT[0] = AT
-    KX = dissoc.KX_F(Tk, S, XT[3], XT[4]) # dissociation constants
+    KX = dissociation.KX_F(Tk, S, XT[3], XT[4]) # dissociation constants
 
-    return sim.H(Macid, Msamp, Cacid, XT, KX)
+    return simulate.H(Macid, Msamp, Cacid, XT, KX)
 
 
 def simAT(Macid,Tk,H,Msamp,S,CT=0,PT=0,SiT=0):
 
     mu = Msamp / (Msamp + Macid)
 
-    XT = conc.XT(S, CT, PT, SiT) # total concentrations  / mol/kg-sw
-    KX = dissoc.KX_F(Tk, S, XT[3], XT[4]) # dissociation constants
+    XT = concentrations.XT(S, CT, PT, SiT) # total concentrations  / mol/kg-sw
+    KX = dissociation.KX_F(Tk, S, XT[3], XT[4]) # dissociation constants
 
-    return sim.AT(H, mu, *XT, *KX)
+    return simulate.AT(H, mu, *XT, *KX)
 
 
 # ========================================================= MPH FUNCTIONS =====
@@ -121,7 +122,7 @@ def MPH_CRM(datfile, Vsamp, AT_cert, S, CT, PT, SiT,
     Macid, EMF, Tk, Msamp, XT, KX = \
         prep(datfile, Vsamp,S, CT, PT, SiT, burette_cx, Tk_force)
 
-    Cacid = calib.MPH(Macid, EMF, Tk, Msamp, AT_cert, XT, KX)['x'][0]
+    Cacid = calibrate.MPH(Macid, EMF, Tk, Msamp, AT_cert, XT, KX)['x'][0]
 
     AT, EMF0 = solve.MPH(Macid, EMF, Tk, Msamp, Cacid, *XT, KX)['x']
 
