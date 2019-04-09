@@ -4,8 +4,16 @@
 from .constants import psal2Cl, RMM_B, RMM_F
 
 def XT(psal, CT=0, PT=0, SiT=0):
-    """Assemble a list of concentrations."""
-    return [None, CT, BT(psal), ST(psal), FT(psal), PT, SiT]
+    """Assemble a dict of concentrations."""
+#    return [None, CT, BT(psal), ST(psal), FT(psal), PT, SiT]
+    return {
+        'C': CT,
+        'B': BT(psal),
+        'S': ST(psal),
+        'F': FT(psal),
+        'P': PT,
+        'Si': SiT,
+    }
 
 def BT(psal):
     """Estimate total borate from practical salinity in mol/kg-sw [LKB10]."""

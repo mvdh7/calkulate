@@ -26,8 +26,8 @@ def prep(datfile, Vsamp, psal, CT, PT, SiT, burette_cx=1, tempKforce=None):
         tempK[:] = tempKforce
     Msamp = Vsamp * density.sw(tempK[0], psal) * 1e-3 # sample mass / kg
     Macid = burette_cx * Vacid * density.acid(tempK) * 1e-3 # acid mass / kg
-    XT = concentrations.XT(psal, CT, PT, SiT) # total concentrations
-    KX = dissociation.KX_F(tempK, psal, XT[3], XT[4]) # dissociation constants
+    XT = concentrations.XT(psal, CT, PT, SiT)
+    KX = dissociation.KX_F(tempK, psal, XT['S'], XT['F'])
     return Macid, EMF, tempK, Msamp, XT, KX
 
 
@@ -84,7 +84,7 @@ def complete(datfile, Vsamp, Cacid, psal, CT, PT, SiT, burette_cx=1,
         tempKforce=None):
     Macid, EMF, tempK, Msamp, XT, KX = prep(datfile, Vsamp, psal, CT, PT, SiT,
         burette_cx, tempKforce)
-    return solve.complete(Macid, EMF, tempK, Msamp, Cacid, *XT, KX)
+    return solve.complete(Macid, EMF, tempK, Msamp, Cacid, XT, KX)
 
 def completeCRM(datfile, Vsamp, AT_cert, psal, CT, PT, SiT,
         burette_cx=1, tempKforce=None):
@@ -92,5 +92,5 @@ def completeCRM(datfile, Vsamp, AT_cert, psal, CT, PT, SiT,
         burette_cx, tempKforce)
     Cacid = calibrate.complete(Macid, EMF, tempK, Msamp, AT_cert,
         XT, KX)['x'][0]
-    AT, EMF0 = solve.complete(Macid, EMF, tempK, Msamp, Cacid, *XT, KX)['x']
+    AT, EMF0 = solve.complete(Macid, EMF, tempK, Msamp, Cacid, XT, KX)['x']
     return Cacid, AT, EMF0
