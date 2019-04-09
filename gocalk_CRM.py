@@ -4,17 +4,11 @@ import calkulate as calk
 #datfile = 'datfiles/0-0  0  (0)CRM-144-0435-4.dat'
 #datfile = 'datfiles/calk_simtit.dat'
 datfile = 'Ruth Pre-Locate/2019_0305_67_0_0_1.dat'
-
-Vacid,EMF,Tk = calk.io.VINDTA(datfile)
-
+Vacid,EMF,Tk = calk.io.vindta(datfile)
 Dacid = calk.density.acid(Tk[0]) # kg/l
-
 Macid = Vacid * Dacid * 1e-3 # kg
-
 Vsamp = 100. # ml
-
 S = 33.571
-
 Msamp = Vsamp * calk.density.sw(Tk[0],S) / 1e6 # kg
 
 # Get *XT and *KX
@@ -23,28 +17,16 @@ AT_cert = 0.00223860
 CT  = 0.00203153
 PT  = 3.1e-7
 SiT = 2.5e-6
-
-XT = calk.conc.XT(S,CT,PT,SiT)
-
-KX = calk.dissoc.KX_F(Tk,S,XT[3],XT[4])
+XT = calk.concentrations.XT(S,CT,PT,SiT)
+KX = calk.dissociation.KX_F(Tk,S,XT[3],XT[4])
 
 # Solve
 
 Cacid = 0.1
 
-#Macid,EMF,Tk,Msamp, F1g,Lg, ATg,EMF0g,pHg,L = calk.VINDTA.guessGran(datfile,
-#    Vsamp,Cacid,S)
-
-#test1 = calk.sim.H(Macid,Msamp,Cacid,XT,KX)
-
-#test2 = calk.VINDTA.simH(Macid,Tk,Msamp,Cacid,S,AT_cert,CT,PT,SiT)
-
-
-test = calk.VINDTA.MPH(datfile,Vsamp,Cacid,S,CT,PT,SiT)['x']
-
+test = calk.vindta.complete(datfile,Vsamp,Cacid,S,CT,PT,SiT)['x']
 H = calk.solve.emf2h(EMF,test[1],Tk)
-
-simAT = calk.VINDTA.simAT(Macid,Tk,H,Msamp,S,CT,PT,SiT)[0]
+simAT = calk.vindta.simAT(Macid,Tk,H,Msamp,S,CT,PT,SiT)[0]
 
 
 

@@ -3,7 +3,6 @@
 
 from numpy import exp, log
 
-
 # ===== COMBINED KX LISTS =====================================================
 
 # --- DSC07 best practice, Free scale -----------------------------------------
@@ -20,10 +19,8 @@ def KX_F(tempK, psal, ST, FT):
     KP1_T, KP2_T, KP3_T = KP_T_DSC07(tempK, psal) # Total
     KSi_T = KSi_T_M95(tempK, psal) # Total
 
-    # Get pH scale conversion factors
-    T2F = 1 / (1 + ST / KHSO4_F)
-
-    # Convert everything to Free pH scale
+    # Get pH scale conversion factors and convert to Free pH scale
+    T2F = 1 / (1 + ST/KHSO4_F)
     KC1_F  = KC1_T * T2F
     KC2_F = KC2_T * T2F
     KB_F = KB_T * T2F
@@ -40,8 +37,8 @@ def KX_F(tempK, psal, ST, FT):
 
 # ===== IONIC STRENGTH ========================================================
 
-
 def Istr(psal):
+    """Estimate ionic strength from salinity."""
     return 19.924 * psal / (1000 - 1.005 * psal)
 
 

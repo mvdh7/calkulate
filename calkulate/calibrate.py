@@ -4,16 +4,17 @@
 from scipy.optimize import least_squares as olsq
 from . import solve
 
-def halfGran(Macid, EMF, Tk, Msamp, AT_cert, XT, KX):
-    return olsq(lambda Cacid: solve.halfGran(Macid, EMF, Tk, Msamp, Cacid,
+def halfGran(Macid, emf, tempK, Msamp, AT_cert, XT, KX):
+    """Calibrate acid concentration using half-Gran method."""
+    return olsq(lambda Cacid: solve.halfGran(Macid, emf, tempK, Msamp, Cacid,
         *XT, *KX, suppress_warnings=True)[0] - AT_cert, 0.1, method='lm')
 
-def MPH(Macid, EMF, Tk, Msamp, AT_cert, XT, KX):
-    return olsq(lambda Cacid: \
-        solve.MPH(Macid, EMF, Tk, Msamp, Cacid, *XT, KX)['x'][0] - AT_cert,
-        0.1, method='lm')
+def complete(Macid, emf, tempK, Msamp, AT_cert, XT, KX):
+    """Calibrate acid concentration using Complete Calculation."""
+    return olsq(lambda Cacid: solve.MPH(Macid, emf, tempK, Msamp, Cacid, 
+        *XT, KX)['x'][0] - AT_cert, 0.1, method='lm')
 
-def DAA03(Macid, EMF, Tk, Msamp, AT_cert, XT, KX):
-    return olsq(lambda Cacid: \
-        solve.DAA03(Macid, EMF, Tk, Msamp, Cacid, *XT, KX)['x'][0] - AT_cert,
-        0.1, method='lm')
+def DAA03(Macid, emf, tempK, Msamp, AT_cert, XT, KX):
+    """Calibrate acid concentration following Dickson et al. (2003)."""
+    return olsq(lambda Cacid: solve.DAA03(Macid, emf, tempK, Msamp, Cacid, 
+        *XT, KX)['x'][0] - AT_cert, 0.1, method='lm')

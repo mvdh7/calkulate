@@ -8,11 +8,9 @@ from .constants import Tzero
 def vindta(datfile):
 
     tdata = genfromtxt(datfile, delimiter='\t', skip_header=2)
-
     Vacid = tdata[:, 0] # ml
     EMF = tdata[:, 1] # mV
     tempK = tdata[:, 2] + Tzero # K
-
     return Vacid, EMF, tempK
 
 
