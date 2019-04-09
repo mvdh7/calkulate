@@ -17,7 +17,9 @@ pip install calkulate
 
 Other versions are probably fine, but untested. We use Python 3.6 rather than 3.7 to enable integration with MATLAB.
 
-See the [quick-start guide](quick-start) for more detailed instructions and examples.
+A few brief Python examples can be found in the script [calkDickson1981.py](https://github.com/mvdh7/calkulate/blob/master/calkDickson1981.py). More will follow, along with some visualisation tools.
+
+<!-- See the [quick-start guide](quick-start) for more detailed instructions and examples.-->
 
 
 # Development status
@@ -27,7 +29,7 @@ Calkulate v2.0 is in beta. Tests of the accuracy of its coefficients and equatio
 
 # Citation
 
-A paper describing Calkulate v2 is in preparation. For now, if you use Calkulate in your research, please cite it as:
+A paper describing Calkulate v2 is in preparation. For now, if you use any version of Calkulate in your research, please cite it as:
 
   * Humphreys, M. P. (2015). "Calculating seawater total alkalinity from open-cell titration data using a modified Gran plot technique," in *Measurements and Concepts in Marine Carbonate Chemistry* (PhD Thesis, Ocean and Earth Science, University of Southampton, UK), 25–44.
 

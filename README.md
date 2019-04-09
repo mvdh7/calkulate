@@ -8,6 +8,7 @@ v2 is under heavy development! For stable v1.0.2 (for MATLAB only) [see the rele
 
 Documentation is under construction at [calkulate.readthedocs.io](https://calkulate.readthedocs.io/en/latest/).
 
+
 ## Installation
 
 ```python
@@ -16,7 +17,7 @@ pip install calkulate
 
 ## Citation
 
-A paper describing Calkulate v2 is in preparation. For now, if you use Calkulate in your research, please cite it as:
+A paper describing Calkulate v2 is in preparation. For now, if you use any version of Calkulate in your research, please cite it as:
 
   * Humphreys, M. P. (2015). "Calculating seawater total alkalinity from open-cell titration data using a modified Gran plot technique," in *Measurements and Concepts in Marine Carbonate Chemistry* (PhD Thesis, Ocean and Earth Science, University of Southampton, UK), 25–44.
 

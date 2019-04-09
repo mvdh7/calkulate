@@ -11,7 +11,7 @@ theme: readthedocs
 
 nav:
   - Overview: index.md
-  - Quick-start guide: quick-start.md
+#  - Quick-start guide: quick-start.md
   - Calkulate modules:
     - .io - data import and export: modules/io.md
     - .solve - alkalinity solvers: modules/solve.md

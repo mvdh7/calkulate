@@ -20,13 +20,13 @@ $$A_\text{T} = \ce{HCO3- + 2CO3^2- + B(OH)4- + OH- - H+ - HSO4- - HF}$$
 
 $$\ce{- H3PO4 + HPO4^2- + 2PO4^3- + Si(OH)3O-}$$
 
-The [stoichiometric dissociation constant](../dissoc/) for each component equilibrium can be used to substitute the individual ionic concentrations in the equation above for functions of the [total concentration of each species](../conc/) and the hydrogen ion concentration.
+The [stoichiometric dissociation constant](../dissociation/) for each component equilibrium can be used to substitute the individual ionic concentrations in the equation above for functions of the [total concentration of each species](../concentrations/) and the hydrogen ion concentration.
 
 <hr />
 
 ## `.AT` - alkalinity from pH
 
-Determines total alkalinity from pH (actually, hydrogen ion concentration) and a set of total concentrations and stoichiometric dissociation constants using the equation above.
+Determines total alkalinity from pH (actually, hydrogen ion concentration) and a set of total concentrations and stoichioDmetric dissociation constants using the equation above.
 
 **Syntax:**
 
