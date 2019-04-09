@@ -47,6 +47,6 @@ Its ongoing development has been funded by the [Natural Environment Research Cou
 
 # License
 
-<img src="img/1920px-GPLv3_Logo.svg.png" width="25%" />
+<!--<img src="img/1920px-GPLv3_Logo.svg.png" width="25%" />-->
 
 The entirety of Calkulate is licensed under the [GNU General Public License version 3 (GPLv3)](https://www.gnu.org/licenses/gpl-3.0.en.html).
