@@ -4,6 +4,7 @@
 from .constants import psal2Cl, RMM_B, RMM_F
 
 def XT(psal, CT=0, PT=0, SiT=0):
+    """Assemble a list of concentrations."""
     return [None, CT, BT(psal), ST(psal), FT(psal), PT, SiT]
 
 def BT(psal):

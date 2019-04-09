@@ -9,7 +9,8 @@ from numpy import exp, log
 # --- DSC07 best practice, Free scale -----------------------------------------
 
 def KX_F(tempK, psal, ST, FT):
-
+    """Assemble a list of dissociation constants."""
+    
     # Evaluate dissociation coefficients
     KC1_T, KC2_T = KC_T_LDK00(tempK, psal) # Total
     KB_T = KB_T_D90a(tempK, psal) # Total

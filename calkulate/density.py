@@ -10,9 +10,8 @@ from numpy import sqrt
 #          doi:10.1016/0198-0149(81)90122-9
 
 def sw(tempK, S):
-
+    """Seawater density at 1 atm in kg/l [M81]."""
     tempC = tempK - 273.15
-
     return (999.842594 \
           +   6.793952e-2 * tempC \
           -   9.095290e-3 * tempC**2 \
