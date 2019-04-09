@@ -1,33 +1,33 @@
 # Fluid densities
 
-Functions of temperature and salinity that estimate the densities of [1] seawater and [2] mixtures of hydrochloric acid (HCl) and sodium chloride (NaCl).
+`.density` contains functions of temperature and salinity that estimate the densities of [1] seawater and [2] mixtures of hydrochloric acid (HCl) and sodium chloride (NaCl).
 
 
 <hr />
 
-## `.sw`: seawater at 1 atm
+## `.sw` - seawater at 1 atm
 
 Calculates the density of seawater as a function of its temperature and practical salinity at a pressure of 1 atm, following Millero and Poisson (1981).
 
 **Syntax:**
 
 ```python
-rho_sw = calk.density.sw(tempk, psal)
+rho_sw = calk.density.sw(tempK, psal)
 ```
 
 **Inputs:**
 
-  * `tempk`: seawater temperature in K;
-  * `psal`: practical salinity.
+  * `tempK` - seawater temperature in K;
+  * `psal` - practical salinity.
 
 **Output:**
 
-  * `rho_sw`: seawater density in kg·dm<sup>−3</sup>.
+  * `rho_sw` - seawater density in kg·dm<sup>−3</sup>.
 
 
 <hr />
 
-## `.acid`: 0.1 M HCl in 0.6 M NaCl
+## `.acid` - 0.1 M HCl in 0.6 M NaCl
 
 Calculates the density of a mixed solution of 0.1 M HCl and 0.6 M NaCl as a function of its temperature, at a pressure of 1 atm.
 
@@ -42,20 +42,20 @@ This represents a 0.1 mol·dm<sup>−3</sup> HCl titrant mixed with NaCl, with t
 **Syntax:**
 
 ```python
-rho_acid = calk.density.acid(tempk)
+rho_acid = calk.density.acid(tempK)
 ```
 
 **Input:**
 
-  * `tempk`: acid temperature in K.
+  * `tempK` - acid temperature in K.
 
 **Output:**
 
-  * `rho_acid`: acid density in kg·dm<sup>−3</sup>.
+  * `rho_acid` - acid density in kg·dm<sup>−3</sup>.
 
 <hr />
 
-## `.acid25`: HCl in NaCl at 25 °C
+## `.acid25` - HCl in NaCl at 25 °C
 
 Calculates the density of a mixed solution of HCl and NaCl as a function of its composition, at a pressure of 1 atm and temperature of 25 °C, following Dickson et al. (2007).
 
@@ -69,9 +69,9 @@ rho25 = calk.density.acid25(mHCl, mNaCl)
 
 **Input:**
 
-  * `mHCl`: HCl concentration in mol·kg-H<sub>2</sub>O<sup>−1</sup>;
-  * `mNaCl`: NaCl concentration in mol·kg-H<sub>2</sub>O<sup>−1</sup>.
+  * `mHCl` - HCl concentration in mol·kg-H<sub>2</sub>O<sup>−1</sup>;
+  * `mNaCl` - NaCl concentration in mol·kg-H<sub>2</sub>O<sup>−1</sup>.
 
 **Output:**
 
-  * `rho25`: acid density in kg·dm<sup>−3</sup>.
+  * `rho25` - acid density in kg·dm<sup>−3</sup>.

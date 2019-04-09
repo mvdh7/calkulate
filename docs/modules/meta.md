@@ -1,8 +1,7 @@
 # Package metadata
 
-Contains metadata about Calkulate.
+`.meta` contains metadata about Calkulate.
 
-
-## `.version`: version number
+## `.version` - version number
 
 A string containing the current version number.

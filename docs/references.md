@@ -14,7 +14,7 @@
 
   * Dickson, A. G. (1981). An exact definition of total alkalinity and a procedure for the estimation of alkalinity and total inorganic carbon from titration data. *Deep-Sea Res. Pt A* 28, 609–623. <a href="https://doi.org/10.1016/0198-0149(81)90121-7">doi:10.1016/0198-0149(81)90121-7</a>.
 
-  * Dickson, A. G. (1990a). Standard potential of the reaction: AgCl<sub>(s)</sub> + 0.5 H<sub>2(g)</sub> = Ag<sub>(s)</sub> + HCl<sub>(aq)</sub>, and the standard acidity constant of the ion HSO<sub>4</sub><sup>−</sup> in synthetic sea water from 273.15 to 318.15 K. *J. Chem. Thermodyn.* 22, 113–127. <a href="https://doi.org/10.1016/0021-9614(90)90074-Z">doi:10.1016/0021-9614(90)90074-Z</a>.
+  * Dickson, A. G. (1990a). Standard potential of the reaction: AgCl(s) + 0.5 H<sub>2</sub>(g) = Ag(s) + HCl(aq), and the standard acidity constant of the ion HSO<sub>4</sub><sup>−</sup> in synthetic sea water from 273.15 to 318.15 K. *J. Chem. Thermodyn.* 22, 113–127. <a href="https://doi.org/10.1016/0021-9614(90)90074-Z">doi:10.1016/0021-9614(90)90074-Z</a>.
 
   * Dickson, A. G. (1990b). Thermodynamics of the dissociation of boric acid in synthetic seawater from 273.15 to 318.15 K. *Deep-Sea Res. Pt A* 37, 755–766. <a href="https://doi.org/10.1016/0198-0149(90)90004-F">doi:10.1016/0198-0149(90)90004-F</a>.
 

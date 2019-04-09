@@ -18,7 +18,7 @@ nav:
     - .simulate - alkalinity and pH simulator: modules/simulate.md
     - .calibrate - calibration methods: modules/calibrate.md
     - .dissociation - dissociation constants: modules/dissociation.md
-    - .concentrations - solute concentrations: modules/concentrations.md
+    - .concentrations - solute concentrations from salinity: modules/concentrations.md
     - .density - fluid densities: modules/density.md
     - .constants - physical constants: modules/constants.md
     - .meta - package metadata: modules/meta.md
