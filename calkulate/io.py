@@ -40,16 +40,16 @@ def Dickson1981():
     XT['P'] = 0 # Phosphate
     XT['Si'] = 0 # Silicate
     # Set dissociation constants, all on Free pH scale
-    KH2O = full_like(Macid, 4.32e-14)
-    KC1 = full_like(Macid, 1.00e-06)
+    KXF = {}
+    KXF['w'] = full_like(Macid, 4.32e-14)
+    KXF['C1'] = full_like(Macid, 1.00e-06)
     KC1KC2 = full_like(Macid, 8.20e-16)
-    KC2 = KC1KC2 / KC1
-    KB = full_like(Macid, 1.78e-09)
-    KHSO4 = 1 / full_like(Macid, 1.23e+01)
-    KHF = 1 / full_like(Macid, 4.08e+02)
-    KP1 = full_like(Macid, 56.8)
-    KP2 = full_like(Macid, 8e-7)
-    KP3 = full_like(Macid, 1.32e-15) / KP2
-    KSi = full_like(Macid, 1)
-    KX = [KC1, KC2, KB, KH2O, KHSO4, KHF, KP1, KP2, KP3, KSi]
-    return Macid, pH, tempK, Msamp, Cacid, psal, AT, XT, KX
+    KXF['C2'] = KC1KC2 / KXF['C1']
+    KXF['B'] = full_like(Macid, 1.78e-09)
+    KXF['S'] = 1 / full_like(Macid, 1.23e+01)
+    KXF['F'] = 1 / full_like(Macid, 4.08e+02)
+    KXF['P1'] = full_like(Macid, 56.8)
+    KXF['P2'] = full_like(Macid, 8e-7)
+    KXF['P3'] = full_like(Macid, 1.32e-15) / KXF['P2']
+    KXF['Si'] = full_like(Macid, 1)
+    return Macid, pH, tempK, Msamp, Cacid, psal, AT, XT, KXF
