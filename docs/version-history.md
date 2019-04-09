@@ -3,6 +3,11 @@
 Despite the version number, Calkulate v2.0 is in beta, as the original MATLAB program is being extended and converted to Python.
 
 
+## 2.0.23
+
+**Release date:** forthcoming
+
+
 ## 2.0.22
 
 **Release date:** 2019-04-09
