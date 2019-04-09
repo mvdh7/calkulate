@@ -4,14 +4,14 @@
 
 <hr />
 
-## `.VINDTA` - import VINDTA-style .dat files
+## `.vindta` - import VINDTA-style .dat files
 
 Imports titration data in the .dat file format output by VINDTA instruments. This format is easy to replicate with any other sort of data that you may have.
 
 **Syntax:**
 
 ```python
-Vacid, EMF, tempK = calk.io.VINDTA(datfile)
+Vacid, EMF, tempK = calk.io.vindta(datfile)
 ```
 
 **Input:**

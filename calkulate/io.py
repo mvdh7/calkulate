@@ -29,27 +29,27 @@ def Dickson1981():
     tempK = full_like(Macid, 298.15) # K
     Cacid = 0.3 # mol/kg-soln
     Msamp = 0.2 # kg
-    psal = 35.0  # practical
-    # Set concentrations
-    AT  = 0.00245 # Alkalinity / mol/kg-sw
-    BT  = 0.00042 # Borate     / mol/kg-sw
-    CT  = 0.00220 # Carbon     / mol/kg-sw
-    ST  = 0.02824 # Sulfate    / mol/kg-sw
-    FT  = 0.00007 # Fluoride   / mol/kg-sw
-    PT  = 0       # Phosphate  / mol/kg-sw
-    SiT = 0       # Silicate   / mol/kg-sw
-    XT  = [AT, CT, BT, ST, FT, PT, SiT]
-    # Set dissociation constants (all are Free pH scale)
-    KH2O   = full_like(Macid, 4.32e-14)
-    KC1    = full_like(Macid, 1.00e-06)
+    psal = 35.0 # practical salinity
+    # Set concentrations, all in mol/kg-sw
+    AT = 0.00245 # Alkalinity
+    XT = {}
+    XT['B'] = 0.00042 # Borate
+    XT['C'] = 0.00220 # Carbon
+    XT['S'] = 0.02824 # Sulfate
+    XT['F'] = 0.00007 # Fluoride
+    XT['P'] = 0 # Phosphate
+    XT['Si'] = 0 # Silicate
+    # Set dissociation constants, all on Free pH scale
+    KH2O = full_like(Macid, 4.32e-14)
+    KC1 = full_like(Macid, 1.00e-06)
     KC1KC2 = full_like(Macid, 8.20e-16)
-    KC2    = KC1KC2 / KC1
-    KB     = full_like(Macid, 1.78e-09)
-    KHSO4  = 1 / full_like(Macid, 1.23e+01)
-    KHF    = 1 / full_like(Macid, 4.08e+02)
-    KP1    = full_like(Macid, 56.8)
-    KP2    = full_like(Macid, 8e-7)
-    KP3    = full_like(Macid, 1.32e-15) / KP2
-    KSi    = full_like(Macid, 1)
+    KC2 = KC1KC2 / KC1
+    KB = full_like(Macid, 1.78e-09)
+    KHSO4 = 1 / full_like(Macid, 1.23e+01)
+    KHF = 1 / full_like(Macid, 4.08e+02)
+    KP1 = full_like(Macid, 56.8)
+    KP2 = full_like(Macid, 8e-7)
+    KP3 = full_like(Macid, 1.32e-15) / KP2
+    KSi = full_like(Macid, 1)
     KX = [KC1, KC2, KB, KH2O, KHSO4, KHF, KP1, KP2, KP3, KSi]
-    return Macid, pH, tempK, Msamp, Cacid, psal, XT, KX
+    return Macid, pH, tempK, Msamp, Cacid, psal, AT, XT, KX
