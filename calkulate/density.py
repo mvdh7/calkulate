@@ -5,16 +5,9 @@
 
 from numpy import sqrt
 
-# Seawater density in kg/l
-# Inputs: T (temperature / deg C), S (practical salinity)
-# Valid ranges: 0 < T < 40 degC & 0.5 < S < 43
-# Source: Millero & Poisson (1981) DSR-A 28(6).
-#          doi:10.1016/0198-0149(81)90122-9
-
-def sw(tempK, S):
-    """Estimate seawater density from temperature and practical salinity
-    at 1 atm pressure, following Millero and Poisson (1981).
-    """
+def sw(tempK, psal):
+    """Seawater density at 1 atm in kg/l (Millero and Poisson, 1981)."""
+    # 0 < T < 40 degC & 0.5 < S < 43
     tempC = tempK - 273.15
     return (999.842594 \
           +   6.793952e-2 * tempC \
@@ -26,14 +19,12 @@ def sw(tempK, S):
           -   4.0899e-3   * tempC \
           +   7.6438e-5   * tempC**2 \
           -   8.2467e-7   * tempC**3 \
-          +   5.3875e-9   * tempC**4 ) * S \
+          +   5.3875e-9   * tempC**4 ) * psal \
       + ( -   5.72466e-3 \
           +   1.0227e-4   * tempC \
-          -   1.6546e-6   * tempC**2 ) * S**1.5 \
-      +       4.8314e-4                * S**2   ) * 1e-3
+          -   1.6546e-6   * tempC**2 ) * psal**1.5 \
+      +       4.8314e-4                * psal**2   ) * 1e-3
 
-# =============================================================================
-#
 # --- Estimate HCl titrant density --------------------------------------------
 #
 # Output in kg/l
@@ -54,32 +45,23 @@ def sw(tempK, S):
 #   Cl- : 0.7 mol/l
 # This represents (approximately) a 0.1 molar HCl titrant in an NaCl solution
 #  with ionic strength equal to that of seawater (cf. DAA03)
-
 def acid(tempK):
-    
     return - 3.7239826839826254e-06 * tempK**2 \
            + 1.9182242077921724e-03 * tempK \
            + 7.8213696227965890e-01
 
 # Or just at 25 degC, following Dickson et al. (2007), Chapter 5, Section 4.4:
-# (note incorrect check value is returned, should be 1.02056 for (0.2, 0.5))
-
+# (note incorrect check value is returned; should be 1.02056 for (0.2, 0.5))
 def acid25(mHCl, mNaCl):
-
     rhow25 = 0.99704 # g / cm**3
-
     m = mHCl + mNaCl # mol / kg-H2O
-
-    # Eqs. (16) and (17)
+    # Eqs. (16) and (17):
     phiHCl  = 17.854 + 1.460 * sqrt(m) - 0.307 * m
     phiNaCl = 16.613 + 1.811 * sqrt(m) + 0.094 * m
-
-    # Eqs. (14) and (15)
+    # Eqs. (14) and (15):
     mT = (36.46 * mHCl + 58.44 * mNaCl) / (mHCl + mNaCl)
     phimix = (mHCl * phiHCl + mNaCl * phiNaCl) / (mHCl + mNaCl)
-
-    # Eq. (13)
+    # Eq. (13):
     rho25 = rhow25 * (1e3 + mT * (mHCl + mNaCl)) / \
         (1e3 + phimix * (mHCl + mNaCl) * rhow25)
-
     return rho25 # g / cm**3

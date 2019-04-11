@@ -139,11 +139,13 @@ figures/*
 *.vbp
 *.vbw
 
-# Unwanted .dat files
-Ruth\ Pre-Locate/*
-VINDTA_VB_2014/*
-coggins*
-
 # MATLAB
 *.m~
 *.asv
+matlab/*
+
+# Closets of skeletons
+no-release/*
+Ruth\ Pre-Locate/*
+VINDTA_VB_2014/*
+coggins*

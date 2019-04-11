@@ -14,7 +14,7 @@ setuptools.setup(
     packages     = setuptools.find_packages(),
     install_requires = [
         'numpy>=1.15',
-        'scipy>=1.1']
+        'scipy>=1.1'],
     long_description = long_description,
     long_description_content_type = 'text/markdown',
     classifiers = (
