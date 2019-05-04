@@ -7,6 +7,8 @@ Despite the version number, Calkulate v2.0 is in beta, as the original MATLAB pr
 
 **Release date:** forthcoming
 
+  * Made all concentrations in **calibrate.solve** optional.
+
 
 ## 2.0.22
 

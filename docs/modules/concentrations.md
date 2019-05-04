@@ -2,22 +2,15 @@
 MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
 MathJax.Ajax.config.path["mhchem"] =
   "https://cdnjs.cloudflare.com/ajax/libs/mathjax-mhchem/3.3.2";
-MathJax.Hub.Config({
-  TeX: {
-    extensions: ["[mhchem]/mhchem.js"]
-  }
-});
-</script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+MathJax.Hub.Config({TeX: {extensions: ["[mhchem]/mhchem.js"]}});
+</script><script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
 
 
 # Solute concentrations from salinity
 
 `.concentrations` contains functions of salinity to estimate the total concentrations of the dissolved components of seawater.
 
-
 <hr />
-
 
 ## `.XT` - dict of concentrations
 
@@ -44,9 +37,7 @@ XT = calk.concentrations.XT(psal, CT=0, PT=0, SiT=0)
 
 Output fields `C`, `P` and `Si` are assigned by the respective user inputs, or given values of zero if not specified. `B`, `S` and `F` are estimated from `psal` using the other functions in this module.
 
-
 <hr />
-
 
 ## `.BT` - total borate
 

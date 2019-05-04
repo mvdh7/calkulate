@@ -28,13 +28,17 @@ Vacid, EMF, tempK = calk.io.vindta(datfile)
 
 ## `.Dickson1981` - load simulated titration
 
-Imports data from titration simulated by Dickson (1981), reported in his Table 1.
+Imports data from titration simulated by Dickson (1981), reported in his Tables 1 (without phosphate) and 4 (with phosphate).
 
 **Syntax:**
 
 ```python
-Macid, pH, tempK, Msamp, Cacid, psal, XT, KX = calk.io.Dickson1981()
+Macid, pH, tempK, Msamp, Cacid, psal, XT, KX = calk.io.Dickson1981(withPhosphate=True)
 ```
+
+**Input:**
+
+  * `withPhosphate` - logical determining whether titration data should include phosphate (`True`, Table 4) or not (`False`, Table 1); defaults to `True`.
 
 **Outputs:**
 
