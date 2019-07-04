@@ -18,6 +18,7 @@ __all__ = [
     'calibrate',
     'concentrations',
     'constants',
+    'dataviz',
     'density',
     'dissociation',
     'io',
@@ -27,7 +28,7 @@ __all__ = [
     'vindta'
 ]
 
-from . import calibrate, concentrations, constants, density, dissociation, \
-    io, meta, simulate, solve, vindta
+from . import calibrate, concentrations, constants, dataviz, density, \
+    dissociation, io, meta, simulate, solve, vindta
 
 __version__ = meta.version
