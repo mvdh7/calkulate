@@ -68,14 +68,14 @@ def guessGran(datfile, Vsamp, Cacid, psal, burette_cx=1, tempKforce=None):
 def simH(Macid, tempK, Msamp, Cacid, psal, AT, CT=0, PT=0, SiT=0):
     XT = concentrations.XT(psal, CT, PT, SiT) # total concentrations
     XT[0] = AT
-    KX = dissociation.KX_F(tempK, psal, XT[3], XT[4]) # dissociation constants
+    KX = dissociation.KXF(tempK, psal, XT) # dissociation constants
     return simulate.H(Macid, Msamp, Cacid, XT, KX)
 
 def simAT(Macid, tempK, H, Msamp, psal, CT=0, PT=0, SiT=0):
     mu = Msamp / (Msamp + Macid)
     XT = concentrations.XT(psal, CT, PT, SiT) # total concentrations
-    KX = dissociation.KX_F(tempK, psal, XT[3], XT[4]) # dissociation constants
-    return simulate.AT(H, mu, *XT, *KX)
+    KX = dissociation.KXF(tempK, psal, XT) # dissociation constants
+    return simulate.AT(H, mu, XT, KX)
 
 
 # ========================================================= MPH FUNCTIONS =====
