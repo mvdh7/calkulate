@@ -1,6 +1,7 @@
 # Calkulate: seawater total alkalinity from titration data.
 # Copyright (C) 2019  Matthew Paul Humphreys  (GNU GPLv3)
 from numpy import full_like, linspace, log10, logical_and, mean, nan, sqrt
+from numpy import min as np_min
 from numpy import max as np_max
 from matplotlib.pyplot import (figure, gca, rcParams, subplots_adjust, title,
     xlabel, ylabel)
@@ -36,71 +37,94 @@ def _graphprep(datfile, Vsamp, psal, CT, PT, SiT, Cacid):
     return (Macid, EMF, Msamp, f1g, Lg, ATg, emf0g, gemf0, AT_emf0, solution,
         ATpts, RMS, Npts, rgb)
 
-def graphax1(fig, gs, Macid, EMF, rgb, AT_emf0, Msamp, Cacid, ATg):
-    ax1 = fig.add_subplot(gs[0, 0])
-    ax1.scatter(Macid*1e3, EMF, c=rgb, edgecolors='k')
-    ax1.axvline(1e3*AT_emf0['x'][0]*Msamp/Cacid, color='b', linestyle='--')
-    ax1.axvline(1e3*ATg*Msamp/Cacid, color='y', linestyle='--')
-    ylabel('EMF (mV)')
-    title('a) Final EMF$^{0}$ = %f mV' % AT_emf0['x'][1], fontsize=10)
-    return ax1
+def emf_titration(ax, Macid, emf, rgb, AT_emf0, Msamp, Cacid, ATg, sublabel):
+    """EMF change as acid is added throughout a titration."""
+    ax.scatter(Macid*1e3, emf, c=rgb, edgecolors='k', clip_on=False)
+    ax.axvline(1e3*AT_emf0['x'][0]*Msamp/Cacid, color='b', linestyle='--')
+    ax.axvline(1e3*ATg*Msamp/Cacid, color='y', linestyle='--')
+    ax.set_xlim([0, np_max(Macid)*1e3])
+    yrange = np_max(emf) - np_min(emf)
+    ax.set_ylim([np_min(emf)-yrange*0.05, np_max(emf)+yrange*0.05])
+    ax.set_xlabel('Acid mass / g')
+    ax.set_ylabel('EMF / mV')
+    ax.set_title('{}Final EMF$^\circ$ = {:.2f} mV'.format(sublabel,
+        AT_emf0['x'][1]), fontsize=10)
+    return ax
 
-def graphax2(fig, gs, Macid, f1g, rgb, ATg, Msamp, Cacid):
-    ax2 = fig.add_subplot(gs[1, 0])
-    ax2.scatter(Macid*1e3, f1g, c=rgb, edgecolors='k')
-    ax2.axvline(1e3*ATg*Msamp/Cacid, color='y', linestyle='--')
-    ylabel('F$_{1}$')
-    title('b) First guess AT = %f μmol kg$^{-1}$' % (ATg*1e6), fontsize=10)
-    return ax2
+def f1_Gran(ax, Macid, f1g, rgb, ATg, Msamp, Cacid, sublabel):
+    """F1 Gran plot function for the first alkalinity estimate."""
+    ax.scatter(Macid*1e3, f1g*1e-7, c=rgb, edgecolors='k', clip_on=False)
+    ax.axvline(1e3*ATg*Msamp/Cacid, color='y', linestyle='--')
+    ax.set_xlim([0, np_max(Macid)*1e3])
+    ax.set_ylim([0, np_max(f1g*1.05e-7)])
+    ax.set_xlabel('Acid mass / g')
+    ax.set_ylabel('$F_1 \cdot 10^{-7}$')
+    ax.set_title('{}First-guess alkalinity = {:.1f} μmol/kg'.format(sublabel,
+        ATg*1e6), fontsize=10)
+    return ax
     
-def graphax3(fig, gs, ax1, Macid, Lg, gemf0, rgb, emf0g, ATg, Msamp, Cacid):
-    ax3 = fig.add_subplot(gs[2,0], sharex=ax1)
-    ax3.scatter(Macid[Lg]*1e3, gemf0, c=rgb[Lg], edgecolors='k')
-    ax3.axhline(emf0g, color='y')
-    ax3.axvline(1e3*ATg*Msamp/Cacid, color='y', linestyle='--')
-    ylabel('First guess \n EMF$^{0}$ (mV)')
-    title('c) First guess EMF$^{0}$ = %f mV' % emf0g, fontsize=10)
-    return ax3
+def emf0_estimate(ax, Macid, Lg, gemf0, rgb, emf0g, ATg, Msamp, Cacid, sublabel):
+    """First estimate of EMF0."""
+    ax.scatter(Macid[Lg]*1e3, gemf0, c=rgb[Lg], edgecolors='k', clip_on=False)
+    ax.axhline(emf0g, color='y')
+    ax.axvline(1e3*ATg*Msamp/Cacid, color='y', linestyle='--')
+    ax.set_xlim([0, np_max(Macid)*1e3])
+    ax.set_xlabel('Acid mass / g')
+    ax.set_ylabel('First-guess EMF$^\circ$ / mV')
+    ax.set_title('{}First-guess EMF$^\circ$ = {:.2f} mV'.format(sublabel,
+        emf0g), fontsize=10)
+    return ax
 
-def graphax4(fig, gs, Macid, solution):
-    ax4 = fig.add_subplot(gs[3,0])
-    ax4.scatter(Macid*1e3, solution[0]*1e6)
-    ylabel('Estimated titration \n alkalinity (μmol kg$^{-1}$)')
-    xlabel('Mass of acid (g)')
-    title('d) Linear decrease in AT during titration', fontsize=10)
-    return ax4
+def AT_titration(ax, Macid, solution, sublabel):
+    """Linear decrease in alkalinity as acid is added during a titration."""
+    ax.scatter(Macid*1e3, solution[0]*1e6, clip_on=False)
+    ax.set_xlim([0, np_max(Macid)*1e3])
+    ax.set_ylabel('Alkalinity / μmol kg$^{-1}$')
+    ax.set_xlabel('Acid mass / g')
+    title(sublabel, fontsize=10)
+    return ax
 
-def graphax5(fig, gs, Macid, ATpts, rgb, AT_emf0, RMS, Npts):
-    ax5 = fig.add_subplot(gs[0,1])
-    ax5.scatter(Macid*1e3, ATpts*1e6, c=rgb, edgecolors='k')
-    ax5.axhline(AT_emf0['x'][0]*1e6, color='b')
-    ylabel('AT from pH \n (μmol kg$^{-1}$)')
-    title('e) Final AT = %f μmol kg$^{-1} \pm$ %f (n = %i)' % \
-         ((AT_emf0['x'][0]*1e6), (RMS*1e6), Npts), fontsize=10)
-    return ax5
+def AT_estimates(ax, Macid, ATpts, rgb, AT_emf0, RMS, Npts, sublabel):
+    """Original sample alkalinity estimated from each titration point."""
+    ax.scatter(Macid*1e3, ATpts*1e6, c=rgb, edgecolors='k', clip_on=False)
+    ax.axhline(AT_emf0['x'][0]*1e6, color='b')
+    ax.set_xlim([0, np_max(Macid)*1e3])
+    ax.set_ylabel('AT from pH / μmol kg$^{-1}$')
+    ax.set_title('{}Final alkalinity = ({:.1f} $\pm$ {:.1f}) μmol/kg ($n$ = {})'.format(
+        sublabel, AT_emf0['x'][0]*1e6, RMS*1e6, Npts), fontsize=10)
+    return ax
 
-def graphax6(fig, gs, Macid, ATpts, solution):
-    ax6 = fig.add_subplot(gs[1:4, 1])
-    ax6.plot(Macid*1e3, -log10(ATpts), label='AT', marker='o', markersize=3, \
-             c='k')
-    names = ['+[HCO$_{3}^{-}$]', '+2[CO$_{3}^{2-}$]', '+[B(OH)$_{4}$]', \
-             '+[OH$^{-}$]', '-[H$^{+}$]', '-[HSO$_{4}^{-}$]', '-[HF]', \
-             '-[H$_{3}$PO$_{4}$]', '+[HPO$_{4}^{2-}$]', '+2[PO$_{4}^{3-}$]', \
-             '+[SiO(OH)$_{3}$]']
+def components(ax, Macid, ATpts, solution, sublabel):
+    """Changes in every component of alkalinity throughout a titration."""
+    ax.plot(Macid*1e3, -log10(ATpts), label='AT', marker='o', markersize=3,
+             c='k', clip_on=False)
+    names = [
+        '+[HCO$_{3}^{-}$]',
+        '+2[CO$_{3}^{2-}$]',
+        '+[B(OH)$_{4}$]',
+        '+[OH$^{-}$]',
+        '-[H$^{+}$]',
+        '-[HSO$_{4}^{-}$]',
+        '-[HF]',
+        '-[H$_{3}$PO$_{4}$]',
+        '+[HPO$_{4}^{2-}$]',
+        '+2[PO$_{4}^{3-}$]',
+        '+[SiO(OH)$_{3}$]',
+    ]
     c = iter(tab20(linspace(0, 0.9, len(names))))
     for k, name in enumerate(names):
         if name.startswith('-'):
             solution[1][k] = solution[1][k]*-1
     for j, name in enumerate(names):
-        ax6.plot(Macid*1e3, -log10(solution[1][j]), label=name, marker='x', \
-                 markersize=3, c=next(c))
-    ax = gca()
+        ax.plot(Macid*1e3, -log10(solution[1][j]), label=name, marker='x',
+                 markersize=3, c=next(c), clip_on=False)
+    ax.set_xlim([0, np_max(Macid)*1e3])
     ax.set_ylim(ax.get_ylim()[::-1])
-    ax6.legend(bbox_to_anchor=(1.05, 1))
-    xlabel('Mass of acid (g)')
-    ylabel('-log$_{10}$(Concentration from pH)(mol kg$^{-1}$)')
-    title('f) AT components', fontsize=10)
-    return ax6
+    ax.legend(bbox_to_anchor=(1.05, 1))
+    ax.set_xlabel('Mass of acid / g')
+    ax.set_ylabel('-log$_{10}$(concentration from pH / mol kg$^{-1}$)')
+    ax.set_title(sublabel, fontsize=10)
+    return ax
 
 def graph(datfile, Vsamp, psal, CT, PT, SiT, Cacid):
     """Plot everything for a single titration."""
@@ -110,10 +134,16 @@ def graph(datfile, Vsamp, psal, CT, PT, SiT, Cacid):
     rcParams.update({'font.size': 10})
     gs = fig.add_gridspec(4, 2)
     subplots_adjust(wspace=0.3, hspace=0.8)
-    ax1 = graphax1(fig, gs, Macid, EMF, rgb, AT_emf0, Msamp, Cacid, ATg)
-    ax2 = graphax2(fig, gs, Macid, f1g, rgb, ATg, Msamp, Cacid)
-    ax3 = graphax3(fig, gs, ax1, Macid, Lg, gemf0, rgb, emf0g, ATg, Msamp, Cacid)
-    ax4 = graphax4(fig, gs, Macid, solution)
-    ax5 = graphax5(fig, gs, Macid, ATpts, rgb, AT_emf0, RMS, Npts)
-    ax6 = graphax6(fig, gs, Macid, ATpts, solution)
+    ax1 = fig.add_subplot(gs[0, 0])
+    emf_titration(ax1, Macid, EMF, rgb, AT_emf0, Msamp, Cacid, ATg, '(a) ')
+    ax2 = fig.add_subplot(gs[1, 0])
+    f1_Gran(ax2, Macid, f1g, rgb, ATg, Msamp, Cacid, '(b) ')
+    ax3 = fig.add_subplot(gs[2, 0])
+    emf0_estimate(ax3, Macid, Lg, gemf0, rgb, emf0g, ATg, Msamp, Cacid, '(c) ')
+    ax4 = fig.add_subplot(gs[3, 0])
+    AT_titration(ax4, Macid, solution, '(d) ')
+    ax5 = fig.add_subplot(gs[0, 1])
+    AT_estimates(ax5, Macid, ATpts, rgb, AT_emf0, RMS, Npts, '(e) ')
+    ax6 = fig.add_subplot(gs[1:4, 1])
+    components(ax6, Macid, ATpts, solution, '(f)')
     return fig
