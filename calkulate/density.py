@@ -24,16 +24,12 @@ def sw(tempK, psal):
       +       4.8314e-4                * psal**2   ) * 1e-3
 
 # --- Estimate HCl titrant density --------------------------------------------
-#
 # Output in kg/l
-#
 # Uses a second-order polynomial, fit through temperature/density points:
-#
 # tempK = [288.15, 290.65, 293.15, 295.65, 298.15, 300.65,
 #       303.15, 305.65, 308.15] # K
 # D  = [1.025664, 1.025079, 1.024442, 1.023754, 1.023018, 1.022235,
 #       1.021408, 1.020538, 1.019627] # kg/l
-#
 # These density points were calculated using E-AIM
 #  [http://www.aim.env.uea.ac.uk/aim/density/density_electrolyte.php]
 #  with option "rho, at the total solute mass fraction"
