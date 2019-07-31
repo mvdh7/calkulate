@@ -1,4 +1,4 @@
-# Calkulate: seawater total alkalinity from titration data
+# Calkulate: seawater total alkalinity from titration data.
 # Copyright (C) 2019  Matthew Paul Humphreys  (GNU GPLv3)
 """Convenient function wrappers for working with VINDTA titration data."""
 from . import (calibrate, concentrations, density, dissociation, io,
