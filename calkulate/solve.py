@@ -10,9 +10,7 @@ from scipy.stats import linregress
 from . import simulate
 from .constants import F, R
 
-#==============================================================================
 #====== EMF to [H+] CONVERSIONS ===============================================
-
 def emf2h(emf, emf0, tempK):
     """Convert EMF to [H+]."""
     # DAA03 Eq. (13) with typo corrected (i.e. EMF and EMF0 switched)
@@ -25,9 +23,7 @@ def h2emf(h, emf0, tempK):
 def f2demf0(tempK, f):
     return log(f) * R*tempK/F
 
-#==============================================================================
 #====== GRAN ESTIMATOR FUNCTIONS ==============================================
-
 def f1(Macid, emf, tempk, Msamp):
     return (Msamp + Macid) * exp(emf * F / (R * tempk)) # DAA03 Eq. (10)
 
@@ -51,11 +47,8 @@ def guessGran(Macid, EMF, tempK, Msamp, Cacid):
     pHg = -log10(Hg)
     return ATg, EMF0g, Hg, pHg
 
-#==============================================================================
 #====== LEAST-SQUARES SOLVERS =================================================
-
 #----- Complete Calculation ---------------------------------------------------
-
 def _lsqfun_complete(Macid, EMF, tempK, Msamp, Cacid, EMF0, AT, XT, KX):
     mu = Msamp / (Msamp + Macid)
     H = emf2h(EMF, EMF0, tempK)
@@ -80,9 +73,7 @@ def complete_emf0(Macid, emf, tempK, emf0, Msamp, Cacid, XT, KX):
     AT = (simulate.AT(H, mu, XT, *KX)[0] + Macid*Cacid/(Macid + Msamp)) / mu
     return mean(AT[L]), std(AT[L])
 
-
 #----- Dickson et al. (2003) method -------------------------------------------
-
 def _lsqfun_DAA03(Macid, H, Msamp, Cacid, f, AT, XT, KXF):
     Z = 1 + XT['S']/KXF['S'] # DAA03 Eq. (15)
     return AT + XT['S'] / (1 + KXF['S']*Z/(f*H)) \
@@ -104,7 +95,6 @@ def DAA03(Macid, emf, tempK, Msamp, Cacid, XT, KXF):
 #    return EMF0g - log(AT_f['x'][1]) * R*mean(tempK)/F
 
 #----- Dickson (1981) method --------------------------------------------------
-
 def _lsqfun_Dickson1981(Macid, H, Msamp, Cacid, f, AT, XT, KXF):
     # Dickson (1981) Eq. (16):
     return Msamp * (AT - XT['C'] * (1/(1 + f*H/KXF['C1']) \
@@ -122,10 +112,7 @@ def Dickson1981(Macid, EMF, tempK, Msamp, Cacid, XT, KXF):
         [ATg,ATg*0.95, 1], x_scale=[1e-3, 1e-3, 1], method='lm')
     return AT_CT_f#, EMF0g - log(AT_CT_f['x'][2]) * R * mean(tempK) / F
 
-
-#==============================================================================
 #====== HALF-GRAN PLOT METHOD =================================================
-
 def halfGran(Macid, EMF, tempK, Msamp, Cacid, XT, KXF,
         pHrange=[3., 4.], suppress_warnings=False):
     """Solve for AT using the half-Gran method (Humphreys, 2015)."""

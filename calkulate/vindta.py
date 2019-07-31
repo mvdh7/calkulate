@@ -18,21 +18,18 @@ from numpy import max as np_max
 # tempKforce = titration temperature (optional) in K
 
 # ================================================== PREPARATORY FUNCTION =====
-
 def prep(datfile, Vsamp, psal, CT, PT, SiT, burette_cx=1, tempKforce=None):
     """Import VINDTA-style .dat file and prepare data for analysis."""
     Vacid, EMF, tempK = io.vindta(datfile)
     if tempKforce is not None:
         tempK[:] = tempKforce
-    Msamp = Vsamp * density.sw(tempK[0], psal) * 1e-3 # sample mass / kg
-    Macid = burette_cx * Vacid * density.acid(tempK) * 1e-3 # acid mass / kg
+    Msamp = Vsamp * density.sw(tempK[0], psal)*1e-3 # sample mass / kg
+    Macid = burette_cx * Vacid * density.acid(tempK)*1e-3 # acid mass / kg
     XT = concentrations.XT(psal, CT, PT, SiT)
     KXF = dissociation.KXF(tempK, psal, XT)
     return Macid, EMF, tempK, Msamp, XT, KXF
 
-
 # =================================================== HALF-GRAN FUNCTIONS =====
-
 def halfGran(datfile, Vsamp, Cacid, psal, CT, PT, burette_cx=1,
         tempKforce=None):
     Macid, EMF, tempK, Msamp, XT, KX = prep(datfile, Vsamp, psal, CT, PT, 0, 
@@ -49,9 +46,7 @@ def halfGranCRM(datfile, Vsamp, AT_cert, psal, CT, PT, burette_cx=1,
         *XT, *KX)
     return Cacid, AT, EMF0
 
-
 # ================================================ PLOT THE LOT FUNCTIONS =====
-
 def guessGran(datfile, Vsamp, Cacid, psal, burette_cx=1, tempKforce=None):
     Macid, EMF, tempK, Msamp, _, _ = prep(datfile, Vsamp, psal, 0, 0, 0,
         burette_cx, tempKforce)
@@ -77,9 +72,7 @@ def simAT(Macid, tempK, H, Msamp, psal, CT=0, PT=0, SiT=0):
     KX = dissociation.KXF(tempK, psal, XT) # dissociation constants
     return simulate.AT(H, mu, XT, KX)
 
-
 # ========================================================= MPH FUNCTIONS =====
-
 def complete(datfile, Vsamp, Cacid, psal, CT, PT, SiT, burette_cx=1, 
         tempKforce=None):
     Macid, EMF, tempK, Msamp, XT, KX = prep(datfile, Vsamp, psal, CT, PT, SiT,
