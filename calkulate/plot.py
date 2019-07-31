@@ -5,8 +5,6 @@ from matplotlib.pyplot import rcParams, ylabel, xlabel, figure, gca, title, \
 subplots_adjust
 from matplotlib.cm import tab20
 
-
-
 #graph plots a range of graphs using the nutrient data and dat file of a sample
 def graph(datfile, Vsamp, psal, CT, PT, SiT, Cacid):
      Macid, EMF, tempK, Msamp, XT, KXF = vindta.prep(datfile, Vsamp, psal, CT, 
@@ -85,11 +83,3 @@ def graph(datfile, Vsamp, psal, CT, PT, SiT, Cacid):
      xlabel('Mass of acid (g)')
      ylabel('-log$_{10}$(Concentration from pH)(mol kg$^{-1}$)')
      title('f) AT components', fontsize=10)
-    
-     
-     
-     
-     
-     
-     
-     
