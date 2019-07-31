@@ -152,7 +152,7 @@ def components(ax, Macid, ATpts, solution, sublabel):
     return ax
 
 def titration(datfile, Vsamp, psal, CT, PT, SiT, Cacid):
-    """Plot everything for a single titration."""
+    """Plot everything for a single titration with a VINDTA-style .dat file."""
     (Macid, EMF, Msamp, f1g, Lg, ATg, emf0g, gemf0, AT_emf0, solution, ATpts,
         RMS, Npts, rgb) = prep(datfile, Vsamp, psal, CT, PT, SiT, Cacid)
     fig = figure(figsize=[17, 10])
