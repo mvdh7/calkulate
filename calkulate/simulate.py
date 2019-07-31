@@ -1,6 +1,6 @@
-# Calkulate: seawater total alkalinity from titration data
+# Calkulate: seawater total alkalinity from titration data.
 # Copyright (C) 2019  Matthew Paul Humphreys  (GNU GPLv3)
-
+"""Simulate total alkalinity and pH during titrations."""
 from scipy.optimize import least_squares as olsq
 from numpy import full_like, nan
 

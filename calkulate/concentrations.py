@@ -1,6 +1,6 @@
-# Calkulate: seawater total alkalinity from titration data
+# Calkulate: seawater total alkalinity from titration data.
 # Copyright (C) 2019  Matthew Paul Humphreys  (GNU GPLv3)
-
+"""Estimate total concentrations from practical salinity."""
 from .constants import psal2Cl, RMM_B, RMM_F
 
 def XT(psal, CT=0, PT=0, SiT=0):

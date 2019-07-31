@@ -1,6 +1,8 @@
-# Calkulate: seawater total alkalinity from titration data
+# Calkulate: seawater total alkalinity from titration data.
 # Copyright (C) 2019  Matthew Paul Humphreys  (GNU GPLv3)
-
+"""Calibrate acid titrant concentration using certified reference material
+measurements.
+"""
 from scipy.optimize import least_squares as olsq
 from . import solve
 

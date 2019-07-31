@@ -1,5 +1,6 @@
 # Calkulate: seawater total alkalinity from titration data.
 # Copyright (C) 2019  Matthew Paul Humphreys  (GNU GPLv3)
+"""Visualise Calkulate calculations."""
 from numpy import array, log10, logical_and, mean, sqrt, zeros
 from numpy import min as np_min
 from numpy import max as np_max
@@ -76,7 +77,7 @@ def emf0_estimate(ax, Macid, Lg, gemf0, rgb, emf0g, ATg, Msamp, Cacid, sublabel)
     ax.set_xlim([0, np_max(Macid)*1e3])
     ax.set_xlabel('Acid mass / g')
     ax.set_ylabel('First-guess EMF$^\circ$ / mV')
-    ax.set_title('{} First-guess EMF$^\circ$ = {:.2f} mV'.format(sublabel,
+    ax.set_title('{} First-guess EMF$^\circ$ = {:.1f} mV'.format(sublabel,
         emf0g), fontsize=10)
     return ax
 
@@ -99,6 +100,7 @@ def AT_estimates(ax, Macid, ATpts, rgb, AT_emf0, RMS, Npts, sublabel):
     yrange = (np_max(ATpts) - np_min(ATpts))*1e6
     ax.set_ylim([np_min(ATpts*1e6) - yrange*0.05,
         np_max(ATpts*1e6 + yrange*0.05)])
+    ax.set_xlabel('Acid mass / g')
     ax.set_ylabel('AT from pH / μmol kg$^{-1}$')
     ax.set_title(('{} Final alkalinity = ({:.1f} $\pm$ {:.1f}) μmol/kg' + 
         ' ($n$ = {})').format(sublabel, AT_emf0['x'][0]*1e6, RMS*1e6, Npts),
@@ -144,7 +146,7 @@ def components(ax, Macid, ATpts, solution, sublabel):
     ax.set_xlim([0, np_max(Macid)*1e3])
     ax.set_ylim(ax.get_ylim()[::-1])
     ax.legend(bbox_to_anchor=(1.05, 1))
-    ax.set_xlabel('Mass of acid / g')
+    ax.set_xlabel('Acid mass / g')
     ax.set_ylabel('$-$log$_{10}$(concentration from pH / mol kg$^{-1}$)')
     ax.set_title(sublabel, fontsize=10)
     return ax

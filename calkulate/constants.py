@@ -1,5 +1,6 @@
-# Calkulate: seawater total alkalinity from titration data
+# Calkulate: seawater total alkalinity from titration data.
 # Copyright (C) 2019  Matthew Paul Humphreys  (GNU GPLv3)
+"""Define universal constants."""
 
 # Universal physical constants
 R = 8.3144621 # Gas constant in J / (K * mol)

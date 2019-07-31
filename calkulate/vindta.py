@@ -1,8 +1,8 @@
 # Calkulate: seawater total alkalinity from titration data
 # Copyright (C) 2019  Matthew Paul Humphreys  (GNU GPLv3)
-
-from . import calibrate, concentrations, density, dissociation, io, \
-    simulate, solve
+"""Convenient function wrappers for working with VINDTA titration data."""
+from . import (calibrate, concentrations, density, dissociation, io,
+    simulate, solve)
 from numpy import logical_and
 from numpy import max as np_max
 
