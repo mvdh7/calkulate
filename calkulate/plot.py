@@ -68,7 +68,8 @@ def f1_Gran(ax, Macid, f1g, rgb, ATg, Msamp, Cacid, sublabel):
         ATg*1e6), fontsize=10)
     return ax
     
-def emf0_estimate(ax, Macid, Lg, gemf0, rgb, emf0g, ATg, Msamp, Cacid, sublabel):
+def emf0_estimate(ax, Macid, Lg, gemf0, rgb, emf0g, ATg, Msamp, Cacid,
+        sublabel):
     """First estimate of EMF0."""
     ax.axhline(emf0g, color=_rgb_guess, zorder=1)
     ax.axvline(1e3*ATg*Msamp/Cacid, color=_rgb_guess, linestyle='--', zorder=1)
