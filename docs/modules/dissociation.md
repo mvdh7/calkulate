@@ -2,21 +2,14 @@
 MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
 MathJax.Ajax.config.path["mhchem"] =
   "https://cdnjs.cloudflare.com/ajax/libs/mathjax-mhchem/3.3.2";
-MathJax.Hub.Config({
-  TeX: {
-    extensions: ["[mhchem]/mhchem.js"]
-  }
-});
-</script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
-
+MathJax.Hub.Config({TeX: {extensions: ["[mhchem]/mhchem.js"]}});
+</script><script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
 
 # Dissociation constants
 
 `.dissociation` contains functions of temperature and salinity that estimate the stoichiometric dissociation constants required to model seawater equilibria. All are valid at a pressure of 1 atm.
 
-<hr />
-
+---
 
 ## `.KXF` - dict of dissociation constants
 
@@ -40,8 +33,7 @@ KX = calk.dissociation.KXF(tempK, psal, XT)
 
 The dissociation constants are evaluated using the other functions in this module.
 
-
-<hr />
+---
 
 ## `.Istr` - ionic strength
 
@@ -61,8 +53,7 @@ Istr = calk.dissociation.Istr(psal)
 
   * `Istr` - ionic strength in mol·kg-sw<sup>−1</sup>.
 
-
-<hr />
+---
 
 ## Carbonic acid
 
@@ -103,7 +94,7 @@ K1, K2 = calk.dissociation.KC_T_LDK00(tempK, psal)
   * `K1` - first stoichiometric dissociation constant for carbonic acid ($K_1^\*$), on the Total pH scale, in mol·kg-sw<sup>−1</sup>;
   * `K2` - second stoichiometric dissociation constant for carbonic acid ($K_2^\*$), on the Total pH scale, in mol·kg-sw<sup>−1</sup>.
 
-<hr />
+---
 
 ## Boric acid
 
@@ -139,7 +130,7 @@ KB = calk.dissociation.KB_T_D90a(tempK, psal)
 
   * `KB` - stoichiometric dissociation constant for boric acid ($K_\text{B}^\*$), on the Total pH scale, in mol·kg-sw<sup>−1</sup>.
 
-<hr />
+---
 
 ## Water
 
@@ -170,7 +161,7 @@ KH2O = calk.dissociation.KH2O_T_DSC07(tempK, psal)
 
   * `KH2O` - stoichiometric dissociation constant for water ($K_\text{w}^\*$), on the Total pH scale, in (mol·kg-sw<sup>−1</sup>)<sup>2</sup>.
 
-<hr />
+---
 
 ## Bisulfate
 
@@ -206,7 +197,7 @@ KHSO4 = calk.dissociation.KHSO4_F_D90b(tempK, psal)
 
   * `KHSO4` - stoichiometric dissociation constant for bisulfate ($K_\text{w}^\*$), on the Free pH scale, in mol·kg-sw<sup>−1</sup>.
 
-<hr />
+---
 
 ## Hydrofluoric acid
 
@@ -267,7 +258,7 @@ KHF = calk.dissociation.KHF_F_DR79(tempK, psal)
 
   * `KHF` - stoichiometric dissociation constant for hydrogen fluoride ($K_\text{HF}^\*$), on the Free pH scale, in mol·kg-sw<sup>−1</sup>.
 
-<hr />
+---
 
 ## Phosphoric acid
 
@@ -308,7 +299,7 @@ KP1, KP2, KP3 = calk.dissociation.KP_T_DSC07(tempK, psal)
   * `KP2` - second stoichiometric dissociation constant for phosphoric acid ($K_\text{P2}^\*$), on the Total pH scale, in mol·kg-sw<sup>−1</sup>;
   * `KP3` - third stoichiometric dissociation constant for phosphoric acid ($K_\text{P3}^\*$), on the Total pH scale, in mol·kg-sw<sup>−1</sup>.
 
-<hr />
+---
 
 ## Orthosilicic acid
 
@@ -339,7 +330,7 @@ KSi = calk.dissociation.KSi_T_M95(tempK, psal)
 
   * `KSi` - stoichiometric dissociation constant for silicic acid ($K_\text{Si}^\*$), on the Total pH scale, in mol·kg-sw<sup>−1</sup>.
 
-<hr />
+---
 
 <!--
 

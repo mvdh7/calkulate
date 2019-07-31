@@ -12,16 +12,18 @@ theme: readthedocs
 nav:
   - Overview: index.md
 #  - Quick-start guide: quick-start.md
-  - Calkulate modules:
+  - Main Calkulate modules:
     - .io - data import and export: modules/io.md
     - .solve - alkalinity solvers: modules/solve.md
-    - .simulate - alkalinity and pH simulator: modules/simulate.md
     - .calibrate - calibration methods: modules/calibrate.md
+    - .vindta - convenient wrappers: modules/vindta.md
+    - .plot - titration visualisation: modules/plot.md
+  - Behind the scenes:
+    - .simulate - alkalinity and pH simulator: modules/simulate.md
     - .dissociation - dissociation constants: modules/dissociation.md
     - .concentrations - solute concentrations from salinity: modules/concentrations.md
     - .density - fluid densities: modules/density.md
     - .constants - physical constants: modules/constants.md
     - .meta - package metadata: modules/meta.md
-    - .vindta - VINDTA functions: modules/vindta.md
   - Version history: version-history.md
   - References: references.md
