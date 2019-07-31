@@ -11,7 +11,7 @@ _rgb_guess = array([0.96, 0.86, 0.04])
 _rgb_final = array([0.21, 0.46, 1])
 _rgb_both = array([0.27, 0.8, 0.54])
 
-def _graphprep(datfile, Vsamp, psal, CT, PT, SiT, Cacid):
+def prep(datfile, Vsamp, psal, CT, PT, SiT, Cacid):
     """Preparatory calculations for plotting."""
     Macid, EMF, tempK, Msamp, XT, KXF = vindta.prep(datfile, Vsamp, psal, CT, 
         PT, SiT)
@@ -151,10 +151,10 @@ def components(ax, Macid, ATpts, solution, sublabel):
     ax.set_title(sublabel, fontsize=10)
     return ax
 
-def graph(datfile, Vsamp, psal, CT, PT, SiT, Cacid):
+def titration(datfile, Vsamp, psal, CT, PT, SiT, Cacid):
     """Plot everything for a single titration."""
     (Macid, EMF, Msamp, f1g, Lg, ATg, emf0g, gemf0, AT_emf0, solution, ATpts,
-        RMS, Npts, rgb) = _graphprep(datfile, Vsamp, psal, CT, PT, SiT, Cacid)
+        RMS, Npts, rgb) = prep(datfile, Vsamp, psal, CT, PT, SiT, Cacid)
     fig = figure(figsize=[17, 10])
     rcParams.update({'font.size': 10})
     gs = fig.add_gridspec(4, 2)
