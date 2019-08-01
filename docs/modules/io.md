@@ -11,7 +11,7 @@ Imports titration data in the .dat file format output by VINDTA instruments. Thi
 **Syntax:**
 
 ```python
-Vacid, EMF, tempK = calk.io.vindta(datfile)
+volAcid, emf, tempK = calk.io.vindta(datfile)
 ```
 
 **Input:**
@@ -20,8 +20,8 @@ Vacid, EMF, tempK = calk.io.vindta(datfile)
 
 **Outputs:**
 
-  * `Vacid` - volume of acid titrant added in ml;
-  * `EMF` - titration cell potential in mV;
+  * `volAcid` - volume of acid titrant added in ml;
+  * `emf` - titration cell potential in mV;
   * `tempK` - titre temperature in K.
 
 ---
@@ -33,7 +33,8 @@ Imports data from titration simulated by Dickson (1981), reported in his Tables 
 **Syntax:**
 
 ```python
-Macid, pH, tempK, Msamp, Cacid, psal, XT, KX = calk.io.Dickson1981(withPhosphate=True)
+massAcid, pH, tempK, massSample, concAcid, pSal, XT, KX = \
+    calk.io.Dickson1981(withPhosphate=True)
 ```
 
 **Input:**
@@ -42,6 +43,6 @@ Macid, pH, tempK, Msamp, Cacid, psal, XT, KX = calk.io.Dickson1981(withPhosphate
 
 **Outputs:**
 
-  * `Macid`, `tempK`, `Msamp`, `Cacid`, `psal`, `XT` and `KX` have [their usual meanings]();
+  * `massAcid`, `tempK`, `massSample`, `concAcid`, `pSal`, `XT` and `KX` have [their usual meanings](../../conventions);
   * `XT[0]` contains the true total alkalinity value;
   * `pH` - the pH values (Free scale) simulated by Dickson (1981) throughout the titration.
