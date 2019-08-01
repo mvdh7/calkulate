@@ -77,7 +77,7 @@ def simAT(massAcid, tempK, H, massSample, pSal, CT=0, PT=0, SiT=0):
     mu = solve.mu(massAcid, massSample)
     XT = concentrations.XT(pSal, CT, PT, SiT)
     KX = dissociation.KXF(tempK, pSal, XT)
-    return simulate.AT(H, mu, XT, KX)
+    return simulate.alk(H, mu, XT, KX)
 
 def complete(datfile, volSample, concAcid, pSal, CT, PT, SiT,
         buretteCorrection=1, tempKForce=None):

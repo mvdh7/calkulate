@@ -4,7 +4,7 @@
 from scipy.optimize import least_squares as olsq
 from numpy import full_like, nan
 
-def AT(h, mu, XT, KXF):
+def alk(h, mu, XT, KXF):
     """Simulate total alkalinity from known pH and total concentrations."""
     OH = KXF['w']/h
     if 'C' in XT.keys():
@@ -38,15 +38,15 @@ def AT(h, mu, XT, KXF):
         SiOOH3 = mu*XT['Si']*KXF['Si']/(h + KXF['Si'])
     else:
         SiOOH3 = 0
-    AT = bicarb + 2*carb + B4 + OH - h - HSO4 - HF - P0 + P2 + 2*P3 + SiOOH3
-    return AT, [bicarb, 2*carb, B4, OH, -h, -HSO4, -HF, -P0, P2, 2*P3, SiOOH3]
+    alk = bicarb + 2*carb + B4 + OH - h - HSO4 - HF - P0 + P2 + 2*P3 + SiOOH3
+    return alk, [bicarb, 2*carb, B4, OH, -h, -HSO4, -HF, -P0, P2, 2*P3, SiOOH3]
 
 def pH(massAcid, massSample, concAcid, alk0, XT, KXF):
     """Simulate pH from known total alkalinity and total concentrations."""
     pH = full_like(massAcid, nan)
     mu = massSample/(massSample + massAcid)
     for i, massAcid_i in enumerate(massAcid):
-        pH[i] = olsq(lambda pH: AT(10.0**-pH, mu[i], XT, KXF)[0] - mu[i]*alk0 +
+        pH[i] = olsq(lambda pH: alk(10.0**-pH, mu[i], XT, KXF)[0] - mu[i]*alk0 +
                 massAcid_i*concAcid/(massAcid_i + massSample),
             8.0, method='lm')['x']
     return pH

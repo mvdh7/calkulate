@@ -65,7 +65,7 @@ def _lsqfun_complete(massAcid, emf, tempK, massSample, concAcid, emf0, alk, XT,
         KX):
     xmu = mu(massAcid, massSample)
     H = emf2h(emf, emf0, tempK)
-    return (simulate.AT(H, xmu, XT, KX)[0] - alk*xmu +
+    return (simulate.alk(H, xmu, XT, KX)[0] - alk*xmu +
         massAcid*concAcid/(massAcid + massSample))
 
 def complete(massAcid, emf, tempK, massSample, concAcid, XT, KXF):
