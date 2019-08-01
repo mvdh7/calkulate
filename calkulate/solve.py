@@ -41,7 +41,7 @@ def granEmf0(massAcid, emf, tempK, massSample, concAcid, alk, HSO4=0, HF=0):
         - massSample*(HF + HSO4))/(massSample + massAcid)))
 
 def guessGran(massAcid, emf, tempK, massSample, concAcid):
-    """Simple Gran plot first guesses for AT and EMF0."""
+    """Simple Gran plot first guesses for alkalinity and EMF0."""
     f1Guess = f1(massAcid, emf, tempK, massSample)
     LGuess = logical_and(
         f1Guess > 0.1*np_max(f1Guess),
@@ -80,7 +80,7 @@ def complete(massAcid, emf, tempK, massSample, concAcid, XT, KXF):
     return alk_emf0
 
 def complete_emf0(massAcid, emf, tempK, emf0, massSample, concAcid, XT, KX):
-    """Complete Calculation of AT with known EMF0."""
+    """Complete Calculation of alkalinity with known EMF0."""
     H  = emf2h(emf, emf0, tempK)
     pH = -log10(H)
     L = logical_and(pH > 3, pH < 4)

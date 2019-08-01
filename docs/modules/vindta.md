@@ -61,7 +61,7 @@ massAcid, emf, tempK, massSample, XT, KXF = calk.vindta.prep(datfile, volSample,
   * `PT` - sample phosphate in mol/kg;
   * `SiT` - sample silicate in mol/kg;
   * `burette_cx` - optional, multiplicative correction factor for the volume of the burette that delivers acid to the titration cell (defaults to `1`);
-  * `tempKforce` - optional, average temperature of the titration in K - if not `None` (the default) this overrides whatever temperature data is in the .dat file.
+  * `tempKforce` - optional, average temperature of the titration in K - if not `None` (the default) then this overrides whatever temperature data is in the .dat file.
 
 **Outputs:**
 

@@ -2,14 +2,14 @@
 # Copyright (C) 2019  Matthew Paul Humphreys  (GNU GPLv3)
 """Import and export data."""
 from numpy import arange, array, full_like, genfromtxt
-from .constants import Tzero
+from .constants import tZero
 
 def vindta(datfile):
     """Import VINDTA-style .dat file titration table."""
     tData = genfromtxt(datfile, delimiter='\t', skip_header=2)
     volAcid = tData[:, 0] # ml
     emf = tData[:, 1] # mV
-    tempK = tData[:, 2] + Tzero # K
+    tempK = tData[:, 2] + tZero # K
     return volAcid, emf, tempK
 
 def Dickson1981(withPhosphate=True):
@@ -32,10 +32,10 @@ def Dickson1981(withPhosphate=True):
     KXF['w'] = full_like(massAcid, 4.32e-14)
     KXF['C1'] = full_like(massAcid, 1.00e-06)
     KC1KC2 = full_like(massAcid, 8.20e-16)
-    KXF['C2'] = KC1KC2 / KXF['C1']
+    KXF['C2'] = KC1KC2/KXF['C1']
     KXF['B'] = full_like(massAcid, 1.78e-09)
-    KXF['S'] = 1 / full_like(massAcid, 1.23e+01)
-    KXF['F'] = 1 / full_like(massAcid, 4.08e+02)
+    KXF['S'] = 1/full_like(massAcid, 1.23e+01)
+    KXF['F'] = 1/full_like(massAcid, 4.08e+02)
     KXF['P1'] = full_like(massAcid, 56.8)
     KXF['P2'] = full_like(massAcid, 8e-7)
     KXF['P3'] = full_like(massAcid, 1.32e-15) / KXF['P2']

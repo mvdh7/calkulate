@@ -2,13 +2,13 @@
 
 Despite the version number, Calkulate v2.0 is in beta, as the original MATLAB program is being extended and converted to Python.
 
-
 ## 2.0.23
 
 **Release date:** forthcoming
 
-  * Made all concentrations in **calibrate.solve** optional.
-
+  * Made all concentrations in **calibrate.solve** optional;
+  * Renamed many functions and variable names, as described in the [conventions](../conventions) documentation;
+  * Added **plot** module to visualise titration results.
 
 ## 2.0.22
 
@@ -22,7 +22,6 @@ Despite the version number, Calkulate v2.0 is in beta, as the original MATLAB pr
   * Switched pH simulator to solve for pH, not [H<sup>+</sup>];
   * Active efforts towards MATLAB integration paused.
 
-
 ## 2.0.21
 
 **Release date:** 2019-01-15
@@ -31,7 +30,7 @@ Despite the version number, Calkulate v2.0 is in beta, as the original MATLAB pr
   * Tested all solvers successfully against simulated titration data from Dickson (1981);
   * Final release before starting to track updates here in the version history.
 
-<hr />
+---
 
 # 1.0.2 (MATLAB)
 

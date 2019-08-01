@@ -13,6 +13,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""Seawater total alkalinity from titration data."""
 
 __all__ = [
     'calibrate',
@@ -43,3 +44,4 @@ from . import (
 )
 
 __version__ = meta.version
+__author__ = 'Matthew P. Humphreys'

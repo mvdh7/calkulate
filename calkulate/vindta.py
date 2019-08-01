@@ -68,15 +68,15 @@ def guessGran(datfile, volSample, concAcid, pSal, buretteCorrection=1,
         pHg, L)
 
 def simH(massAcid, tempK, massSample, concAcid, pSal, alk, CT=0, PT=0, SiT=0):
-    XT = concentrations.XT(pSal, CT, PT, SiT) # total concentrations
+    XT = concentrations.XT(pSal, CT, PT, SiT)
     XT[0] = alk
-    KX = dissociation.KXF(tempK, pSal, XT) # dissociation constants
+    KX = dissociation.KXF(tempK, pSal, XT)
     return simulate.H(massAcid, massSample, concAcid, XT, KX)
 
 def simAT(massAcid, tempK, H, massSample, pSal, CT=0, PT=0, SiT=0):
     mu = solve.mu(massAcid, massSample)
-    XT = concentrations.XT(pSal, CT, PT, SiT) # total concentrations
-    KX = dissociation.KXF(tempK, pSal, XT) # dissociation constants
+    XT = concentrations.XT(pSal, CT, PT, SiT)
+    KX = dissociation.KXF(tempK, pSal, XT)
     return simulate.AT(H, mu, XT, KX)
 
 def complete(datfile, volSample, concAcid, pSal, CT, PT, SiT,
