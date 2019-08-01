@@ -20,8 +20,8 @@ def BT(pSal):
 
 def FT(pSal):
     """Estimate total fluoride from practical salinity in mol/kg-sw [W71]."""
-    return pSal*6.75e-5/(ramF*pSal2Cl)
+    return pSal*6.75e-5/(ramF*pSal2cl)
 
 def ST(pSal):
     """Estimate total sulfate from practical salinity in mol/kg-sw [???]."""
-    return (0.14/96.061)*(pSal/pSal2Cl)
+    return (0.14/96.061)*(pSal/pSal2cl)

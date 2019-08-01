@@ -33,7 +33,7 @@ def prep(datfile, volSample, pSal, CT, PT, SiT, concAcid):
     alk0Sim = (alkSim[0] + massAcid*concAcid/(massAcid + massSample))/mu
     RMS = sqrt(mean(alk_emf0['fun']**2))
     Npts = len(alk_emf0['fun'])
-    rgb = zeros((len(EMF), 3))
+    rgb = zeros((len(emf), 3))
     for i in range(len(rgb)):
         if LGuess[i] and L[i]:
             rgb[i] = _rgb_both
@@ -165,7 +165,7 @@ def components(ax, massAcid, alk0Sim, alkSim, sublabel):
 
 def titration(datfile, volSample, pSal, CT, PT, SiT, concAcid):
     """Plot everything for a single titration with a VINDTA-style .dat file."""
-    (massAcid, EMF, massSample, f1Guess, LGuess, alkGuess, emf0Guess, granEmf0,
+    (massAcid, emf, massSample, f1Guess, LGuess, alkGuess, emf0Guess, granEmf0,
         alk_emf0, alkSim, alk0Sim, RMS, Npts, rgb) = prep(datfile, volSample,
         pSal, CT, PT, SiT, concAcid)
     fig = figure(figsize=[17, 10])

@@ -38,8 +38,8 @@ def AT(h, mu, XT, KXF):
         SiOOH3 = mu*XT['Si']*KXF['Si']/(h + KXF['Si'])
     else:
         SiOOH3 = 0
-    AT = bicarb + 2*carb + B4 + OH - H - HSO4 - HF - P0 + P2 + 2*P3 + SiOOH3
-    return AT, [bicarb, 2*carb, B4, OH, -H, -HSO4, -HF, -P0, P2, 2*P3, SiOOH3]
+    AT = bicarb + 2*carb + B4 + OH - h - HSO4 - HF - P0 + P2 + 2*P3 + SiOOH3
+    return AT, [bicarb, 2*carb, B4, OH, -h, -HSO4, -HF, -P0, P2, 2*P3, SiOOH3]
 
 def pH(massAcid, massSample, concAcid, alk0, XT, KXF):
     """Simulate pH from known total alkalinity and total concentrations."""

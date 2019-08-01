@@ -74,7 +74,7 @@ def complete(massAcid, emf, tempK, massSample, concAcid, XT, KXF):
         massSample, concAcid)
     L = logical_and(pHGuess > 3, pHGuess < 4)
     KXL = {k: v[L] for k, v in KXF.items()}
-    alk_emf0 = olsq(lambda AT_emf0: _lsqfun_complete(massAcid[L], emf[L],
+    alk_emf0 = olsq(lambda alk_emf0: _lsqfun_complete(massAcid[L], emf[L],
             tempK[L], massSample, concAcid, alk_emf0[1], alk_emf0[0], XT, KXL),
         [alkGuess, emf0Guess], x_scale=[1e-6, 1], method='lm')
     return alk_emf0
