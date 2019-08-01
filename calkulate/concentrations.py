@@ -4,7 +4,7 @@
 from .constants import pSal2cl, ramB, ramF
 
 def XT(pSal, CT=0, PT=0, SiT=0):
-    """Assemble a dict of concentrations in mol/kg-sw."""
+    """Assemble a dict of sample concentrations in mol/kg-sw."""
     return {
         'C': CT,
         'B': BT(pSal),

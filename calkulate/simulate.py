@@ -4,11 +4,12 @@
 from scipy.optimize import least_squares as olsq
 from numpy import full_like, nan
 
-def alk(h, mu, XT, KXF):
+def alk(h, mu, XT, KXF, dicFraction=1):
     """Simulate total alkalinity from known pH and total concentrations."""
     OH = KXF['w']/h
     if 'C' in XT.keys():
-        co2aq = mu*XT['C']/(1 + KXF['C1']/h + KXF['C1']*KXF['C2']/h**2)
+        co2aq = dicFraction*mu*XT['C']/(1 + KXF['C1']/h +
+            KXF['C1']*KXF['C2']/h**2)
         bicarb = KXF['C1']*co2aq/h
         carb = KXF['C2']*bicarb/h
     else:

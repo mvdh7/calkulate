@@ -61,11 +61,11 @@ def mu(massAcid, massSample):
 
 #====== LEAST-SQUARES SOLVERS =================================================
 #----- Complete Calculation ---------------------------------------------------
-def _lsqfun_complete(massAcid, emf, tempK, massSample, concAcid, emf0, alk, XT,
+def _lsqfunComplete(massAcid, emf, tempK, massSample, concAcid, emf0, alk, XT,
         KX):
     xmu = mu(massAcid, massSample)
-    H = emf2h(emf, emf0, tempK)
-    return (simulate.alk(H, xmu, XT, KX)[0] - alk*xmu +
+    h = emf2h(emf, emf0, tempK)
+    return (simulate.alk(h, xmu, XT, KX)[0] - alk*xmu +
         massAcid*concAcid/(massAcid + massSample))
 
 def complete(massAcid, emf, tempK, massSample, concAcid, XT, KXF):
@@ -74,7 +74,28 @@ def complete(massAcid, emf, tempK, massSample, concAcid, XT, KXF):
         massSample, concAcid)
     L = logical_and(pHGuess > 3, pHGuess < 4)
     KXL = {k: v[L] for k, v in KXF.items()}
-    alk_emf0 = olsq(lambda alk_emf0: _lsqfun_complete(massAcid[L], emf[L],
+    alk_emf0 = olsq(lambda alk_emf0: _lsqfunComplete(massAcid[L], emf[L],
+            tempK[L], massSample, concAcid, alk_emf0[1], alk_emf0[0], XT, KXL),
+        [alkGuess, emf0Guess], x_scale=[1e-6, 1], method='lm')
+    return alk_emf0
+
+def _lsqfunCompleteDic(massAcid, emf, tempK, massSample, concAcid, emf0, alk,
+        XT, KX):
+    xmu = mu(massAcid, massSample)
+    h = emf2h(emf, emf0, tempK)
+    dicFraction=exp(massAcid*100)
+    return (simulate.alk(h, xmu, XT, KX, dicFraction=dicFraction)[0] - alk*xmu +
+        massAcid*concAcid/(massAcid + massSample))
+
+def completeDic(massAcid, emf, tempK, massSample, concAcid, XT, KXF):
+    """Solve for alkalinity using the Complete Calculation method and
+    including DIC loss through CO2 degassing.
+    """
+    alkGuess, emf0Guess, _, pHGuess = guessGran(massAcid, emf, tempK,
+        massSample, concAcid)
+    L = pHGuess > 3
+    KXL = {k: v[L] for k, v in KXF.items()}
+    alk_emf0 = olsq(lambda alk_emf0: _lsqfunCompleteDic(massAcid[L], emf[L],
             tempK[L], massSample, concAcid, alk_emf0[1], alk_emf0[0], XT, KXL),
         [alkGuess, emf0Guess], x_scale=[1e-6, 1], method='lm')
     return alk_emf0
@@ -85,7 +106,7 @@ def complete_emf0(massAcid, emf, tempK, emf0, massSample, concAcid, XT, KX):
     pH = -log10(H)
     L = logical_and(pH > 3, pH < 4)
     xmu = mu(massAcid, massSample)
-    alk = (simulate.AT(H, xmu, XT, *KX)[0] + massAcid*concAcid/(massAcid +
+    alk = (simulate.alk(H, xmu, XT, *KX)[0] + massAcid*concAcid/(massAcid +
         massSample))/xmu
     return mean(alk[L]), std(alk[L])
 
