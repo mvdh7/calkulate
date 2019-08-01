@@ -2,7 +2,7 @@
 
 `.io` contains functions to import titration data and export results in various formats.
 
-<hr />
+---
 
 ## `.vindta` - import VINDTA-style .dat files
 
@@ -24,7 +24,7 @@ Vacid, EMF, tempK = calk.io.vindta(datfile)
   * `EMF` - titration cell potential in mV;
   * `tempK` - titre temperature in K.
 
-<hr />
+---
 
 ## `.Dickson1981` - load simulated titration
 

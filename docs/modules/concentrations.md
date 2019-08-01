@@ -10,7 +10,7 @@ MathJax.Hub.Config({TeX: {extensions: ["[mhchem]/mhchem.js"]}});
 
 `.concentrations` contains functions of salinity to estimate the total concentrations of the dissolved components of seawater.
 
-<hr />
+---
 
 ## `.XT` - dict of concentrations
 
@@ -37,7 +37,7 @@ XT = calk.concentrations.XT(psal, CT=0, PT=0, SiT=0)
 
 Output fields `C`, `P` and `Si` are assigned by the respective user inputs, or given values of zero if not specified. `B`, `S` and `F` are estimated from `psal` using the other functions in this module.
 
-<hr />
+---
 
 ## `.BT` - total borate
 
