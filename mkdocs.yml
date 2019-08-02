@@ -11,6 +11,7 @@ theme: readthedocs
 
 nav:
   - Overview: index.md
+  - Conventions: conventions.md
 #  - Quick-start guide: quick-start.md
   - Main Calkulate modules:
     - .io - data import and export: modules/io.md

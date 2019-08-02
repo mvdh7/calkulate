@@ -19,18 +19,18 @@ MathJax.Hub.Config({TeX: {extensions: ["[mhchem]/mhchem.js"]}});
 **Syntax:**
 
 ```python
-AT_emf0 = calk.solve.solver(Macid, emf, tempK, Msamp, Cacid, XT, KXF)
+alk_emf0 = calk.solve.solver(massAcid, emf, tempK, massSample, concAcid, XT, KXF)
 ```
 
 **Inputs:**
 
-All inputs have [their usual meanings]().
+All inputs have [their usual meanings](../../conventions).
 
 **Output:**
 
-  * `AT_emf0` - full output from the [`scipy.optimize.least_squares`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.least_squares.html) solver:
-    * `AT_emf0['x'][0]` - best-fit total alkalinity in mol·kg-sw<sup>−1</sup>;
-    * `AT_emf0['x'][1]` - best-fit EMF<sub>0</sub> in mV.
+  * `alk_emf0` - full output from the [`scipy.optimize.least_squares`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.least_squares.html) solver:
+    * `alk_emf0['x'][0]` - best-fit total alkalinity in mol·kg-sw<sup>−1</sup>;
+    * `alk_emf0['x'][1]` - best-fit EMF<sub>0</sub> in mV.
 
 <hr />
 

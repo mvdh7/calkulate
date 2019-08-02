@@ -2,8 +2,7 @@
 
 `.density` contains functions of temperature and salinity that estimate the densities of [1] seawater and [2] mixtures of hydrochloric acid (HCl) and sodium chloride (NaCl).
 
-
-<hr />
+---
 
 ## `.sw` - seawater at 1 atm
 
@@ -12,7 +11,7 @@ Calculates the density of seawater as a function of its temperature and practica
 **Syntax:**
 
 ```python
-rho_sw = calk.density.sw(tempK, psal)
+rhoSeawater = calk.density.sw(tempK, psal)
 ```
 
 **Inputs:**
@@ -22,10 +21,9 @@ rho_sw = calk.density.sw(tempK, psal)
 
 **Output:**
 
-  * `rho_sw` - seawater density in kg·dm<sup>−3</sup>.
+  * `rhoSeawater` - seawater density in kg·dm<sup>−3</sup>.
 
-
-<hr />
+---
 
 ## `.acid` - 0.1 M HCl in 0.6 M NaCl
 
@@ -42,7 +40,7 @@ This represents a 0.1 mol·dm<sup>−3</sup> HCl titrant mixed with NaCl, with t
 **Syntax:**
 
 ```python
-rho_acid = calk.density.acid(tempK)
+rhoAcid = calk.density.acid(tempK)
 ```
 
 **Input:**
@@ -51,9 +49,9 @@ rho_acid = calk.density.acid(tempK)
 
 **Output:**
 
-  * `rho_acid` - acid density in kg·dm<sup>−3</sup>.
+  * `rhoAcid` - acid density in kg·dm<sup>−3</sup>.
 
-<hr />
+---
 
 ## `.acid25` - HCl in NaCl at 25 °C
 
@@ -64,7 +62,7 @@ Note that the result from this function does not quite agree with the check valu
 **Syntax:**
 
 ```python
-rho25 = calk.density.acid25(mHCl, mNaCl)
+rhoAcid25 = calk.density.acid25(mHCl, mNaCl)
 ```
 
 **Input:**
@@ -74,4 +72,4 @@ rho25 = calk.density.acid25(mHCl, mNaCl)
 
 **Output:**
 
-  * `rho25` - acid density in kg·dm<sup>−3</sup>.
+  * `rhoAcid25` - acid density in kg·dm<sup>−3</sup>.

@@ -3,7 +3,7 @@
 """Estimate seawater and acid densities from temperature and salinity."""
 from numpy import sqrt
 
-def sw(tempK, psal):
+def sw(tempK, pSal):
     """Seawater density at 1 atm in kg/l (Millero and Poisson, 1981)."""
     # 0 < T < 40 degC & 0.5 < S < 43
     tempC = tempK - 273.15
@@ -17,11 +17,11 @@ def sw(tempK, psal):
           -   4.0899e-3   * tempC
           +   7.6438e-5   * tempC**2
           -   8.2467e-7   * tempC**3
-          +   5.3875e-9   * tempC**4 ) * psal
+          +   5.3875e-9   * tempC**4 ) * pSal
       + ( -   5.72466e-3
           +   1.0227e-4   * tempC
-          -   1.6546e-6   * tempC**2 ) * psal**1.5
-      +       4.8314e-4                * psal**2   ) * 1e-3
+          -   1.6546e-6   * tempC**2 ) * pSal**1.5
+      +       4.8314e-4                * pSal**2   ) * 1e-3
 
 # --- Estimate HCl titrant density --------------------------------------------
 # Output in kg/l

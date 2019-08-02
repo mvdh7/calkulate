@@ -4,35 +4,70 @@
 
 ## What format is that?
 
-A VINDTA spits out a text file with the extension '.dat' for each titration that usually looks something like this:
+A VINDTA spits out a text file with the extension '.dat' for each titration that usually looks something like this (with extra rows in place of the `...`):
 
     bottle	CRM-144-0435-4	0	0	0	0	0.00	0.00	35.000	4.000	0.00	0.0
     24.857	35.000	0.000	0.000
     0.000	187.600	24.857
     0.150	209.350	24.855
     0.300	236.800	24.857
-    0.450	255.950	24.865
-    0.600	269.600	24.862
-    0.750	280.050	24.867
-    0.900	288.700	24.870
-    1.050	296.350	24.855
-    1.200	303.450	24.867
-    1.350	310.600	24.855
-    1.500	317.900	24.877
-    1.650	325.950	24.862
-    1.800	335.150	24.865
-    1.950	347.000	24.860
-    2.100	363.550	24.852
-    2.250	392.150	24.872
-    2.400	423.550	24.872
-    2.550	441.150	24.865
-    2.700	451.900	24.867
-    2.850	459.500	24.857
-    3.000	465.400	24.860
-    3.150	470.300	24.860
-    3.300	474.400	24.860
-    3.450	477.900	24.852
-    3.600	481.000	24.867
+    ...     ...     ...
     3.750	483.800	24.862
     3.900	486.350	24.865
     4.050	488.650	24.862
+
+The first two lines contain various bits of user-inputted information about the sample. Other than skipping past them to the titration data, these lines are totally ignored by Calkulate.
+
+The rest of the file has a row for each acid addition step in the titration. The space- or tab-separated columns are:
+
+  1. Volume of acid added in ml;
+  2. Measured EMF of the sample + acid mixture in mV;
+  3. Temperature of the sample + acid mixture in °C.
+
+If you organise your titration data from any source into this format, you can use the functions in this module to work with it in Calkulate.
+
+## Generic syntax
+
+There are two functions in this module corresponding to each of the alkalinity-solving methods available in module [solve](../solve): one to solve for alkalinity where acid concentration is known, and one to solve for acid concentration where alkalinity is known. The syntaxes are:
+
+```python
+# Solve for acid concentration:
+OptimizeResult = calk.vindta.methodCRM(datfile, Vsamp, AT_cert, psal, CT, PT,
+    burette_cx=1, tempKforce=None)
+# Solve for alkalinity:
+OptimizeResult = calk.vindta.method(datfile, Vsamp, Cacid, psal, CT, PT,
+    burette_cx=1, tempKforce=None)
+```
+
+## `.prep` - import and prepare for Calkulate
+
+Imports a single .dat file and does some preliminary calculations assuming a typical open ocean seawater composition.
+
+You probably won't need to use this function yourself, as it is used internally by the other functions in this module.
+
+**Syntax:**
+
+```python
+massAcid, emf, tempK, massSample, XT, KXF = calk.vindta.prep(datfile, volSample,
+    psal, CT, PT, SiT, buretteCorrection=1, tempKForce=None)
+```
+
+**Inputs:**
+
+  * `datfile` - the file name (and path) to the .dat file;
+  * `Vsamp` - sample volume before acid addition in ml;
+  * `psal` - sample practical salinity;
+  * `CT` - sample dissolved inorganic carbon in mol/kg;
+  * `PT` - sample phosphate in mol/kg;
+  * `SiT` - sample silicate in mol/kg;
+  * `burette_cx` - optional, multiplicative correction factor for the volume of the burette that delivers acid to the titration cell (defaults to `1`);
+  * `tempKforce` - optional, average temperature of the titration in K - if not `None` (the default) then this overrides whatever temperature data is in the .dat file.
+
+**Outputs:**
+
+  * `massAcid` - acid mass in kg;
+  * `emf` - titration EMF in mV;
+  * `tempK` - titration temperature in K;
+  * `massSample` - sample mass before acid addition in kg;
+  * `XT` - dict of concentrations (generated using the `XT` function in module [concentrations](../concentrations));
+  * `KXF` - dict of dissociation constants (generated using the `KXF` function in module [dissociation](../dissociation)).
