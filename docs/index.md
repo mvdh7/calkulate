@@ -1,54 +1,49 @@
-<!--<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>-->
+# <img src="img/logo_transparent.png" style="vertical-align:sub" width="105px" /> v2.0.23 (beta)
 
-<div style="text-align: center; padding-bottom: 4%">
-<img src="img/logo_transparent.png" width="50%" />
-</div>
+Calkulate is a Python 3.6+ package for determining total alkalinity from seawater titration data.
 
-**Calkulate** is a Python 3.6+ package for determining total alkalinity from seawater titration data.
+## Installation
 
+If you're using Conda, first create a new environment with Python 3.6+, NumPy 1.15+, and SciPy 1.1+ - or you can just allow Pip to install these dependencies for you. Other similar versions are probably fine, but untested. Then, to install:
 
-# Installation
+    pip install calkulate
 
-If using conda, first create and activate a new environment with Python 3.6+, numpy 1.15+, and scipy 1.1+ (or you can allow pip to install these dependencies for you). Then:
+## Get Calkulating!
 
-```shell
-pip install calkulate
+This documentation is intended to present a broad overview of how Calkulate works, rather than provide a detailed syntactic reference for every constituent module and function.
+
+Within Python, the import convention is:
+
+```python
+import calkulate as calk
 ```
 
-Other versions are probably fine, but untested. We use Python 3.6 rather than 3.7 to enable integration with MATLAB.
+To quickly get started with some analysis, jump straight to the [workflow examples](../workflow). These examples illustrate the different parts of Calkulate that you may need to use, and provide a framework that you can quickly modify to suit your own requirements.
 
-A few brief Python examples can be found in the script [calkDickson1981.py](https://github.com/mvdh7/calkulate/blob/master/calkDickson1981.py). More will follow, along with some visualisation tools.
+To find out more about the principles by which Calkulate calculates things, take a look at the other parts of the documentation. These explain the conventions for naming and defining the input and output variables ([variables and conventions](conventions)), the different methods by which alkalinity can be estimated from titration data ([alkalinity solvers](solvers)), and how to calibrate the acid titrant's concentration ([titrant calibration](calibration)). Changes from version to version are recorded in the [version history](versions) and a key to the codes used for [literature references](references) is provided.
 
-<!-- See the [quick-start guide](quick-start) for more detailed instructions and examples.-->
+## Development status
 
+Calkulate v2.0 is in beta. Tests of the accuracy of its coefficients and equations are underway, so results may change. The API may change and functions may be added or removed. Use at your own peril!
 
-# Development status
-
-Calkulate v2.0 is in beta. Tests of the accuracy of its coefficients and equations are underway, so results may change. API may change and functions may be added or removed. Use at your own peril!
-
-
-# Citation
+## Citation
 
 A paper describing Calkulate v2 is in preparation. For now, if you use any version of Calkulate in your research, please cite it as:
 
-  * Humphreys, M. P. (2015). "Calculating seawater total alkalinity from open-cell titration data using a modified Gran plot technique," in *Measurements and Concepts in Marine Carbonate Chemistry* (PhD Thesis, Ocean and Earth Science, University of Southampton, UK), 25–44.
+> Humphreys, M. P. (2015). "Calculating seawater total alkalinity from open-cell titration data using a modified Gran plot technique," in *Measurements and Concepts in Marine Carbonate Chemistry* (PhD Thesis, Ocean and Earth Science, University of Southampton, UK), 25–44.
 
 But please do check back here for any updates first (or [get in touch](https://mvdh.xyz/contact/))!
 
-
-# Acknowledgements
+## Acknowledgements
 
 Calkulate is maintained by [Dr Matthew P. Humphreys](https://mvdh.xyz) at the Centre for Ocean and Atmospheric Sciences, School of Environmental Sciences, University of East Anglia, Norwich, UK.
 
-Its ongoing development has been funded by the [Natural Environment Research Council](https://nerc.ukri.org/) (NERC, UK):
+Its ongoing development has been indirectly funded by the [Natural Environment Research Council](https://nerc.ukri.org/) (NERC, UK):
 
   * Originally through a PhD studentship to Matthew P. Humphreys (NE/J500112/1),
   * Followed by *CaNDyFloSS: Carbon and Nutrient Dynamics and Fluxes over Shelf Systems* (NE/K00185X/1) and *RAGNARoCC: Radiatively active gases from the North Atlantic Region and Climate Change* (NE/K002546/1),
   * And now through *NSFGEO-NERC: A Thermodynamic Chemical Speciation Model for the Oceans, Seas, and Estuaries* (NE/P012361/1).
 
-
-# License
-
-<!--<img src="img/1920px-GPLv3_Logo.svg.png" width="25%" />-->
+## License
 
 The entirety of Calkulate is licensed under the [GNU General Public License version 3 (GPLv3)](https://www.gnu.org/licenses/gpl-3.0.en.html).

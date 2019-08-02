@@ -6,25 +6,13 @@ copyright: Copyright &copy; 2019 Matthew P. Humphreys (GNU GPLv3).
 site_url: https://calkulate.readthedocs.io/
 repo_url: https://github.com/mvdh7/calkulate
 
-lang: en
 theme: readthedocs
 
 nav:
-  - Overview: index.md
-  - Conventions: conventions.md
-#  - Quick-start guide: quick-start.md
-  - Main Calkulate modules:
-    - .io - data import and export: modules/io.md
-    - .solve - alkalinity solvers: modules/solve.md
-    - .calibrate - calibration methods: modules/calibrate.md
-    - .vindta - convenient wrappers: modules/vindta.md
-    - .plot - titration visualisation: modules/plot.md
-  - Behind the scenes:
-    - .simulate - alkalinity and pH simulator: modules/simulate.md
-    - .dissociation - dissociation constants: modules/dissociation.md
-    - .concentrations - solute concentrations from salinity: modules/concentrations.md
-    - .density - fluid densities: modules/density.md
-    - .constants - physical constants: modules/constants.md
-    - .meta - package metadata: modules/meta.md
-  - Version history: version-history.md
+  - Overview and installation: index.md
+  - Variables and conventions: conventions.md
+  - Alkalinity solvers: solvers.md
+  - Titrant calibration: calibration.md
+  - Workflow examples: workflow.md
+  - Version history: versions.md
   - References: references.md

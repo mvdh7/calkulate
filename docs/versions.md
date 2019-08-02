@@ -8,7 +8,8 @@ Despite the version number, Calkulate v2.0 is in beta, as the original MATLAB pr
 
   * Made all concentrations in **calibrate.solve** optional;
   * Renamed many functions and variable names, as described in the [conventions](../conventions) documentation;
-  * Added **plot** module to visualise titration results.
+  * Added **plot** module to visualise titration results;
+  * Major re-organisation of documentation.
 
 ## 2.0.22
 

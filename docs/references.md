@@ -1,12 +1,10 @@
-# Reference list
+# Key to citation codes
 
 <!--
 
 Bates, R. G., and Erickson, W. P. (1986). Thermodynamics of the dissociation of 2-aminopyridinium ion in synthetic seawater and a standard for pH in marine systems. *J. Solution Chem.* 15, 891–901. <a href="https://doi.org/10.1007/BF00646030">doi:10.1007/BF00646030</a>.
 
 Bell, T. G., Johnson, M. T., Jickells, T. D., and Liss, P. S. (2008). Corrigendum to: Ammonia/ammonium dissociation coefficient in seawater: A significant numerical correction. *Environ. Chem.* 5, 258. <a href="https://doi.org/10.1071/EN07032_CO">doi:10.1071/EN07032_CO</a>.
-
--->
 
 Clegg, S. L., and Wexler, A. S. (2011a). Densities and Apparent Molar Volumes of Atmospherically Important Electrolyte Solutions. 1. The Solutes H<sub>2</sub>SO<sub>4</sub>, HNO<sub>3</sub>, HCl, Na<sub>2</sub>SO<sub>4</sub>, NaNO<sub>3</sub>, NaCl, (NH<sub>4</sub>)<sub>2</sub>SO<sub>4</sub>, NH<sub>4</sub>NO<sub>3</sub>, and NH<sub>4</sub>Cl from 0 to 50 °C, Including Extrapolations to Very Low Temperature and to the Pure Liquid State, and NaHSO<sub>4</sub>, NaOH, and NH<sub>3</sub> at 25 °C. *J. Phys. Chem. A* 115, 3393–3460. [doi:10.1021/jp108992a](https://doi.org/10.1021/jp108992a).
 
@@ -37,3 +35,5 @@ Millero, F. J., and Poisson, A. (1981). International one-atmosphere equation of
 Perez, F. F., and Fraga, F. (1987). Association constant of fluoride and hydrogen ions in seawater. *Mar. Chem.* 21, 161–168. <a href="https://doi.org/10.1016/0304-4203(87)90036-3">doi:10.1016/0304-4203(87)90036-3</a>.
 
 Wooster, W. S., Lee, A. J., and Dietrich, G. (1969). Redefinition of Salinity. *Limnol. Oceanogr.* 14, 437–438. <a href="https://doi.org/10.4319/lo.1969.14.3.0437">doi:10.4319/lo.1969.14.3.0437</a>.
+
+-->
