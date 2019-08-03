@@ -151,7 +151,7 @@ def Dickson1981(massAcid, EMF, tempK, massSample, concAcid, XT, KXF):
         _lsqfun_Dickson1981(massAcid[L], hGuess[L], massSample, concAcid,
             alk_CT_f[2], alk_CT_f[0], alk_CT_f[1], XT, KXL),
         [alkGuess, alkGuess*0.95, 1], x_scale=[1e-3, 1e-3, 1], method='lm')
-    return alk_CT_f#, EMF0g - log(alk_CT_f['x'][2]) * R * mean(tempK) / F
+    return alk_CT_f
 
 #====== HALF-GRAN PLOT METHOD =================================================
 def halfGran(massAcid, emf, tempK, massSample, concAcid, XT, KXF,
