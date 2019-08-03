@@ -4,9 +4,9 @@
 from numpy import arange, array, full_like, genfromtxt
 from .constants import tZero
 
-def vindta(datfile):
+def vindta(datfile, delimiter='\t', skip_header=2):
     """Import VINDTA-style .dat file titration table."""
-    tData = genfromtxt(datfile, delimiter='\t', skip_header=2)
+    tData = genfromtxt(datfile, delimiter, skip_header)
     volAcid = tData[:, 0] # ml
     emf = tData[:, 1] # mV
     tempK = tData[:, 2] + tZero # K
@@ -21,27 +21,27 @@ def Dickson1981(withPhosphate=True):
     pSal = 35.0 # practical salinity
     # Set concentrations, all in mol/kg-sw
     alk = 0.00245 # Alkalinity
-    XT = {}
-    XT['B'] = 0.00042 # Borate
-    XT['C'] = 0.00220 # Carbon
-    XT['S'] = 0.02824 # Sulfate
-    XT['F'] = 0.00007 # Fluoride
-    XT['Si'] = 0 # Silicate
+    concTotals = {}
+    concTotals['B'] = 0.00042 # Borate
+    concTotals['C'] = 0.00220 # Carbon
+    concTotals['S'] = 0.02824 # Sulfate
+    concTotals['F'] = 0.00007 # Fluoride
+    concTotals['Si'] = 0 # Silicate
     # Set dissociation constants, all on Free pH scale
-    KXF = {}
-    KXF['w'] = full_like(massAcid, 4.32e-14)
-    KXF['C1'] = full_like(massAcid, 1.00e-06)
-    KC1KC2 = full_like(massAcid, 8.20e-16)
-    KXF['C2'] = KC1KC2/KXF['C1']
-    KXF['B'] = full_like(massAcid, 1.78e-09)
-    KXF['S'] = 1/full_like(massAcid, 1.23e+01)
-    KXF['F'] = 1/full_like(massAcid, 4.08e+02)
-    KXF['P1'] = full_like(massAcid, 56.8)
-    KXF['P2'] = full_like(massAcid, 8e-7)
-    KXF['P3'] = full_like(massAcid, 1.32e-15) / KXF['P2']
-    KXF['Si'] = full_like(massAcid, 1)
+    eqConstants = {}
+    eqConstants['w'] = full_like(massAcid, 4.32e-14)
+    eqConstants['C1'] = full_like(massAcid, 1.00e-06)
+    kC1kC2 = full_like(massAcid, 8.20e-16)
+    eqConstants['C2'] = kC1kC2/eqConstants['C1']
+    eqConstants['B'] = full_like(massAcid, 1.78e-09)
+    eqConstants['S'] = 1/full_like(massAcid, 1.23e+01)
+    eqConstants['F'] = 1/full_like(massAcid, 4.08e+02)
+    eqConstants['P1'] = full_like(massAcid, 56.8)
+    eqConstants['P2'] = full_like(massAcid, 8e-7)
+    eqConstants['P3'] = full_like(massAcid, 1.32e-15)/eqConstants['P2']
+    eqConstants['Si'] = full_like(massAcid, 1)
     if withPhosphate:
-        XT['P'] = 0.00001 # Phosphate
+        concTotals['P'] = 0.00001 # Phosphate
         pH = array([
             8.046129, 7.902742, 7.724342, 7.509157, 7.284827, 7.089577,
             6.931664, 6.802646, 6.693843, 6.588221, 6.514787, 6.437841,
@@ -54,7 +54,7 @@ def Dickson1981(withPhosphate=True):
             3.077446, 3.050022, 3.024213,
         ]) # Free scale pH
     else:
-        XT['P'] = 0 # Phosphate
+        concTotals['P'] = 0 # Phosphate
         pH = array([
             8.065650, 7.925895, 7.752062, 7.539922, 7.312923, 7.111723,
             6.948715, 6.816116, 6.704825, 6.608421, 6.522665, 6.444704,
@@ -66,4 +66,5 @@ def Dickson1981(withPhosphate=True):
             3.291906, 3.248062, 3.208187, 3.171626, 3.137874, 3.106531,
             3.077278, 3.049854, 3.024045,
         ]) # Free scale pH
-    return massAcid, pH, tempK, massSample, concAcid, pSal, alk, XT, KXF
+    return (massAcid, pH, tempK, massSample, concAcid, pSal, alk, concTotals,
+        eqConstants)
