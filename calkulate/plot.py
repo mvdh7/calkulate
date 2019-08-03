@@ -11,10 +11,12 @@ _rgb_guess = array([0.96, 0.86, 0.04])
 _rgb_final = array([0.21, 0.46, 1])
 _rgb_both = array([0.27, 0.8, 0.54])
 
-def prep(datfile, volSample, pSal, CT, PT, SiT, concAcid):
+def prep(datfile, volSample, pSal, totalCarbonate, totalPhosphate,
+        totalSilicate, concAcid):
     """Preparatory calculations for plotting."""
-    massAcid, emf, tempK, massSample, XT, KXF = vindta.prep(datfile, volSample,
-        pSal, CT, PT, SiT)
+    massAcid, emf, tempK, massSample, concTotals, eqConstants = \
+        vindta.prep(datfile, volSample, pSal, totalCarbonate, totalPhosphate,
+        totalSilicate)
     f1Guess = solve.f1(massAcid, emf, tempK, massSample)
     LGuess = logical_and(
         f1Guess > 0.1*np_max(f1Guess),
@@ -25,10 +27,11 @@ def prep(datfile, volSample, pSal, CT, PT, SiT, concAcid):
     granEmf0 = solve.granEmf0(massAcid[LGuess], emf[LGuess], tempK[LGuess],
         massSample, concAcid, alkGuess)
     L = logical_and(pHGuess > 3, pHGuess < 4)
-    alk_emf0 = solve.complete(massAcid, emf, tempK, massSample, concAcid, XT,
-        KXF)
+    alk_emf0 = solve.complete(massAcid, emf, tempK, massSample, concAcid,
+        concTotals, eqConstants)
     h = solve.emf2h(emf, alk_emf0['x'][1], tempK)
-    alkSim = vindta.simAT(massAcid, tempK, h, massSample, pSal, CT, PT, SiT)
+    alkSim = vindta.simAT(massAcid, tempK, h, massSample, pSal, totalCarbonate,
+        totalPhosphate, totalSilicate)
     mu = solve.mu(massAcid, massSample)
     alk0Sim = (alkSim[0] + massAcid*concAcid/(massAcid + massSample))/mu
     RMS = sqrt(mean(alk_emf0['fun']**2))
@@ -122,8 +125,8 @@ def alkEstimates(ax, massAcid, alk0Sim, rgb, alk_emf0, RMS, Npts, sublabel):
 
 def components(ax, massAcid, alk0Sim, alkSim, sublabel):
     """Every component of alkalinity throughout a titration."""
-    ax.plot(massAcid*1e3, -log10(alk0Sim), label='AT', marker='o', markersize=3,
-             c='k', clip_on=False)
+    ax.plot(massAcid*1e3, -log10(alk0Sim), label='AT', marker='o',
+        markersize=3, c='k', clip_on=False)
     rgbs = array([
         [0.4, 0.4, 0.4],
         [0.4, 0.4, 0.4],
@@ -163,11 +166,12 @@ def components(ax, massAcid, alk0Sim, alkSim, sublabel):
     ax.set_title(sublabel, fontsize=10)
     return ax
 
-def titration(datfile, volSample, pSal, CT, PT, SiT, concAcid):
+def everything(datfile, volSample, pSal, totalCarbonate, totalPhosphate,
+        totalSilicate, concAcid):
     """Plot everything for a single titration with a VINDTA-style .dat file."""
     (massAcid, emf, massSample, f1Guess, LGuess, alkGuess, emf0Guess, granEmf0,
         alk_emf0, alkSim, alk0Sim, RMS, Npts, rgb) = prep(datfile, volSample,
-        pSal, CT, PT, SiT, concAcid)
+        pSal, totalCarbonate, totalPhosphate, totalSilicate, concAcid)
     fig = figure(figsize=[17, 10])
     rcParams.update({'font.size': 10})
     gs = fig.add_gridspec(4, 2)

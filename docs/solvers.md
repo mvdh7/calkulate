@@ -10,7 +10,8 @@ MathJax.Hub.Config({TeX: {extensions: ["[mhchem]/mhchem.js"]}});
 Several different approaches for determining total alkalinity from titration data are implemented in Calkulate. They are implemented by functions in Calkulate's `solve` module, and they all share a common syntax:
 
 ```python
-OptimizeResult = calk.solve.method(massAcid, emf, tempK, massSample, concAcid, XT, KXF)
+OptimizeResult = calk.solve.method(massAcid, emf, tempK, massSample, concAcid,
+    concTotals, eqConstants)
 ```
 
 The formats of the input variables are described in the documentation section on [variables and conventions](../conventions).
@@ -36,7 +37,8 @@ This is the recommended method. It takes into account every major component of t
 **Syntax:**
 
 ```python
-alk, emf0 = calk.solve.complete(massAcid, emf, tempK, massSample, concAcid, XT, KXF)['x']
+alk, emf0 = calk.solve.complete(massAcid, emf, tempK, massSample, concAcid,
+    concTotals, eqConstants)['x']
 ```
 
 **Specifics:**
@@ -60,7 +62,8 @@ This is the approach described by [DAA03](../references/#DAA03). A separate impl
 **Syntax:**
 
 ```python
-alk, f = calk.solve.DAA03(massAcid, emf, tempK, massSample, concAcid, XT, KXF)['x']
+alk, f = calk.solve.DAA03(massAcid, emf, tempK, massSample, concAcid,
+    concTotals, eqConstants)['x']
 ```
 
 **Specifics:**
@@ -84,7 +87,8 @@ This is the approach described by [D81](../references/#D81). It uses a high pH r
 **Syntax:**
 
 ```python
-alk, CT, f = calk.solve.Dickson1981(massAcid, emf, tempK, massSample, concAcid, XT, KXF)['x']
+alk, CT, f = calk.solve.Dickson1981(massAcid, emf, tempK, massSample, concAcid,
+    concTotals, eqConstants)['x']
 ```
 
 **Specifics:**
@@ -112,7 +116,8 @@ Prior to the advent of easy-to-compute least-squares solvers, alkalinity was det
 **Syntax:**
 
 ```python
-alk, emf0 = calk.solve.halfGran(massAcid, emf, tempK, massSample, concAcid, XT, KXF)
+alk, emf0 = calk.solve.halfGran(massAcid, emf, tempK, massSample, concAcid,
+    concTotals, eqConstants)
 ```
 
 Note that this returns the alkalinity and EMF° values directly, rather than as an `OptimizeResult` as in the case of the least-squares fitting functions.

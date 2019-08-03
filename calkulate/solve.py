@@ -10,7 +10,7 @@ from scipy.stats import linregress
 from . import simulate
 from .constants import F, R
 
-#====== EMF to [H+] CONVERSIONS ===============================================
+#====== EMF CONVERSIONS =======================================================
 def emf2h(emf, emf0, tempK):
     """Convert EMF to [H+]."""
     # DAA03 Eq. (13) with typo corrected (i.e. EMF and EMF0 switched)
@@ -20,7 +20,7 @@ def h2emf(h, emf0, tempK):
     """Convert [H+] to EMF."""
     return emf0 + log(h)*R*tempK/F
 
-def f2demf0(tempK, f):
+def f2dEmf0(tempK, f):
     return log(f)*R*tempK/F
 
 #====== GRAN ESTIMATOR FUNCTIONS ==============================================
@@ -36,7 +36,7 @@ def granGuessAlk(massAcid, f1, massSample, concAcid):
     return alkGuess
 
 def granEmf0(massAcid, emf, tempK, massSample, concAcid, alk, HSO4=0, HF=0):
-    """DAA03 Eq. (11)."""
+    """DAA03 equation (11)."""
     return (emf - (R*tempK/F)*log(((massAcid*concAcid - massSample*alk)
         - massSample*(HF + HSO4))/(massSample + massAcid)))
 
@@ -61,102 +61,74 @@ def mu(massAcid, massSample):
 
 #====== LEAST-SQUARES SOLVERS =================================================
 #----- Complete Calculation ---------------------------------------------------
-def _lsqfunComplete(massAcid, emf, tempK, massSample, concAcid, emf0, alk, XT,
-        KX):
+def _lsqfunComplete(massAcid, emf, tempK, massSample, concAcid, emf0, alk,
+        concTotals, eqConstants):
     xmu = mu(massAcid, massSample)
     h = emf2h(emf, emf0, tempK)
-    return (simulate.alk(h, xmu, XT, KX)[0] - alk*xmu +
+    return (simulate.alk(h, xmu, concTotals, eqConstants)[0] - alk*xmu +
         massAcid*concAcid/(massAcid + massSample))
 
-def complete(massAcid, emf, tempK, massSample, concAcid, XT, KXF):
-    """Solve for alkalinity using the Complete Calculation method."""
+def complete(massAcid, emf, tempK, massSample, concAcid, concTotals,
+        eqConstants):
+    """Solve for alkalinity and EMF0 using the complete calculation method."""
     alkGuess, emf0Guess, _, pHGuess = guessGran(massAcid, emf, tempK,
         massSample, concAcid)
     L = logical_and(pHGuess > 3, pHGuess < 4)
-    KXL = {k: v[L] for k, v in KXF.items()}
+    eqConstantsL = {k: v[L] for k, v in eqConstants.items()}
     alk_emf0 = olsq(lambda alk_emf0: _lsqfunComplete(massAcid[L], emf[L],
-            tempK[L], massSample, concAcid, alk_emf0[1], alk_emf0[0], XT, KXL),
+            tempK[L], massSample, concAcid, alk_emf0[1], alk_emf0[0],
+            concTotals, eqConstantsL),
         [alkGuess, emf0Guess], x_scale=[1e-6, 1], method='lm')
     return alk_emf0
-
-def _lsqfunCompleteDic(massAcid, emf, tempK, massSample, concAcid, emf0, alk,
-        XT, KX):
-    xmu = mu(massAcid, massSample)
-    h = emf2h(emf, emf0, tempK)
-    dicFraction=exp(massAcid*100)
-    return (simulate.alk(h, xmu, XT, KX, dicFraction=dicFraction)[0] - alk*xmu +
-        massAcid*concAcid/(massAcid + massSample))
-
-def completeDic(massAcid, emf, tempK, massSample, concAcid, XT, KXF):
-    """Solve for alkalinity using the Complete Calculation method and
-    including DIC loss through CO2 degassing.
-    """
-    alkGuess, emf0Guess, _, pHGuess = guessGran(massAcid, emf, tempK,
-        massSample, concAcid)
-    L = pHGuess > 3
-    KXL = {k: v[L] for k, v in KXF.items()}
-    alk_emf0 = olsq(lambda alk_emf0: _lsqfunCompleteDic(massAcid[L], emf[L],
-            tempK[L], massSample, concAcid, alk_emf0[1], alk_emf0[0], XT, KXL),
-        [alkGuess, emf0Guess], x_scale=[1e-6, 1], method='lm')
-    return alk_emf0
-
-def complete_emf0(massAcid, emf, tempK, emf0, massSample, concAcid, XT, KX):
-    """Complete Calculation of alkalinity with known EMF0."""
-    H  = emf2h(emf, emf0, tempK)
-    pH = -log10(H)
-    L = logical_and(pH > 3, pH < 4)
-    xmu = mu(massAcid, massSample)
-    alk = (simulate.alk(H, xmu, XT, *KX)[0] + massAcid*concAcid/(massAcid +
-        massSample))/xmu
-    return mean(alk[L]), std(alk[L])
 
 #----- Dickson et al. (2003) method -------------------------------------------
-def _lsqfun_DAA03(massAcid, H, massSample, concAcid, f, AT, XT, KXF):
+def _lsqfun_DAA03(massAcid, H, massSample, concAcid, f, AT, concTotals,
+        eqConstants):
     """DAA03 Eqs. (14) and (15)."""
-    Z = 1 + XT['S']/KXF['S']
-    return (AT + XT['S']/(1 + KXF['S']*Z/(f*H))
-        + XT['F']/(1 + KXF['F']/(f*H))
+    Z = 1 + concTotals['S']/eqConstants['S']
+    return (AT + concTotals['S']/(1 + eqConstants['S']*Z/(f*H))
+        + concTotals['F']/(1 + eqConstants['F']/(f*H))
         + ((massSample + massAcid)/massSample)*f*H/Z -
             massAcid*concAcid/massSample)
 
-def DAA03(massAcid, emf, tempK, massSample, concAcid, XT, KXF):
-    """Solve for alkalinity following Dickson et al. (2003)."""
+def DAA03(massAcid, emf, tempK, massSample, concAcid, concTotals, eqConstants):
+    """Solve for alkalinity and f using the Dickson CRM method [DAA03]."""
     alkGuess, emf0Guess, hGuess, pHGuess = guessGran(massAcid, emf, tempK,
         massSample, concAcid)
     L = logical_and(pHGuess > 3, pHGuess < 3.5)
-    KXL = {k: v[L] for k, v in KXF.items()}
+    eqConstantsL = {k: v[L] for k, v in eqConstants.items()}
     return olsq(lambda alk_f:
         _lsqfun_DAA03(massAcid[L], hGuess[L], massSample, concAcid, alk_f[1],
-            alk_f[0], XT, KXL),
+            alk_f[0], concTotals, eqConstantsL),
         [alkGuess, 1], x_scale=[1e-3, 1], method='lm')
 
-# To convert Dickson's "f" to an EMF0 value:
-#def DAA03_emf0:
-#    return EMF0g - log(alk_f['x'][1]) * R*mean(tempK)/F
-
 #----- Dickson (1981) method --------------------------------------------------
-def _lsqfun_Dickson1981(massAcid, H, massSample, concAcid, f, AT, XT, KXF):
-    """Dickson (1981) Eq. (16)."""
-    return (massSample*(AT - XT['C']*(1/(1 + f*H/KXF['C1'])
-        + 1/(1 + f*H/KXF['C2'])) - XT['B']/(1 + f*H/KXF['B']))
-        + (massSample + massAcid)*(f*H - KXF['w']/(f*H)) - massAcid*concAcid)
+def _lsqfun_Dickson1981(massAcid, H, massSample, concAcid, f, AT, concTotals,
+        eqConstants):
+    """D81 equation (16)."""
+    return (massSample*(AT - concTotals['C']*(1/(1 + f*H/eqConstants['C1'])
+        + 1/(1 + f*H/eqConstants['C2']))
+        - concTotals['B']/(1 +f*H/eqConstants['B']))
+        + (massSample + massAcid)*(f*H - eqConstants['w']/(f*H))
+        - massAcid*concAcid)
 
-def Dickson1981(massAcid, EMF, tempK, massSample, concAcid, XT, KXF):
-    """Solve for alkalinity and CT following Dickson (1981)."""
+def Dickson1981(massAcid, EMF, tempK, massSample, concAcid, concTotals,
+        eqConstants):
+    """Solve for alkalinity, DIC and f using the closed-cell method [D81]."""
     alkGuess, EMF0g, hGuess, pHGuess = guessGran(massAcid, EMF, tempK,
         massSample, concAcid)
     L = pHGuess > 5
-    KXL = {k: v[L] for k, v in KXF.items()}
+    eqConstantsL = {k: v[L] for k, v in eqConstants.items()}
     alk_CT_f = olsq(lambda alk_CT_f:
         _lsqfun_Dickson1981(massAcid[L], hGuess[L], massSample, concAcid,
-            alk_CT_f[2], alk_CT_f[0], alk_CT_f[1], XT, KXL),
+            alk_CT_f[2], alk_CT_f[0], alk_CT_f[1], concTotals, eqConstantsL),
         [alkGuess, alkGuess*0.95, 1], x_scale=[1e-3, 1e-3, 1], method='lm')
     return alk_CT_f
 
 #====== HALF-GRAN PLOT METHOD =================================================
-def halfGran(massAcid, emf, tempK, massSample, concAcid, XT, KXF,
-        pHRange=[3., 4.], suppressWarnings=False):
-    """Solve for alkalinity using the half-Gran method (Humphreys, 2015)."""
+def halfGran(massAcid, emf, tempK, massSample, concAcid, concTotals,
+        eqConstants, pHRange=[3., 4.], suppressWarnings=False):
+    """Solve for alkalinity and EMF0 using the half-Gran method [H15]."""
     xmu = mu(massAcid, massSample)
     granReps = int(20)
     stepAlk = full(granReps, nan)
@@ -187,14 +159,16 @@ def halfGran(massAcid, emf, tempK, massSample, concAcid, XT, KXF,
         stepEmf0[i] = nanmean(granEmf0[i])
         granH[i] = emf2h(emf, stepEmf0[i], tempK)
         granPH[i] = -log10(granH[i])
-        granBicarb = xmu*XT['C']/(granH[i]/KXF['C1'] + 1)
-        granHSO4 = xmu*XT['S']/(1 + KXF['S']/granH[i])
-        granHF = xmu*XT['F']/(1 + KXF['F']/granH[i])
-        granBorate = xmu*XT['B']/(1 + granH[i]/KXF['B'])
-        granOH = KXF['w']/granH[i]
-        granPP2 = (xmu*XT['P']*(1 - KXF['P1']*KXF['P2']/(granH[i]**2))
-            / (1 + KXF['P1']/granH[i] + KXF['P2']*KXF['P3']/granH[i]**2
-                + KXF['P1']*KXF['P2']*KXF['P3']/granH[i]**3))
+        granBicarb = xmu*concTotals['C']/(granH[i]/eqConstants['C1'] + 1)
+        granHSO4 = xmu*concTotals['S']/(1 + eqConstants['S']/granH[i])
+        granHF = xmu*concTotals['F']/(1 + eqConstants['F']/granH[i])
+        granBorate = xmu*concTotals['B']/(1 + granH[i]/eqConstants['B'])
+        granOH = eqConstants['w']/granH[i]
+        granPP2 = (xmu*concTotals['P']*(1 -
+            eqConstants['P1']*eqConstants['P2']/(granH[i]**2))
+            / (1 + eqConstants['P1']/granH[i] +
+            eqConstants['P2']*eqConstants['P3']/granH[i]**2 +
+            eqConstants['P1']*eqConstants['P2']*eqConstants['P3']/granH[i]**3))
         if i < granReps-1:
             granG[i+1] = (granH[i] + granHSO4 + granHF - granBicarb
                 - granOH - granBorate + granPP2)*(massSample + massAcid)
