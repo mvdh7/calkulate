@@ -11,6 +11,9 @@ theme: readthedocs
 nav:
   - Overview and installation: index.md
   - Variables and conventions: conventions.md
+  - Data import: io.md
+  - Total concentrations: concentrations.md
+  - Equilibrium constants: dissociation.md
   - Alkalinity solvers: solvers.md
   - Titrant calibration: calibration.md
   - Workflow examples: workflow.md

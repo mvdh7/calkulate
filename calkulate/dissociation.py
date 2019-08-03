@@ -96,7 +96,7 @@ def kSiOH4_T_M95(tempK, pSal):
         + log(1 - 0.001005*pSal))
     return exp(lnkSi)
 
-def kNH3_X_BJJL08(tempK, pSal):
+def kNH3_U_BJJL08(tempK, pSal):
     """Ammonium dissociation constant [BJJL08]."""
     pKNH4 = 10.0423 - 0.0315536*tempK + 0.003071*pSal # BJJL08 Eq. (3)
     return 10**-pKNH4

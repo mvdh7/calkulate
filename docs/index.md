@@ -20,7 +20,16 @@ import calkulate as calk
 
 To quickly get started with some analysis, jump straight to the [workflow examples](../workflow). These examples illustrate the different parts of Calkulate that you may need to use, and provide a framework that you can quickly modify to suit your own requirements.
 
-To find out more about the principles by which Calkulate calculates things, take a look at the other parts of the documentation. These explain the conventions for naming and defining the input and output variables ([variables and conventions](conventions)), the different methods by which alkalinity can be estimated from titration data ([alkalinity solvers](solvers)), and how to calibrate the acid titrant's concentration ([titrant calibration](calibration)). Changes from version to version are recorded in the [version history](versions) and a key to the codes used for [literature references](references) is provided.
+To find out more about the principles by which Calkulate calculates things, take a look at the other parts of the documentation. These explain:
+
+  * [Variables and conventions](conventions): the conventions for naming and defining the input and output variables;
+  * [Data import](io): how to import titration data to work with;
+  * [Total concentrations](concentrations): estimating total concentrations from salinity, or defining your own;
+  * [Equilibrium constants](dissociation): defining stoichiometric equilibrium constants for the alkalinity solvers;
+  * [Alkalinity solvers](solvers): the different methods by which alkalinity can be estimated from titration data;
+  * [Titrant calibration](calibration): how to calibrate the acid titrant's concentration;
+  * [Version history](versions): changes from version to version; and
+  * [Literature references](references): a key to the codes used for citations.
 
 ## Development status
 

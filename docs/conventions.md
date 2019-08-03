@@ -68,7 +68,7 @@ Scalar constants, each of which may have a different value for each titration:
 
 A number of Calkulate functions take two dicts as inputs. These are, and contain:
 
-  1. `concTotals` - the total concentrations of chemical species that are variable over the titration pH range (for more details see the [total concentrations](../concentrations) documentation);
+  1. `concTotals` - the constant total concentrations of chemical species that are individually variable over the titration pH range (for more details see the [total concentrations](../concentrations) documentation);
   2. `eqConstants` - the stoichiometric dissociation constants for each equilibrium in seawater, evaluated at the titration temperature and sample salinity, on the Free pH scale (for more details see the [dissociation constants](../dissociation) documentation).
 
 ## Guesstimates
