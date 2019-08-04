@@ -66,6 +66,7 @@ The different options for `Solute` and `REF` (i.e. [literature reference](../ref
 
 **Options:**
 
+  * `totalFluoride_R65`: Riley, 1965 [[R65](../references/#R65)];
   * `totalFluoride_W71`: Warner, 1971 [[W71](../references/#W71)] (default).
 
 ### Total sulfate

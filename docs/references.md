@@ -8,6 +8,8 @@
 
 <tr><td align='right' id='BJJL08'>BJJL08</td><td>Bell, T. G., Johnson, M. T., Jickells, T. D., and Liss, P. S. (2008). Corrigendum to: Ammonia/ammonium dissociation coefficient in seawater: A significant numerical correction. <i>Environ. Chem.</i> 5(3), 258. <a href="https://doi.org/10.1071/EN07032_CO">doi:10.1071/EN07032_CO</a>.</td></tr>
 
+<tr><td align='right' id='CRP94'>CRP94</td><td>Clegg, S. L., Rard, J. A., and Pitzer, K. S. (1994). Thermodynamic properties of 0–6 mol kg<sup>–1</sup> aqueous sulfuric acid from 273.15 to 328.15 K. <i>J. Chem. Soc., Faraday Trans.</i> 90, 1875–1894. <a href="https://doi.org/10.1039/FT9949001875">doi:10.1039/FT9949001875</a>.</td></tr>
+
 <tr><td align='right' id='D81'>D81</td><td>Dickson, A. G. (1981). An exact definition of total alkalinity and a procedure for the estimation of alkalinity and total inorganic carbon from titration data. <i>Deep-Sea Res. Pt. A</i> 28(6), 609–623. <a href="https://doi.org/10.1016/0198-0149(81)90121-7">doi:10.1016/0198-0149(81)90121-7</a>.</td></tr>
 
 <tr><td align='right' id='D90a'>D90a</td><td>Dickson, A. G. (1990a). Thermodynamics of the dissociation of boric acid in synthetic seawater from 273.15 to 318.15 K. <i>Deep-Sea Res. Pt. A</i> 37(5), 755–766. <a href="https://doi.org/10.1016/0198-0149(90)90004-F">doi:10.1016/0198-0149(90)90004-F</a>.</td></tr>
@@ -36,11 +38,15 @@
 
 <tr><td align='right' id='PF87'>PF87</td><td>Perez, F. F., and Fraga, F. (1987). Association constant of fluoride and hydrogen ions in seawater. <i>Mar. Chem.</i> 21(2), 161–168. <a href="https://doi.org/10.1016/0304-4203(87)90036-3">doi:10.1016/0304-4203(87)90036-3</a>.</td></tr>
 
+<tr><td align='right' id='R65'>R65</td><td>Riley, J. P. (1965). The occurrence of anomalously high fluoride concentrations in the North Atlantic. <i>Deep-Sea Res.</i> 12(2), 219–220. <a href="https://doi.org/10.1016/0011-7471(65)90027-6">doi:10.1016/0011-7471(65)90027-6</a>.</td></tr>
+
 <tr><td align='right' id='U74'>U74</td><td>Uppström, L. R. (1974). The boron/chlorinity ratio of deep-sea water from the Pacific Ocean. <i>Deep-Sea Res.</i> 21(2), 161–162. <a href="https://doi.org/10.1016/0011-7471(74)90074-6">doi:10.1016/0011-7471(74)90074-6</a>.</td></tr>
 
 <tr><td align='right' id='W71'>W71</td><td>Warner, T. B. (1971). Normal fluoride content of seawater. <i>Deep-Sea Res.</i> 18(12), 1255–1263. <a href="https://doi.org/10.1016/0011-7471(71)90030-1">doi:10.1016/0011-7471(71)90030-1</a>.</td></tr>
 
 <tr><td align='right' id='WLD69'>WLD69</td><td>Wooster, W. S., Lee, A. J., and Dietrich, G. (1969). Redefinition of Salinity. <i>Limnol. Oceanogr.</i> 14(3), 437–438. <a href="https://doi.org/10.4319/lo.1969.14.3.0437">doi:10.4319/lo.1969.14.3.0437</a>.</td></tr>
+
+<tr><td align='right' id='WM13'>WM13</td><td>Waters, J. F., and Millero, F. J. (2013). The free proton concentration scale for seawater pH. <i>Mar. Chem.</i> 149, 8–22. <a href="https://doi.org/10.1016/j.marchem.2012.11.003">doi:10.1016/j.marchem.2012.11.003</a>.</td></tr>
 
 <tr><td align='right' id='ZW01'>ZW01</td><td>Zeebe, R. E., and Wolf-Gladrow, D. (2001). <i>CO<sub>2</sub> in Seawater: Equilibrium, Kinetics, Isotopes</i>. Elsevier Oceanography Series 65, Elsevier B.V., Amsterdam, The Netherlands.</td></tr>
 

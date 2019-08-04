@@ -61,6 +61,33 @@ def kHSO4_F_D90b(tempK, pSal):
         + log(1 - 0.001005*pSal)) # D90b Eqs. (22) & (23)
     return exp(lnkHSO4)
 
+def kHSO4_F_WM13(tempK, pSal):
+    """Bisulfate dissociation constant [WM13]."""
+    # WM13 equation 29, constants from Corrigendum to WM13, Table 6
+    c1 = 4.24666      
+    c2 = -0.152671      
+    c3 = 2.67059e-2
+    c4 = -4.2128e-5
+    c5 = 0.2542181
+    c6 = -5.09534e-3
+    c7 = 7.1589e-4
+    c8 = -2.91179e-3
+    c9 = 2.09968e-5
+    c10 = -4.03724e-5
+    log10_KK = ((c1 + c2*tempK + c3*tempK*log(tempK) + c4*tempK**2)*pSal**0.5 +
+        (c5 + c6*tempK + c7*tempK*log(tempK))*pSal + (c8 + c9*tempK)*pSal**1.5
+        + c10*pSal**2)
+    # WM13 equation 30, constants taken directly from CRP94
+    a1 = 562.69486
+    a2 = -102.5154
+    a3 = -1.117033e-4
+    a4 = 0.2477538
+    a5 = -13273.75
+    log10_Ko = a1 + a2*log(tempK) + a3*tempK**2 + a4*tempK + a5/tempK
+    # Dissociation constant
+    pkHSO4 = -(log10_KK + log10_Ko)
+    return 10.0**-pkHSO4
+
 def kHF_T_PF87(tempK, pSal):
     """Hydrogen fluoride dissociation constant [PF87]."""
     # 9 < T < 33 degC; 10 < S < 40

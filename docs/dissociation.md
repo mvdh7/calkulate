@@ -119,8 +119,9 @@ $$K_\text{S}^\* = \frac{[\ce{SO4^2-}] [\ce{H+}]}{[\ce{HSO4-}]}$$
 
 **Options:**
 
-  * `.kHSO4_F_D90b`: Dickson, 1990b [[D90b](../references/#D90b)] (default):
-    * Valid: 0 < temperature < 45 °C; 5 < salinity < 45.
+  * `kHSO4_F_D90b`: Dickson, 1990b [[D90b](../references/#D90b)] (default):
+    * Valid: 0 < temperature < 45 °C; 5 < salinity < 45;
+  * `kHSO4_F_WM13`: Waters and Millero, 2013 [[WM13](../references/#WM13)].
 
 ### `HF`: hydrofluoric acid
 
