@@ -28,14 +28,15 @@ def f1(massAcid, emf, tempK, massSample):
     """Simple Gran plot estimator function, DAA03 Eq. (10)."""
     return (massSample + massAcid)*exp(emf*F/(R*tempK))
 
-def granGuessAlk(massAcid, f1, massSample, concAcid):
+def granAlkGuess(massAcid, f1, massSample, concAcid):
     """Simple Gran plot first guess of alkalinity."""
     grad, intY, _, _, _ = linregress(massAcid, f1)
     intX = -intY/grad
     alkGuess = intX*concAcid/massSample
     return alkGuess
 
-def granEmf0(massAcid, emf, tempK, massSample, concAcid, alk, HSO4=0, HF=0):
+def granEmf0Guess(massAcid, emf, tempK, massSample, concAcid, alk, HSO4=0,
+        HF=0):
     """DAA03 equation (11)."""
     return (emf - (R*tempK/F)*log(((massAcid*concAcid - massSample*alk)
         - massSample*(HF + HSO4))/(massSample + massAcid)))
@@ -47,10 +48,10 @@ def guessGran(massAcid, emf, tempK, massSample, concAcid):
         f1Guess > 0.1*np_max(f1Guess),
         f1Guess < 0.9*np_max(f1Guess),
     )
-    alkGuess = granGuessAlk(massAcid[LGuess], f1Guess[LGuess], massSample,
+    alkGuess = granAlkGuess(massAcid[LGuess], f1Guess[LGuess], massSample,
         concAcid)
-    emf0Guess = mean(granEmf0(massAcid[LGuess], emf[LGuess], tempK[LGuess],
-        massSample, concAcid, alkGuess))
+    emf0Guess = mean(granEmf0Guess(massAcid[LGuess], emf[LGuess],
+        tempK[LGuess], massSample, concAcid, alkGuess))
     hGuess = emf2h(emf, emf0Guess, tempK)
     pHGuess = -log10(hGuess)
     return alkGuess, emf0Guess, hGuess, pHGuess
@@ -103,27 +104,28 @@ def DAA03(massAcid, emf, tempK, massSample, concAcid, concTotals, eqConstants):
         [alkGuess, 1], x_scale=[1e-3, 1], method='lm')
 
 #----- Dickson (1981) method --------------------------------------------------
-def _lsqfun_Dickson1981(massAcid, H, massSample, concAcid, f, AT, concTotals,
-        eqConstants):
+def _lsqfun_Dickson1981(massAcid, h, massSample, concAcid, f, alk,
+        totalCarbonate, concTotals, eqConstants):
     """D81 equation (16)."""
-    return (massSample*(AT - concTotals['C']*(1/(1 + f*H/eqConstants['C1'])
-        + 1/(1 + f*H/eqConstants['C2']))
-        - concTotals['B']/(1 +f*H/eqConstants['B']))
-        + (massSample + massAcid)*(f*H - eqConstants['w']/(f*H))
+    return (massSample*(alk - totalCarbonate*(1/(1 + f*h/eqConstants['C1'])
+        + 1/(1 + f*h/eqConstants['C2']))
+        - concTotals['B']/(1 +f*h/eqConstants['B']))
+        + (massSample + massAcid)*(f*h - eqConstants['w']/(f*h))
         - massAcid*concAcid)
 
-def Dickson1981(massAcid, EMF, tempK, massSample, concAcid, concTotals,
+def Dickson1981(massAcid, emf, tempK, massSample, concAcid, concTotals,
         eqConstants):
     """Solve for alkalinity, DIC and f using the closed-cell method [D81]."""
-    alkGuess, EMF0g, hGuess, pHGuess = guessGran(massAcid, EMF, tempK,
+    alkGuess, EMF0g, hGuess, pHGuess = guessGran(massAcid, emf, tempK,
         massSample, concAcid)
     L = pHGuess > 5
     eqConstantsL = {k: v[L] for k, v in eqConstants.items()}
-    alk_CT_f = olsq(lambda alk_CT_f:
+    alk_totalCarbonate_f = olsq(lambda alk_totalCarbonate_f:
         _lsqfun_Dickson1981(massAcid[L], hGuess[L], massSample, concAcid,
-            alk_CT_f[2], alk_CT_f[0], alk_CT_f[1], concTotals, eqConstantsL),
+            alk_totalCarbonate_f[2], alk_totalCarbonate_f[0],
+            alk_totalCarbonate_f[1], concTotals, eqConstantsL),
         [alkGuess, alkGuess*0.95, 1], x_scale=[1e-3, 1e-3, 1], method='lm')
-    return alk_CT_f
+    return alk_totalCarbonate_f
 
 #====== HALF-GRAN PLOT METHOD =================================================
 def halfGran(massAcid, emf, tempK, massSample, concAcid, concTotals,
@@ -147,14 +149,14 @@ def halfGran(massAcid, emf, tempK, massSample, concAcid, concTotals,
         else:
             LG = logical_and(granPH[i-1] > pHRange[0],
                              granPH[i-1] < pHRange[1])
-        stepAlk[i] = granGuessAlk(massAcid[LG], granG[i, LG], massSample,
+        stepAlk[i] = granAlkGuess(massAcid[LG], granG[i, LG], massSample,
             concAcid)
         PPC = 5e-3 # permitted % change in AT
         if i > 2:
             if np_abs(stepAlk[i] - stepAlk[i-1])/stepAlk[i] < PPC/100:
                 converged = True
                 break
-        granEmf0[i, LG] = granEmf0(massAcid[LG], emf[LG], tempK[LG],
+        granEmf0[i, LG] = granEmf0Guess(massAcid[LG], emf[LG], tempK[LG],
             massSample, concAcid, stepAlk[i], granHSO4[LG], granHF[LG])
         stepEmf0[i] = nanmean(granEmf0[i])
         granH[i] = emf2h(emf, stepEmf0[i], tempK)

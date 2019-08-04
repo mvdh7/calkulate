@@ -87,9 +87,11 @@ This is the approach described by [D81](../references/#D81). It uses a high pH r
 **Syntax:**
 
 ```python
-alk, CT, f = calk.solve.Dickson1981(massAcid, emf, tempK, massSample, concAcid,
-    concTotals, eqConstants)['x']
+alk, totalCarbonate, f = calk.solve.Dickson1981(massAcid, emf, tempK, massSample,
+    concAcid, concTotals, eqConstants)['x']
 ```
+
+Note that if a `totalCarbonate` value is provided within the `concTotals` dict it should not cause any problems but it will be completely ignored by this solver.
 
 **Specifics:**
 

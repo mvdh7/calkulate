@@ -6,7 +6,7 @@ from .constants import tZero
 
 def vindta(datfile, delimiter='\t', skip_header=2):
     """Import VINDTA-style .dat file titration table."""
-    tData = genfromtxt(datfile, delimiter, skip_header)
+    tData = genfromtxt(datfile, delimiter=delimiter, skip_header=skip_header)
     volAcid = tData[:, 0] # ml
     emf = tData[:, 1] # mV
     tempK = tData[:, 2] + tZero # K
