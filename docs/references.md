@@ -36,6 +36,8 @@
 
 <tr><td align='right' id='PF87'>PF87</td><td>Perez, F. F., and Fraga, F. (1987). Association constant of fluoride and hydrogen ions in seawater. <i>Mar. Chem.</i> 21(2), 161–168. <a href="https://doi.org/10.1016/0304-4203(87)90036-3">doi:10.1016/0304-4203(87)90036-3</a>.</td></tr>
 
+<tr><td align='right' id='U74'>U74</td><td>Uppström, L. R. (1974). The boron/chlorinity ratio of deep-sea water from the Pacific Ocean. <i>Deep-Sea Res.</i> 21(2), 161–162. <a href="https://doi.org/10.1016/0011-7471(74)90074-6">doi:10.1016/0011-7471(74)90074-6</a>.</td></tr>
+
 <tr><td align='right' id='W71'>W71</td><td>Warner, T. B. (1971). Normal fluoride content of seawater. <i>Deep-Sea Res.</i> 18(12), 1255–1263. <a href="https://doi.org/10.1016/0011-7471(71)90030-1">doi:10.1016/0011-7471(71)90030-1</a>.</td></tr>
 
 <tr><td align='right' id='WLD69'>WLD69</td><td>Wooster, W. S., Lee, A. J., and Dietrich, G. (1969). Redefinition of Salinity. <i>Limnol. Oceanogr.</i> 14(3), 437–438. <a href="https://doi.org/10.4319/lo.1969.14.3.0437">doi:10.4319/lo.1969.14.3.0437</a>.</td></tr>

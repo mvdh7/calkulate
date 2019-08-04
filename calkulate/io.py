@@ -4,16 +4,24 @@
 from numpy import arange, array, full_like, genfromtxt
 from .constants import tZero
 
-def vindta(datfile, delimiter='\t', skip_header=2):
-    """Import VINDTA-style .dat file titration table."""
-    tData = genfromtxt(datfile, delimiter=delimiter, skip_header=skip_header)
+def vindta(datFile, delimiter='\t', skip_header=2):
+    """Import a single VINDTA-style .dat file titration dataset."""
+    tData = genfromtxt(datFile, delimiter=delimiter, skip_header=skip_header)
     volAcid = tData[:, 0] # ml
     emf = tData[:, 1] # mV
     tempK = tData[:, 2] + tZero # K
     return volAcid, emf, tempK
 
+def writeDat(datFile, volAcid, emf, tempK, line0='', line1=''):
+    """Write a titration dataset to a VINDTA-style .dat file."""
+    with open(datFile, 'w') as f:
+        f.write('{}\n{}\n'.format(line0, line1))
+        for i in range(len(volAcid)):
+            f.write('{:.3f} {:.3f} {:.3f}\n'.format(
+                volAcid[i], emf[i], tempK[i]-tZero))
+
 def Dickson1981(withPhosphate=True):
-    """Import simulated titrations from Dickson (1981)."""
+    """Import simulated titrations from D81."""
     massAcid = arange(0, 2.51, 0.05)*1e-3 # acid mass in kg
     tempK = full_like(massAcid, 298.15) # K
     concAcid = 0.3 # mol/kg-soln
@@ -36,7 +44,7 @@ def Dickson1981(withPhosphate=True):
     eqConstants['B'] = full_like(massAcid, 1.78e-09)
     eqConstants['S'] = 1/full_like(massAcid, 1.23e+01)
     eqConstants['F'] = 1/full_like(massAcid, 4.08e+02)
-    eqConstants['P1'] = full_like(massAcid, 56.8)
+    eqConstants['P1'] = full_like(massAcid, 1/56.8)
     eqConstants['P2'] = full_like(massAcid, 8e-7)
     eqConstants['P3'] = full_like(massAcid, 1.32e-15)/eqConstants['P2']
     eqConstants['Si'] = full_like(massAcid, 1)

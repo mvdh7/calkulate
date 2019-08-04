@@ -10,7 +10,7 @@ theme: readthedocs
 
 nav:
   - Overview and installation: index.md
-  - Workflow examples: workflow.md
+  - Workflow examples: examples.md
   - Give me a bit more detail!:
     - Variables and conventions: conventions.md
     - Data import: io.md

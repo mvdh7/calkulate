@@ -18,6 +18,10 @@ def totalBorate_LKB10(pSal):
     """Estimate total borate from practical salinity in mol/kg-sw [LKB10]."""
     return pSal*0.1336e-3/ramB
 
+def totalBorate_U74(pSal):
+    """Estimate total borate from practical salinity in mol/kg-sw [U74]."""
+    return pSal*0.232e-3/(ramB*pSal2cl)
+
 def totalFluoride_W71(pSal):
     """Estimate total fluoride from practical salinity in mol/kg-sw [W71]."""
     return pSal*6.75e-5/(ramF*pSal2cl)

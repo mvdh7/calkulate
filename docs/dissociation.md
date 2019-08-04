@@ -75,7 +75,7 @@ $$K_2^\* = \frac{[\ce{CO3^2-}] [\ce{H+}]}{[\ce{HCO3-}]}$$
 
 **Options:**
 
-  * `ksH2CO3_T_LDK00`: [LDK00](../references/#LDK00) (default).
+  * `ksH2CO3_T_LDK00`: Lueker et al., 2000 [[LDK00](../references/#LDK00)] (default).
     * Valid: 2 < temperature < 35 °C; 19 < salinity < 43.
 
 ### `BOH3`: boric acid
@@ -90,7 +90,7 @@ $$K_\text{B}^\* = \frac{[\ce{B(OH)4-}] [\ce{H+}]}{[\ce{B(OH)3}]}$$
 
 **Options:**
 
-  *  `kBOH3_T_D90a`: [D90a](../references/#D90a) (default).
+  *  `kBOH3_T_D90a`: Dickson, 1990a [[D90a](../references/#D90a)] (default).
     * Valid: 0 < temperature < 45 °C; 5 < salinity < 45.
 
 ### `H2O`: water
@@ -105,7 +105,7 @@ $$K_\text{w}^\* = [\ce{OH-}] [\ce{H+}]$$
 
 **Options:**
 
-  * `kH2O_T_DSC07`: [DSC07](../references/#DSC07) (default).
+  * `kH2O_T_DSC07`: Dickson et al., 2007 [[DSC07](../references/#DSC07)] (default).
 
 ### `HSO4`: bisulfate
 
@@ -119,7 +119,7 @@ $$K_\text{S}^\* = \frac{[\ce{SO4^2-}] [\ce{H+}]}{[\ce{HSO4-}]}$$
 
 **Options:**
 
-  * `.kHSO4_F_D90b`: [D90b](../references/#D90b) (default).
+  * `.kHSO4_F_D90b`: Dickson, 1990b [[D90b](../references/#D90b)] (default).
     * Valid: 0 < temperature < 45 °C; 5 < salinity < 45.
 
 ### `HF`: hydrofluoric acid
@@ -134,9 +134,9 @@ $$K_\text{HF}^\* = \frac{[\ce{F-}] [\ce{H+}]}{[\ce{HF}]}$$
 
 **Options:**
 
-  * `kHF_F_DR79`: [DR79](../references/#DR79).
+  * `kHF_F_DR79`: Dickson and Riley, 1979 [[DR79](../references/#DR79)].
     * Valid: 5 < temperature < 35 °C; 10 < salinity < 48.
-  * `kHF_T_PF87`: [PF87](../references/#PF87) (default).
+  * `kHF_T_PF87`: Perez and Fraga, 1987 [[PF87](../references/#PF87)] (default).
     * Valid: 9 < temperature < 33 °C; 10 < salinity < 40.
 
 ### `H3PO4`: phosphoric acid
@@ -159,7 +159,7 @@ $$K_\text{P3}^\* = \frac{[\ce{PO4^3-}] [\ce{H+}]}{[\ce{HPO4^2-}]}$$
 
 **Options:**
 
-  * `ksH3PO4_T_DSC07 `: [DSC07](../references/#DSC07) (default).
+  * `ksH3PO4_T_DSC07 `: Dickson et al., 2007 [[DSC07](../references/#DSC07)] (default).
 
 ### `SiOH3`: orthosilicic acid
 
@@ -173,7 +173,7 @@ $$K_\text{Si}^\* = \frac{[\ce{Si(OH)3O-}] [\ce{H+}]}{[\ce{Si(OH)4}]}$$
 
 **Options:**
 
-  * `kSiOH3_T_M95`: [M95](../references/#M95) (default).
+  * `kSiOH3_T_M95`: Millero, 1995 [[M95](../references/#M95)] (default).
 
 <!--
 

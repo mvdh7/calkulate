@@ -57,7 +57,8 @@ The different options for `Solute` and `REF` (i.e. [literature reference](../ref
 
 **Options:**
 
-  * `totalBorate_LKB10`: [LKB10](../references/#LKB10) (default).
+  * `totalBorate_LKB10`: Lee et al., 2010 [[LKB10](../references/#LKB10)] (default);
+  * `totalBorate_U74`: Uppström, 1974 [[U74](../references/#U74)].
 
 ### Total fluoride
 
@@ -65,7 +66,7 @@ The different options for `Solute` and `REF` (i.e. [literature reference](../ref
 
 **Options:**
 
-  * `totalFluoride_W71`: [W71](../references/#W71) (default).
+  * `totalFluoride_W71`: Warner, 1971 [[W71](../references/#W71)] (default).
 
 ### Total sulfate
 
@@ -73,4 +74,4 @@ The different options for `Solute` and `REF` (i.e. [literature reference](../ref
 
 **Options:**
 
-  * `totalSulfate_MR66`: [MR66](../references/#MR66) (default).
+  * `totalSulfate_MR66`: Morris and Riley, 1966 [[MR66](../references/#MR66)] (default).

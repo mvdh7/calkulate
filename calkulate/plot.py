@@ -24,8 +24,8 @@ def prep(datfile, volSample, pSal, totalCarbonate, totalPhosphate,
     )
     alkGuess, emf0Guess, _, pHGuess = solve.guessGran(massAcid, emf, tempK,
         massSample, concAcid)
-    granEmf0 = solve.granEmf0(massAcid[LGuess], emf[LGuess], tempK[LGuess],
-        massSample, concAcid, alkGuess)
+    granEmf0 = solve.granEmf0Guess(massAcid[LGuess], emf[LGuess],
+        tempK[LGuess], massSample, concAcid, alkGuess)
     L = logical_and(pHGuess > 3, pHGuess < 4)
     alk_emf0 = solve.complete(massAcid, emf, tempK, massSample, concAcid,
         concTotals, eqConstants)
@@ -125,39 +125,30 @@ def alkEstimates(ax, massAcid, alk0Sim, rgb, alk_emf0, RMS, Npts, sublabel):
 
 def components(ax, massAcid, alk0Sim, alkSim, sublabel):
     """Every component of alkalinity throughout a titration."""
-    ax.plot(massAcid*1e3, -log10(alk0Sim), label='AT', marker='o',
-        markersize=3, c='k', clip_on=False)
-    rgbs = array([
-        [0.4, 0.4, 0.4],
-        [0.4, 0.4, 0.4],
-        [0.19, 0.31, 0.97],
-        [1, 0.05, 0.05],
-        [1, 0.05, 0.05],
-        [0.95, 0.8, 0.14],
-        [0.12, 0.74, 0.12],
-        [1, 0.5, 0],
-        [1, 0.5, 0],
-        [1, 0.5, 0],
-        [0.94, 0.56, 0.63],
-    ])
-    names = [
-        '+[HCO$_3^-$]',
-        '+2[CO$_3^{2-}$]',
-        '+[B(OH)$_4^-$]',
-        '+[OH$^-$]',
-        '$-$[H$^+$]',
-        '$-$[HSO$_4^-$]',
-        '$-$[HF]',
-        '$-$[H$_3$PO$_4$]',
-        '+[HPO$_4^{2-}$]',
-        '+2[PO$_4^{3-}$]',
-        '+[SiO(OH)$_3$]',
-    ]
-    for k, name in enumerate(names):
-        if name.startswith('$-$'):
-            alkSim[1][k] = -alkSim[1][k]
-        ax.plot(massAcid*1e3, -log10(alkSim[1][k]), label=name, marker='x',
-            markersize=3, c=rgbs[k], clip_on=False)
+    ax.plot(massAcid*1e3, -log10(alk0Sim), label='Total alkalinity',
+        marker='o', markersize=3, c='k', clip_on=False)
+    # Keys in rgbs_names match those in simulate.alk's components dict
+    rgbs_names = {
+        '+HCO3': [array([0.4, 0.4, 0.4]), '+[HCO$_3^-$]'],
+        '+2*CO3': [array([0.4, 0.4, 0.4]), '+2[CO$_3^{2-}$]'],
+        '+B(OH)4': [array([0.19, 0.31, 0.97]), '+[B(OH)$_4^-$]'],
+        '+OH': [array([1, 0.05, 0.05]), '+[OH$^-$]'],
+        '-H': [array([1, 0.05, 0.05]), '$-$[H$^+$]'],
+        '-HSO4': [array([0.95, 0.8, 0.14]), '$-$[HSO$_4^-$]'],
+        '-HF': [array([0.12, 0.74, 0.12]), '$-$[HF]'],
+        '-H3PO4': [array([1, 0.5, 0]), '$-$[H$_3$PO$_4$]'],
+        '+HPO4': [array([1, 0.5, 0]), '+[HPO$_4^{2-}$]'],
+        '+2*PO4': [array([1, 0.5, 0]), '+2[PO$_4^{3-}$]'],
+        '+SiO(OH)3': [array([0.94, 0.56, 0.63]), '+[SiO(OH)$_3$]'],
+    }
+    for component in alkSim[1].keys():
+        if component.startswith('-'): # this is a bit sketchy
+            yVar = -alkSim[1][component]
+        else:
+            yVar = alkSim[1][component]
+        ax.plot(massAcid*1e3, -log10(yVar), label=rgbs_names[component][1],
+            marker='x', markersize=3, c=rgbs_names[component][0],
+            clip_on=False)
     ax.set_xlim([0, np_max(massAcid)*1e3])
     ax.set_ylim(ax.get_ylim()[::-1])
     ax.legend(bbox_to_anchor=(1.05, 1))
@@ -168,7 +159,7 @@ def components(ax, massAcid, alk0Sim, alkSim, sublabel):
 
 def everything(datfile, volSample, pSal, totalCarbonate, totalPhosphate,
         totalSilicate, concAcid):
-    """Plot everything for a single titration with a VINDTA-style .dat file."""
+    """Plot everything for a single titration from a VINDTA-style .dat file."""
     (massAcid, emf, massSample, f1Guess, LGuess, alkGuess, emf0Guess, granEmf0,
         alk_emf0, alkSim, alk0Sim, RMS, Npts, rgb) = prep(datfile, volSample,
         pSal, totalCarbonate, totalPhosphate, totalSilicate, concAcid)

@@ -1,11 +1,12 @@
 # Calkulate: seawater total alkalinity from titration data.
 # Copyright (C) 2019  Matthew Paul Humphreys  (GNU GPLv3)
-"""Convenient function wrappers for working with VINDTA titration data."""
+"""Function wrappers for working with VINDTA-style titration data."""
 from . import (calibrate, concentrations, density, dissociation, io, simulate,
     solve)
 from numpy import logical_and
 from numpy import max as np_max
 # ================================================ INPUTS AND THEIR UNITS =====
+# datFile = .dat file name (and path)
 # volSample = sample volume in ml
 # concAcid = acid molality in mol/kg
 # pSal = practical salinity (dimensionless)
@@ -15,10 +16,10 @@ from numpy import max as np_max
 # totalSilicate = silicate in mol/kg-sw
 # tempKForce = titration temperature (optional) in K
 
-def prep(datfile, volSample, pSal, totalCarbonate, totalPhosphate,
+def prep(datFile, volSample, pSal, totalCarbonate, totalPhosphate,
         totalSilicate, buretteCorrection=1, tempKForce=None):
     """Import VINDTA-style .dat file and prepare data for analysis."""
-    volAcid, emf, tempK = io.vindta(datfile)
+    volAcid, emf, tempK = io.vindta(datFile)
     if tempKForce is not None:
         tempK[:] = tempKForce
     massSample = volSample*density.sw(tempK[0], pSal)*1e-3
@@ -29,23 +30,23 @@ def prep(datfile, volSample, pSal, totalCarbonate, totalPhosphate,
     return massAcid, emf, tempK, massSample, concTotals, eqConstants
 
 # =================================================== HALF-GRAN FUNCTIONS =====
-def halfGran(datfile, volSample, concAcid, pSal, totalCarbonate,
+def halfGran(datFile, volSample, concAcid, pSal, totalCarbonate,
         totalPhosphate, buretteCorrection=1, tempKForce=None):
     """Solve for alkalinity using the half-Gran method [H15] for a VINDTA-style
     titration data file.
     """
-    massAcid, emf, tempK, massSample, concTotals, eqConstants = prep(datfile,
+    massAcid, emf, tempK, massSample, concTotals, eqConstants = prep(datFile,
         volSample, pSal, totalCarbonate, totalPhosphate, 0,
         buretteCorrection, tempKForce)
     return solve.halfGran(massAcid, emf, tempK, massSample, concAcid,
         concTotals, eqConstants)
 
-def halfGranCRM(datfile, volSample, alkCert, pSal, totalCarbonate,
+def halfGranCRM(datFile, volSample, alkCert, pSal, totalCarbonate,
         totalPhosphate, buretteCorrection=1, tempKForce=None):
     """Solve for acid concentration using the half-Gran method [H15]
     for a VINDTA-style titration data file.
     """
-    massAcid, emf, tempK, massSample, concTotals, eqConstants = prep(datfile,
+    massAcid, emf, tempK, massSample, concTotals, eqConstants = prep(datFile,
         volSample, pSal, totalCarbonate, totalPhosphate, 0, buretteCorrection,
         tempKForce)
     concAcid = calibrate.halfGran(massAcid, emf, tempK, massSample, alkCert,
@@ -55,9 +56,9 @@ def halfGranCRM(datfile, volSample, alkCert, pSal, totalCarbonate,
     return concAcid, alk, emf0
 
 # ================================================ PLOT THE LOT FUNCTIONS =====
-def guessGran(datfile, volSample, concAcid, pSal, buretteCorrection=1,
+def guessGran(datFile, volSample, concAcid, pSal, buretteCorrection=1,
         tempKForce=None):
-    massAcid, EMF, tempK, massSample, _, _ = prep(datfile, volSample, pSal, 0,
+    massAcid, EMF, tempK, massSample, _, _ = prep(datFile, volSample, pSal, 0,
         0, 0, buretteCorrection, tempKForce)
     # Evaluate f1 function and corresponding logical
     f1g = solve.f1(massAcid, EMF, tempK, massSample)
@@ -87,23 +88,23 @@ def simAT(massAcid, tempK, H, massSample, pSal, totalCarbonate=0,
     eqConstants = dissociation.eqConstants(tempK, pSal, concTotals)
     return simulate.alk(H, mu, concTotals, eqConstants)
 
-def complete(datfile, volSample, concAcid, pSal, totalCarbonate,
+def complete(datFile, volSample, concAcid, pSal, totalCarbonate,
         totalPhosphate, totalSilicate, buretteCorrection=1, tempKForce=None):
     """Solve for alkalinity using the complete calculation method for a
     VINDTA-style titration data file.
     """
-    massAcid, emf, tempK, massSample, concTotals, eqConstants = prep(datfile,
+    massAcid, emf, tempK, massSample, concTotals, eqConstants = prep(datFile,
         volSample, pSal, totalCarbonate, totalPhosphate, totalSilicate,
         buretteCorrection, tempKForce)
     return solve.complete(massAcid, emf, tempK, massSample, concAcid,
         concTotals, eqConstants)
 
-def completeCRM(datfile, volSample, alkCert, pSal, totalCarbonate,
+def completeCRM(datFile, volSample, alkCert, pSal, totalCarbonate,
         totalPhosphate, totalSilicate, buretteCorrection=1, tempKForce=None):
     """Solve for acid concentration using the complete calculation method for a
     VINDTA-style titration data file.
     """
-    massAcid, emf, tempK, massSample, concTotals, eqConstants = prep(datfile,
+    massAcid, emf, tempK, massSample, concTotals, eqConstants = prep(datFile,
         volSample, pSal, totalCarbonate, totalPhosphate, totalSilicate,
         buretteCorrection, tempKForce)
     concAcid = calibrate.complete(massAcid, emf, tempK, massSample, alkCert,
