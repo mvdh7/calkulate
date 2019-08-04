@@ -38,6 +38,18 @@ The rest of the file has a row for each acid addition step in the titration. The
  2. Measured EMF of the sample + acid mixture in mV;
  3. Temperature of the sample + acid mixture in °C.
 
+### Creating .dat files
+
+If you have imported or simulated titration data in [the format expected by Calkulate](../conventions), you can export it in this .dat file format using the `io.writeDat` function:
+
+```python
+calk.io.writeDat(datFile, volAcid, emf, tempK, line0='', line1='')
+```
+
+Be careful - if the specified `datFile` already exists then it will be overwritten without warning!
+
+The optional `line0` and `line1` inputs allow you to add anything to the first two lines of the .dat file; these lines are ignored by the Calkulate import function.
+
 ---
 
 ## Simulated titrations

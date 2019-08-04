@@ -5,7 +5,7 @@ MathJax.Ajax.config.path["mhchem"] =
 MathJax.Hub.Config({TeX: {extensions: ["[mhchem]/mhchem.js"]}});
 </script><script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
 
-# Equilibrium constants
+# Stoichiometric dissociation constants
 
 The [alkalinity solvers](../solvers) need values for the stoichiometric dissociation constant for each equilibrium that is active over the titration pH range in order to solve for alkalinity.  These are collated in a dict called `eqConstants`, to conveniently pass this information into the solver functions. The dict can be generated using the function of the same name in the `dissociation` module, or you can assemble your own manually.
 
