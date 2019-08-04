@@ -18,7 +18,7 @@ Within Python, the import convention is:
 import calkulate as calk
 ```
 
-To quickly get started with some analysis, jump straight to the [workflow examples](../workflow). These examples illustrate the different parts of Calkulate that you may need to use, and provide a framework that you can quickly modify to suit your own requirements.
+To quickly get started with some analysis, jump straight to the [workflow examples](../examples). These examples illustrate the different parts of Calkulate that you may need to use, and provide a framework that you can quickly modify to suit your own requirements.
 
 To find out more about the principles by which Calkulate calculates things, take a look at the other parts of the documentation. These explain:
 
