@@ -42,6 +42,8 @@
 
 <tr><td align='right' id='WLD69'>WLD69</td><td>Wooster, W. S., Lee, A. J., and Dietrich, G. (1969). Redefinition of Salinity. <i>Limnol. Oceanogr.</i> 14(3), 437–438. <a href="https://doi.org/10.4319/lo.1969.14.3.0437">doi:10.4319/lo.1969.14.3.0437</a>.</td></tr>
 
+<tr><td align='right' id='ZW01'>ZW01</td><td>Zeebe, R. E., and Wolf-Gladrow, D. (2001). <i>CO<sub>2</sub> in Seawater: Equilibrium, Kinetics, Isotopes</i>. Elsevier Oceanography Series 65, Elsevier B.V., Amsterdam, The Netherlands.</td></tr>
+
 </table>
 
 <!--

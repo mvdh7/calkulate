@@ -9,7 +9,7 @@ MathJax.Hub.Config({TeX: {extensions: ["[mhchem]/mhchem.js"]}});
 
 The [alkalinity solvers](../solvers) need values for the stoichiometric dissociation constant for each equilibrium that is active over the titration pH range in order to solve for alkalinity.  These are collated in a dict called `eqConstants`, to conveniently pass this information into the solver functions. The dict can be generated using the function of the same name in the `dissociation` module, or you can assemble your own manually.
 
-All stoichiometric equilibrium constants are on the Free pH scale unless otherwise specified, and are valid only at a pressure of ~1 atm.
+All stoichiometric equilibrium constants are on the Free pH scale (as defined by [ZW01](../references/#ZW01)), and are valid only at a pressure of ~1 atm, unless otherwise specified.
 
 ---
 
@@ -55,7 +55,7 @@ kEq = calk.dissociation.kEq_SCALE_REF(tempK, pSal)
 
 The different options for `Eq`, `SCALE` and `REF` (i.e. [literature reference](../references)) are listed below. The value marked as 'default' is the one used by the `eqConstants` function.
 
-The `SCALE` component indicates the pH scale (as defined by [ZW91](../references/#ZW91)) that the constant is defined on: `F` for Free scale, `T` for Total scale, `S` for Seawater scale, and `U` where the scale is unknown.
+The `SCALE` component indicates the pH scale (as defined by [ZW01](../references/#ZW01)) that the constant is defined on: `F` for Free scale, `T` for Total scale, `S` for Seawater scale, and `U` where the scale is unknown.
 
 For solutes with multiphase equilibria, the `k` at the start of the function name is replaced by `ks`, and all of the relevant constants are returned as a tuple.
 
@@ -75,7 +75,7 @@ $$K_2^\* = \frac{[\ce{CO3^2-}] [\ce{H+}]}{[\ce{HCO3-}]}$$
 
 **Options:**
 
-  * `ksH2CO3_T_LDK00`: Lueker et al., 2000 [[LDK00](../references/#LDK00)] (default).
+  * `ksH2CO3_T_LDK00`: Lueker et al., 2000 [[LDK00](../references/#LDK00)] (default):
     * Valid: 2 < temperature < 35 °C; 19 < salinity < 43.
 
 ### `BOH3`: boric acid
@@ -119,7 +119,7 @@ $$K_\text{S}^\* = \frac{[\ce{SO4^2-}] [\ce{H+}]}{[\ce{HSO4-}]}$$
 
 **Options:**
 
-  * `.kHSO4_F_D90b`: Dickson, 1990b [[D90b](../references/#D90b)] (default).
+  * `.kHSO4_F_D90b`: Dickson, 1990b [[D90b](../references/#D90b)] (default):
     * Valid: 0 < temperature < 45 °C; 5 < salinity < 45.
 
 ### `HF`: hydrofluoric acid
@@ -134,9 +134,9 @@ $$K_\text{HF}^\* = \frac{[\ce{F-}] [\ce{H+}]}{[\ce{HF}]}$$
 
 **Options:**
 
-  * `kHF_F_DR79`: Dickson and Riley, 1979 [[DR79](../references/#DR79)].
+  * `kHF_F_DR79`: Dickson and Riley, 1979 [[DR79](../references/#DR79)]:
     * Valid: 5 < temperature < 35 °C; 10 < salinity < 48.
-  * `kHF_T_PF87`: Perez and Fraga, 1987 [[PF87](../references/#PF87)] (default).
+  * `kHF_T_PF87`: Perez and Fraga, 1987 [[PF87](../references/#PF87)] (default):
     * Valid: 9 < temperature < 33 °C; 10 < salinity < 40.
 
 ### `H3PO4`: phosphoric acid
