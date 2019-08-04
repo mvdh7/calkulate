@@ -183,3 +183,11 @@ def halfGran(massAcid, emf, tempK, massSample, concAcid, concTotals,
         finalAlk = nan
         finalEmf0 = nan
     return {'x': [finalAlk, finalEmf0]}
+
+# Dict of all solvers
+allSolvers = {
+    'complete': complete,
+    'daa03': DAA03,
+    'dickson1981': Dickson1981,
+    'halfgran': halfGran,
+}

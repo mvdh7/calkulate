@@ -107,7 +107,6 @@ venv.bak/
 *.xlsx
 *.mat
 *.pkl
-*.csv
 
 # Miscellaneous
 *.docx

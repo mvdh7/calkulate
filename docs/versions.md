@@ -11,7 +11,7 @@ Despite the version number, Calkulate v2.0 is in beta, as the original MATLAB pr
   * Updated `halfGran` solver to return values in dict field `'x'` for consistency;
   * Fixed fatal bug in `Dickson1981` solver;
   * Fixed incorrect `eqConstants['P1']` value in D81 dataset loading function;
-  * Combined all calibration functions into a single generic function that can implement any solving method;
+  * Combined all calibration and VINDTA-style functions into generic functions that can implement any solving method;
   * Major re-organisation of documentation.
 
 ## 2.0.22
