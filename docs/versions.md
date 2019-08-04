@@ -1,8 +1,8 @@
-# 2.0 (Python, beta)
+# 2.1
 
-Despite the version number, Calkulate v2.0 is in beta, as the original MATLAB program is being extended and converted to Python.
+Calkulate v2.1 is the first stable version in Python! New features will continue to be added, and bugs fixed, but the API of existing functions will no longer be changed.
 
-## 2.0.23
+## 2.1.0
 
 **Release date:** forthcoming
 
@@ -12,7 +12,11 @@ Despite the version number, Calkulate v2.0 is in beta, as the original MATLAB pr
   * Fixed fatal bug in `Dickson1981` solver;
   * Fixed incorrect `eqConstants['P1']` value in D81 dataset loading function;
   * Combined all calibration and VINDTA-style functions into generic functions that can implement any solving method;
-  * Major re-organisation of documentation.
+  * Major documentation overhaul.
+
+# 2.0 (Python, beta)
+
+Despite the version number, Calkulate v2.0 is still a beta, as the original MATLAB program is extended and converted to Python.
 
 ## 2.0.22
 
@@ -40,4 +44,4 @@ Despite the version number, Calkulate v2.0 is in beta, as the original MATLAB pr
 
 **Release date:** 2015
 
-The original Calkulate v1.0.2 is a MATLAB-only implementation of the half-Gran alkalinity solver, as described by Humphreys (2015). The final version will remain freely available: see [the appropriate branch on GitHub](https://github.com/mvdh7/calkulate/tree/1.0.2).
+The original Calkulate v1.0.2 is a MATLAB-only implementation of the half-Gran alkalinity solver, as described by Humphreys (2015). The final version will remain freely available: see [the appropriate project branch on GitHub](https://github.com/mvdh7/calkulate/tree/1.0.2).
