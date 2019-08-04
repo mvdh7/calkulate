@@ -117,7 +117,21 @@ Prior to the advent of easy-to-compute least-squares solvers, alkalinity was det
 
 ```python
 alk, emf0 = calk.solve.halfGran(massAcid, emf, tempK, massSample, concAcid,
-    concTotals, eqConstants)
+    concTotals, eqConstants)['x']
 ```
 
-Note that this returns the alkalinity and EMF° values directly, rather than as an `OptimizeResult` as in the case of the least-squares fitting functions.
+Note that this returns a dict with one field (`'x'`) containing a list of the alkalinity and EMF° values, rather than a true `OptimizeResult` as in the case of the least-squares fitting functions.
+
+**Specifics:**
+
+*1. Which chemical species are included in the alkalinity equation?*
+
+> $\ce{CO2(aq)}$, $\ce{HCO3-}$, $\ce{CO3^2-}$, $\ce{B(OH)4-}$, $\ce{HSO4-}$, $\ce{HF}$, $\ce{H3PO4}$, $\ce{HPO4^2-}$, $\ce{PO4^3-}$, $\ce{H+}$ and $\ce{OH-}$.
+
+*2. Which titration points (i.e. what pH range) are used for the fitting?*
+
+> 3 < pH < 4
+
+*3. How is EMF° defined mathematically within the fitting process?*
+
+> Directly as EMF°.

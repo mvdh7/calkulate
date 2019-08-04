@@ -2,7 +2,7 @@
 # Copyright (C) 2019  Matthew Paul Humphreys  (GNU GPLv3)
 """Solve titration data for alkalinity."""
 from numpy import (exp, full, isnan, log, log10, logical_and, mean, nan,
-    nanmean, size, std, zeros)
+    nanmean, size, zeros)
 from numpy import abs as np_abs
 from numpy import max as np_max
 from scipy.optimize import least_squares as olsq
@@ -180,4 +180,4 @@ def halfGran(massAcid, emf, tempK, massSample, concAcid, concTotals,
             print('Calkulate: half-Gran plot iterations did not converge!')
         finalAlk = nan
         finalEmf0 = nan
-    return finalAlk, finalEmf0
+    return {'x': [finalAlk, finalEmf0]}
