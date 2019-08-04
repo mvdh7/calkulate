@@ -2,10 +2,10 @@ import pandas as pd
 import numpy as np
 import calkulate as calk
 
-# Import dataset summary and set titration subsample volume and solver method
+# Import dataset summary, and set titration subsample volume and solver method
 dataset = pd.read_csv('datfiles/exampleDataset.csv')
 volSample = 99.956 # ml
-method = 'Dickson1981'
+method = 'complete'
 
 # Get best-fit acid concentration for each CRM and then calculate average
 dataset['concAcidPerCRM'] = np.nan
