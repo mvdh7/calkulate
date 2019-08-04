@@ -14,6 +14,8 @@ Calkulate v2.1 is the first stable version in Python! New features will continue
   * Combined all calibration and VINDTA-style functions into generic functions that can implement any solving method;
   * Major documentation overhaul.
 
+---
+
 # 2.0 (Python, beta)
 
 Despite the version number, Calkulate v2.0 is still a beta, as the original MATLAB program is extended and converted to Python.
