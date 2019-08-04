@@ -15,7 +15,7 @@ for i in dataset.index:
             'datfiles/{}.dat'.format(dataset.fileName[i]),
             volSample, dataset.alkCert[i]*1e-6, dataset.pSal[i],
             dataset.totalCarbonate[i]*1e-6, dataset.totalPhosphate[i]*1e-6,
-            dataset.totalSilicate[i]*1e-6, solver=method)
+            dataset.totalSilicate[i]*1e-6, solver=method)['x'][0]
 dataset['concAcidMean'] = dataset.concAcidPerCRM.mean()
 
 # Solve every titration for alkalinity

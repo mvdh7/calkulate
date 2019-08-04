@@ -137,3 +137,18 @@ Note that this returns a dict with one field (`'x'`) containing a list of the al
 *3. How is EMF° defined mathematically within the fitting process?*
 
 > Directly as EMF°.
+
+---
+
+## Wrapper for .dat file inputs
+
+If your data is formatted as a [VINDTA-style .dat file](../io/#what-format-is-that), you can more easily implement any of the solvers above using the wrapped `alk` function in the `vindta` module:
+
+```python
+alkOptResult = calk.vindta.alk(datFile, volSample, concAcid, pSal, totalCarbonate,
+    totalPhosphate, totalSilicate, solver='complete', buretteCorrection=1, tempKForce=None)
+```
+
+Here, the input `datFile` is the file name (and path to it, if necessary) of the titration data file that you want to solve. Just like in the [calibration function](../calibration), the case-insensitive optional `solver` input (defaults to the [complete calculation](#complete-complete-calculation) method) can be set as the name of any of the methods described above.
+
+The output `alkOptResult` provides the full optimisation output that would be obtained by using the normal version of the method.

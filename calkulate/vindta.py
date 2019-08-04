@@ -44,7 +44,7 @@ def alk(datFile, volSample, concAcid, pSal, totalCarbonate, totalPhosphate,
                 *solve.allSolvers.keys()))
         alkOptResult = {'x': [None,]}
     return alkOptResult
-    
+
 def concAcid(datFile, volSample, alkCert, pSal, totalCarbonate,
         totalPhosphate, totalSilicate, solver='complete', buretteCorrection=1,
         tempKForce=None, **kwargs):
@@ -52,6 +52,6 @@ def concAcid(datFile, volSample, alkCert, pSal, totalCarbonate,
     massAcid, emf, tempK, massSample, concTotals, eqConstants = prep(datFile,
         volSample, pSal, totalCarbonate, totalPhosphate, totalSilicate,
         buretteCorrection, tempKForce)
-    concAcid = calibrate.concAcid(massAcid, emf, tempK, massSample, alkCert,
-        concTotals, eqConstants, solver, **kwargs)['x'][0]
-    return concAcid
+    concAcidOptResult = calibrate.concAcid(massAcid, emf, tempK, massSample,
+        alkCert, concTotals, eqConstants, solver, **kwargs)
+    return concAcidOptResult
