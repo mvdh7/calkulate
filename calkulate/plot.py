@@ -125,7 +125,7 @@ def alkEstimates(ax, massAcid, alk0Sim, rgb, alk_emf0, RMS, Npts, sublabel):
 
 def components(ax, massAcid, alk0Sim, alkSim, sublabel):
     """Every component of alkalinity throughout a titration."""
-    ax.plot(massAcid*1e3, -log10(alk0Sim), label='Total alkalinity',
+    ax.plot(massAcid*1e3, -log10(alk0Sim), label='Total alk.',
         marker='o', markersize=3, c='k', clip_on=False)
     # Keys in rgbs_names match those in simulate.alk's components dict
     rgbs_names = {

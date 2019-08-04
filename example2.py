@@ -1,6 +1,6 @@
 import calkulate as calk
 
-# Certified reference material batch 144 values from:
+# Certified reference material (CRM) batch 144 values from:
 #     https://www.nodc.noaa.gov/ocads/oceans/Dickson_CRM/batches.html
 pSal = 33.571
 totalCarbonate = 2031.53e-6
@@ -8,7 +8,7 @@ totalPhosphate = 0.31e-6
 totalSilicate = 2.5e-6
 alkCert = 2238.60e-6
 
-# Import a VINDTA-style .dat file for a certified reference material analysis
+# Import a VINDTA-generated .dat file from a real CRM-144 analysis
 volSample = 99.981 # ml
 datFile = 'datfiles/CRM-144-0435-4.dat'
 massAcid, emf, tempK, massSample, concTotals, eqConstants = \
@@ -25,6 +25,6 @@ alk = calk.solve.complete(massAcid, emf, tempK, massSample, concAcid,
 print('Certified alkalinity  = {:.2f} micromol/kg-sw'.format(alkCert*1e6))
 print('Calibrated alkalinity = {:.2f} micromol/kg-sw'.format(alk*1e6))
 
-# Visualise everything about this titration
+# Visualise "everything" about this titration
 calk.plot.everything(datFile, volSample, pSal, totalCarbonate, totalPhosphate,
     totalSilicate, concAcid)
