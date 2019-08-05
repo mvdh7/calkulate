@@ -1,6 +1,6 @@
 # 2.1
 
-Calkulate v2.1 is the first stable version in Python! New features will continue to be added, and bugs fixed, but the API of existing functions will no longer be changed.
+Calkulate v2.1 is the first stable version in Python! New features will continue to be added, documentation developed, and bugs fixed, but the API of existing functions will no longer be changed.
 
 ## 2.1.0
 
@@ -12,7 +12,7 @@ Calkulate v2.1 is the first stable version in Python! New features will continue
   * Fixed fatal bug in `Dickson1981` solver;
   * Fixed incorrect `eqConstants['P1']` value in D81 dataset loading function;
   * Combined all calibration and VINDTA-style functions into generic functions that can implement any solving method;
-  * Major documentation overhaul.
+  * Major documentation overhaul, and added workflow examples.
 
 ---
 
