@@ -27,3 +27,6 @@ for i in dataset.index:
         dataset.totalCarbonate[i]*1e-6, dataset.totalPhosphate[i]*1e-6,
         dataset.totalSilicate[i]*1e-6, solver=method)['x'][0]
 dataset.loc[:, 'alk'] *= 1e6 # convert to micromol/kg
+
+# Export new results back into a CSV file
+dataset.to_csv('datfiles/exampleDataset_calibrated.csv')

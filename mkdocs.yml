@@ -10,7 +10,11 @@ theme: readthedocs
 
 nav:
   - Overview and installation: index.md
-  - Workflow examples: examples.md
+  - Workflow examples:
+    - Compare all solvers: examples/compare-all-solvers.md
+    - Simulate a titration: examples/resimulate-d81.md
+    - Calibrate a CRM: examples/self-calibrate-crm.md
+    - Solve a series of measurements: examples/dataset-loop.md
   - Give me a bit more detail!:
     - Variables and conventions: conventions.md
     - Data import: io.md

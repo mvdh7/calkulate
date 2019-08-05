@@ -4,7 +4,6 @@ import calkulate as calk
 # Import D81 simulated titration with phosphate
 massAcid, pH, tempK, massSample, concAcid, pSal, alk, concTotals, eqConstants \
     = calk.io.Dickson1981(withPhosphate=False)
-totalCarbonate = concTotals['C']
 
 # Define EMF0 & convert pH to EMF, as if we'd done a potentiometric titration
 emf0 = 660.0
@@ -19,6 +18,14 @@ alk_DAA03, f_DAA03 = calk.solve.DAA03(*solveArgs)['x']
 alk_Dickson1981, totalCarbonate_Dickson1981, f_Dickson1981 = \
     calk.solve.Dickson1981(*solveArgs)['x']
 alk_halfGran, emf0_halfGran = calk.solve.halfGran(*solveArgs)['x']
+
+# Print out results nicely
+print('Total alkalinity in micromol/kg-sw:')
+print(('{:^11} '*5).format('True', 'Complete', 'DAA03', 'Dickson1981',
+    'halfGran'))
+print('With true concAcid:')
+print(('{:^11.2f} '*5).format(*np.array([alk, alk_complete, alk_DAA03,
+    alk_Dickson1981, alk_halfGran])*1e6))
 
 # Solve for the acid concentration with every solver
 calibrateArgs = (massAcid, emf, tempK, massSample, alk, concTotals,
@@ -43,13 +50,7 @@ alk_Dickson1981_cal, totalCarbonate_Dickson1981_cal, f_Dickson1981_cal = \
 alk_halfGran_cal, emf0_halfGran_cal = calk.solve.halfGran(massAcid, emf, tempK,
     massSample, concAcid_halfGran, concTotals, eqConstants)['x']
 
-# Print out results nicely
-print('Total alkalinity in micromol/kg-sw:')
-print(('{:^11} '*5).format('True', 'Complete', 'DAA03', 'Dickson1981',
-    'halfGran'))
-print('With true concAcid:')
-print(('{:^11.2f} '*5).format(*np.array([alk, alk_complete, alk_DAA03,
-    alk_Dickson1981, alk_halfGran])*1e6))
+# Print out self-calibrated results
 print('With self-calibrated concAcid:')
 print(('{:^11.2f} '*5).format(*np.array([alk, alk_complete_cal, alk_DAA03_cal,
     alk_Dickson1981_cal, alk_halfGran_cal])*1e6))

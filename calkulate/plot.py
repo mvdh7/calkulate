@@ -5,7 +5,7 @@ from numpy import array, log10, logical_and, mean, sqrt, zeros
 from numpy import min as np_min
 from numpy import max as np_max
 from matplotlib.pyplot import figure, rcParams, subplots_adjust
-from . import solve, vindta
+from . import simulate, solve, vindta
 
 _rgb_guess = array([0.96, 0.86, 0.04])
 _rgb_final = array([0.21, 0.46, 1])
@@ -30,9 +30,8 @@ def prep(datfile, volSample, pSal, totalCarbonate, totalPhosphate,
     alk_emf0 = solve.complete(massAcid, emf, tempK, massSample, concAcid,
         concTotals, eqConstants)
     h = solve.emf2h(emf, alk_emf0['x'][1], tempK)
-    alkSim = vindta.simAT(massAcid, tempK, h, massSample, pSal, totalCarbonate,
-        totalPhosphate, totalSilicate)
     mu = solve.mu(massAcid, massSample)
+    alkSim = simulate.alk(h, mu, concTotals, eqConstants)
     alk0Sim = (alkSim[0] + massAcid*concAcid/(massAcid + massSample))/mu
     RMS = sqrt(mean(alk_emf0['fun']**2))
     Npts = len(alk_emf0['fun'])
