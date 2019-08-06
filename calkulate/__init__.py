@@ -43,8 +43,5 @@ from . import (
     vindta,
 )
 
+__author__ = 'Matthew P. Humphreys and Ruth Matthews'
 __version__ = meta.version
-__author__ = [
-    'Matthew P. Humphreys', 
-    'Ruth Matthews',
-]

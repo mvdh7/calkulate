@@ -4,7 +4,7 @@ Calkulate v2.1 is the first stable version in Python! New features will continue
 
 ## 2.1.0
 
-**Release date:** forthcoming
+**Release date:** 2019-08-06
 
   * Renamed many functions and variables, as now described in the [conventions](../conventions) documentation;
   * Added **plot** module to visualise titration results;

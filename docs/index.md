@@ -31,10 +31,6 @@ To find out more about the principles by which Calkulate calculates things, take
   * [Version history](versions): changes from version to version; and
   * [Literature references](references): a key to the codes used for citations.
 
-## Development status
-
-Calkulate v2.0 is in beta. Tests of the accuracy of its coefficients and equations are underway, so results may change. The API may change and functions may be added or removed. Use at your own peril!
-
 ## Citation
 
 A paper describing Calkulate v2 is in preparation. For now, if you use any version of Calkulate in your research, please cite it as:
@@ -45,7 +41,7 @@ But please do check back here for any updates first (or [get in touch](https://m
 
 ## Acknowledgements
 
-Calkulate is maintained by [Dr Matthew P. Humphreys](https://mvdh.xyz) at the Centre for Ocean and Atmospheric Sciences, School of Environmental Sciences, University of East Anglia, Norwich, UK.
+Calkulate is maintained by [Dr Matthew P. Humphreys](https://mvdh.xyz) and Ruth Matthews at the Centre for Ocean and Atmospheric Sciences, School of Environmental Sciences, University of East Anglia, Norwich, UK.
 
 Its ongoing development has been indirectly funded by the [Natural Environment Research Council](https://nerc.ukri.org/) (NERC, UK):
 
