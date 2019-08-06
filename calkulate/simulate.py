@@ -1,35 +1,70 @@
-# Calkulate: seawater total alkalinity from titration data
+# Calkulate: seawater total alkalinity from titration data.
 # Copyright (C) 2019  Matthew Paul Humphreys  (GNU GPLv3)
-
+"""Simulate total alkalinity and pH during titrations."""
 from scipy.optimize import least_squares as olsq
 from numpy import full_like, nan
+from . import solve
 
-def AT(H, mu, XT, KXF):
+def alk(h, mu, concTotals, eqConstants):
     """Simulate total alkalinity from known pH and total concentrations."""
-    CO2aq = mu * XT['C'] / (1 + KXF['C1']/H + KXF['C1']*KXF['C2']/H**2)
-    bicarb = KXF['C1'] * CO2aq / H
-    carb = KXF['C2'] * bicarb / H
-    B4 = mu * XT['B']*KXF['B'] / (H + KXF['B'])
-    OH = KXF['w'] / H
-    HSO4 = mu * XT['S']*H / (KXF['S'] + H)
-    HF = mu * XT['F']*H / (KXF['F'] + H)
-    P0 = mu * XT['P'] / (1 + KXF['P1']/H + KXF['P1']*KXF['P2']/H**2 \
-        + KXF['P1']*KXF['P2']*KXF['P3']/H**3)
-    P2 = mu * XT['P'] / (H**2/(KXF['P1']*KXF['P2']) + H/KXF['P2'] + 1 \
-        + KXF['P3']/H)
-    P3 = mu * XT['P'] / (H**3/(KXF['P1']*KXF['P2']*KXF['P3']) \
-        + H**2/(KXF['P2']*KXF['P3']) + H/KXF['P3'] + 1)
-    SiOOH3 = mu * XT['Si']*KXF['Si'] / (H + KXF['Si'])
-    AT = bicarb + 2*carb + B4 + OH - H - HSO4 - HF - P0 + P2 + 2*P3 + SiOOH3
-    return AT, [bicarb, 2*carb, B4, OH, -H, -HSO4, -HF, -P0, P2, 2*P3, SiOOH3]
+    OH = eqConstants['w']/h
+    if 'C' in concTotals.keys():
+        co2aq = mu*concTotals['C']/(1 + eqConstants['C1']/h +
+            eqConstants['C1']*eqConstants['C2']/h**2)
+        bicarb = eqConstants['C1']*co2aq/h
+        carb = eqConstants['C2']*bicarb/h
+    else:
+        bicarb = carb = 0
+    if 'B' in concTotals.keys():
+        B4 = mu*concTotals['B']*eqConstants['B']/(h + eqConstants['B'])
+    else:
+        B4 = 0
+    if 'S' in concTotals.keys():
+        HSO4 = mu*concTotals['S']*h/(eqConstants['S'] + h)
+    else:
+        HSO4 = 0
+    if 'F' in concTotals.keys():
+        HF = mu*concTotals['F']*h/(eqConstants['F'] + h)
+    else:
+        HF = 0
+    if 'P' in concTotals.keys():
+        P0 = mu*concTotals['P']/(1 + eqConstants['P1']/h +
+            eqConstants['P1']*eqConstants['P2']/h**2 +
+            eqConstants['P1']*eqConstants['P2']*eqConstants['P3']/h**3)
+        P2 = mu*concTotals['P']/(h**2/(eqConstants['P1']*eqConstants['P2']) +
+            h/eqConstants['P2'] + 1 + eqConstants['P3']/h)
+        P3 = mu*concTotals['P']/(h**3/(eqConstants['P1']*eqConstants['P2']*
+            eqConstants['P3']) + h**2/(eqConstants['P2']*eqConstants['P3']) +
+            h/eqConstants['P3'] + 1)
+    else:
+        P0 = P2 = P3 = 0
+    if 'Si' in concTotals.keys():
+        SiOOH3 = mu*concTotals['Si']*eqConstants['Si']/(h + eqConstants['Si'])
+    else:
+        SiOOH3 = 0
+    alk = bicarb + 2*carb + B4 + OH - h - HSO4 - HF - P0 + P2 + 2*P3 + SiOOH3
+    components = {
+        '+HCO3': bicarb,
+        '+2*CO3': 2*carb,
+        '+B(OH)4': B4,
+        '+OH': OH,
+        '-H': -h,
+        '-HSO4': -HSO4,
+        '-HF': -HF,
+        '-H3PO4': -P0,
+        '+HPO4': P2,
+        '+2*PO4': P3,
+        '+SiO(OH)3': SiOOH3,
+    }
+    return alk, components
 
-def pH(Macid, Msamp, Cacid, AT0, XT, KXF):
+def pH(massAcid, massSample, concAcid, alk0, concTotals, eqConstants):
     """Simulate pH from known total alkalinity and total concentrations."""
-    pH = full_like(Macid, nan)
-    mu = Msamp/(Msamp + Macid)
-    for i, Macid_i in enumerate(Macid):
-        pH[i] = olsq(lambda pH: \
-            AT(10.0**-pH, mu[i], XT, KXF)[0] - mu[i]*AT0 + \
-                Macid_i*Cacid/(Macid_i + Msamp),
-            8.0, method='lm')['x']
+    pH = full_like(massAcid, nan)
+    mu = solve.mu(massAcid, massSample)
+    for i, massAcid_i in enumerate(massAcid):
+        pH[i] = olsq(lambda pH: alk(10.0**-pH, mu[i], concTotals,
+                eqConstants)[0] - mu[i]*alk0 + massAcid_i*concAcid/
+                (massAcid_i + massSample),
+            8.0, method='lm')['x'][0]
     return pH

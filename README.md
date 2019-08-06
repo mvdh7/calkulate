@@ -1,10 +1,10 @@
-# Calkulate
+# Calkulate v2
 
 [![pypi badge](https://img.shields.io/pypi/v/calkulate.svg?style=popout)](https://pypi.org/project/calkulate/)
 
-Seawater total alkalinity from open-cell, non-purged, stepwise, potentiometric titration data.
+Calkulate calculates alkalinity from potentiometric titration data.
 
-v2 is under heavy development! For stable v1.0.2 (for MATLAB only) [see the relevant branch](https://github.com/mvdh7/calkulate/tree/1.0.2).
+For v1.0.2 (for MATLAB, and only implementing the half-Gran solver) [see the relevant branch](https://github.com/mvdh7/calkulate/tree/1.0.2).
 
 Documentation is under construction at [calkulate.readthedocs.io](https://calkulate.readthedocs.io/en/latest/).
 

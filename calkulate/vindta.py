@@ -1,96 +1,57 @@
-# Calkulate: seawater total alkalinity from titration data
+# Calkulate: seawater total alkalinity from titration data.
 # Copyright (C) 2019  Matthew Paul Humphreys  (GNU GPLv3)
-
-from . import calibrate, concentrations, density, dissociation, io, \
-    simulate, solve
-from numpy import logical_and
-from numpy import max as np_max
-
+"""Function wrappers for working with VINDTA-style titration data."""
+from . import calibrate, concentrations, density, dissociation, io, solve
 # ================================================ INPUTS AND THEIR UNITS =====
+# datFile = .dat file name (and path)
+# volSample = sample volume in ml
+# concAcid = acid molality in mol/kg
+# pSal = practical salinity (dimensionless)
+# alkCert = certified total alkalinity in mol/kg-sw
+# totalCarbonate = dissolved inorganic carbon in mol/kg-sw
+# totalPhosphate = phosphate in mol/kg-sw
+# totalSilicate = silicate in mol/kg-sw
+# tempKForce = titration temperature (optional) in K
 
-# Vsamp      = sample volume                    in ml
-# Cacid      = acid molality                    in mol/kg
-# S          = practical salinity
-# AT_cert    = certified total alkalinity       in mol/kg-sw
-# CT         = dissolved inorganic carbon       in mol/kg-sw
-# PT         = phosphate                        in mol/kg-sw
-# SiT        = silicate                         in mol/kg-sw
-# tempKforce = titration temperature (optional) in K
-
-# ================================================== PREPARATORY FUNCTION =====
-
-def prep(datfile, Vsamp, psal, CT, PT, SiT, burette_cx=1, tempKforce=None):
+def prep(datFile, volSample, pSal, totalCarbonate, totalPhosphate,
+        totalSilicate, buretteCorrection=1, tempKForce=None):
     """Import VINDTA-style .dat file and prepare data for analysis."""
-    Vacid, EMF, tempK = io.vindta(datfile)
-    if tempKforce is not None:
-        tempK[:] = tempKforce
-    Msamp = Vsamp * density.sw(tempK[0], psal) * 1e-3 # sample mass / kg
-    Macid = burette_cx * Vacid * density.acid(tempK) * 1e-3 # acid mass / kg
-    XT = concentrations.XT(psal, CT, PT, SiT)
-    KXF = dissociation.KXF(tempK, psal, XT)
-    return Macid, EMF, tempK, Msamp, XT, KXF
+    volAcid, emf, tempK = io.vindta(datFile)
+    if tempKForce is not None:
+        tempK[:] = tempKForce
+    massSample = volSample*density.sw(tempK[0], pSal)*1e-3
+    massAcid = buretteCorrection*volAcid*density.acid(tempK)*1e-3
+    concTotals = concentrations.concTotals(pSal, totalCarbonate,
+        totalPhosphate, totalSilicate)
+    eqConstants = dissociation.eqConstants(tempK, pSal, concTotals)
+    return massAcid, emf, tempK, massSample, concTotals, eqConstants
 
+def alk(datFile, volSample, concAcid, pSal, totalCarbonate, totalPhosphate,
+        totalSilicate, solver='complete', buretteCorrection=1,
+        tempKForce=None, **kwargs):
+    """Solve for alkalinity from a VINDTA-style titration .dat file."""
+    massAcid, emf, tempK, massSample, concTotals, eqConstants = prep(datFile,
+        volSample, pSal, totalCarbonate, totalPhosphate, totalSilicate,
+        buretteCorrection, tempKForce)
+    if solver.lower() in solve.allSolvers.keys():
+        solveFunc = solve.allSolvers[solver.lower()]
+        alkOptResult = solveFunc(massAcid, emf, tempK, massSample, concAcid,
+            concTotals, eqConstants, **kwargs)
+    else:
+        print('calkulate.vindta.alk: solver not recognised.')
+        print('Options (case-insensitive):' +
+            (len(solve.allSolvers.keys())*' \'{}\'').format(
+                *solve.allSolvers.keys()))
+        alkOptResult = {'x': [None,]}
+    return alkOptResult
 
-# =================================================== HALF-GRAN FUNCTIONS =====
-
-def halfGran(datfile, Vsamp, Cacid, psal, CT, PT, burette_cx=1,
-        tempKforce=None):
-    Macid, EMF, tempK, Msamp, XT, KX = prep(datfile, Vsamp, psal, CT, PT, 0, 
-        burette_cx, tempKforce)
-    return solve.halfGran(Macid, EMF, tempK, Msamp, Cacid, *XT, *KX)
-
-def halfGranCRM(datfile, Vsamp, AT_cert, psal, CT, PT, burette_cx=1,
-        tempKforce=None):
-    Macid, EMF, tempK, Msamp, XT, KX = prep(datfile, Vsamp, psal, CT, PT, 0,
-        burette_cx, tempKforce)
-    Cacid = calibrate.halfGran(Macid, EMF, tempK, Msamp, AT_cert,
-        XT, KX)['x'][0]
-    AT, EMF0, _, _, _, _ = solve.halfGran(Macid, EMF, tempK, Msamp, Cacid,
-        *XT, *KX)
-    return Cacid, AT, EMF0
-
-
-# ================================================ PLOT THE LOT FUNCTIONS =====
-
-def guessGran(datfile, Vsamp, Cacid, psal, burette_cx=1, tempKforce=None):
-    Macid, EMF, tempK, Msamp, _, _ = prep(datfile, Vsamp, psal, 0, 0, 0,
-        burette_cx, tempKforce)
-    # Evaluate f1 function and corresponding logical
-    f1g = solve.f1(Macid, EMF, tempK, Msamp)
-    Lg = logical_and(f1g > 0.1 * np_max(f1g), f1g < 0.9 * np_max(f1g))
-    # Get first guesses
-    ATg, EMF0g, _, pHg = solve.guessGran(Macid, EMF, tempK, Msamp, Cacid)
-    EMF0gvec = solve.Gran_EMF0(Macid, EMF, tempK, Msamp, Cacid, ATg)
-    # Select data for fitting
-    L = logical_and(pHg > 3, pHg < 4)
-    return Macid, EMF, tempK, Msamp,  f1g, Lg, EMF0gvec, ATg, EMF0g, pHg, L
-
-def simH(Macid, tempK, Msamp, Cacid, psal, AT, CT=0, PT=0, SiT=0):
-    XT = concentrations.XT(psal, CT, PT, SiT) # total concentrations
-    XT[0] = AT
-    KX = dissociation.KX_F(tempK, psal, XT[3], XT[4]) # dissociation constants
-    return simulate.H(Macid, Msamp, Cacid, XT, KX)
-
-def simAT(Macid, tempK, H, Msamp, psal, CT=0, PT=0, SiT=0):
-    mu = Msamp / (Msamp + Macid)
-    XT = concentrations.XT(psal, CT, PT, SiT) # total concentrations
-    KX = dissociation.KX_F(tempK, psal, XT[3], XT[4]) # dissociation constants
-    return simulate.AT(H, mu, *XT, *KX)
-
-
-# ========================================================= MPH FUNCTIONS =====
-
-def complete(datfile, Vsamp, Cacid, psal, CT, PT, SiT, burette_cx=1, 
-        tempKforce=None):
-    Macid, EMF, tempK, Msamp, XT, KX = prep(datfile, Vsamp, psal, CT, PT, SiT,
-        burette_cx, tempKforce)
-    return solve.complete(Macid, EMF, tempK, Msamp, Cacid, XT, KX)
-
-def completeCRM(datfile, Vsamp, AT_cert, psal, CT, PT, SiT,
-        burette_cx=1, tempKforce=None):
-    Macid, EMF, tempK, Msamp, XT, KX = prep(datfile, Vsamp, psal, CT, PT, SiT,
-        burette_cx, tempKforce)
-    Cacid = calibrate.complete(Macid, EMF, tempK, Msamp, AT_cert,
-        XT, KX)['x'][0]
-    AT, EMF0 = solve.complete(Macid, EMF, tempK, Msamp, Cacid, XT, KX)['x']
-    return Cacid, AT, EMF0
+def concAcid(datFile, volSample, alkCert, pSal, totalCarbonate,
+        totalPhosphate, totalSilicate, solver='complete', buretteCorrection=1,
+        tempKForce=None, **kwargs):
+    """Solve for acid concentration from a VINDTA-style titration .dat file."""
+    massAcid, emf, tempK, massSample, concTotals, eqConstants = prep(datFile,
+        volSample, pSal, totalCarbonate, totalPhosphate, totalSilicate,
+        buretteCorrection, tempKForce)
+    concAcidOptResult = calibrate.concAcid(massAcid, emf, tempK, massSample,
+        alkCert, concTotals, eqConstants, solver, **kwargs)
+    return concAcidOptResult

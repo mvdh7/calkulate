@@ -1,27 +1,35 @@
-# Calkulate: seawater total alkalinity from titration data
+# Calkulate: seawater total alkalinity from titration data.
 # Copyright (C) 2019  Matthew Paul Humphreys  (GNU GPLv3)
+"""Estimate total concentrations from practical salinity."""
+from .constants import pSal2cl, ramB, ramF
 
-from .constants import psal2Cl, RMM_B, RMM_F
-
-def XT(psal, CT=0, PT=0, SiT=0):
-    """Assemble a dict of concentrations in mol/kg-sw."""
+def concTotals(pSal, totalCarbonate=0, totalPhosphate=0, totalSilicate=0):
+    """Assemble a dict of sample concentrations in mol/kg-sw."""
     return {
-        'C': CT,
-        'B': BT(psal),
-        'S': ST(psal),
-        'F': FT(psal),
-        'P': PT,
-        'Si': SiT,
-    } # all in mol/kg-sw
+        'C': totalCarbonate,
+        'B': totalBorate_LKB10(pSal),
+        'S': totalSulfate_MR66(pSal),
+        'F': totalFluoride_W71(pSal),
+        'P': totalPhosphate,
+        'Si': totalSilicate,
+    }
 
-def BT(psal):
+def totalBorate_LKB10(pSal):
     """Estimate total borate from practical salinity in mol/kg-sw [LKB10]."""
-    return psal * 0.1336e-3 / RMM_B
+    return pSal*0.1336e-3/ramB
 
-def FT(psal):
+def totalBorate_U74(pSal):
+    """Estimate total borate from practical salinity in mol/kg-sw [U74]."""
+    return pSal*0.232e-3/(ramB*pSal2cl)
+
+def totalFluoride_R65(pSal):
+    """Estimate total fluoride from practical salinity in mol/kg-sw [R65]."""
+    return pSal*6.7e-5/(ramF*pSal2cl)
+    
+def totalFluoride_W71(pSal):
     """Estimate total fluoride from practical salinity in mol/kg-sw [W71]."""
-    return psal * 6.75e-5 / (RMM_F * psal2Cl)
+    return pSal*6.75e-5/(ramF*pSal2cl)
 
-def ST(psal):
-    """Estimate total sulfate from practical salinity in mol/kg-sw [???]."""
-    return (0.14 / 96.061) * (psal / psal2Cl)
+def totalSulfate_MR66(pSal):
+    """Estimate total sulfate from practical salinity in mol/kg-sw [MR66]."""
+    return (0.14/96.061)*(pSal/pSal2cl)

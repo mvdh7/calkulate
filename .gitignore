@@ -107,7 +107,6 @@ venv.bak/
 *.xlsx
 *.mat
 *.pkl
-*.csv
 
 # Miscellaneous
 *.docx
@@ -149,3 +148,7 @@ no-release/*
 Ruth\ Pre-Locate/*
 VINDTA_VB_2014/*
 coggins*
+
+
+# Ruth's bits and bobs
+individual.py

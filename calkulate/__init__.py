@@ -13,6 +13,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""Seawater total alkalinity from titration data."""
 
 __all__ = [
     'calibrate',
@@ -22,12 +23,25 @@ __all__ = [
     'dissociation',
     'io',
     'meta',
+    'plot',
     'simulate',
     'solve',
-    'vindta'
+    'vindta',
 ]
 
-from . import calibrate, concentrations, constants, density, dissociation, \
-    io, meta, simulate, solve, vindta
+from . import (
+    calibrate,
+    concentrations,
+    constants,
+    density,
+    dissociation,
+    io,
+    meta,
+    plot,
+    simulate,
+    solve,
+    vindta,
+)
 
+__author__ = 'Matthew P. Humphreys and Ruth Matthews'
 __version__ = meta.version

@@ -1,20 +1,23 @@
-# Calkulate: seawater total alkalinity from titration data
+# Calkulate: seawater total alkalinity from titration data.
 # Copyright (C) 2019  Matthew Paul Humphreys  (GNU GPLv3)
-
+"""Calibrate acid titrant concentration using certified reference material
+measurements.
+"""
 from scipy.optimize import least_squares as olsq
 from . import solve
 
-def halfGran(Macid, emf, tempK, Msamp, AT_cert, XT, KXF):
-    """Calibrate acid concentration using half-Gran method."""
-    return olsq(lambda Cacid: solve.halfGran(Macid, emf, tempK, Msamp, Cacid,
-        XT, KXF, suppress_warnings=True)[0] - AT_cert, 0.1, method='lm')
-
-def complete(Macid, emf, tempK, Msamp, AT_cert, XT, KXF):
-    """Calibrate acid concentration using Complete Calculation."""
-    return olsq(lambda Cacid: solve.complete(Macid, emf, tempK, Msamp, Cacid, 
-        XT, KXF)['x'][0] - AT_cert, 0.1, method='lm')
-
-def DAA03(Macid, emf, tempK, Msamp, AT_cert, XT, KXF):
-    """Calibrate acid concentration following Dickson et al. (2003)."""
-    return olsq(lambda Cacid: solve.DAA03(Macid, emf, tempK, Msamp, Cacid, 
-        XT, KXF)['x'][0] - AT_cert, 0.1, method='lm')
+def concAcid(massAcid, emf, tempK, massSample, alkCert, concTotals,
+        eqConstants, solver='complete', **kwargs):
+    """Calibrate the acid concentration using known sample alkalinity."""
+    if solver.lower() in solve.allSolvers.keys():
+        solveFunc = solve.allSolvers[solver.lower()]
+        concAcidOptResult = olsq(lambda concAcid: solveFunc(massAcid, emf,
+            tempK, massSample, concAcid, concTotals, eqConstants,
+            **kwargs)['x'][0] - alkCert, 0.1, method='lm')
+    else:
+        print('calkulate.calibrate.concAcid: solver not recognised.')
+        print('Options (case-insensitive):' +
+            (len(solve.allSolvers.keys())*' \'{}\'').format(
+                *solve.allSolvers.keys()))
+        concAcidOptResult = {'x': [None,]}
+    return concAcidOptResult

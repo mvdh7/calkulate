@@ -1,27 +1,26 @@
 site_name: Calkulate
 site_author: Matthew P. Humphreys
-site_description: Seawater total alkalinity from titration data
+site_description: Seawater total alkalinity from titration data.
 copyright: Copyright &copy; 2019 Matthew P. Humphreys (GNU GPLv3).
 
 site_url: https://calkulate.readthedocs.io/
 repo_url: https://github.com/mvdh7/calkulate
 
-lang: en
 theme: readthedocs
 
 nav:
-  - Overview: index.md
-#  - Quick-start guide: quick-start.md
-  - Calkulate modules:
-    - .io - data import and export: modules/io.md
-    - .solve - alkalinity solvers: modules/solve.md
-    - .simulate - alkalinity and pH simulator: modules/simulate.md
-    - .calibrate - calibration methods: modules/calibrate.md
-    - .dissociation - dissociation constants: modules/dissociation.md
-    - .concentrations - solute concentrations from salinity: modules/concentrations.md
-    - .density - fluid densities: modules/density.md
-    - .constants - physical constants: modules/constants.md
-    - .meta - package metadata: modules/meta.md
-    - .vindta - VINDTA functions: modules/vindta.md
-  - Version history: version-history.md
+  - Overview and installation: index.md
+  - Workflow examples:
+    - Compare all solvers: examples/compare-all-solvers.md
+    - Simulate a titration: examples/resimulate-d81.md
+    - Calibrate a CRM: examples/self-calibrate-crm.md
+    - Solve a series of measurements: examples/dataset-loop.md
+  - Give me a bit more detail!:
+    - Variables and conventions: conventions.md
+    - Data import: io.md
+    - Total concentrations: concentrations.md
+    - Equilibrium constants: dissociation.md
+    - Alkalinity solvers: solvers.md
+    - Titrant calibration: calibration.md
+  - Version history: versions.md
   - References: references.md
