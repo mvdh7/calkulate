@@ -44,4 +44,7 @@ from . import (
 )
 
 __version__ = meta.version
-__author__ = 'Matthew P. Humphreys'
+__author__ = [
+    'Matthew P. Humphreys', 
+    'Ruth Matthews',
+]

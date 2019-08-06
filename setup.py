@@ -7,7 +7,7 @@ with open('README.md', 'r') as fh:
 setuptools.setup(
     name = 'Calkulate',
     version = __version__,
-    author = 'Matthew P. Humphreys',
+    author = ['Matthew P. Humphreys', 'Ruth Matthews'],
     author_email = 'm.p.humphreys@icloud.com',
     description = 'Seawater total alkalinity from titration data',
     url = 'https://github.com/mvdh7/calkulate',
