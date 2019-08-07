@@ -17,7 +17,7 @@ def writeDat(datFile, volAcid, emf, tempK, line0='', line1=''):
     with open(datFile, 'w') as f:
         f.write('{}\n{}\n'.format(line0, line1))
         for i in range(len(volAcid)):
-            f.write('{:.3f} {:.3f} {:.3f}\n'.format(
+            f.write('{:.5f}\t{:.5f}\t{:.3f}\n'.format(
                 volAcid[i], emf[i], tempK[i]-tZero))
 
 def Dickson1981(withPhosphate=True):
