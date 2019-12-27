@@ -41,13 +41,15 @@ But please do check back here for any updates first (or [get in touch](https://m
 
 ## Acknowledgements
 
-Calkulate is maintained by [Dr Matthew P. Humphreys](https://mvdh.xyz) and Ruth Matthews at the Centre for Ocean and Atmospheric Sciences, School of Environmental Sciences, University of East Anglia, Norwich, UK.
+Calkulate is maintained by [Dr Matthew P. Humphreys](https://mvdh.xyz) at the NIOZ Royal Netherlands Institute for Sea Research (Texel, the Netherlands), and Ruth Matthews at the University of East Anglia (Norwich, UK).
 
-Its ongoing development has been indirectly funded by the [Natural Environment Research Council](https://nerc.ukri.org/) (NERC, UK):
+Its ongoing development has been indirectly funded by the [Natural Environment Research Council](https://nerc.ukri.org/) (NERC, UK) and the [Dutch Research Council](https://www.nwo.nl/en) (NWO, the Netherlands).
 
+<!--
   * Originally through a PhD studentship to Matthew P. Humphreys (NE/J500112/1),
   * Followed by *CaNDyFloSS: Carbon and Nutrient Dynamics and Fluxes over Shelf Systems* (NE/K00185X/1) and *RAGNARoCC: Radiatively active gases from the North Atlantic Region and Climate Change* (NE/K002546/1),
-  * And now through *NSFGEO-NERC: A Thermodynamic Chemical Speciation Model for the Oceans, Seas, and Estuaries* (NE/P012361/1).
+  * Then through *NSFGEO-NERC: A Thermodynamic Chemical Speciation Model for the Oceans, Seas, and Estuaries* (NE/P012361/1).
+-->
 
 ## License
 
