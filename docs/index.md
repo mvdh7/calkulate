@@ -1,4 +1,4 @@
-# <img src="img/logo_transparent.png" style="vertical-align:sub" width="105px" /> v2.1.1 (pre-release)
+# <img src="img/logo_transparent.png" style="vertical-align:sub" width="105px" /> v2.2.0-dev
 
 Calkulate is a Python 3.6+ package for determining total alkalinity from seawater titration data.
 
