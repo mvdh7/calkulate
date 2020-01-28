@@ -15,7 +15,7 @@ totalCarbonate = 2031.53e-6
 totalPhosphate = 0.31e-6
 totalSilicate = 2.5e-6
 volSample = 100
-volAcid, emf, tempK  = calk.simulate.titration(acidVolStep=acidVolStep,
+volAcid0, emf, tempK  = calk.simulate.titration(acidVolStep=acidVolStep,
     alk0=alk0, buretteCorrection=buretteCorrection, concAcid=concAcid,
     emf0=emf0, maxVolAcid=maxVolAcid, pSal=pSal, tempK=tempK,
     totalCarbonate=totalCarbonate, totalPhosphate=totalPhosphate,
@@ -23,18 +23,19 @@ volAcid, emf, tempK  = calk.simulate.titration(acidVolStep=acidVolStep,
 
 # Now replace results with totalCarbonate as array
 totalCarbonateVec = np.full_like(emf, totalCarbonate) # flat
-totalCarbonateVec = 5e-6 + totalCarbonate*(volSample - volAcid)/volSample
+# totalCarbonateVec = 5e-6 + totalCarbonate*(volSample - volAcid)/volSample
 # totalCarbonateVec = totalCarbonate*(0.98 + np.exp(-volAcid)*0.02)
 # totalCarbonateVec = totalCarbonate*(0.4 + np.exp(-volAcid*2)*0.3)
-volAcid, emf, tempK = calk.simulate.titration(acidVolStep=acidVolStep,
+acidMult = 1.04
+volAcid, emf, tempK = calk.simulate.titration(acidVolStep=acidVolStep*acidMult,
     alk0=alk0, buretteCorrection=buretteCorrection, concAcid=concAcid,
-    emf0=emf0, maxVolAcid=maxVolAcid, pSal=pSal, tempK=tempK,
+    emf0=emf0, maxVolAcid=maxVolAcid*acidMult, pSal=pSal, tempK=tempK,
     totalCarbonate=totalCarbonateVec, totalPhosphate=totalPhosphate,
     totalSilicate=totalSilicate, volSample=volSample)
 
 # Solve it for alkalinity
 massSample = volSample*calk.density.sw(tempK[0], pSal)*1e-3
-massAcid = buretteCorrection*volAcid*calk.density.acid(tempK)*1e-3
+massAcid = buretteCorrection*volAcid0*calk.density.acid(tempK)*1e-3
 concTotals = calk.concentrations.concTotals(pSal, totalCarbonate,
     totalPhosphate, totalSilicate)
 eqConstants = calk.dissociation.eqConstants(tempK, pSal, concTotals)
