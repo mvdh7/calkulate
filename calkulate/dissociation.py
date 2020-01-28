@@ -1,5 +1,5 @@
 # Calkulate: seawater total alkalinity from titration data
-# Copyright (C) 2019  Matthew Paul Humphreys  (GNU GPLv3)
+# Copyright (C) 2019-2020  Matthew Paul Humphreys  (GNU GPLv3)
 """Evaluate stoichiometric equilibrium constants."""
 from numpy import exp, log, sqrt
 

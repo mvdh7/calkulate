@@ -1,5 +1,5 @@
 # Calkulate: seawater total alkalinity from titration data.
-# Copyright (C) 2019  Matthew Paul Humphreys  (GNU GPLv3)
+# Copyright (C) 2019-2020  Matthew Paul Humphreys  (GNU GPLv3)
 """Simulate total alkalinity and pH during titrations."""
 from scipy.optimize import least_squares as olsq
 from numpy import full_like, nan
@@ -9,10 +9,12 @@ def alk(h, mu, concTotals, eqConstants):
     """Simulate total alkalinity from known pH and total concentrations."""
     OH = eqConstants['w']/h
     if 'C' in concTotals.keys():
-        co2aq = mu*concTotals['C']/(1 + eqConstants['C1']/h +
-            eqConstants['C1']*eqConstants['C2']/h**2)
-        bicarb = eqConstants['C1']*co2aq/h
-        carb = eqConstants['C2']*bicarb/h
+        KC1 = eqConstants['C1']
+        KC2 = eqConstants['C2']
+        TC = concTotals['C']
+        co2aq = mu*TC/(1 + KC1/h + KC1*KC2/h**2)
+        bicarb = KC1*co2aq/h
+        carb = KC2*bicarb/h
     else:
         bicarb = carb = 0
     if 'B' in concTotals.keys():
@@ -28,14 +30,13 @@ def alk(h, mu, concTotals, eqConstants):
     else:
         HF = 0
     if 'P' in concTotals.keys():
-        P0 = mu*concTotals['P']/(1 + eqConstants['P1']/h +
-            eqConstants['P1']*eqConstants['P2']/h**2 +
-            eqConstants['P1']*eqConstants['P2']*eqConstants['P3']/h**3)
-        P2 = mu*concTotals['P']/(h**2/(eqConstants['P1']*eqConstants['P2']) +
-            h/eqConstants['P2'] + 1 + eqConstants['P3']/h)
-        P3 = mu*concTotals['P']/(h**3/(eqConstants['P1']*eqConstants['P2']*
-            eqConstants['P3']) + h**2/(eqConstants['P2']*eqConstants['P3']) +
-            h/eqConstants['P3'] + 1)
+        TP = concTotals['P']
+        KP1 = eqConstants['P1']
+        KP2 = eqConstants['P2']
+        KP3 = eqConstants['P3']
+        P0 = mu*TP/(1 + KP1/h + KP1*KP2/h**2 + KP1*KP1*KP3/h**3)
+        P2 = mu*TP/(h**2/(KP1*KP2) + h/KP2 + 1 + KP3/h)
+        P3 = mu*TP/(h**3/(KP1*KP2*KP3) + h**2/(KP2*KP3) + h/KP3 + 1)
     else:
         P0 = P2 = P3 = 0
     if 'Si' in concTotals.keys():

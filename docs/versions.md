@@ -1,12 +1,14 @@
-# 2.1
-
-Calkulate v2.1 is the first stable version in Python! New features will continue to be added, documentation developed, and bugs fixed, but the API of existing functions will no longer be changed.
-
-## 2.1.1
+# 2.2
 
 **Release date:** forthcoming
 
+## 2.2.0
+
   * Fixed `io.writeDat` function to correctly delimit .dat files with tabs (not spaces).
+
+# 2.1
+
+Calkulate v2.1 is the first stable version in Python! New features will continue to be added, documentation developed, and bugs fixed, but the API of existing functions will no longer be changed.
 
 ## 2.1.0
 

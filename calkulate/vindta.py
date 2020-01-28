@@ -1,5 +1,5 @@
 # Calkulate: seawater total alkalinity from titration data.
-# Copyright (C) 2019  Matthew Paul Humphreys  (GNU GPLv3)
+# Copyright (C) 2019-2020  Matthew Paul Humphreys  (GNU GPLv3)
 """Function wrappers for working with VINDTA-style titration data."""
 from . import calibrate, concentrations, density, dissociation, io, solve
 # ================================================ INPUTS AND THEIR UNITS =====
