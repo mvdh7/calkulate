@@ -2,7 +2,7 @@
 # Copyright (C) 2019-2020  Matthew Paul Humphreys  (GNU GPLv3)
 """Simulate total alkalinity and pH during titrations."""
 from scipy.optimize import least_squares as olsq
-from numpy import arange, full_like, nan
+from numpy import arange, full_like, size, nan
 from . import concentrations, density, dissociation, solve
 
 def alk(h, mu, concTotals, eqConstants):
@@ -64,7 +64,9 @@ def pH(massAcid, massSample, concAcid, alk0, concTotals, eqConstants):
     pH = full_like(massAcid, nan)
     mu = solve.mu(massAcid, massSample)
     for i, massAcid_i in enumerate(massAcid):
-        pH[i] = olsq(lambda pH: alk(10.0**-pH, mu[i], concTotals,
+        iConcTotals = {k: v if size(v)==1 else v[i]
+            for k, v in concTotals.items()}
+        pH[i] = olsq(lambda pH: alk(10.0**-pH, mu[i], iConcTotals,
                 eqConstants)[0] - mu[i]*alk0 + massAcid_i*concAcid/
                 (massAcid_i + massSample),
             8.0, method='lm')['x'][0]
@@ -85,4 +87,4 @@ def titration(acidVolStep=0.15, alk0=2238.6e-6, buretteCorrection=1,
     pHSim = pH(massAcid, massSample, concAcid, alk0, concTotals,
         eqConstants)
     emf = solve.h2emf(10.0**-pHSim, emf0, tempK)
-    return massAcid, emf, tempK
+    return volAcid, emf, full_like(emf, tempK)

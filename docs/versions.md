@@ -5,7 +5,8 @@
 ## 2.2.0
 
   * Fixed `io.writeDat` function to correctly delimit .dat files with tabs (not spaces);
-  * Added `simulate.titration` function to directly simulate a VINDTA-style titration dataset.
+  * Added `simulate.titration` function to directly simulate a VINDTA-style titration dataset;
+  * Updated solver functions to optionally accept `concTotals['C']` as an array.
 
 # 2.1
 

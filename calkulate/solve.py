@@ -61,6 +61,11 @@ def mu(massAcid, massSample):
     return massSample/(massSample + massAcid)
 
 #====== LEAST-SQUARES SOLVERS =================================================
+def _eqConcL(concTotals, eqConstants, L):
+    eqConstantsL = {k: v[L] for k, v in eqConstants.items()}
+    concTotalsL = {k: v if size(v)==1 else v[L] for k, v in concTotals.items()}
+    return concTotalsL, eqConstantsL
+
 #----- Complete Calculation ---------------------------------------------------
 def _lsqfunComplete(massAcid, emf, tempK, massSample, concAcid, emf0, alk,
         concTotals, eqConstants):
@@ -75,10 +80,10 @@ def complete(massAcid, emf, tempK, massSample, concAcid, concTotals,
     alkGuess, emf0Guess, _, pHGuess = guessGran(massAcid, emf, tempK,
         massSample, concAcid)
     L = logical_and(pHGuess > 3, pHGuess < 4)
-    eqConstantsL = {k: v[L] for k, v in eqConstants.items()}
+    concTotalsL, eqConstantsL = _eqConcL(concTotals, eqConstants, L)
     alk_emf0 = olsq(lambda alk_emf0: _lsqfunComplete(massAcid[L], emf[L],
             tempK[L], massSample, concAcid, alk_emf0[1], alk_emf0[0],
-            concTotals, eqConstantsL),
+            concTotalsL, eqConstantsL),
         [alkGuess, emf0Guess], x_scale=[1e-6, 1], method='lm')
     return alk_emf0
 
@@ -97,10 +102,10 @@ def DAA03(massAcid, emf, tempK, massSample, concAcid, concTotals, eqConstants):
     alkGuess, emf0Guess, hGuess, pHGuess = guessGran(massAcid, emf, tempK,
         massSample, concAcid)
     L = logical_and(pHGuess > 3, pHGuess < 3.5)
-    eqConstantsL = {k: v[L] for k, v in eqConstants.items()}
+    concTotalsL, eqConstantsL = _eqConcL(concTotals, eqConstants, L)
     return olsq(lambda alk_f:
         _lsqfun_DAA03(massAcid[L], hGuess[L], massSample, concAcid, alk_f[1],
-            alk_f[0], concTotals, eqConstantsL),
+            alk_f[0], concTotalsL, eqConstantsL),
         [alkGuess, 1], x_scale=[1e-3, 1], method='lm')
 
 #----- Dickson (1981) method --------------------------------------------------
@@ -119,11 +124,11 @@ def Dickson1981(massAcid, emf, tempK, massSample, concAcid, concTotals,
     alkGuess, EMF0g, hGuess, pHGuess = guessGran(massAcid, emf, tempK,
         massSample, concAcid)
     L = pHGuess > 5
-    eqConstantsL = {k: v[L] for k, v in eqConstants.items()}
+    concTotalsL, eqConstantsL = _eqConcL(concTotals, eqConstants, L)
     alk_totalCarbonate_f = olsq(lambda alk_totalCarbonate_f:
         _lsqfun_Dickson1981(massAcid[L], hGuess[L], massSample, concAcid,
             alk_totalCarbonate_f[2], alk_totalCarbonate_f[0],
-            alk_totalCarbonate_f[1], concTotals, eqConstantsL),
+            alk_totalCarbonate_f[1], concTotalsL, eqConstantsL),
         [alkGuess, alkGuess*0.95, 1], x_scale=[1e-3, 1e-3, 1], method='lm')
     return alk_totalCarbonate_f
 

@@ -1,52 +1,57 @@
-from copy import deepcopy
 import numpy as np
 import matplotlib.pyplot as plt
 import calkulate as calk
 
-# Read titration data from .dat file.
-# It's a CRM: self-calibrate it following examples/self-calibrate-crm.py
-# Certified reference material (CRM) batch 144 values from:
-#     https://www.nodc.noaa.gov/ocads/oceans/Dickson_CRM/batches.html
+# Simulate a VINDTA-style titration
+acidVolStep = 0.15
+alk0 = 2238.6e-6
+buretteCorrection = 1
+concAcid = 0.1
+emf0 = 660
+maxVolAcid = 4.1
 pSal = 33.571
+tempK = 298.15
 totalCarbonate = 2031.53e-6
 totalPhosphate = 0.31e-6
 totalSilicate = 2.5e-6
-alkCert = 2238.60e-6
-volSample = 99.981 # ml
-datFile = 'datfiles/CRM-144-0435-4.dat'
-massAcid, emf, tempK, massSample, concTotals, eqConstants = \
-    calk.vindta.prep(datFile, volSample, pSal, totalCarbonate, totalPhosphate,
-    totalSilicate)
-concAcid = calk.calibrate.concAcid(massAcid, emf, tempK, massSample, alkCert,
-    concTotals, eqConstants)['x'][0]
-alkCheck, emf0Check = calk.solve.complete(massAcid, emf, tempK, massSample,
+volSample = 100
+volAcid, emf, tempK  = calk.simulate.titration(acidVolStep=acidVolStep,
+    alk0=alk0, buretteCorrection=buretteCorrection, concAcid=concAcid,
+    emf0=emf0, maxVolAcid=maxVolAcid, pSal=pSal, tempK=tempK,
+    totalCarbonate=totalCarbonate, totalPhosphate=totalPhosphate,
+    totalSilicate=totalSilicate, volSample=volSample)
+
+# Now replace results with totalCarbonate as array
+totalCarbonateVec = np.full_like(emf, totalCarbonate) # flat
+totalCarbonateVec = totalCarbonate*(0.98 + np.exp(-volAcid)*0.02)
+volAcid, emf, tempK = calk.simulate.titration(acidVolStep=acidVolStep,
+    alk0=alk0, buretteCorrection=buretteCorrection, concAcid=concAcid,
+    emf0=emf0, maxVolAcid=maxVolAcid, pSal=pSal, tempK=tempK,
+    totalCarbonate=totalCarbonateVec, totalPhosphate=totalPhosphate,
+    totalSilicate=totalSilicate, volSample=volSample)
+
+# Solve it for alkalinity
+massSample = volSample*calk.density.sw(tempK[0], pSal)*1e-3
+massAcid = buretteCorrection*volAcid*calk.density.acid(tempK)*1e-3
+concTotals = calk.concentrations.concTotals(pSal, totalCarbonate,
+    totalPhosphate, totalSilicate)
+eqConstants = calk.dissociation.eqConstants(tempK, pSal, concTotals)
+alk0Solved, emf0Solved = calk.solve.complete(massAcid, emf, tempK, massSample,
     concAcid, concTotals, eqConstants)['x']
 
-test = calk.simulate.titration()
-print(test)
+# Estimate alkalinity at every titration point
+hSolved = calk.solve.emf2h(emf, emf0Solved, tempK)
+pHSolved = -np.log10(hSolved)
+mu = calk.solve.mu(massAcid, massSample)
+alkSim, alkSimComponents = calk.simulate.alk(hSolved, mu, concTotals,
+    eqConstants)
+alk0Est = alkSim/mu + massAcid*concAcid/massSample
 
-# #%% Now, simulate this titration
-# mu = calk.solve.mu(massAcid, massSample)
-# # Set simulation conditions
-# concTotalsSimulator = deepcopy(concTotals)
-# # concTotalsSimulator['Si'] = 10e-6
-# concTotalsSimulator['C'] = np.full_like(eqConstants['C1'], 2031.53e-6)*mu**12
-# # Set solving conditions
-# concTotalsSolver = deepcopy(concTotals)
-# # Simulate and solve
-# pHSim = calk.simulate.pH(massAcid, massSample, concAcid, alkCert,
-#     concTotalsSimulator, eqConstants)
-# hSim = 10.0**-pHSim
-# emfSim = calk.solve.h2emf(hSim, emf0, tempK)
-# alk0SimSolved, emf0SimSolved = calk.solve.complete(massAcid, emfSim, tempK,
-#     massSample, concAcid, concTotalsSolver, eqConstants)['x']
-# hSimSolved = calk.solve.emf2h(emfSim, emf0SimSolved, tempK)
-# alkTitSimSolved = calk.simulate.alk(hSimSolved, mu, concTotalsSolver,
-#     eqConstants)[0]
-# alkEst = (alkTitSimSolved + massAcid*concAcid/(massAcid + massSample))/mu
-# # Plot difference
-# fig, ax = plt.subplots(2, 1)
-# ax[0].scatter(massAcid, alkEst*1e6)
-# ax[0].set_xlim([0, np.max(massAcid)])
-# ax[0].plot([0, np.max(massAcid)], alk0SimSolved*np.array([1, 1])*1e6, c='k')
-
+# Plot differences
+fig, ax = plt.subplots(2, 1)
+ax[0].scatter(massAcid, alk0Est*1e6)
+ax[0].set_xlim([0, np.max(massAcid)])
+ax[0].plot([0, np.max(massAcid)], alk0Solved*np.array([1, 1])*1e6, c='k')
+ax[1].scatter(massAcid, totalCarbonateVec*1e6)
+ax[1].set_xlim([0, np.max(massAcid)])
+ax[1].plot([0, np.max(massAcid)], totalCarbonate*np.array([1, 1])*1e6, c='k')
