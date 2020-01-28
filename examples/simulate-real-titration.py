@@ -23,7 +23,9 @@ volAcid, emf, tempK  = calk.simulate.titration(acidVolStep=acidVolStep,
 
 # Now replace results with totalCarbonate as array
 totalCarbonateVec = np.full_like(emf, totalCarbonate) # flat
-totalCarbonateVec = totalCarbonate*(0.98 + np.exp(-volAcid)*0.02)
+totalCarbonateVec = 5e-6 + totalCarbonate*(volSample - volAcid)/volSample
+# totalCarbonateVec = totalCarbonate*(0.98 + np.exp(-volAcid)*0.02)
+# totalCarbonateVec = totalCarbonate*(0.4 + np.exp(-volAcid*2)*0.3)
 volAcid, emf, tempK = calk.simulate.titration(acidVolStep=acidVolStep,
     alk0=alk0, buretteCorrection=buretteCorrection, concAcid=concAcid,
     emf0=emf0, maxVolAcid=maxVolAcid, pSal=pSal, tempK=tempK,
@@ -51,7 +53,7 @@ alk0Est = alkSim/mu + massAcid*concAcid/massSample
 fig, ax = plt.subplots(2, 1)
 ax[0].scatter(massAcid, alk0Est*1e6)
 ax[0].set_xlim([0, np.max(massAcid)])
-ax[0].plot([0, np.max(massAcid)], alk0Solved*np.array([1, 1])*1e6, c='k')
+ax[0].plot([0, np.max(massAcid)], alk0Solved*np.array([1, 1])*1e6, c='r')
 ax[1].scatter(massAcid, totalCarbonateVec*1e6)
 ax[1].set_xlim([0, np.max(massAcid)])
-ax[1].plot([0, np.max(massAcid)], totalCarbonate*np.array([1, 1])*1e6, c='k')
+ax[1].plot([0, np.max(massAcid)], totalCarbonate*np.array([1, 1])*1e6, c='r')
