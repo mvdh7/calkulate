@@ -4,7 +4,8 @@
 
 ## 2.2.0
 
-  * Fixed `io.writeDat` function to correctly delimit .dat files with tabs (not spaces).
+  * Fixed `io.writeDat` function to correctly delimit .dat files with tabs (not spaces);
+  * Added `simulate.titration` function to directly simulate a VINDTA-style titration dataset.
 
 # 2.1
 

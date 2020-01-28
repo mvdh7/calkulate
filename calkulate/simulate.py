@@ -2,8 +2,8 @@
 # Copyright (C) 2019-2020  Matthew Paul Humphreys  (GNU GPLv3)
 """Simulate total alkalinity and pH during titrations."""
 from scipy.optimize import least_squares as olsq
-from numpy import full_like, nan
-from . import solve
+from numpy import arange, full_like, nan
+from . import concentrations, density, dissociation, solve
 
 def alk(h, mu, concTotals, eqConstants):
     """Simulate total alkalinity from known pH and total concentrations."""
@@ -69,3 +69,20 @@ def pH(massAcid, massSample, concAcid, alk0, concTotals, eqConstants):
                 (massAcid_i + massSample),
             8.0, method='lm')['x'][0]
     return pH
+
+def titration(acidVolStep=0.15, alk0=2238.6e-6, buretteCorrection=1,
+        concAcid=0.1, emf0=660, maxVolAcid=4.1, pSal=33.571, tempK=298.15,
+        totalCarbonate=2031.53e-6, totalPhosphate=0.31e-6,
+        totalSilicate=2.5e-6, volSample=100):
+    """Simulate a VINDTA-style titration dataset."""
+    # Default values resemble Dickson CRM batch 144.
+    volAcid = arange(0, maxVolAcid, acidVolStep)
+    massSample = volSample*density.sw(tempK, pSal)*1e-3
+    massAcid = buretteCorrection*volAcid*density.acid(tempK)*1e-3
+    concTotals = concentrations.concTotals(pSal, totalCarbonate,
+        totalPhosphate, totalSilicate)
+    eqConstants = dissociation.eqConstants(tempK, pSal, concTotals)
+    pHSim = pH(massAcid, massSample, concAcid, alk0, concTotals,
+        eqConstants)
+    emf = solve.h2emf(10.0**-pHSim, emf0, tempK)
+    return massAcid, emf, tempK
