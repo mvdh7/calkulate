@@ -73,12 +73,12 @@ def pH(massAcid, massSample, concAcid, alk0, concTotals, eqConstants):
     return pH
 
 def titration(acidVolStep=0.15, alk0=2238.6e-6, buretteCorrection=1,
-        concAcid=0.1, emf0=660, maxVolAcid=4.1, pSal=33.571, tempK=298.15,
-        totalCarbonate=2031.53e-6, totalPhosphate=0.31e-6,
+        concAcid=0.1, emf0=660, extraVolAcid=0, maxVolAcid=4.1, pSal=33.571,
+        tempK=298.15, totalCarbonate=2031.53e-6, totalPhosphate=0.31e-6,
         totalSilicate=2.5e-6, volSample=100):
     """Simulate a VINDTA-style titration dataset."""
     # Default values resemble Dickson CRM batch 144.
-    volAcid = arange(0, maxVolAcid, acidVolStep)
+    volAcid = arange(0, maxVolAcid, acidVolStep) + extraVolAcid
     massSample = volSample*density.sw(tempK, pSal)*1e-3
     massAcid = buretteCorrection*volAcid*density.acid(tempK)*1e-3
     concTotals = concentrations.concTotals(pSal, totalCarbonate,
