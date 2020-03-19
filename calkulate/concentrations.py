@@ -1,9 +1,28 @@
 # Calkulate: seawater total alkalinity from titration data.
 # Copyright (C) 2019-2020  Matthew Paul Humphreys  (GNU GPLv3)
 """Estimate total concentrations from practical salinity."""
+from PyCO2SYS import assemble
 from .constants import pSal2cl, ramB, ramF
 
-def concTotals(pSal, totalCarbonate=0, totalPhosphate=0, totalSilicate=0):
+def concTotals(pSal, totalCarbonate=0, totalPhosphate=0, totalSilicate=0,
+                WhichKs=10, WhoseTB=2):
+    """Assemble a dict of sample concentrations in mol/kg-sw.
+    Use PyCO2SYS functions.
+    """
+    aconcs = assemble.inputs({
+        'SAL': pSal, 'WhichKs': WhichKs, 'WhoseTB': WhoseTB,})[0].values()
+    totalBorate, totalFluoride, totalSulfate = \
+        assemble.concentrations(*aconcs)
+    return {
+        'C': totalCarbonate,
+        'B': totalBorate,
+        'S': totalSulfate,
+        'F': totalFluoride,
+        'P': totalPhosphate,
+        'Si': totalSilicate,
+        }
+
+def _concTotals(pSal, totalCarbonate=0, totalPhosphate=0, totalSilicate=0):
     """Assemble a dict of sample concentrations in mol/kg-sw."""
     return {
         'C': totalCarbonate,
@@ -12,7 +31,7 @@ def concTotals(pSal, totalCarbonate=0, totalPhosphate=0, totalSilicate=0):
         'F': totalFluoride_W71(pSal),
         'P': totalPhosphate,
         'Si': totalSilicate,
-    }
+        }
 
 def totalBorate_LKB10(pSal):
     """Estimate total borate from practical salinity in mol/kg-sw [LKB10]."""

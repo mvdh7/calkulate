@@ -4,6 +4,7 @@
 
 ## 2.2.0
 
+  * Updated `concentrations.concTotals` and `dissociation.eqConstants` to use [PyCO2SYS](https://github.com/mvdh7/PyCO2SYS) functions to calculate things instead of functions built in to Calkulate.
   * Fixed `io.writeDat` function to correctly delimit .dat files with tabs (not spaces);
   * Added `simulate.titration` function to directly simulate a VINDTA-style titration dataset;
   * Updated solver functions to optionally accept `concTotals['C']` as an array.
