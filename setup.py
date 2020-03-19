@@ -16,6 +16,7 @@ setuptools.setup(
         'matplotlib>=3',
         'numpy>=1.15',
         'scipy>=1.1',
+        'PyCO2SYS==1.1.0',
     ],
     long_description = long_description,
     long_description_content_type = 'text/markdown',
