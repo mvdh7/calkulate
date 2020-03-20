@@ -6,7 +6,7 @@ Calkulate calculates alkalinity from potentiometric titration data.
 
 For v1.0.2 (for MATLAB, and only implementing the half-Gran solver) [see the relevant branch](https://github.com/mvdh7/calkulate/tree/1.0.2).
 
-Documentation is under construction at [calkulate.readthedocs.io](https://calkulate.readthedocs.io/en/latest/).
+Documentation is available at [calkulate.readthedocs.io](https://calkulate.readthedocs.io/en/latest/).
 
 
 ## Installation

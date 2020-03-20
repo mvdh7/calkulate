@@ -1,22 +1,26 @@
 # Calkulate: seawater total alkalinity from titration data.
-# Copyright (C) 2019  Matthew Paul Humphreys  (GNU GPLv3)
+# Copyright (C) 2019-2020  Matthew Paul Humphreys  (GNU GPLv3)
 """Visualise Calkulate calculations."""
 from numpy import array, log10, logical_and, mean, sqrt, zeros
+from numpy import any as np_any
 from numpy import min as np_min
 from numpy import max as np_max
 from matplotlib.pyplot import figure, rcParams, subplots_adjust
-from . import simulate, solve, vindta
+from . import datfile, simulate, solve
 
 _rgb_guess = array([0.96, 0.86, 0.04])
 _rgb_final = array([0.21, 0.46, 1])
 _rgb_both = array([0.27, 0.8, 0.54])
 
-def prep(datfile, volSample, pSal, totalCarbonate, totalPhosphate,
-        totalSilicate, concAcid):
+def prep(datFile, volSample, pSal, totalCarbonate, totalPhosphate,
+        totalSilicate, concAcid, WhichKs=10, WhoseKSO4=1, WhoseKF=1, WhoseTB=2,
+        totalAmmonia=0, totalH2Sulfide=0):
     """Preparatory calculations for plotting."""
     massAcid, emf, tempK, massSample, concTotals, eqConstants = \
-        vindta.prep(datfile, volSample, pSal, totalCarbonate, totalPhosphate,
-        totalSilicate)
+        datfile.prep(datFile, volSample, pSal, totalCarbonate, totalPhosphate,
+        totalSilicate, WhichKs=WhichKs, WhoseKSO4=WhoseKSO4, WhoseKF=WhoseKF,
+        WhoseTB=WhoseTB, totalAmmonia=totalAmmonia,
+        totalH2Sulfide=totalH2Sulfide)
     f1Guess = solve.f1(massAcid, emf, tempK, massSample)
     LGuess = logical_and(
         f1Guess > 0.1*np_max(f1Guess),
@@ -116,7 +120,7 @@ def alkEstimates(ax, massAcid, alk0Sim, rgb, alk_emf0, RMS, Npts, sublabel):
     ax.set_ylim([np_min(alk0Sim*1e6) - yrange*0.05,
         np_max(alk0Sim*1e6 + yrange*0.05)])
     ax.set_xlabel('Acid mass / g')
-    ax.set_ylabel('AT from pH / μmol kg$^{-1}$')
+    ax.set_ylabel('$A_\mathrm{T}$ from pH / μmol$\cdot$kg$^{-1}$')
     ax.set_title(('{} Final alkalinity = ({:.1f} $\pm$ {:.1f}) μmol/kg' +
         ' ($n$ = {})').format(sublabel, alk_emf0['x'][0]*1e6, RMS*1e6, Npts),
         fontsize=10)
@@ -128,40 +132,46 @@ def components(ax, massAcid, alk0Sim, alkSim, sublabel):
         marker='o', markersize=3, c='k', clip_on=False)
     # Keys in rgbs_names match those in simulate.alk's components dict
     rgbs_names = {
-        '+HCO3': [array([0.4, 0.4, 0.4]), '+[HCO$_3^-$]'],
-        '+2*CO3': [array([0.4, 0.4, 0.4]), '+2[CO$_3^{2-}$]'],
-        '+B(OH)4': [array([0.19, 0.31, 0.97]), '+[B(OH)$_4^-$]'],
-        '+OH': [array([1, 0.05, 0.05]), '+[OH$^-$]'],
-        '-H': [array([1, 0.05, 0.05]), '$-$[H$^+$]'],
-        '-HSO4': [array([0.95, 0.8, 0.14]), '$-$[HSO$_4^-$]'],
-        '-HF': [array([0.12, 0.74, 0.12]), '$-$[HF]'],
-        '-H3PO4': [array([1, 0.5, 0]), '$-$[H$_3$PO$_4$]'],
-        '+HPO4': [array([1, 0.5, 0]), '+[HPO$_4^{2-}$]'],
-        '+2*PO4': [array([1, 0.5, 0]), '+2[PO$_4^{3-}$]'],
-        '+SiO(OH)3': [array([0.94, 0.56, 0.63]), '+[SiO(OH)$_3$]'],
+        '+HCO3': ['xkcd:grey', '+[HCO$_3^-$]'],
+        '+2*CO3': ['xkcd:grey', '+2[CO$_3^{2-}$]'],
+        '+B(OH)4': ['xkcd:blue', '+[B(OH)$_4^-$]'],
+        '+OH': ['xkcd:red', '+[OH$^-$]'],
+        '-H': ['xkcd:red', '$-$[H$^+$]'],
+        '-HSO4': ['xkcd:golden yellow', '$-$[HSO$_4^-$]'],
+        '-HF': ['xkcd:green', '$-$[HF]'],
+        '-H3PO4': ['xkcd:orange', '$-$[H$_3$PO$_4$]'],
+        '+HPO4': ['xkcd:orange', '+[HPO$_4^{2-}$]'],
+        '+2*PO4': ['xkcd:orange', '+2[PO$_4^{3-}$]'],
+        '+SiO(OH)3': ['xkcd:pink', '+[SiO(OH)$_3$]'],
+        '+NH3': ['xkcd:aquamarine', '+[NH$_3$]'],
+        '+HS': ['xkcd:indigo', '+[HS$^-$]']
     }
     for component in alkSim[1].keys():
         if component.startswith('-'): # this is a bit sketchy
             yVar = -alkSim[1][component]
         else:
             yVar = alkSim[1][component]
-        ax.plot(massAcid*1e3, -log10(yVar), label=rgbs_names[component][1],
-            marker='x', markersize=3, c=rgbs_names[component][0],
-            clip_on=False)
+        if np_any(yVar > 0):
+            ax.plot(massAcid*1e3, -log10(yVar), label=rgbs_names[component][1],
+                marker='x', markersize=3, c=rgbs_names[component][0],
+                clip_on=False)
     ax.set_xlim([0, np_max(massAcid)*1e3])
     ax.set_ylim(ax.get_ylim()[::-1])
     ax.legend(bbox_to_anchor=(1.05, 1))
     ax.set_xlabel('Acid mass / g')
-    ax.set_ylabel('$-$log$_{10}$(concentration from pH / mol kg$^{-1}$)')
+    ax.set_ylabel('$-$log$_{10}$(concentration from pH / mol$\cdot$kg$^{-1}$)')
     ax.set_title(sublabel, fontsize=10)
     return ax
 
 def everything(datfile, volSample, pSal, totalCarbonate, totalPhosphate,
-        totalSilicate, concAcid):
+        totalSilicate, concAcid, WhichKs=10, WhoseKSO4=1, WhoseKF=1, WhoseTB=2,
+        totalAmmonia=0, totalH2Sulfide=0):
     """Plot everything for a single titration from a VINDTA-style .dat file."""
     (massAcid, emf, massSample, f1Guess, LGuess, alkGuess, emf0Guess, granEmf0,
         alk_emf0, alkSim, alk0Sim, RMS, Npts, rgb) = prep(datfile, volSample,
-        pSal, totalCarbonate, totalPhosphate, totalSilicate, concAcid)
+        pSal, totalCarbonate, totalPhosphate, totalSilicate, concAcid,
+        WhichKs=WhichKs, WhoseKSO4=WhoseKSO4, WhoseKF=WhoseKF, WhoseTB=WhoseTB,
+        totalAmmonia=totalAmmonia, totalH2Sulfide=totalH2Sulfide)
     fig = figure(figsize=[17, 10])
     rcParams.update({'font.size': 10})
     gs = fig.add_gridspec(4, 2)

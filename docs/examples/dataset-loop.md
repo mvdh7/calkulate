@@ -24,7 +24,7 @@ Next, we loop through the CRMs, and calculate the best-fit acid concentration fo
 dataset['concAcidPerCRM'] = np.nan
 for i in dataset.index:
     if dataset.type[i] == 'CRM':
-        dataset.loc[i, 'concAcidPerCRM'] = calk.vindta.concAcid(
+        dataset.loc[i, 'concAcidPerCRM'] = calk.datfile.concAcid(
             'datfiles/{}.dat'.format(dataset.fileName[i]),
             volSample, dataset.alkCert[i]*1e-6, dataset.pSal[i],
             dataset.totalCarbonate[i]*1e-6, dataset.totalPhosphate[i]*1e-6,
@@ -38,7 +38,7 @@ Now that we have a calibrated acid concentration, we can loop through all of the
 # Solve every titration for alkalinity
 dataset['alk'] = np.nan
 for i in dataset.index:
-    dataset.loc[i, 'alk'] = calk.vindta.alk(
+    dataset.loc[i, 'alk'] = calk.datfile.alk(
         'datfiles/{}.dat'.format(dataset.fileName[i]), volSample,
         dataset.concAcidMean[i], dataset.pSal[i],
         dataset.totalCarbonate[i]*1e-6, dataset.totalPhosphate[i]*1e-6,

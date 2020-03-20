@@ -7,13 +7,15 @@ totalCarbonate = 2031.53e-6
 totalPhosphate = 0.31e-6
 totalSilicate = 2.5e-6
 alkCert = 2238.60e-6
+totalAmmonia = 0 # 1.0e-6 # use non-zero value just for testing
+totalH2Sulfide = 0 # 1.0e-6 # use non-zero value just for testing
 
 # Import a VINDTA-generated .dat file from a real CRM-144 analysis
 volSample = 99.981 # ml
 datFile = 'datfiles/CRM-144-0435-4.dat'
 massAcid, emf, tempK, massSample, concTotals, eqConstants = \
-    calk.vindta.prep(datFile, volSample, pSal, totalCarbonate, totalPhosphate,
-    totalSilicate)
+    calk.datfile.prep(datFile, volSample, pSal, totalCarbonate, totalPhosphate,
+    totalSilicate, totalAmmonia=totalAmmonia, totalH2Sulfide=totalH2Sulfide)
 
 # Calibrate the acid concentration based on this CRM measurement
 concAcid = calk.calibrate.concAcid(massAcid, emf, tempK, massSample, alkCert,
@@ -27,4 +29,5 @@ print('Calibrated alkalinity = {:.2f} micromol/kg-sw'.format(alk*1e6))
 
 # Visualise "everything" about this titration
 calk.plot.everything(datFile, volSample, pSal, totalCarbonate, totalPhosphate,
-    totalSilicate, concAcid)
+    totalSilicate, concAcid, totalAmmonia=totalAmmonia,
+    totalH2Sulfide=totalH2Sulfide)

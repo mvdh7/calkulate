@@ -1,23 +1,27 @@
 # Calkulate: seawater total alkalinity from titration data
-# Copyright (C) 2019  Matthew Paul Humphreys  (GNU GPLv3)
+# Copyright (C) 2019-2020  Matthew Paul Humphreys  (GNU GPLv3)
 """Import data to use with Calkulate and export results."""
 from numpy import arange, array, full_like, genfromtxt
 from .constants import tZero
 
-def vindta(datFile, delimiter='\t', skip_header=2):
+def datfile(datFile, delimiter='\t', skip_header=2, **kwargs):
     """Import a single VINDTA-style .dat file titration dataset."""
-    tData = genfromtxt(datFile, delimiter=delimiter, skip_header=skip_header)
+    tData = genfromtxt(datFile, delimiter=delimiter, skip_header=skip_header,
+        **kwargs)
     volAcid = tData[:, 0] # ml
     emf = tData[:, 1] # mV
     tempK = tData[:, 2] + tZero # K
     return volAcid, emf, tempK
+
+# Add alias to avoid breaking old code
+vindta = datfile
 
 def writeDat(datFile, volAcid, emf, tempK, line0='', line1=''):
     """Write a titration dataset to a VINDTA-style .dat file."""
     with open(datFile, 'w') as f:
         f.write('{}\n{}\n'.format(line0, line1))
         for i in range(len(volAcid)):
-            f.write('{:.3f} {:.3f} {:.3f}\n'.format(
+            f.write('{:.5f}\t{:.5f}\t{:.3f}\n'.format(
                 volAcid[i], emf[i], tempK[i]-tZero))
 
 def Dickson1981(withPhosphate=True):

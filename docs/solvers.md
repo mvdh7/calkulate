@@ -32,7 +32,7 @@ The different least-squares methods can thus be briefly defined in terms of the 
 
 ### `complete`: complete calculation
 
-This is the recommended method. It takes into account every major component of typical open ocean seawater, and uses a low pH range that minimises the influence of the carbonic acid equilibria upon the final result.
+This is the recommended method. It takes into account every major component of typical open ocean seawater and uses a low pH range that minimises the influence of the carbonic acid equilibria upon the final result. If provided in `concTotals`, then the ammonia and hydrogen sulfide equilibria are also taken into account.
 
 **Syntax:**
 
@@ -45,7 +45,7 @@ alk, emf0 = calk.solve.complete(massAcid, emf, tempK, massSample, concAcid,
 
 *1. Which chemical species are included in the alkalinity equation?*
 
-> All of them! That is: $\ce{CO2(aq)}$, $\ce{HCO3-}$, $\ce{CO3^2-}$, $\ce{B(OH)4-}$, $\ce{HSO4-}$, $\ce{HF}$, $\ce{H3PO4}$, $\ce{HPO4^2-}$, $\ce{PO4^3-}$, $\ce{SiO(OH)3-}$, $\ce{H+}$ and $\ce{OH-}$.
+> All of them! That is: $\ce{CO2(aq)}$, $\ce{HCO3-}$, $\ce{CO3^2-}$, $\ce{B(OH)4-}$, $\ce{HSO4-}$, $\ce{HF}$, $\ce{H3PO4}$, $\ce{HPO4^2-}$, $\ce{PO4^3-}$, $\ce{SiO(OH)3-}$, $\ce{H+}$, $\ce{OH-}$, $\ce{NH_3}$, and $\ce{HS-}$.
 
 *2. Which titration points (i.e. what pH range) are used for the fitting?*
 
