@@ -8,6 +8,12 @@ If you're using Conda, first create a new environment with Python 3.6+, NumPy 1.
 
     pip install calkulate
 
+To upgrade in existing installation when there is a new release:
+
+    pip install calkulate --upgrade --no-cache-dir
+
+Since v2.2.0, Calkulate also requires [PyCO2SYS](https://github.com/mvdh7/PyCO2SYS) v1.1.1 or greater. This will be automatically installed by Pip if you don't have it.
+
 ## Get Calkulating!
 
 This documentation is intended to present a broad overview of how Calkulate works, rather than provide a detailed syntactic reference for every constituent module and function.
