@@ -5,7 +5,7 @@ from PyCO2SYS import assemble
 from .constants import pSal2cl, ramB, ramF
 
 def concTotals(pSal, totalCarbonate=0, totalPhosphate=0, totalSilicate=0,
-                WhichKs=10, WhoseTB=2):
+        WhichKs=10, WhoseTB=2):
     """Assemble a dict of sample concentrations in mol/kg-sw.
     Use PyCO2SYS functions.
     """

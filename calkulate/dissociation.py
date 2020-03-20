@@ -4,8 +4,7 @@
 from numpy import exp, log, sqrt
 from PyCO2SYS import assemble
 
-def eqConstants(tempK, pSal, concTotals, WhichKs=10, WhoseKSO4=1, WhoseKF=1,
-                 WhoseTB=2):
+def eqConstants(tempK, pSal, concTotals, WhichKs=10, WhoseKSO4=1, WhoseKF=1):
     """Assemble a dict of dissociation constants on the Free pH scale.
     Use PyCO2SYS functions.
     """
@@ -17,7 +16,6 @@ def eqConstants(tempK, pSal, concTotals, WhichKs=10, WhoseKSO4=1, WhoseKF=1,
         'WhichKs': WhichKs,
         'WhoseKSO4': WhoseKSO4,
         'WhoseKF': WhoseKF,
-        'WhoseTB': WhoseTB,
         'TP': concTotals['P'],
         'TSi': concTotals['Si'],
         'SAL': pSal,
