@@ -26,8 +26,5 @@ print('Certified alkalinity  = {:.2f} micromol/kg-sw'.format(alkCert*1e6))
 print('Calibrated alkalinity = {:.2f} micromol/kg-sw'.format(alk*1e6))
 
 # Test new functions
-tconcs0 = calk.concentrations._concTotals(pSal) # old
-tconcs1 = calk.concentrations.concTotals(pSal) # new
-teqs0 = calk.dissociation._eqConstants(tempK, pSal, concTotals) # old
-teqs1 = calk.dissociation.eqConstants(tempK, pSal, concTotals) # new
-teqs10 = {k: teqs1[k] - v for k, v in teqs0.items()}
+tconcs1 = calk.concentrations.concTotals(pSal)
+teqs1 = calk.dissociation.eqConstants(tempK, pSal, concTotals)

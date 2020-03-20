@@ -1,14 +1,19 @@
 # 2.2
 
+The main advance in Calkulate v2.2 is switching to using [PyCO2SYS](https://github.com/mvdh7/PyCO2SYS) to evaluate all equilibrium constants and solute concentrations from temperature and salinity, instead of having an independent set of equivalent functions written into Calkulate itself.
+
 **Release date:** forthcoming
 
 ## 2.2.0
 
   * Renamed module `vindta` to `datfile`, but added alias to avoid breaking existing code.
   * Updated `concentrations.concTotals` and `dissociation.eqConstants` to use [PyCO2SYS](https://github.com/mvdh7/PyCO2SYS) functions to calculate things instead of functions built in to Calkulate.
+  * Removed all equilibrium constant and concentration functions that were previously internally in Calkulate.
   * Fixed `io.writeDat` function to correctly delimit .dat files with tabs (not spaces);
   * Added `simulate.titration` function to directly simulate a VINDTA-style titration dataset;
   * Updated solver functions to optionally accept `concTotals['C']` as an array.
+
+---
 
 # 2.1
 
