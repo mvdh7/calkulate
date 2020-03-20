@@ -13,66 +13,30 @@ The [alkalinity solvers](../solvers) need to know the total concentrations of ch
 
 ## `concTotals`: dict of concentrations
 
-Assembles a dict of concentrations as required by other Calkulate functions.
+Assemble a dict of concentrations as required by other Calkulate functions.
 
 **Syntax:**
 
 ```python
 concTotals = calk.concentrations.concTotals(pSal, totalCarbonate=0,
-    totalPhosphate=0, totalSilicate=0)
+    totalPhosphate=0, totalSilicate=0, totalAmmonia=0, totalH2Sulfide=0,
+    WhichKs=10, WhoseTB=2)
 ```
 
 The output `concTotals` dict contains the following variables:
 
-```python
-concTotals = {
-# Defined by inputs to the concTotals function:
-    'C': totalCarbonate,
-    'P': totalPhosphate,
-    'Si': totalSilicate,
-# Estimated from input practical salinity:
-    'B': totalBorate_LKB10(pSal),
-    'S': totalSulfate_MR66(pSal),
-    'F': totalFluoride_W71(pSal),
-}
-```
+*Defined by inputs to the concTotals function:*
 
-The functions to estimate total concentrations are also contained within the `concentrations` module, along with some alternatives that you could manually implement instead.
+  * `C` - `totalCarbonate`.
+  * `P` - `totalPhosphate`.
+  * `Si` - `totalSilicate`.
+  * `NH3` - `totalAmmonia`.
+  * `H2S` - `totalH2Sulfide`.
 
----
+*Estimated from input practical salinity by [PyCO2SYS](https://github.com/mvdh7/PyCO2SYS):*
 
-## Estimates from salinity
+  * `B` - total borate.
+  * `S` - total sulfate.
+  * `F` - total fluoride.
 
-The functions available in the `concentrations` module to estimate total concentrations from practical salinity all follow the same syntax:
-
-```python
-totalSolute = calk.concentrations.totalSolute_REF(pSal)
-```
-
-The different options for `Solute` and `REF` (i.e. [literature reference](../references)) are listed below. The value marked as 'default' is the one used by the `concTotals` function.
-
-### Total borate
-
-`totalBorate` $= [\ce{B(OH)3}] + [\ce{B(OH)4−}]$ in mol/kg-sw.
-
-**Options:**
-
-  * `totalBorate_LKB10`: Lee et al., 2010 [[LKB10](../references/#LKB10)] (default);
-  * `totalBorate_U74`: Uppström, 1974 [[U74](../references/#U74)].
-
-### Total fluoride
-
-`totalFluoride` $= [\ce{HF}] + [\ce{F−}]$ in mol/kg-sw.
-
-**Options:**
-
-  * `totalFluoride_R65`: Riley, 1965 [[R65](../references/#R65)];
-  * `totalFluoride_W71`: Warner, 1971 [[W71](../references/#W71)] (default).
-
-### Total sulfate
-
-`totalSulfate` $= [\ce{HSO4−}] + [\ce{SO4^2−}]$ in mol/kg-sw.
-
-**Options:**
-
-  * `totalSulfate_MR66`: Morris and Riley, 1966 [[MR66](../references/#MR66)] (default).
+The exact functions of salinity used by PyCO2SYS to estimate these concentrations can be set using the inputs `WhichKs`, which is the same as the PyCO2SYS input `K1K2CONSTANTS`, and `WhoseTB`, which corresponds to the PyCO2SYS input `KSO4CONSTANTS`: a value of `1` for `WhoseTB` is the same as options `1` and `2` for `KSO4CONSTANTS`, while a value of `2` is the same as options `3` and `4`.

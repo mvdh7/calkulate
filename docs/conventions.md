@@ -7,7 +7,7 @@ MathJax.Hub.Config({TeX: {extensions: ["[mhchem]/mhchem.js"]}});
 
 # Names, dimensions and units
 
-Within Python, the import convention for Calkulate is:
+The import convention for Calkulate is:
 
 ```python
 import calkulate as calk

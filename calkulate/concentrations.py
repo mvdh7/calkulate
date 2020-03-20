@@ -4,7 +4,7 @@
 from PyCO2SYS import assemble
 
 def concTotals(pSal, totalCarbonate=0, totalPhosphate=0, totalSilicate=0,
-        WhichKs=10, WhoseTB=2):
+        totalAmmonia=0, totalH2Sulfide=0, WhichKs=10, WhoseTB=2):
     """Assemble a dict of sample concentrations in mol/kg-sw using PyCO2SYS."""
     aconcs = assemble.inputs({
         'SAL': pSal, 'WhichKs': WhichKs, 'WhoseTB': WhoseTB,})[0].values()
@@ -17,4 +17,6 @@ def concTotals(pSal, totalCarbonate=0, totalPhosphate=0, totalSilicate=0,
         'F': totalFluoride,
         'P': totalPhosphate,
         'Si': totalSilicate,
+        'NH3': totalAmmonia,
+        'H2S': totalH2Sulfide,
         }

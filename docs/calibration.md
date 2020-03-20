@@ -22,10 +22,10 @@ By default this calibration function uses the [complete calculation](../solvers/
 
 ## Wrapper for .dat file inputs
 
-If your data is formatted as a [VINDTA-style .dat file](../io/#what-format-is-that), you can more easily implement any of the solvers above using the wrapped `concAcid` function in the `vindta` module:
+If your data is formatted as a [VINDTA-style .dat file](../io/#what-format-is-that), you can more easily implement any of the solvers above using the wrapped `concAcid` function in the `datfile` module:
 
 ```python
-concAcidOptResult = calk.vindta.alk(datFile, volSample, alkCert, pSal, totalCarbonate,
+concAcidOptResult = calk.datfile.alk(datFile, volSample, alkCert, pSal, totalCarbonate,
     totalPhosphate, totalSilicate, solver='complete', buretteCorrection=1, tempKForce=None)
 ```
 

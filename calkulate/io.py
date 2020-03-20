@@ -4,13 +4,17 @@
 from numpy import arange, array, full_like, genfromtxt
 from .constants import tZero
 
-def vindta(datFile, delimiter='\t', skip_header=2):
+def datfile(datFile, delimiter='\t', skip_header=2, **kwargs):
     """Import a single VINDTA-style .dat file titration dataset."""
-    tData = genfromtxt(datFile, delimiter=delimiter, skip_header=skip_header)
+    tData = genfromtxt(datFile, delimiter=delimiter, skip_header=skip_header,
+        **kwargs)
     volAcid = tData[:, 0] # ml
     emf = tData[:, 1] # mV
     tempK = tData[:, 2] + tZero # K
     return volAcid, emf, tempK
+
+# Add alias to avoid breaking old code
+vindta = datfile
 
 def writeDat(datFile, volAcid, emf, tempK, line0='', line1=''):
     """Write a titration dataset to a VINDTA-style .dat file."""
