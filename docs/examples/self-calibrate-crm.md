@@ -25,7 +25,7 @@ Next, we import and prepare the .dat file:
 volSample = 99.981 # ml
 datFile = 'datfiles/CRM-144-0435-4.dat'
 massAcid, emf, tempK, massSample, concTotals, eqConstants = \
-    calk.vindta.prep(datFile, volSample, pSal, totalCarbonate, totalPhosphate,
+    calk.datfile.prep(datFile, volSample, pSal, totalCarbonate, totalPhosphate,
     totalSilicate)
 ```
 

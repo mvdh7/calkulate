@@ -14,7 +14,7 @@ totalH2Sulfide = 0 # 1.0e-6 # use non-zero value just for testing
 volSample = 99.981 # ml
 datFile = 'datfiles/CRM-144-0435-4.dat'
 massAcid, emf, tempK, massSample, concTotals, eqConstants = \
-    calk.vindta.prep(datFile, volSample, pSal, totalCarbonate, totalPhosphate,
+    calk.datfile.prep(datFile, volSample, pSal, totalCarbonate, totalPhosphate,
     totalSilicate, totalAmmonia=totalAmmonia, totalH2Sulfide=totalH2Sulfide)
 
 # Calibrate the acid concentration based on this CRM measurement
