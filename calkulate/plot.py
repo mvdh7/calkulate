@@ -5,17 +5,17 @@ from numpy import array, log10, logical_and, mean, sqrt, zeros
 from numpy import min as np_min
 from numpy import max as np_max
 from matplotlib.pyplot import figure, rcParams, subplots_adjust
-from . import simulate, solve, vindta
+from . import datfile, simulate, solve
 
 _rgb_guess = array([0.96, 0.86, 0.04])
 _rgb_final = array([0.21, 0.46, 1])
 _rgb_both = array([0.27, 0.8, 0.54])
 
-def prep(datfile, volSample, pSal, totalCarbonate, totalPhosphate,
+def prep(datFile, volSample, pSal, totalCarbonate, totalPhosphate,
         totalSilicate, concAcid):
     """Preparatory calculations for plotting."""
     massAcid, emf, tempK, massSample, concTotals, eqConstants = \
-        vindta.prep(datfile, volSample, pSal, totalCarbonate, totalPhosphate,
+        datfile.prep(datFile, volSample, pSal, totalCarbonate, totalPhosphate,
         totalSilicate)
     f1Guess = solve.f1(massAcid, emf, tempK, massSample)
     LGuess = logical_and(

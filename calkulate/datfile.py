@@ -40,20 +40,6 @@ The equivalent options are:
 |      4        |     2     |     2     |
 """
 from . import calibrate, concentrations, density, dissociation, io, solve
-# ================================================ INPUTS AND THEIR UNITS =====
-# datFile = .dat file name (and path)
-# volSample = sample volume in ml
-# concAcid = acid molality in mol/kg
-# pSal = practical salinity (dimensionless)
-# alkCert = certified total alkalinity in mol/kg-sw
-# totalCarbonate = dissolved inorganic carbon in mol/kg-sw
-# totalPhosphate = phosphate in mol/kg-sw
-# totalSilicate = silicate in mol/kg-sw
-# tempKForce = titration temperature (optional) in K
-# WhichKs =
-# WhoseKSO4 =
-# WhoseKF =
-# WhoseTB =
 
 def prep(datFile, volSample, pSal, totalCarbonate, totalPhosphate,
         totalSilicate, buretteCorrection=1, tempKForce=None, WhichKs=10,

@@ -4,6 +4,7 @@
 
 ## 2.2.0
 
+  * Renamed module `vindta` to `datfile`, but added alias to avoid breaking existing code.
   * Updated `concentrations.concTotals` and `dissociation.eqConstants` to use [PyCO2SYS](https://github.com/mvdh7/PyCO2SYS) functions to calculate things instead of functions built in to Calkulate.
   * Fixed `io.writeDat` function to correctly delimit .dat files with tabs (not spaces);
   * Added `simulate.titration` function to directly simulate a VINDTA-style titration dataset;

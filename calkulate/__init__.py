@@ -19,6 +19,7 @@ __all__ = [
     'calibrate',
     'concentrations',
     'constants',
+    'datfile',
     'density',
     'dissociation',
     'io',
@@ -26,13 +27,13 @@ __all__ = [
     'plot',
     'simulate',
     'solve',
-    'vindta',
 ]
 
 from . import (
     calibrate,
     concentrations,
     constants,
+    datfile,
     density,
     dissociation,
     io,
@@ -40,8 +41,10 @@ from . import (
     plot,
     simulate,
     solve,
-    vindta,
 )
 
-__author__ = 'Matthew P. Humphreys and Ruth Matthews'
+# Add alias to avoid breaking old code
+vindta = datfile
+
+__author__ = 'Matthew P. Humphreys and Ruth S. Matthews'
 __version__ = meta.version
