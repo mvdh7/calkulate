@@ -2,6 +2,12 @@
 
 The main advance in Calkulate v2.2 is switching to using [PyCO2SYS](https://github.com/mvdh7/PyCO2SYS) to evaluate all equilibrium constants and solute concentrations from temperature and salinity, instead of having an independent set of equivalent functions written into Calkulate itself.
 
+## 2.2.1
+
+**Release date:** forthcoming
+
+  * 
+
 **Release date:** 2020-03-20
 
 ## 2.2.0
