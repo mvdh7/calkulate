@@ -40,7 +40,7 @@ The equivalent options are:
 |      3        |     1     |     2     |
 |      4        |     2     |     2     |
 """
-from . import calibrate, concentrations, density, dissociation, io, solve
+from . import calibrate, concentrations, convert, dissociation, io, solve
 
 def prep(datFile, volSample, pSal, totalCarbonate, totalPhosphate,
         totalSilicate, buretteCorrection=1, tempKForce=None, WhichKs=10,
@@ -49,8 +49,9 @@ def prep(datFile, volSample, pSal, totalCarbonate, totalPhosphate,
     volAcid, emf, tempK = io.datfile(datFile)
     if tempKForce is not None:
         tempK[:] = tempKForce
-    massSample = volSample*density.sw(tempK[0], pSal)*1e-3
-    massAcid = buretteCorrection*volAcid*density.acid(tempK)*1e-3
+    massSample = convert.vol2massSample(volSample, tempK[0], pSal)
+    massAcid = convert.vol2massAcid(volAcid, tempK,
+        buretteCorrection=buretteCorrection)
     concTotals = concentrations.concTotals(pSal, totalCarbonate=totalCarbonate,
         totalPhosphate=totalPhosphate, totalSilicate=totalSilicate,
         WhichKs=WhichKs, WhoseTB=WhoseTB, totalAmmonia=totalAmmonia,

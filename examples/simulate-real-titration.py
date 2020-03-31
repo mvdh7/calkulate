@@ -15,6 +15,7 @@ totalCarbonate = 1969.5e-6
 totalPhosphate = 0.1e-6
 totalSilicate = 0.7e-6
 volSample = 96
+
 # Simulate junk first just to get correctly sized arrays
 volAcid0, emf, tempK  = calk.simulate.titration(acidVolStep=acidVolStep,
     alk0=alk0, buretteCorrection=buretteCorrection, concAcid=concAcid,

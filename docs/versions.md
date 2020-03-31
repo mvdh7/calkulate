@@ -6,7 +6,7 @@ The main advance in Calkulate v2.2 is switching to using [PyCO2SYS](https://gith
 
 **Release date:** forthcoming
 
-  * 
+  * Added `convert` module with convenience functions to convert acid and sample volumes into masses.
 
 **Release date:** 2020-03-20
 
