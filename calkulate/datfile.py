@@ -1,6 +1,6 @@
 # Calkulate: seawater total alkalinity from titration data.
 # Copyright (C) 2019-2020  Matthew Paul Humphreys  (GNU GPLv3)
-"""Function wrappers for working with titration data in text files.
+"""Wrapper functions for working with titration data in text files.
 
 # Common inputs:
 
@@ -40,7 +40,8 @@ The equivalent options are:
 |      3        |     1     |     2     |
 |      4        |     2     |     2     |
 """
-from . import calibrate, concentrations, convert, dissociation, io, solve
+from . import (calibrate, concentrations, convert, dissociation, io, solve,
+    titration)
 
 def prep(datFile, volSample, pSal, totalCarbonate, totalPhosphate,
         totalSilicate, buretteCorrection=1, tempKForce=None, WhichKs=10,
@@ -95,3 +96,9 @@ def concAcid(datFile, volSample, alkCert, pSal, totalCarbonate,
     concAcidOptResult = calibrate.concAcid(massAcid, emf, tempK, massSample,
         alkCert, concTotals, eqConstants, solver=solver, **kwargs)
     return concAcidOptResult
+
+def Potentiometric(datFile, volSample, pSal, **kwargs):
+    """Generate a Potentiometric titration object from a .dat file."""
+    volAcid, emf, tempK = io.datfile(datFile)
+    return titration.Potentiometric(volAcid, emf, tempK, pSal, volSample,
+        **kwargs)

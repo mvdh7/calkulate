@@ -12,9 +12,9 @@ def concTotals(pSal, totalCarbonate=0, totalPhosphate=0, totalSilicate=0,
         assemble.concentrations(*aconcs)
     return {
         'C': totalCarbonate,
-        'B': totalBorate,
-        'S': totalSulfate,
-        'F': totalFluoride,
+        'B': totalBorate[0],
+        'S': totalSulfate[0],
+        'F': totalFluoride[0],
         'P': totalPhosphate,
         'Si': totalSilicate,
         'NH3': totalAmmonia,
