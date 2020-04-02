@@ -1,12 +1,13 @@
 # Calkulate: seawater total alkalinity from titration data.
 # Copyright (C) 2019-2020  Matthew Paul Humphreys  (GNU GPLv3)
 """Visualise Calkulate calculations."""
-from numpy import array, log10, logical_and, mean, sqrt, zeros
+from numpy import array, log10, logical_and, mean, ones, sqrt, zeros
 from numpy import abs as np_abs
 from numpy import any as np_any
 from numpy import min as np_min
 from numpy import max as np_max
 from matplotlib.pyplot import figure, gca, rcParams, subplots_adjust
+from matplotlib import patches as patches
 from . import datfile, simulate, solve
 
 _rgb_guess = array([0.96, 0.86, 0.04])
@@ -215,14 +216,25 @@ def alkSteps(titrationPotentiometric, ax=None, **kwargs):
     t = titrationPotentiometric
     assert 'alkSteps' in vars(t), \
         'You must first run `titrationPotentiometric.get_alkSteps().`'
+    solver = 'complete'
+    if 'c' in kwargs.keys():
+        clr = kwargs['c']
+        kwargs = {k: v for k, v in kwargs.items() if k != 'c'}
+    else:
+        clr = 'k'
     ax = _checksetax(ax)
-    L = t.solvedWith
+    ax.axhline(t.alk[solver]*1e6, c='k', linewidth=0.8)
+    L = t.solvedWith[solver]
     ax.scatter(t.volAcid[~L], t.alkSteps[~L]*1e6, **kwargs, facecolor='none',
-        edgecolor='k')
-    ax.scatter(t.volAcid[L], t.alkSteps[L]*1e6, **kwargs, facecolor='k',
-        edgecolor='k')
+        edgecolor=clr, label='Not used')
+    ax.scatter(t.volAcid[L], t.alkSteps[L]*1e6, **kwargs, facecolor=clr,
+        edgecolor=clr, label='Used')
+    ax.legend(edgecolor='k')
     ax.set_xlabel('Acid volume / ml')
-    ax.set_ylabel('Stepwise TA estimate / μmol$\cdot$kg$^-1$')
+    ax.set_ylabel('Stepwise TA estimate / μmol$\cdot$kg$^{-1}$')
+    ax.set_title(
+        'TA = ${:.1f} \pm {:.1f}$ μmol$\cdot$kg$^{{-1}}$ ($n = {}$)'.format(
+        t.alk[solver]*1e6, t.rms[solver]*1e6, sum(L)))
     return ax
 
 # Keys in rgbs match those in simulate.alk's components dict
@@ -287,12 +299,19 @@ def alkComponents(titrationPotentiometric, ax=None):
     t = titrationPotentiometric
     assert 'alkSteps' in vars(t), \
         'You must first run `titrationPotentiometric.get_alkSteps().`'
+    # Get the 'used' values
+    solver = 'complete' # only valid option for now
+    usedMin = np_min(t.volAcid[t.solvedWith[solver]])
+    usedMax = np_max(t.volAcid[t.solvedWith[solver]])
+    # Draw the plot
     ax = _checksetax(ax)
     ax.plot(t.volAcid, -log10(t.alkSteps), label='Total alk.',
         marker='o', markersize=_markersize, c='k', alpha=_alpha)
     for component, conc in t.alkComponents.items():
         if np_any(conc != 0):
             ax.plot(t.volAcid, -log10(np_abs(conc)), **rgbs[component])
+    ax.add_patch(patches.Rectangle((usedMin, ax.get_ylim()[1]), usedMax-usedMin,
+        ax.get_ylim()[0]-ax.get_ylim()[1], facecolor=0.9*ones(3)))
     ax.invert_yaxis()
     ax.legend(bbox_to_anchor=(1.05, 1), edgecolor='k')
     ax.set_xlabel('Acid volume / ml')
