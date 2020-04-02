@@ -113,6 +113,7 @@ class Potentiometric:
             self.concAcid = {}
             self.alk = {}
             self.emf0 = {}
+            self.solvedWith = {}
         self.concAcid[solver] = concAcid
         self.alkSolved[solver] = solve.allSolvers[solver](self.massAcid,
             self.emf, self.tempK, self.massSample, self.concAcid[solver],
@@ -125,7 +126,7 @@ class Potentiometric:
         self.rms = {}
         if solver in ['complete']:
             self.rms[solver] = sqrt(mean(self.alkSolved[solver]['fun']**2))
-        self.solvedWith = self.alkSolved[solver]['L']
+        self.solvedWith[solver] = self.alkSolved[solver]['L']
 
     def calibrate_concAcid(self, alkCert, solver='complete', checkInputs=True,
             **kwargs):
