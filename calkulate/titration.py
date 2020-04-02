@@ -153,7 +153,7 @@ class Potentiometric:
         assert 'concAcid' in vars(self) and solver in self.concAcid.keys(), \
             ('You must first solve for alkalinity ' +
              'using `solve_alk()` with the same `solver`.')
-        self.h = solve.emf2h(self.emf, self.emf0[solver], self.tempK)
+        self.h = convert.emf2h(self.emf, self.emf0[solver], self.tempK)
         self.mu = solve.mu(self.massAcid, self.massSample)
         self.alkSim, self.alkComponents = simulate.alk(self.h, self.mu,
             self.concTotals, self.eqConstants)

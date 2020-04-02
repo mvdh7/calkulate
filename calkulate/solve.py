@@ -7,21 +7,14 @@ from numpy import abs as np_abs
 from numpy import max as np_max
 from scipy.optimize import least_squares as olsq
 from scipy.stats import linregress
-from . import simulate
+from . import convert, simulate
 from .constants import F, R
 
 #====== EMF CONVERSIONS =======================================================
-def emf2h(emf, emf0, tempK):
-    """Convert EMF to [H+]."""
-    # DAA03 Eq. (13) with typo corrected (i.e. EMF and EMF0 switched)
-    return exp((emf - emf0)*F/(R*tempK))
-
-def h2emf(h, emf0, tempK):
-    """Convert [H+] to EMF."""
-    return emf0 + log(h)*R*tempK/F
-
-def f2dEmf0(tempK, f):
-    return log(f)*R*tempK/F
+# Aliases for backwards compatibility
+emf2h = convert.emf2h
+h2emf = convert.h2emf
+f2dEmf0 = convert.f2dEmf0
 
 #====== GRAN ESTIMATOR FUNCTIONS ==============================================
 def f1(massAcid, emf, tempK, massSample):
