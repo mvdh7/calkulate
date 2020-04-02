@@ -1,7 +1,8 @@
 # Calkulate: seawater total alkalinity from titration data.
 # Copyright (C) 2019-2020  Matthew Paul Humphreys  (GNU GPLv3)
 """Classes for object-oriented style calculations."""
-from numpy import isscalar, full_like, nan, ndarray, size
+from copy import deepcopy
+from numpy import isscalar, full_like, mean, nan, ndarray, size, sqrt
 from numpy import all as np_all
 from . import calibrate, concentrations, convert, dissociation, simulate, solve
 
@@ -107,21 +108,24 @@ class Potentiometric:
                 '`concAcid` must be a scalar with a positive value.'
             assert solver in solve.allSolvers.keys(), \
                 '`solver` must be in `calkulate.solve.allSolvers.keys()`.'
-        if 'alk_solved' not in vars(self):
-            self.alk_solved = {}
+        if 'alkSolved' not in vars(self):
+            self.alkSolved = {}
             self.concAcid = {}
             self.alk = {}
             self.emf0 = {}
         self.concAcid[solver] = concAcid
-        self.alk_solved[solver] = solve.allSolvers[solver](self.massAcid,
+        self.alkSolved[solver] = solve.allSolvers[solver](self.massAcid,
             self.emf, self.tempK, self.massSample, self.concAcid[solver],
             self.concTotals, self.eqConstants)
-        self.alk[solver] = self.alk_solved[solver]['x'][0]
+        self.alk[solver] = self.alkSolved[solver]['x'][0]
         if solver in ['complete', 'halfgran']:
-            self.emf0[solver] = self.alk_solved[solver]['x'][1]
+            self.emf0[solver] = self.alkSolved[solver]['x'][1]
         else:
             self.emf0[solver] = nan
-        self.solvedWith = self.alk_solved[solver]['L']
+        self.rms = {}
+        if solver in ['complete']:
+            self.rms[solver] = sqrt(mean(self.alkSolved[solver]['fun']**2))
+        self.solvedWith = self.alkSolved[solver]['L']
 
     def calibrate_concAcid(self, alkCert, solver='complete', checkInputs=True,
             **kwargs):
@@ -154,3 +158,7 @@ class Potentiometric:
             self.concTotals, self.eqConstants)
         self.alkSteps = ((self.alkSim + self.massAcid*self.concAcid[solver]/
             (self.massAcid + self.massSample))/self.mu)
+
+    def copy(self):
+        """Return an independent copy of this titration object."""
+        return deepcopy(self)
