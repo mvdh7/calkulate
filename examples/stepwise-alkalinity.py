@@ -1,8 +1,7 @@
-# import numpy as np
 import matplotlib.pyplot as plt
 import calkulate as calk
 
-# Simulate a VINDTA-style titration
+# Define inputs to simulate a potentiometric titration
 acidVolStep = 0.15
 alk0 = 2279.7e-6
 buretteCorrection = 1
@@ -21,39 +20,35 @@ concs = {
 }
 Ks = {'WhichKs': 10, 'WhoseKSO4': 1, 'WhoseKF': 1, 'WhoseTB': 2}
 
-# Simulate junk first just to get correctly sized arrays
+# Simulate the arrays then put them into a Potentiometric object
 volAcid, emf, tempK = calk.simulate.titration(acidVolStep=acidVolStep,
     alk0=alk0, buretteCorrection=buretteCorrection, concAcid=concAcid,
     emf0=emf0, maxVolAcid=maxVolAcid, pSal=pSal, tempK=tempK,
     volSample=volSample, **concs, **Ks)
-
 this = calk.titration.Potentiometric(volAcid, emf, tempK, pSal, volSample,
-                                     **concs, **Ks)
-# this.solve_concAcid(alk0)
-solver = 'complete'
+                                      **concs, **Ks)
+
+# # Alternatively, just simulate directly into a Potentiometric object
+# this = calk.simulate.Potentiometric(acidVolStep=acidVolStep,
+#     alk0=alk0, buretteCorrection=buretteCorrection, concAcid=concAcid,
+#     emf0=emf0, maxVolAcid=maxVolAcid, pSal=pSal, tempK=tempK,
+#     volSample=volSample, **concs, **Ks)
+
+solver = 'complete' # this is the only valid option for now
 this.solve_alk(concAcid, solver=solver)
 this.get_alkSteps(solver=solver)
-# doesn't work for other solvers!
 
-# fig, ax = plt.subplots(figsize=(5, 8))
-# calk.plot.alkComponents(this)
+# Plot the components of alkalinity along the way
+fig, ax = plt.subplots(figsize=(5, 8))
+calk.plot.alkComponents(this)
 
-# Try import from .dat file
+# Import titration from .dat file into a Potentiometric object
 that = calk.datfile.Potentiometric('datfiles/CRM-144-0435-4.dat',
                                    volSample, pSal, **concs, **Ks)
 that.calibrate_concAcid(2250.0e-6)
 that.solve_alk(that.concAcidCert['complete'])
 that.get_alkSteps()
 
+# Plot the stepwise alkalinity estimates
 fig, ax = plt.subplots(figsize=(5, 4))
 calk.plot.alkSteps(that)
-
-# fig, ((ax0, axX), (ax1, axY)) = plt.subplots(2, 2, figsize=(8, 6))
-# gs = ax0.get_gridspec()
-# axX.remove()
-# axY.remove()
-# ax2 = fig.add_subplot(gs[:, 1])
-# calk.plot.emf(this, ax=ax0)
-# calk.plot.alkSteps(this, ax=ax1)
-# calk.plot.alkComponents(this, ax=ax2)
-# plt.tight_layout()
