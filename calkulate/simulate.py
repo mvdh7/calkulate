@@ -4,6 +4,8 @@
 from scipy.optimize import least_squares as olsq
 from numpy import arange, full_like, size, nan
 from . import concentrations, density, dissociation, solve
+from . import titration as titr # to avoid namespace clash while maintaining
+                                # backwards compatibility
 
 def alk(h, mu, concTotals, eqConstants):
     """Simulate total alkalinity from known pH and total concentrations."""
@@ -96,22 +98,70 @@ def pH(massAcid, massSample, concAcid, alk0, concTotals, eqConstants):
             8.0, method='lm')['x'][0]
     return pH
 
-def titration(acidVolStep=0.15, alk0=2238.6e-6, buretteCorrection=1,
-        concAcid=0.1, emf0=660, extraVolAcid=0, maxVolAcid=4.1, pSal=33.571,
-        tempK=298.15, totalCarbonate=2031.53e-6, totalPhosphate=0.31e-6,
-        totalSilicate=2.5e-6, volSample=100, totalAmmonia=0, totalH2Sulfide=0,
-        WhichKs=10, WhoseKSO4=1, WhoseKF=1, WhoseTB=2):
+def _titrationDefaults():
+    """Set titration simulation defaults to resemble Dickson CRM, batch 144."""
+    return {
+        'acidVolStep': 0.15,
+        'alk0': 2238.6e-6,
+        'buretteCorrection': 1,
+        'concAcid': 0.1,
+        'emf0': 660,
+        'extraVolAcid': 0,
+        'maxVolAcid': 4.1,
+        'pSal': 33.571,
+        'tempK': 298.15,
+        'totalCarbonate': 2031.53e-6,
+        'totalPhosphate': 0.31e-6,
+        'totalSilicate': 2.5e-6,
+        'volSample': 100,
+        'totalAmmonia': 0,
+        'totalH2Sulfide': 0,
+        'WhichKs': 10,
+        'WhoseKSO4': 1,
+        'WhoseKF': 1,
+        'WhoseTB': 2,
+    }
+
+def _titrationSettings(**kwargs):
+    """Merge user-specified inputs with titration defaults."""
+    return {k: v if v is not None else _titrationDefaults()[k]
+        for k, v in kwargs.items()}
+
+def titration(acidVolStep=None, alk0=None, buretteCorrection=None,
+        concAcid=None, emf0=None, extraVolAcid=None, maxVolAcid=None,
+        pSal=None, tempK=None, totalCarbonate=None, totalPhosphate=None,
+        totalSilicate=None, volSample=None, totalAmmonia=None,
+        totalH2Sulfide=None, WhichKs=None, WhoseKSO4=None, WhoseKF=None,
+        WhoseTB=None):
     """Simulate a titration dataset."""
-    # Default values resemble Dickson CRM batch 144.
-    volAcid = arange(0, maxVolAcid, acidVolStep) + extraVolAcid
-    massSample = volSample*density.sw(tempK, pSal)*1e-3
-    massAcid = buretteCorrection*volAcid*density.acid(tempK)*1e-3
-    concTotals = concentrations.concTotals(pSal, totalCarbonate,
-        totalPhosphate, totalSilicate, totalAmmonia=totalAmmonia,
-        totalH2Sulfide=totalH2Sulfide, WhichKs=WhichKs, WhoseTB=WhoseTB)
-    eqConstants = dissociation.eqConstants(tempK, pSal, concTotals,
-        WhichKs=WhichKs, WhoseKSO4=WhoseKSO4, WhoseKF=WhoseKF)
-    pHSim = pH(massAcid, massSample, concAcid, alk0, concTotals,
+    ts = _titrationSettings(**locals())
+    volAcid = (arange(0, ts['maxVolAcid'], ts['acidVolStep']) +
+        ts['extraVolAcid'])
+    massSample = ts['volSample']*density.sw(ts['tempK'], ts['pSal'])*1e-3
+    massAcid = ts['buretteCorrection']*volAcid*density.acid(ts['tempK'])*1e-3
+    concTotals = concentrations.concTotals(ts['pSal'], ts['totalCarbonate'],
+        ts['totalPhosphate'], ts['totalSilicate'],
+        totalAmmonia=ts['totalAmmonia'], totalH2Sulfide=ts['totalH2Sulfide'],
+        WhichKs=ts['WhichKs'], WhoseTB=ts['WhoseTB'])
+    eqConstants = dissociation.eqConstants(ts['tempK'], ts['pSal'], concTotals,
+        WhichKs=ts['WhichKs'], WhoseKSO4=ts['WhoseKSO4'], WhoseKF=ts['WhoseKF'])
+    pHSim = pH(massAcid, massSample, ts['concAcid'], ts['alk0'], concTotals,
         eqConstants)
-    emf = solve.h2emf(10.0**-pHSim, emf0, tempK)
-    return volAcid, emf, full_like(emf, tempK)
+    emf = solve.h2emf(10.0**-pHSim, ts['emf0'], ts['tempK'])
+    return volAcid, emf, full_like(emf, ts['tempK'])
+
+def Potentiometric(acidVolStep=None, alk0=None, buretteCorrection=None,
+        concAcid=None, emf0=None, extraVolAcid=None, maxVolAcid=None,
+        pSal=None, tempK=None, totalCarbonate=None, totalPhosphate=None,
+        totalSilicate=None, volSample=None, totalAmmonia=None,
+        totalH2Sulfide=None, WhichKs=None, WhoseKSO4=None, WhoseKF=None,
+        WhoseTB=None):
+    """Simulate a titration dataset as a titration.Potentiometric object."""
+    volAcid, emf, tempK = titration(**locals())
+    ts = _titrationSettings(**locals())
+    return titr.Potentiometric(volAcid, emf, tempK, ts['pSal'], ts['volSample'],
+        totalCarbonate=ts['totalCarbonate'],
+        totalPhosphate=ts['totalPhosphate'], totalSilicate=ts['totalSilicate'],
+        totalAmmonia=ts['totalAmmonia'], totalH2Sulfide=ts['totalH2Sulfide'],
+        WhichKs=ts['WhichKs'], WhoseKSO4=ts['WhoseKSO4'], WhoseKF=ts['WhoseKF'],
+        WhoseTB=ts['WhoseTB'])
