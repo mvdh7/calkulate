@@ -15,10 +15,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """Seawater total alkalinity from titration data."""
 
+# Define and import modules
 __all__ = [
     'calibrate',
     'concentrations',
     'constants',
+    'convert',
     'datfile',
     'density',
     'dissociation',
@@ -27,12 +29,13 @@ __all__ = [
     'plot',
     'simulate',
     'solve',
+    'titration',
 ]
-
 from . import (
     calibrate,
     concentrations,
     constants,
+    convert,
     datfile,
     density,
     dissociation,
@@ -41,10 +44,11 @@ from . import (
     plot,
     simulate,
     solve,
+    titration,
 )
-
-# Add alias to avoid breaking old code
+# Add alias for backwards compatibility
 vindta = datfile
 
+# Metadata
 __author__ = 'Matthew P. Humphreys and Ruth S. Matthews'
 __version__ = meta.version

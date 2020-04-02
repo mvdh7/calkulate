@@ -7,21 +7,14 @@ from numpy import abs as np_abs
 from numpy import max as np_max
 from scipy.optimize import least_squares as olsq
 from scipy.stats import linregress
-from . import simulate
+from . import convert, simulate
 from .constants import F, R
 
 #====== EMF CONVERSIONS =======================================================
-def emf2h(emf, emf0, tempK):
-    """Convert EMF to [H+]."""
-    # DAA03 Eq. (13) with typo corrected (i.e. EMF and EMF0 switched)
-    return exp((emf - emf0)*F/(R*tempK))
-
-def h2emf(h, emf0, tempK):
-    """Convert [H+] to EMF."""
-    return emf0 + log(h)*R*tempK/F
-
-def f2dEmf0(tempK, f):
-    return log(f)*R*tempK/F
+# Aliases for backwards compatibility
+emf2h = convert.emf2h
+h2emf = convert.h2emf
+f2dEmf0 = convert.f2dEmf0
 
 #====== GRAN ESTIMATOR FUNCTIONS ==============================================
 def f1(massAcid, emf, tempK, massSample):
@@ -81,11 +74,12 @@ def complete(massAcid, emf, tempK, massSample, concAcid, concTotals,
         massSample, concAcid)
     L = logical_and(pHGuess > 3, pHGuess < 4)
     concTotalsL, eqConstantsL = _eqConcL(concTotals, eqConstants, L)
-    alk_emf0 = olsq(lambda alk_emf0: _lsqfunComplete(massAcid[L], emf[L],
+    optResult = olsq(lambda alk_emf0: _lsqfunComplete(massAcid[L], emf[L],
             tempK[L], massSample, concAcid, alk_emf0[1], alk_emf0[0],
             concTotalsL, eqConstantsL),
         [alkGuess, emf0Guess], x_scale=[1e-6, 1], method='lm')
-    return alk_emf0
+    optResult['L'] = L
+    return optResult
 
 #----- Dickson et al. (2003) method -------------------------------------------
 def _lsqfun_DAA03(massAcid, H, massSample, concAcid, f, AT, concTotals,
@@ -103,10 +97,12 @@ def DAA03(massAcid, emf, tempK, massSample, concAcid, concTotals, eqConstants):
         massSample, concAcid)
     L = logical_and(pHGuess > 3, pHGuess < 3.5)
     concTotalsL, eqConstantsL = _eqConcL(concTotals, eqConstants, L)
-    return olsq(lambda alk_f:
+    optResult = olsq(lambda alk_f:
         _lsqfun_DAA03(massAcid[L], hGuess[L], massSample, concAcid, alk_f[1],
             alk_f[0], concTotalsL, eqConstantsL),
         [alkGuess, 1], x_scale=[1e-3, 1], method='lm')
+    optResult['L'] = L
+    return optResult
 
 #----- Dickson (1981) method --------------------------------------------------
 def _lsqfun_Dickson1981(massAcid, h, massSample, concAcid, f, alk,
@@ -125,12 +121,13 @@ def Dickson1981(massAcid, emf, tempK, massSample, concAcid, concTotals,
         massSample, concAcid)
     L = pHGuess > 5
     concTotalsL, eqConstantsL = _eqConcL(concTotals, eqConstants, L)
-    alk_totalCarbonate_f = olsq(lambda alk_totalCarbonate_f:
+    optResult = olsq(lambda alk_totalCarbonate_f:
         _lsqfun_Dickson1981(massAcid[L], hGuess[L], massSample, concAcid,
             alk_totalCarbonate_f[2], alk_totalCarbonate_f[0],
             alk_totalCarbonate_f[1], concTotalsL, eqConstantsL),
         [alkGuess, alkGuess*0.95, 1], x_scale=[1e-3, 1e-3, 1], method='lm')
-    return alk_totalCarbonate_f
+    optResult['L'] = L
+    return optResult
 
 #====== HALF-GRAN PLOT METHOD =================================================
 def halfGran(massAcid, emf, tempK, massSample, concAcid, concTotals,
@@ -187,7 +184,11 @@ def halfGran(massAcid, emf, tempK, massSample, concAcid, concTotals,
             print('Calkulate: half-Gran plot iterations did not converge!')
         finalAlk = nan
         finalEmf0 = nan
-    return {'x': [finalAlk, finalEmf0]}
+    optResult = {
+        'x': [finalAlk, finalEmf0],
+        'L': LG,
+    }
+    return optResult
 
 # Dict of all solvers
 allSolvers = {

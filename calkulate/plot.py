@@ -1,11 +1,13 @@
 # Calkulate: seawater total alkalinity from titration data.
 # Copyright (C) 2019-2020  Matthew Paul Humphreys  (GNU GPLv3)
 """Visualise Calkulate calculations."""
-from numpy import array, log10, logical_and, mean, sqrt, zeros
+from numpy import array, log10, logical_and, mean, ones, sqrt, zeros
+from numpy import abs as np_abs
 from numpy import any as np_any
 from numpy import min as np_min
 from numpy import max as np_max
-from matplotlib.pyplot import figure, rcParams, subplots_adjust
+from matplotlib.pyplot import figure, gca, rcParams, subplots_adjust
+from matplotlib import patches as patches
 from . import datfile, simulate, solve
 
 _rgb_guess = array([0.96, 0.86, 0.04])
@@ -126,26 +128,27 @@ def alkEstimates(ax, massAcid, alk0Sim, rgb, alk_emf0, RMS, Npts, sublabel):
         fontsize=10)
     return ax
 
+# Keys in rgbs_names match those in simulate.alk's components dict
+rgbs_names = {
+    '+HCO3': ['xkcd:grey', '+[HCO$_3^-$]'],
+    '+2*CO3': ['xkcd:grey', '+2[CO$_3^{2-}$]'],
+    '+B(OH)4': ['xkcd:blue', '+[B(OH)$_4^-$]'],
+    '+OH': ['xkcd:red', '+[OH$^-$]'],
+    '-H': ['xkcd:red', '$-$[H$^+$]'],
+    '-HSO4': ['xkcd:golden yellow', '$-$[HSO$_4^-$]'],
+    '-HF': ['xkcd:green', '$-$[HF]'],
+    '-H3PO4': ['xkcd:orange', '$-$[H$_3$PO$_4$]'],
+    '+HPO4': ['xkcd:orange', '+[HPO$_4^{2-}$]'],
+    '+2*PO4': ['xkcd:orange', '+2[PO$_4^{3-}$]'],
+    '+SiO(OH)3': ['xkcd:pink', '+[SiO(OH)$_3$]'],
+    '+NH3': ['xkcd:aquamarine', '+[NH$_3$]'],
+    '+HS': ['xkcd:indigo', '+[HS$^-$]']
+}
+
 def components(ax, massAcid, alk0Sim, alkSim, sublabel):
     """Every component of alkalinity throughout a titration."""
     ax.plot(massAcid*1e3, -log10(alk0Sim), label='Total alk.',
         marker='o', markersize=3, c='k', clip_on=False)
-    # Keys in rgbs_names match those in simulate.alk's components dict
-    rgbs_names = {
-        '+HCO3': ['xkcd:grey', '+[HCO$_3^-$]'],
-        '+2*CO3': ['xkcd:grey', '+2[CO$_3^{2-}$]'],
-        '+B(OH)4': ['xkcd:blue', '+[B(OH)$_4^-$]'],
-        '+OH': ['xkcd:red', '+[OH$^-$]'],
-        '-H': ['xkcd:red', '$-$[H$^+$]'],
-        '-HSO4': ['xkcd:golden yellow', '$-$[HSO$_4^-$]'],
-        '-HF': ['xkcd:green', '$-$[HF]'],
-        '-H3PO4': ['xkcd:orange', '$-$[H$_3$PO$_4$]'],
-        '+HPO4': ['xkcd:orange', '+[HPO$_4^{2-}$]'],
-        '+2*PO4': ['xkcd:orange', '+2[PO$_4^{3-}$]'],
-        '+SiO(OH)3': ['xkcd:pink', '+[SiO(OH)$_3$]'],
-        '+NH3': ['xkcd:aquamarine', '+[NH$_3$]'],
-        '+HS': ['xkcd:indigo', '+[HS$^-$]']
-    }
     for component in alkSim[1].keys():
         if component.startswith('-'): # this is a bit sketchy
             yVar = -alkSim[1][component]
@@ -191,3 +194,126 @@ def everything(datfile, volSample, pSal, totalCarbonate, totalPhosphate,
     ax6 = fig.add_subplot(gs[1:4, 1])
     components(ax6, massAcid, alk0Sim, alkSim, '(f)')
     return fig
+
+def _checksetax(ax):
+    if ax is None:
+        ax = gca()
+    return ax
+
+def emf(titrationPotentiometric, ax=None, **kwargs):
+    """EMF throughout a potentiometric titration.
+    Optional `kwargs` are passed through to `matplotlib.pyplot.scatter()`.
+    """
+    t = titrationPotentiometric
+    ax = _checksetax(ax)
+    ax.scatter(t.volAcid, t.emf, **kwargs)
+    ax.set_xlabel('Acid volume / ml')
+    ax.set_ylabel('Sample EMF / mV')
+    return ax
+
+def alkSteps(titrationPotentiometric, ax=None, **kwargs):
+    """Alkalinity estimated separately at each titration step."""
+    t = titrationPotentiometric
+    assert 'alkSteps' in vars(t), \
+        'You must first run `titrationPotentiometric.get_alkSteps().`'
+    solver = 'complete'
+    if 'c' in kwargs.keys():
+        clr = kwargs['c']
+        kwargs = {k: v for k, v in kwargs.items() if k != 'c'}
+    else:
+        clr = 'k'
+    ax = _checksetax(ax)
+    ax.axhline(t.alk[solver]*1e6, c='k', linewidth=0.8)
+    L = t.solvedWith[solver]
+    ax.scatter(t.volAcid[~L], t.alkSteps[~L]*1e6, **kwargs, facecolor='none',
+        edgecolor=clr, label='Not used')
+    ax.scatter(t.volAcid[L], t.alkSteps[L]*1e6, **kwargs, facecolor=clr,
+        edgecolor=clr, label='Used')
+    ax.legend(edgecolor='k')
+    ax.set_xlabel('Acid volume / ml')
+    ax.set_ylabel('Stepwise TA estimate / μmol$\cdot$kg$^{-1}$')
+    ax.set_title(
+        'TA = ${:.1f} \pm {:.1f}$ μmol$\cdot$kg$^{{-1}}$ ($n = {}$)'.format(
+        t.alk[solver]*1e6, t.rms[solver]*1e6, sum(L)))
+    return ax
+
+# Keys in rgbs match those in simulate.alk's components dict
+rgbs = {
+    '+HCO3': {
+        'c': 'xkcd:grey',
+        'label': '+[HCO$_3^-$]'},
+    '+2*CO3': {
+        'c': 'xkcd:grey',
+        'label': '+2[CO$_3^{2-}$]'},
+    '+B(OH)4': {
+        'c': 'xkcd:blue',
+        'label': '+[B(OH)$_4^-$]'},
+    '+OH': {
+        'c': 'xkcd:red',
+        'label': '+[OH$^-$]'},
+    '-H': {
+        'c': 'xkcd:red',
+        'label': '$-$[H$^+$]'},
+    '-HSO4': {
+        'c': 'xkcd:golden yellow',
+        'label': '$-$[HSO$_4^-$]'},
+    '-HF': {
+        'c': 'xkcd:green',
+        'label': '$-$[HF]'},
+    '-H3PO4': {
+        'c': 'xkcd:orange',
+        'label': '$-$[H$_3$PO$_4$]'},
+    '+HPO4': {
+        'c': 'xkcd:orange',
+        'label': '+[HPO$_4^{2-}$]'},
+    '+2*PO4': {
+        'c': 'xkcd:orange',
+        'label': '+2[PO$_4^{3-}$]'},
+    '+SiO(OH)3': {
+        'c': 'xkcd:pink',
+        'label': '+[SiO(OH)$_3$]'},
+    '+NH3': {
+        'c': 'xkcd:aquamarine',
+        'label': '+[NH$_3$]'},
+    '+HS': {
+        'c': 'xkcd:indigo',
+        'label': '+[HS$^-$]'},
+}
+# Add default markers, if not specifically defined
+_alpha = 0.7
+_markersize = 5
+for component, rgb in rgbs.items():
+    if 'alpha' not in rgb.keys():
+        rgb['alpha'] = _alpha
+    if 'marker' not in rgb.keys():
+        if component.startswith('+'):
+            rgb['marker'] = '^'
+        elif component.startswith('-'):
+            rgb['marker'] = 'v'
+        else:
+            rgb['marker'] = 'o'
+    if 'markersize' not in rgb.keys():
+        rgb['markersize'] = _markersize
+
+def alkComponents(titrationPotentiometric, ax=None):
+    t = titrationPotentiometric
+    assert 'alkSteps' in vars(t), \
+        'You must first run `titrationPotentiometric.get_alkSteps().`'
+    # Get the 'used' values
+    solver = 'complete' # only valid option for now
+    usedMin = np_min(t.volAcid[t.solvedWith[solver]])
+    usedMax = np_max(t.volAcid[t.solvedWith[solver]])
+    # Draw the plot
+    ax = _checksetax(ax)
+    ax.plot(t.volAcid, -log10(t.alkSteps), label='Total alk.',
+        marker='o', markersize=_markersize, c='k', alpha=_alpha)
+    for component, conc in t.alkComponents.items():
+        if np_any(conc != 0):
+            ax.plot(t.volAcid, -log10(np_abs(conc)), **rgbs[component])
+    ax.add_patch(patches.Rectangle((usedMin, ax.get_ylim()[1]), usedMax-usedMin,
+        ax.get_ylim()[0]-ax.get_ylim()[1], facecolor=0.9*ones(3)))
+    ax.invert_yaxis()
+    ax.legend(bbox_to_anchor=(1.05, 1), edgecolor='k')
+    ax.set_xlabel('Acid volume / ml')
+    ax.set_ylabel('$-$log$_{10}$(concentration from pH / mol$\cdot$kg$^{-1}$)')
+    return ax

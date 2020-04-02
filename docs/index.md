@@ -1,4 +1,4 @@
-# <img src="img/logo_transparent.png" style="vertical-align:sub" width="105px" /> v2.2.0
+# <img src="img/logo_transparent.png" style="vertical-align:sub" width="105px" /> v2.3.0
 
 Calkulate is a Python 3.6+ package for determining total alkalinity from seawater titration data.
 
@@ -47,7 +47,7 @@ But please do check back here for any updates first (or [get in touch](https://m
 
 ## Acknowledgements
 
-Calkulate is maintained by [Dr Matthew P. Humphreys](https://mvdh.xyz) at the NIOZ Royal Netherlands Institute for Sea Research (Texel, the Netherlands), and Ruth Matthews at the University of East Anglia (Norwich, UK).
+Calkulate is maintained by [Dr Matthew P. Humphreys](https://mvdh.xyz) at the NIOZ Royal Netherlands Institute for Sea Research (Texel, the Netherlands), and [Ruth Matthews](https://people.uea.ac.uk/ruth_matthews) at the University of East Anglia (Norwich, UK).
 
 Its ongoing development has been indirectly funded by the [Natural Environment Research Council](https://nerc.ukri.org/) (NERC, UK) and the [Dutch Research Council](https://www.nwo.nl/en) (NWO, the Netherlands).
 

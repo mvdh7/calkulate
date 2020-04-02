@@ -11,9 +11,11 @@ Documentation is available at [calkulate.readthedocs.io](https://calkulate.readt
 
 ## Installation
 
-```python
-pip install calkulate
-```
+    pip install calkulate
+
+## Upgrade
+
+    pip install calkulate --upgrade --no-cache-dir
 
 ## Citation
 

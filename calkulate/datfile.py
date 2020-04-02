@@ -1,6 +1,6 @@
 # Calkulate: seawater total alkalinity from titration data.
 # Copyright (C) 2019-2020  Matthew Paul Humphreys  (GNU GPLv3)
-"""Function wrappers for working with titration data in text files.
+"""Wrapper functions for working with titration data in text files.
 
 # Common inputs:
 
@@ -40,7 +40,8 @@ The equivalent options are:
 |      3        |     1     |     2     |
 |      4        |     2     |     2     |
 """
-from . import calibrate, concentrations, density, dissociation, io, solve
+from . import (calibrate, concentrations, convert, dissociation, io, solve,
+    titration)
 
 def prep(datFile, volSample, pSal, totalCarbonate, totalPhosphate,
         totalSilicate, buretteCorrection=1, tempKForce=None, WhichKs=10,
@@ -49,8 +50,9 @@ def prep(datFile, volSample, pSal, totalCarbonate, totalPhosphate,
     volAcid, emf, tempK = io.datfile(datFile)
     if tempKForce is not None:
         tempK[:] = tempKForce
-    massSample = volSample*density.sw(tempK[0], pSal)*1e-3
-    massAcid = buretteCorrection*volAcid*density.acid(tempK)*1e-3
+    massSample = convert.vol2massSample(volSample, tempK[0], pSal)
+    massAcid = convert.vol2massAcid(volAcid, tempK,
+        buretteCorrection=buretteCorrection)
     concTotals = concentrations.concTotals(pSal, totalCarbonate=totalCarbonate,
         totalPhosphate=totalPhosphate, totalSilicate=totalSilicate,
         WhichKs=WhichKs, WhoseTB=WhoseTB, totalAmmonia=totalAmmonia,
@@ -94,3 +96,9 @@ def concAcid(datFile, volSample, alkCert, pSal, totalCarbonate,
     concAcidOptResult = calibrate.concAcid(massAcid, emf, tempK, massSample,
         alkCert, concTotals, eqConstants, solver=solver, **kwargs)
     return concAcidOptResult
+
+def Potentiometric(datFile, volSample, pSal, **kwargs):
+    """Generate a Potentiometric titration object from a .dat file."""
+    volAcid, emf, tempK = io.datfile(datFile)
+    return titration.Potentiometric(volAcid, emf, tempK, pSal, volSample,
+        **kwargs)

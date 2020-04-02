@@ -1,3 +1,18 @@
+# 2.3
+
+Calkulate v2.3 introduces a new `Potentiometric` class that titration datasets can be imported into, enabling easier high-level analysis using the existing array-based functions. This is not yet properly documented, although there is a working example script in the Github repo (*examples/stepwise-alkalinity.py*).
+
+## 2.3.0
+
+**Release date:** 2020-04-02
+
+  * Added `convert` module with convenience functions to convert acid and sample volumes into masses.
+  * Relocated EMF to [H<sup>+</sup>] conversion functions from `solve` to `convert`, with aliases to maintain backwards compatibility.
+  * Added `titration` module with new `Potentiometric` class for higher-level manipulation of titration datasets.
+  * Added plotting functions for `Potentiometric` titration objects into the `plot` module.
+
+---
+
 # 2.2
 
 The main advance in Calkulate v2.2 is switching to using [PyCO2SYS](https://github.com/mvdh7/PyCO2SYS) to evaluate all equilibrium constants and solute concentrations from temperature and salinity, instead of having an independent set of equivalent functions written into Calkulate itself.
