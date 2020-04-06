@@ -6,6 +6,8 @@ Calkulate v2.3 introduces a new `Potentiometric` class that titration datasets c
 
 **Release date:** 2020-04-02
 
+[doi:10.5281/zenodo.3737874](https://doi.org/10.5281/zenodo.3737874)
+
   * Added `convert` module with convenience functions to convert acid and sample volumes into masses.
   * Relocated EMF to [H<sup>+</sup>] conversion functions from `solve` to `convert`, with aliases to maintain backwards compatibility.
   * Added `titration` module with new `Potentiometric` class for higher-level manipulation of titration datasets.
@@ -17,9 +19,11 @@ Calkulate v2.3 introduces a new `Potentiometric` class that titration datasets c
 
 The main advance in Calkulate v2.2 is switching to using [PyCO2SYS](https://github.com/mvdh7/PyCO2SYS) to evaluate all equilibrium constants and solute concentrations from temperature and salinity, instead of having an independent set of equivalent functions written into Calkulate itself.
 
+## 2.2.0
+
 **Release date:** 2020-03-20
 
-## 2.2.0
+[doi:10.5281/zenodo.3719139](https://doi.org/10.5281/zenodo.3719139)
 
   * Updated `concentrations.concTotals` and `dissociation.eqConstants` to use [PyCO2SYS](https://github.com/mvdh7/PyCO2SYS) functions to calculate things instead of functions built in to Calkulate.
   * Removed all equilibrium constant and concentration functions that were previously internally in Calkulate.
@@ -39,6 +43,8 @@ Calkulate v2.1 is the first stable version in Python! New features will continue
 
 **Release date:** 2019-08-06
 
+[doi:10.5281/zenodo.3361437](https://doi.org/10.5281/zenodo.3361437)
+
   * Renamed many functions and variables, as now described in the [conventions](../conventions) documentation;
   * Added **plot** module to visualise titration results;
   * Updated `halfGran` solver to return values in dict field `'x'` for consistency;
@@ -56,6 +62,8 @@ Despite the version number, Calkulate v2.0 is still a beta, as the original MATL
 ## 2.0.22
 
 **Release date:** 2019-04-09
+
+[doi:10.5281/zenodo.2634305](https://doi.org/10.5281/zenodo.2634305)
 
   * Added full outline documentation and function docstrings;
   * Added **meta** module, with single-source-of-truth version number;
