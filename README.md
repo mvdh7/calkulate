@@ -1,6 +1,6 @@
 # Calkulate v2
 
-[![pypi badge](https://img.shields.io/pypi/v/calkulate.svg?style=popout)](https://pypi.org/project/calkulate/)
+[![pypi badge](https://img.shields.io/pypi/v/calkulate.svg?style=popout)](https://pypi.org/project/calkulate/) [![DOI](https://zenodo.org/badge/85561246.svg)](https://zenodo.org/badge/latestdoi/85561246)
 
 Calkulate calculates alkalinity from potentiometric titration data.
 
