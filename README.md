@@ -1,6 +1,6 @@
 # Calkulate v2
 
-[![pypi badge](https://img.shields.io/pypi/v/calkulate.svg?style=popout)](https://pypi.org/project/calkulate/)
+[![pypi badge](https://img.shields.io/pypi/v/calkulate.svg?style=popout)](https://pypi.org/project/calkulate/) [![DOI](https://zenodo.org/badge/85561246.svg)](https://zenodo.org/badge/latestdoi/85561246)
 
 Calkulate calculates alkalinity from potentiometric titration data.
 
@@ -19,7 +19,16 @@ Documentation is available at [calkulate.readthedocs.io](https://calkulate.readt
 
 ## Citation
 
-A paper describing Calkulate v2 is in preparation. For now, if you use any version of Calkulate in your research, please cite it as:
+A paper describing Calkulate v2 is in preparation. For now, if you use the current version of Calkulate in your research, please cite it as:
+
+  * Humphreys, M. P. and Matthews, R. S. (2020). Total alkalinity from titration data in Python with Calkulate v2.3.0. [doi:10.5281/zenodo.3737874](https://doi.org/10.5281/zenodo.3737874).
+
+For older Python versions, replace the version, year and DOI as follows:
+
+  * v2.2.0, 2020, [doi:10.5281/zenodo.3719139](https://doi.org/10.5281/zenodo.3719139).
+  * v2.1.0, 2019, [doi:10.5281/zenodo.3361437](https://doi.org/10.5281/zenodo.3361437).
+
+For the original MATLAB version, please cite:
 
   * Humphreys, M. P. (2015). "Calculating seawater total alkalinity from open-cell titration data using a modified Gran plot technique," in *Measurements and Concepts in Marine Carbonate Chemistry* (PhD Thesis, Ocean and Earth Science, University of Southampton, UK), 25–44.
 
