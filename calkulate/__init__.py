@@ -1,5 +1,5 @@
 # Calkulate: seawater total alkalinity from titration data
-# Copyright (C) 2019-2020  Matthew Paul Humphreys  (GNU GPLv3)
+# Copyright (C) 2019-2020  Matthew P. Humphreys  (GNU GPLv3)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,40 +15,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """Seawater total alkalinity from titration data."""
 
-# Define and import modules
-__all__ = [
-    'calibrate',
-    'concentrations',
-    'constants',
-    'convert',
-    'datfile',
-    'density',
-    'dissociation',
-    'io',
-    'meta',
-    'plot',
-    'simulate',
-    'solve',
-    'titration',
-]
-from . import (
-    calibrate,
-    concentrations,
-    constants,
-    convert,
-    datfile,
-    density,
-    dissociation,
-    io,
-    meta,
-    plot,
-    simulate,
-    solve,
-    titration,
-)
-# Add alias for backwards compatibility
-vindta = datfile
-
-# Metadata
-__author__ = 'Matthew P. Humphreys and Ruth S. Matthews'
-__version__ = meta.version
+# Package metadata
+__authorlist__ = ["Humphreys, Matthew P.", "Matthews, Ruth S."]
+__author__ = " and ".join(__authorlist__)
+__version__ = "3.0.0-alpha"

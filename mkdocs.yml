@@ -1,26 +1,22 @@
 site_name: Calkulate
 site_author: Matthew P. Humphreys
 site_description: Seawater total alkalinity from titration data.
-copyright: Copyright &copy; 2019 Matthew P. Humphreys (GNU GPLv3).
-
 site_url: https://calkulate.readthedocs.io/
+copyright: Copyright &copy; 2019—2020  Matthew P. Humphreys  (GNU GPLv3)
+
+repo_name: mvdh7/calkulate
 repo_url: https://github.com/mvdh7/calkulate
 
-theme: readthedocs
-
 nav:
-  - Overview and installation: index.md
-  - Workflow examples:
-    - Compare all solvers: examples/compare-all-solvers.md
-    - Simulate a titration: examples/resimulate-d81.md
-    - Calibrate a CRM: examples/self-calibrate-crm.md
-    - Solve a series of measurements: examples/dataset-loop.md
-  - Give me a bit more detail!:
-    - Variables and conventions: conventions.md
-    - Data import: io.md
-    - Total concentrations: concentrations.md
-    - Equilibrium constants: dissociation.md
-    - Alkalinity solvers: solvers.md
-    - Titrant calibration: calibration.md
-  - Version history: versions.md
-  - References: references.md
+  - Overview: index.md
+
+theme:
+  name: material
+  language: en
+  palette:
+    scheme: slate
+    primary: cyan
+    accent: deep orange
+  font:
+    text: Noto Sans
+    code: Noto Sans Mono
