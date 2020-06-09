@@ -1,0 +1,7 @@
+Name                     Stmts   Miss  Cover
+--------------------------------------------
+calkulate/__init__.py        4      0   100%
+tests/__init__.py            0      0   100%
+tests/test_metadata.py       6      0   100%
+--------------------------------------------
+TOTAL                       10      0   100%
