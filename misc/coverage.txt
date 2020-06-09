@@ -1,9 +1,9 @@
 Name                     Stmts   Miss  Cover
 --------------------------------------------
 calkulate/__init__.py        6      0   100%
-calkulate/io.py              8      0   100%
+calkulate/io.py             13      0   100%
 tests/__init__.py            0      0   100%
-tests/test_io.py            11      0   100%
+tests/test_io.py            19      0   100%
 tests/test_metadata.py       6      0   100%
 --------------------------------------------
-TOTAL                       31      0   100%
+TOTAL                       44      0   100%

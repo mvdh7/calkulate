@@ -19,3 +19,17 @@ def read_dat(
     emf = data[:, emf_col]
     temperature = data[:, temperature_col]
     return acid_volume, emf, temperature
+
+
+def write_dat(
+    fname, acid_volume, emf, temperature, line0="", line1="", mode="x", **kwargs
+):
+    """Write potentiometric titration data to a text file."""
+    with open(fname, mode=mode, **kwargs) as f:
+        f.write("{}\n{}\n".format(line0, line1))
+        for i in range(len(acid_volume)):
+            f.write(
+                "{:.5f}\t{:.5f}\t{:.3f}\n".format(
+                    acid_volume[i], emf[i], temperature[i]
+                )
+            )
