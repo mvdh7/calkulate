@@ -2,13 +2,18 @@ import numpy as np
 import calkulate as calk
 
 
-fname = "tests/data/CRM-144-0435-4.dat"
+fname = "tests/data/CRM-144-0435-4.dat"  # used by all the tests
 
 
 def test_read_dat():
     """Import potentiometric titration data from a text file and check they look like
     they should."""
     titration = calk.types.Potentiometric(fname)
+    assert hasattr(titration, "titrant")
+    assert hasattr(titration, "mixture")
+    assert hasattr(titration.titrant, "volume")
+    assert hasattr(titration.mixture, "emf")
+    assert hasattr(titration.mixture, "temperature")
     assert isinstance(titration.titrant.volume, np.ndarray)
     assert isinstance(titration.mixture.emf, np.ndarray)
     assert isinstance(titration.mixture.temperature, np.ndarray)
