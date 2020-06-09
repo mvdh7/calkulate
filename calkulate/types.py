@@ -26,21 +26,21 @@ class Mixture:
 class Potentiometric:
     """A potentiometrically monitored titration."""
 
-    def __init__(self, fname=None, **kwargs):
+    def __init__(self, fname=None, **read_dat_kwargs):
         self.analyte = Analyte()
         self.titrant = Titrant()
         self.mixture = Mixture()
         if fname is not None:
-            self.read_dat(fname, **kwargs)
+            self.read_dat(fname, **read_dat_kwargs)
 
     def read_dat(
         self,
         fname,
         acid_volume_col=0,
-        delimiter="\t",
         emf_col=1,
-        skip_header=2,
         temperature_col=2,
+        delimiter="\t",
+        skip_header=2,
         **kwargs
     ):
         """Import potentiometric titration data from a text file."""
