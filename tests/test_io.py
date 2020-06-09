@@ -6,24 +6,30 @@ fname = "tests/data/CRM-144-0435-4.dat"
 
 
 def test_read_dat():
-    """Import data from a text file and check the outputs look like they should."""
-    acid_volume, emf, temperature = calk.io.read_dat(fname)
-    assert isinstance(acid_volume, np.ndarray)
-    assert isinstance(emf, np.ndarray)
-    assert isinstance(temperature, np.ndarray)
-    assert len(np.shape(acid_volume)) == 1
-    assert len(np.shape(emf)) == 1
-    assert len(np.shape(temperature)) == 1
-    assert len(acid_volume) == len(emf) == len(temperature)
+    """Import potentiometric titration data from a text file and check they look like
+    they should."""
+    titration = calk.types.Potentiometric(fname)
+    assert isinstance(titration.titrant.volume, np.ndarray)
+    assert isinstance(titration.mixture.emf, np.ndarray)
+    assert isinstance(titration.mixture.temperature, np.ndarray)
+    assert len(np.shape(titration.titrant.volume)) == 1
+    assert len(np.shape(titration.mixture.emf)) == 1
+    assert len(np.shape(titration.mixture.temperature)) == 1
+    assert (
+        len(titration.titrant.volume)
+        == len(titration.mixture.emf)
+        == len(titration.mixture.temperature)
+    )
 
 
 def test_read_write_read_dat():
-    """Import data from a text file, write it back to a text file, and re-import.
-    Check that the values haven't changed.
+    """Import potentiometric titration data from a text file, write them to a new text
+    file, and re-import.  Check that the values haven't changed.
     """
-    read_vars = calk.io.read_dat(fname)
+    titration = calk.types.Potentiometric(fname)
     fname_copy = fname.replace(".dat", "-copy.dat")
-    calk.io.write_dat(fname_copy, *read_vars, mode="w")
-    read_vars_again = calk.io.read_dat(fname_copy)
-    for i in range(len(read_vars)):
-        assert np.all(read_vars[i] == read_vars_again[i])
+    titration.write_dat(fname_copy, mode="w")
+    titration_copy = calk.types.Potentiometric(fname_copy)
+    assert np.all(titration.titrant.volume == titration_copy.titrant.volume)
+    assert np.all(titration.mixture.emf == titration_copy.mixture.emf)
+    assert np.all(titration.mixture.temperature == titration_copy.mixture.temperature)
