@@ -15,6 +15,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """Seawater total alkalinity from titration data."""
 
+from . import io
+
+__all__ = ["io"]
+
 # Package metadata
 __authorlist__ = ["Humphreys, Matthew P.", "Matthews, Ruth S."]
 __author__ = " and ".join(__authorlist__)
