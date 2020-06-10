@@ -41,9 +41,9 @@ def check_read_dat(i):
 
 
 def test_read_dat():
-    """Apply check_read_dat to various lines of the test file."""
-    check_read_dat(0)
-    check_read_dat(2)
+    """Apply check_read_dat to every line of the test file."""
+    for i in range(len(titration_table.index)):
+        check_read_dat(i)
 
 
 def test_read_write_read_dat():
