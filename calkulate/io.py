@@ -6,7 +6,6 @@ import numpy as np
 
 
 def read_dat(
-    self,
     fname,
     acid_volume_col=0,
     emf_col=1,
@@ -17,14 +16,18 @@ def read_dat(
 ):
     """Import potentiometric titration data from a text file."""
     data = np.genfromtxt(fname, delimiter=delimiter, skip_header=skip_header, **kwargs)
-    self.fname = fname
-    self.titrant.volume = data[:, acid_volume_col]
-    self.mixture.emf = data[:, emf_col]
-    self.mixture.temperature = data[:, temperature_col]
+    titrant_volume = data[:, acid_volume_col]
+    mixture_emf = data[:, emf_col]
+    mixture_temperature = data[:, temperature_col]
+    return {
+        "titrant_volume": titrant_volume,
+        "mixture_emf": mixture_emf,
+        "mixture_temperature": mixture_temperature,
+    }
 
 
 def write_dat(
-    self,
+    titration,
     fname,
     line0="",
     line1="",
@@ -37,7 +40,7 @@ def write_dat(
     """Write potentiometric titration data to a text file."""
     with open(fname, mode=mode, **kwargs) as f:
         f.write("{}\n{}\n".format(line0, line1))
-        for i in range(len(self.titrant.volume)):
+        for i in range(len(titration.titrant.volume)):
             f.write(
                 (
                     "{:"
@@ -48,8 +51,21 @@ def write_dat(
                     + temperature_fmt
                     + "}\n"
                 ).format(
-                    self.titrant.volume[i],
-                    self.mixture.emf[i],
-                    self.mixture.temperature[i],
+                    titration.titrant.volume[i],
+                    titration.mixture.emf[i],
+                    titration.mixture.temperature[i],
                 )
             )
+
+
+def check_set(collection, field, default):
+    """Check if a field is in a collection and that it is not a NaN.
+    Return the field if so, or the default if not.
+    """
+    if field in collection:
+        if ~np.isnan(collection[field]):
+            return collection[field]
+        else:
+            return default
+    else:
+        return default

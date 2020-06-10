@@ -2,10 +2,16 @@
 # Copyright (C) 2019-2020  Matthew P. Humphreys  (GNU GPLv3)
 """The densities of various solutions."""
 
+import numpy as np
+
 
 def seawater_atm_MP81(temperature, salinity):
-    """Seawater density at 1 atm in kg/l following MP81."""
-    # Validity: 0 < T < 40 degC & 0.5 < S < 43
+    """Seawater density at 1 atm in kg/l following MP81.
+    
+    Validity:
+      *  0   < T < 40 °C
+      *  0.5 < S < 43
+    """
     return (
         999.842594
         + 6.793952e-2 * temperature
@@ -25,3 +31,23 @@ def seawater_atm_MP81(temperature, salinity):
         * salinity ** 1.5
         + 4.8314e-4 * salinity ** 2
     ) * 1e-3
+
+
+def HCl_NaCl_25C_DSC07(molality_HCl=0.1, molality_NaCl=0.6):
+    """Density of a mixture of HCl and NaCl at 25 °C and 1 atm following DSC07."""
+    rhow25 = 0.99704  # g / cm**3
+    # For convenience:
+    mHCl = molality_HCl
+    mNaCl = molality_NaCl
+    molality_total = molality_HCl + molality_NaCl  # mol / kg-H2O
+    # DSC07 eqs. 16 and 17:
+    phiHCl = 17.854 + 1.460 * np.sqrt(molality_total) - 0.307 * molality_total
+    phiNaCl = 16.613 + 1.811 * np.sqrt(molality_total) + 0.094 * molality_total
+    # DSC07 eqs. 14 and 15:
+    mT = (36.46 * mHCl + 58.44 * mNaCl) / (mHCl + mNaCl)
+    phimix = (mHCl * phiHCl + mNaCl * phiNaCl) / (mHCl + mNaCl)
+    # DSC07 eq. 13:
+    rho25 = (
+        rhow25 * (1e3 + mT * (mHCl + mNaCl)) / (1e3 + phimix * (mHCl + mNaCl) * rhow25)
+    )
+    return rho25

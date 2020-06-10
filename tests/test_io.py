@@ -3,17 +3,16 @@ import numpy as np
 import calkulate as calk
 
 
-titration_table = pd.DataFrame(
-    {"fname": ["tests/data/CRM-144-0435-4.dat", "tests/data/CRM-144-0435-4-copy.dat"],}
-)
+titration_table = pd.read_csv("tests/data/titration_table.csv")
+t = calk.types.Potentiometric(titration_table.loc[0])
 
 
-def test_read_dat():
+def check_read_dat(i):
     """Import potentiometric titration data from a text file and check they look like
     they should."""
-    titration = calk.types.Potentiometric(titration_table.loc[0])
+    titration = calk.types.Potentiometric(titration_table.loc[i])
     assert hasattr(titration, "fname")
-    assert titration.fname == titration_table.loc[0].fname
+    assert titration.fname == titration_table.loc[i].fname
     assert hasattr(titration, "analyte")
     assert hasattr(titration, "titrant")
     assert hasattr(titration, "mixture")
@@ -31,10 +30,20 @@ def test_read_dat():
     assert len(np.shape(titration.mixture.emf)) == 1
     assert len(np.shape(titration.mixture.temperature)) == 1
     assert (
-        len(titration.titrant.volume)
-        == len(titration.mixture.emf)
-        == len(titration.mixture.temperature)
+        np.size(titration.titrant.volume)
+        == np.size(titration.mixture.emf)
+        == np.size(titration.mixture.temperature)
     )
+    assert hasattr(titration.analyte, "mass")
+    assert hasattr(titration.titrant, "mass")
+    assert hasattr(titration.mixture, "dilution_factor")
+    assert np.size(titration.mixture.dilution_factor) == np.size(titration.mixture.emf)
+
+
+def test_read_dat():
+    """Apply check_read_dat to various lines of the test file."""
+    check_read_dat(0)
+    check_read_dat(2)
 
 
 def test_read_write_read_dat():

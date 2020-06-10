@@ -1,0 +1,4 @@
+fname,salinity,analyte_volume,phosphate,silicate,borate,fluoride,sulfate
+tests/data/CRM-144-0435-4.dat,33.571,100,0.31,2.5,NaN,NaN,NaN
+tests/data/CRM-144-0435-4-copy.dat,33.571,100,0.31,2.5,NaN,NaN,NaN
+tests/data/CRM-144-0435-4.dat,33.571,100,0.31,2.5,414.9,65.5,27082.6

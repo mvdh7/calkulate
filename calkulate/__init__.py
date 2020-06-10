@@ -15,9 +15,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """Find total alkalinity from titration data."""
 
-from . import density, types
+from . import density, io, types
 
-__all__ = ["density", "types"]
+__all__ = ["density", "io", "types"]
 
 # Package metadata
 _authorlist = ["Humphreys, Matthew P.", "Matthews, Ruth S."]

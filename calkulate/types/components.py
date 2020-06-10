@@ -3,41 +3,49 @@
 """Classes for the different components of a titration."""
 
 import numpy as np
-from .. import density
+from .. import density, io
 
 
 class Analyte:
     """Properties of the analyte being titrated."""
 
-    pass
-
-    # def __init__(self, salinity=None, temperature=None, volume=None):
-    #     if salinity is not None:
-    #         assert np.size(salinity) == 1, "Analyte salinity must be scalar."
-    #         assert salinity >= 0, "Analyte salinity must be positive."
-    #     self.salinity = salinity
-    #     if temperature is not None:
-    #         assert np.size(temperature) == 1, "Analyte temperature must be scalar."
-    #     self.temperature = temperature
-    #     if volume is not None:
-    #         assert np.size(volume) == 1, "Analyte volume must be scalar."
-    #         assert volume >= 0, "Analyte volume must be positive."
-    #     self.volume = volume
-    #     if salinity is not None and temperature is not None:
-    #         self.get_density()
-
-    # def get_density(self):
-    #     """Calculate analyte density."""
-    #     self.density = density.seawater_atm_MP81(self.temperature, self.salinity)
+    def __init__(self, ttr, fdata):
+        self.salinity = ttr.salinity
+        self.temperature = fdata["mixture_temperature"][0]
+        self.density = density.seawater_atm_MP81(self.temperature, self.salinity)
+        self.volume = ttr.analyte_volume
+        self.mass = self.volume * self.density
+        # User provides or assumed zero:
+        self.ammonia = io.check_set(ttr, "ammonia", 0)
+        self.phosphate = io.check_set(ttr, "phosphate", 0)
+        self.silicate = io.check_set(ttr, "silicate", 0)
+        self.sulfide = io.check_set(ttr, "sulfide", 0)
+        # User provides or estimated later from salinity:
+        self.borate = io.check_set(ttr, "borate", None)
+        self.fluoride = io.check_set(ttr, "fluoride", None)
+        self.sulfate = io.check_set(ttr, "sulfate", None)
 
 
 class Titrant:
     """Properties of the titrant added to the analyte."""
 
-    pass
+    def __init__(self, ttr, fdata):
+        self.volume = fdata["titrant_volume"]
+        self.density = density.HCl_NaCl_25C_DSC07()
+        self.mass = self.volume * self.density
 
 
 class Mixture:
     """Properties of the titrant-analyte mixture."""
 
-    pass
+    def __init__(self, ttr, fdata):
+        self.emf = fdata["mixture_emf"]
+        self.temperature = fdata["mixture_temperature"]
+
+
+class Settings:
+    """Settings for solving the titration."""
+
+    def __init__(self, ttr, fdata):
+        self.carbonic_constants = io.check_set(ttr, "carbonic_constants", 10)
+        self.borate_ratio = io.check_set(ttr, "borate_ratio", 2)
