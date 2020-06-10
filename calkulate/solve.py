@@ -29,7 +29,10 @@ def gran_guess_emf0(titration, HF=0, HSO4=0):
     """Simple Gran-plot first-guess of EMF0 following DAA03 eq. 11."""
     tt = titration  # for convenience
     alkalinity_guess = gran_guess_alkalinity(tt)
-    return tt.mixture.emf - (constants.ideal_gas * tempK / constants.faraday) * np.log(
+    temperature_K = tt.mixture.temperature + constants.absolute_zero
+    return tt.mixture.emf - (
+        constants.ideal_gas * temperature_K / constants.faraday
+    ) * np.log(
         (
             (tt.titrant.mass * tt.titrant.molality - tt.analyte.mass * alkalinity_guess)
             - tt.analyte.mass * (HF + HSO4)
