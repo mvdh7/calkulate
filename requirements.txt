@@ -1,2 +1,3 @@
 PyCO2SYS == 1.4
 numpy >= 1.17
+scipy >= 1.4
