@@ -21,6 +21,7 @@ class Potentiometric:
         self.mixture = components.Mixture(ttr, fdata)
         self.dilute()
         self.get_total_salts()
+        self.get_equilibrium_constants()
 
     write_dat = io.write_dat
 
@@ -31,13 +32,14 @@ class Potentiometric:
         )
 
     def dilute(self):
-        """Calculate and apply dilution factor to total salts in the mixture."""
+        """Calculate and apply dilution factor to total salts in the mixture.
+        Assumes that salinity is not diluted, i.e. titrant and analyte have same salinity.
+        """
         self.get_dilution_factor()
         # For convenience:
         mix = self.mixture
         df = mix.dilution_factor
         # User provides or assumed zero:
-        mix.salinity = self.analyte.salinity * df
         mix.ammonia = self.analyte.ammonia * df
         mix.phosphate = self.analyte.phosphate * df
         mix.silicate = self.analyte.silicate * df
@@ -60,7 +62,7 @@ class Potentiometric:
         """Get dict of total salt concentrations from and for PyCO2SYS."""
         conditioned, npts = pyco2.engine.condition(
             {
-                "SAL": self.mixture.salinity,
+                "SAL": self.analyte.salinity,
                 "NH3": self.mixture.ammonia,
                 "PO4": self.mixture.phosphate,
                 "SI": self.mixture.silicate,
@@ -91,4 +93,28 @@ class Potentiometric:
             conditioned["BORON"],
             totals=totals,
         )
-        
+
+    def get_equilibrium_constants(self):
+        """Get dict of equilibrium constants from and for PyCO2SYS."""
+        assert hasattr(
+            self.mixture, "total_salts"
+        ), "You must run get_total_salts() before get_equilibrium_constants()."
+        conditioned = pyco2.engine.condition(
+            {
+                "TEMPIN": self.mixture.temperature,
+                "PRESIN": 0,
+                "pHSCALEIN": 3,
+                "K1K2CONSTANTS": self.settings.carbonic_constants,
+                "KSO4CONSTANT": self.settings.bisulfate_constant,
+                "KFCONSTANT": self.settings.fluoride_constant,
+            }
+        )[0]
+        self.mixture.equilibrium_constants = pyco2.equilibria.assemble(
+            conditioned["TEMPIN"],
+            conditioned["PRESIN"],
+            self.mixture.total_salts,
+            conditioned["pHSCALEIN"],
+            conditioned["K1K2CONSTANTS"],
+            conditioned["KSO4CONSTANT"],
+            conditioned["KFCONSTANT"],
+        )

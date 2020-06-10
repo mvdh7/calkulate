@@ -47,5 +47,7 @@ class Settings:
     """Settings for solving the titration."""
 
     def __init__(self, ttr, fdata):
-        self.carbonic_constants = io.check_set(ttr, "carbonic_constants", 10)
+        self.bisulfate_constant = io.check_set(ttr, "bisulfate_constant", 1)
         self.borate_ratio = io.check_set(ttr, "borate_ratio", 2)
+        self.carbonic_constants = io.check_set(ttr, "carbonic_constants", 10)
+        self.fluoride_constant = io.check_set(ttr, "fluoride_constant", 1)
