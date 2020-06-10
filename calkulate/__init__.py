@@ -20,6 +20,6 @@ from . import types
 __all__ = ["types"]
 
 # Package metadata
-__authorlist__ = ["Humphreys, Matthew P.", "Matthews, Ruth S."]
-__author__ = " and ".join(__authorlist__)
+_authorlist = ["Humphreys, Matthew P.", "Matthews, Ruth S."]
+__author__ = " and ".join(_authorlist)
 __version__ = "3.0.0-alpha"
