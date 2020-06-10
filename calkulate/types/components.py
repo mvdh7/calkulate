@@ -16,14 +16,14 @@ class Analyte:
         self.volume = ttr.analyte_volume
         self.mass = self.volume * self.density
         # User provides or assumed zero:
-        self.ammonia = io.check_set(ttr, "ammonia", 0)
-        self.phosphate = io.check_set(ttr, "phosphate", 0)
-        self.silicate = io.check_set(ttr, "silicate", 0)
-        self.sulfide = io.check_set(ttr, "sulfide", 0)
+        self.total_ammonia = io.check_set(ttr, "total_ammonia", 0)
+        self.total_phosphate = io.check_set(ttr, "total_phosphate", 0)
+        self.total_silicate = io.check_set(ttr, "total_silicate", 0)
+        self.total_sulfide = io.check_set(ttr, "total_sulfide", 0)
         # User provides or estimated later from salinity:
-        self.borate = io.check_set(ttr, "borate", None)
-        self.fluoride = io.check_set(ttr, "fluoride", None)
-        self.sulfate = io.check_set(ttr, "sulfate", None)
+        self.total_borate = io.check_set(ttr, "total_borate", None)
+        self.total_fluoride = io.check_set(ttr, "total_fluoride", None)
+        self.total_sulfate = io.check_set(ttr, "total_sulfate", None)
 
 
 class Titrant:

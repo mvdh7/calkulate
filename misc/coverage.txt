@@ -6,7 +6,7 @@ calkulate/io.py                    19      0   100%
 calkulate/types/__init__.py        54      0   100%
 calkulate/types/components.py      32      0   100%
 tests/__init__.py                   0      0   100%
-tests/test_io.py                   42      0   100%
+tests/test_io.py                   46      0   100%
 tests/test_metadata.py              6      0   100%
 ---------------------------------------------------
-TOTAL                             174      0   100%
+TOTAL                             178      0   100%

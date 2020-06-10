@@ -38,6 +38,10 @@ def check_read_dat(i):
     assert hasattr(titration.titrant, "mass")
     assert hasattr(titration.mixture, "dilution_factor")
     assert np.size(titration.mixture.dilution_factor) == np.size(titration.mixture.emf)
+    assert hasattr(titration.mixture, "total_salts")
+    assert hasattr(titration.mixture, "equilibrium_constants")
+    assert isinstance(titration.mixture.total_salts, dict)
+    assert isinstance(titration.mixture.equilibrium_constants, dict)
 
 
 def test_read_dat():

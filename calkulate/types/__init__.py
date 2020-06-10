@@ -40,45 +40,45 @@ class Potentiometric:
         mix = self.mixture
         df = mix.dilution_factor
         # User provides or assumed zero:
-        mix.ammonia = self.analyte.ammonia * df
-        mix.phosphate = self.analyte.phosphate * df
-        mix.silicate = self.analyte.silicate * df
-        mix.sulfide = self.analyte.sulfide * df
+        mix.total_ammonia = self.analyte.total_ammonia * df
+        mix.total_phosphate = self.analyte.total_phosphate * df
+        mix.total_silicate = self.analyte.total_silicate * df
+        mix.total_sulfide = self.analyte.total_sulfide * df
         # User provides or estimated later from salinity:
-        if self.analyte.borate is not None:
-            mix.borate = self.analyte.borate * df
+        if self.analyte.total_borate is not None:
+            mix.total_borate = self.analyte.total_borate * df
         else:
-            mix.borate = None
-        if self.analyte.fluoride is not None:
-            mix.fluoride = self.analyte.fluoride * df
+            mix.total_borate = None
+        if self.analyte.total_fluoride is not None:
+            mix.total_fluoride = self.analyte.total_fluoride * df
         else:
-            mix.fluoride = None
-        if self.analyte.sulfate is not None:
-            mix.sulfate = self.analyte.sulfate * df
+            mix.total_fluoride = None
+        if self.analyte.total_sulfate is not None:
+            mix.total_sulfate = self.analyte.total_sulfate * df
         else:
-            mix.sulfate = None
+            mix.total_sulfate = None
 
     def get_total_salts(self):
         """Get dict of total salt concentrations from and for PyCO2SYS."""
         conditioned, npts = pyco2.engine.condition(
             {
                 "SAL": self.analyte.salinity,
-                "NH3": self.mixture.ammonia,
-                "PO4": self.mixture.phosphate,
-                "SI": self.mixture.silicate,
-                "H2S": self.mixture.sulfide,
+                "NH3": self.mixture.total_ammonia,
+                "PO4": self.mixture.total_phosphate,
+                "SI": self.mixture.total_silicate,
+                "H2S": self.mixture.total_sulfide,
                 "K1K2CONSTANTS": self.settings.carbonic_constants,
                 "BORON": self.settings.borate_ratio,
             },
         )
         # Include any internal overrides that have been provided
         totals = {}
-        if self.analyte.borate is not None:
-            totals.update({"TB": self.mixture.borate * 1e-6})
-        if self.analyte.fluoride is not None:
-            totals.update({"TF": self.mixture.fluoride * 1e-6})
-        if self.analyte.sulfate is not None:
-            totals.update({"TSO4": self.mixture.sulfate * 1e-6})
+        if self.analyte.total_borate is not None:
+            totals.update({"TB": self.mixture.total_borate * 1e-6})
+        if self.analyte.total_fluoride is not None:
+            totals.update({"TF": self.mixture.total_fluoride * 1e-6})
+        if self.analyte.total_sulfate is not None:
+            totals.update({"TSO4": self.mixture.total_sulfate * 1e-6})
         if len(totals) > 0:
             totals = pyco2.engine.condition(totals, npts=npts)[0]
         else:
