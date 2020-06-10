@@ -4,7 +4,7 @@ import calkulate as calk
 
 
 titration_table = pd.read_csv("tests/data/titration_table.csv")
-t = calk.types.Potentiometric(titration_table.loc[0])
+tt = calk.types.Potentiometric(titration_table.loc[0])
 
 
 def check_read_dat(i):

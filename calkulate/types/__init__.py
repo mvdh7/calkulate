@@ -19,44 +19,46 @@ class Potentiometric:
         self.analyte = components.Analyte(ttr, fdata)
         self.titrant = components.Titrant(ttr, fdata)
         self.mixture = components.Mixture(ttr, fdata)
+        self.get_mixture_mass()
         self.dilute()
         self.get_total_salts()
         self.get_equilibrium_constants()
 
     write_dat = io.write_dat
 
+    def get_mixture_mass(self):
+        """Calculate the total mass of the titrant-analyte mixture."""
+        self.mixture.mass = self.analyte.mass + self.titrant.mass
+
     def get_dilution_factor(self):
         """Factor for dilution of the analyte by the titrant."""
-        self.mixture.dilution_factor = self.analyte.mass / (
-            self.analyte.mass + self.titrant.mass
-        )
+        self.mixture.dilution_factor = self.analyte.mass / self.mixture.mass
 
     def dilute(self):
         """Calculate and apply dilution factor to total salts in the mixture.
         Assumes that salinity is not diluted, i.e. titrant and analyte have same salinity.
         """
         self.get_dilution_factor()
-        # For convenience:
-        mix = self.mixture
-        df = mix.dilution_factor
+        df = self.mixture.dilution_factor  # for convenience
         # User provides or assumed zero:
-        mix.total_ammonia = self.analyte.total_ammonia * df
-        mix.total_phosphate = self.analyte.total_phosphate * df
-        mix.total_silicate = self.analyte.total_silicate * df
-        mix.total_sulfide = self.analyte.total_sulfide * df
+        self.mixture.total_ammonia = self.analyte.total_ammonia * df
+        self.mixture.total_carbonate = self.analyte.total_carbonate * df
+        self.mixture.total_phosphate = self.analyte.total_phosphate * df
+        self.mixture.total_silicate = self.analyte.total_silicate * df
+        self.mixture.total_sulfide = self.analyte.total_sulfide * df
         # User provides or estimated later from salinity:
         if self.analyte.total_borate is not None:
-            mix.total_borate = self.analyte.total_borate * df
+            self.mixture.total_borate = self.analyte.total_borate * df
         else:
-            mix.total_borate = None
+            self.mixture.total_borate = None
         if self.analyte.total_fluoride is not None:
-            mix.total_fluoride = self.analyte.total_fluoride * df
+            self.mixture.total_fluoride = self.analyte.total_fluoride * df
         else:
-            mix.total_fluoride = None
+            self.mixture.total_fluoride = None
         if self.analyte.total_sulfate is not None:
-            mix.total_sulfate = self.analyte.total_sulfate * df
+            self.mixture.total_sulfate = self.analyte.total_sulfate * df
         else:
-            mix.total_sulfate = None
+            self.mixture.total_sulfate = None
 
     def get_total_salts(self):
         """Get dict of total salt concentrations from and for PyCO2SYS."""

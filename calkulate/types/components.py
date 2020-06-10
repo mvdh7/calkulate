@@ -17,6 +17,7 @@ class Analyte:
         self.mass = self.volume * self.density
         # User provides or assumed zero:
         self.total_ammonia = io.check_set(ttr, "total_ammonia", 0)
+        self.total_carbonate = io.check_set(ttr, "total_carbonate", 0)
         self.total_phosphate = io.check_set(ttr, "total_phosphate", 0)
         self.total_silicate = io.check_set(ttr, "total_silicate", 0)
         self.total_sulfide = io.check_set(ttr, "total_sulfide", 0)
@@ -33,6 +34,12 @@ class Titrant:
         self.volume = fdata["titrant_volume"]
         self.density = density.HCl_NaCl_25C_DSC07()
         self.mass = self.volume * self.density
+        self.concentration = io.check_set(ttr, "titrant_concentration", None)
+        if self.concentration is not None:
+            self.set_molality()
+
+    def set_molality(self):
+        self.molality = self.concentration / self.density
 
 
 class Mixture:
