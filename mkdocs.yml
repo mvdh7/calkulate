@@ -1,6 +1,6 @@
 site_name: Calkulate
 site_author: Matthew P. Humphreys
-site_description: Seawater total alkalinity from titration data.
+site_description: Total alkalinity from titration data.
 site_url: https://calkulate.readthedocs.io/
 copyright: Copyright &copy; 2019—2020  Matthew P. Humphreys  (GNU GPLv3)
 

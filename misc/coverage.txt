@@ -1,11 +1,12 @@
 Name                            Stmts   Miss  Cover
 ---------------------------------------------------
 calkulate/__init__.py               6      0   100%
-calkulate/types/__init__.py        12      0   100%
-calkulate/types/components.py       7      0   100%
-calkulate/types/io.py              12      0   100%
+calkulate/density.py                3      1    67%
+calkulate/types/__init__.py        13      0   100%
+calkulate/types/components.py       9      0   100%
+calkulate/types/io.py              13      0   100%
 tests/__init__.py                   0      0   100%
-tests/test_io.py                   25      0   100%
+tests/test_io.py                   34      0   100%
 tests/test_metadata.py              6      0   100%
 ---------------------------------------------------
-TOTAL                              68      0   100%
+TOTAL                              84      1    99%

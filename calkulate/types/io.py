@@ -17,18 +17,37 @@ def read_dat(
 ):
     """Import potentiometric titration data from a text file."""
     data = np.genfromtxt(fname, delimiter=delimiter, skip_header=skip_header, **kwargs)
+    self.fname = fname
     self.titrant.volume = data[:, acid_volume_col]
     self.mixture.emf = data[:, emf_col]
     self.mixture.temperature = data[:, temperature_col]
 
 
-def write_dat(self, fname, line0="", line1="", mode="x", **kwargs):
+def write_dat(
+    self,
+    fname,
+    line0="",
+    line1="",
+    mode="x",
+    volume_fmt=".5f",
+    emf_fmt=".5f",
+    temperature_fmt=".3f",
+    **kwargs
+):
     """Write potentiometric titration data to a text file."""
     with open(fname, mode=mode, **kwargs) as f:
         f.write("{}\n{}\n".format(line0, line1))
         for i in range(len(self.titrant.volume)):
             f.write(
-                "{:.5f}\t{:.5f}\t{:.3f}\n".format(
+                (
+                    "{:"
+                    + volume_fmt
+                    + "}\t{:"
+                    + emf_fmt
+                    + "}\t{:"
+                    + temperature_fmt
+                    + "}\n"
+                ).format(
                     self.titrant.volume[i],
                     self.mixture.emf[i],
                     self.mixture.temperature[i],

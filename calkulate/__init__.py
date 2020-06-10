@@ -13,11 +13,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""Seawater total alkalinity from titration data."""
+"""Find total alkalinity from titration data."""
 
-from . import types
+from . import density, types
 
-__all__ = ["types"]
+__all__ = ["density", "types"]
 
 # Package metadata
 _authorlist = ["Humphreys, Matthew P.", "Matthews, Ruth S."]

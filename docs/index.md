@@ -1,3 +1,3 @@
 # Calkulate
 
-Calkulate is a Python package for determining total alkalinity from seawater titration data.
+Calkulate is a Python package for finding total alkalinity from titration data.
