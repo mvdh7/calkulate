@@ -4,13 +4,14 @@ import calkulate as calk
 
 
 titration_table = pd.read_csv("tests/data/titration_table.csv")
-tt = calk.types.Potentiometric(titration_table.loc[0])
+tt = calk.Potentiometric(titration_table.loc[0])
 
 
 def check_read_dat(i):
     """Import potentiometric titration data from a text file and check they look like
     they should."""
-    titration = calk.types.Potentiometric(titration_table.loc[i])
+    titration = calk.Potentiometric(titration_table.loc[i])
+    assert isinstance(titration, calk.types.Potentiometric)
     assert hasattr(titration, "fname")
     assert titration.fname == titration_table.loc[i].fname
     assert hasattr(titration, "analyte")
@@ -54,9 +55,9 @@ def test_read_write_read_dat():
     """Import potentiometric titration data from a text file, write them to a new text
     file, and re-import.  Check that the values haven't changed.
     """
-    titration = calk.types.Potentiometric(titration_table.loc[0])
+    titration = calk.Potentiometric(titration_table.loc[0])
     titration.write_dat(titration_table.loc[1].fname, mode="w")
-    titration_copy = calk.types.Potentiometric(titration_table.loc[1])
+    titration_copy = calk.Potentiometric(titration_table.loc[1])
     assert np.all(titration.titrant.volume == titration_copy.titrant.volume)
     assert np.all(titration.mixture.emf == titration_copy.mixture.emf)
     assert np.all(titration.mixture.temperature == titration_copy.mixture.temperature)

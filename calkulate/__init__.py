@@ -23,3 +23,6 @@ __all__ = ["constants", "density", "io", "solve", "types"]
 _authorlist = ["Humphreys, Matthew P.", "Matthews, Ruth S."]
 __author__ = " and ".join(_authorlist)
 __version__ = "3.0.0-alpha"
+
+# Aliases to top level
+Potentiometric = types.Potentiometric
