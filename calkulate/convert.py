@@ -32,6 +32,6 @@ def h_to_emf(h, emf0, temperature):
     return emf0 + np.log(h) * R * temperature_K / F
 
 
-def granEstimator_to_dEmf0(gran_estimator, temperature):
+def f_to_dEmf0(f, temperature):
     temperature_K = temperature + constants.absolute_zero
-    return np.log(gran_estimator) * R * temperature_K / F
+    return np.log(f) * R * temperature_K / F

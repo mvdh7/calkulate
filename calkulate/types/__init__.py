@@ -166,6 +166,7 @@ class Potentiometric:
         )
 
     def get_gran_guesses(self):
+        """Get initial Gran-plot guesses of alkalinity and EMF0."""
         (
             alkalinity_guess,
             self.analyte.emf0_guess,
@@ -174,6 +175,7 @@ class Potentiometric:
         self.analyte.alkalinity_guess = alkalinity_guess * 1e6
 
     def solve(self):
+        """Solve for total alkalinity and EMF0."""
         self.solved = solve.complete(self)
 
     def __repr__(self):
