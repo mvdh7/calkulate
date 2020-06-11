@@ -14,7 +14,7 @@ def test_self_calibration():
     tt.calibrate()
     tt.set_own_titrant_molinity()
     tt.solve()
-    assert np.abs(tt.analyte.alkalinity - tt.analyte.alkalinity_certified) < 1e-7
+    assert np.abs(tt.analyte.alkalinity - tt.analyte.alkalinity_certified) < 1e-6
 
 
 test_self_calibration()
