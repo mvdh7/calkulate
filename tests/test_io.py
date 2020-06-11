@@ -63,5 +63,14 @@ def test_read_write_read_dat():
     assert np.all(titration.mixture.temperature == titration_copy.mixture.temperature)
 
 
+def test_printing():
+    """Test that printing the various classes doesn't throw any errors."""
+    print(tt)
+    print(tt.analyte)
+    print(tt.mixture)
+    print(tt.titrant)
+    print(tt.settings)
+
+
 test_read_dat()
 test_read_write_read_dat()

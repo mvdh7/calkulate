@@ -5,11 +5,12 @@ calkulate/constants.py              4      0   100%
 calkulate/convert.py               18      4    78%
 calkulate/density.py               15      0   100%
 calkulate/io.py                    19      0   100%
-calkulate/solve.py                 48      2    96%
-calkulate/types/__init__.py        75      1    99%
-calkulate/types/components.py      65      4    94%
+calkulate/solve.py                 56      2    96%
+calkulate/types/__init__.py        83      0   100%
+calkulate/types/components.py      68      0   100%
 tests/__init__.py                   0      0   100%
-tests/test_io.py                   47      0   100%
+tests/test_calibration.py          11      0   100%
+tests/test_io.py                   53      0   100%
 tests/test_metadata.py              6      0   100%
 ---------------------------------------------------
-TOTAL                             304     11    96%
+TOTAL                             340      6    98%

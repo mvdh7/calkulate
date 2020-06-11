@@ -1,4 +1,4 @@
-fname,salinity,analyte_volume,total_carbonate,total_phosphate,total_silicate,total_borate,total_fluoride,total_sulfate,borate_ratio,titrant_concentration,temperature_override
-tests/data/CRM-144-0435-4.dat,33.571,100,2031.53,0.31,2.5,NaN,NaN,NaN,1,0.1,NaN
-tests/data/CRM-144-0435-4-copy.dat,33.571,100,2031.53,0.31,2.5,NaN,NaN,NaN,1,0.1,NaN
-tests/data/CRM-144-0435-4.dat,33.571,100,2031.53,0.31,2.5,414.9,65.5,27082.6,NaN,0.1,25
+fname,salinity,analyte_volume,total_carbonate,total_phosphate,total_silicate,total_borate,total_fluoride,total_sulfate,borate_ratio,titrant_concentration,temperature_override,alkalinity_certified
+tests/data/CRM-144-0435-4.dat,33.571,100,2031.53,0.31,2.5,NaN,NaN,NaN,1,0.1,NaN,2238.60
+tests/data/CRM-144-0435-4-copy.dat,33.571,100,2031.53,0.31,2.5,NaN,NaN,NaN,1,0.1,NaN,2238.60
+tests/data/CRM-144-0435-4.dat,33.571,100,2031.53,0.31,2.5,414.9,65.5,27082.6,NaN,0.1,25,2238.60

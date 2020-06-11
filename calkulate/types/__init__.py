@@ -174,9 +174,25 @@ class Potentiometric:
         ) = solve.gran_guesses(self)
         self.analyte.alkalinity_guess = alkalinity_guess * 1e6
 
-    def solve(self):
+    def calibrate(self, solver="complete", x0=0.1):
+        """Calibrate the titrant molinity."""
+        assert (
+            self.analyte.alkalinity_certified is not None
+        ), "You can only calibrate if the certified alkalinity has been set."
+        self.calibrated = solve.calibrate(self, solver=solver, x0=x0)
+
+    def set_own_titrant_molinity(self):
+        """Set the titrant molinity to the value found by calibrating this sample."""
+        self.titrant.molinity = self.calibrated["x"][0]
+
+    def solve(self, solver="complete"):
         """Solve for total alkalinity and EMF0."""
-        self.solved = solve.complete(self)
+        assert (
+            self.titrant.molinity is not None
+        ), "You can only solve if the titrant molinity has been set."
+        self.solved = solve.solvers[solver](self)
+        self.analyte.alkalinity = self.solved["x"][0] * 1e6
+        self.analyte.emf0 = self.solved["x"][1]
 
     def __repr__(self):
         return textwrap.dedent(

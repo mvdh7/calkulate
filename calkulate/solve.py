@@ -98,3 +98,20 @@ def complete(titration):
     )
     opt_result["use_points"] = use_points
     return opt_result
+
+
+solvers = {"complete": complete}
+
+
+def _lsqfun_calibrate(titrant_molinity, titration, solver):
+    tt = titration
+    tt.titrant.molinity = titrant_molinity
+    alkalinity = solver(titration)["x"][0] * 1e6
+    return alkalinity - tt.analyte.alkalinity_certified
+
+
+def calibrate(titration, solver="complete", x0=0.1):
+    """Calibrate the acid concentration where alkalinity is known."""
+    return least_squares(
+        _lsqfun_calibrate, x0, args=(titration, solvers[solver]), method="lm"
+    )

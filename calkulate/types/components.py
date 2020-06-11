@@ -17,6 +17,9 @@ class Analyte:
         self.density = density.seawater_atm_MP81(self.temperature, self.salinity)
         self.volume = float(ttr.analyte_volume)
         self.mass = self.volume * self.density
+        self.alkalinity_certified = io.check_set(ttr, "alkalinity_certified", None)
+        if self.alkalinity_certified is not None:
+            self.alkalinity_certified = float(self.alkalinity_certified)
         # User provides or assumed zero:
         self.total_ammonia = float(io.check_set(ttr, "total_ammonia", 0))
         self.total_carbonate = float(io.check_set(ttr, "total_carbonate", 0))
