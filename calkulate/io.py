@@ -30,7 +30,7 @@ def write_dat(
     titration,
     fname,
     line0="",
-    line1="",
+    line1="titrant_volume\temf\ttemperature",
     mode="x",
     volume_fmt=".5f",
     emf_fmt=".5f",

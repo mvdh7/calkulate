@@ -106,6 +106,9 @@ class Mixture:
     def __init__(self, ttr, fdata):
         self.emf = fdata["mixture_emf"]
         self.temperature = fdata["mixture_temperature"]
+        if "temperature_override" in ttr:
+            if ~np.isnan(ttr.temperature_override):
+                self.temperature[:] = float(ttr.temperature_override)
 
     def __repr__(self):
         return textwrap.dedent(

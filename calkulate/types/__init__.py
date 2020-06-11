@@ -165,11 +165,9 @@ class Potentiometric:
         return textwrap.dedent(
             """\
             calkulate.types.Potentiometric
-               analyte
-                 fname = "{}"
-               mixture
-              settings
-               titrant\
+                          fname = '{}'
+               Other attributes = ['analyte', 'mixture', 'settings', 'titrant']
+                        Methods = write_dat()\
             """.format(
                 self.fname
             )
