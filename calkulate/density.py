@@ -33,16 +33,16 @@ def seawater_atm_MP81(temperature, salinity):
     ) * 1e-3
 
 
-def HCl_NaCl_25C_DSC07(molality_HCl=0.1, molality_NaCl=0.6):
+def HCl_NaCl_25C_DSC07(molinity_HCl=0.1, molinity_NaCl=0.6):
     """Density of a mixture of HCl and NaCl at 25 °C and 1 atm following DSC07."""
     rhow25 = 0.99704  # g / cm**3
     # For convenience:
-    mHCl = molality_HCl
-    mNaCl = molality_NaCl
-    molality_total = molality_HCl + molality_NaCl  # mol / kg-H2O
+    mHCl = molinity_HCl
+    mNaCl = molinity_NaCl
+    molinity_total = molinity_HCl + molinity_NaCl  # mol / kg-H2O
     # DSC07 eqs. 16 and 17:
-    phiHCl = 17.854 + 1.460 * np.sqrt(molality_total) - 0.307 * molality_total
-    phiNaCl = 16.613 + 1.811 * np.sqrt(molality_total) + 0.094 * molality_total
+    phiHCl = 17.854 + 1.460 * np.sqrt(molinity_total) - 0.307 * molinity_total
+    phiNaCl = 16.613 + 1.811 * np.sqrt(molinity_total) + 0.094 * molinity_total
     # DSC07 eqs. 14 and 15:
     mT = (36.46 * mHCl + 58.44 * mNaCl) / (mHCl + mNaCl)
     phimix = (mHCl * phiHCl + mNaCl * phiNaCl) / (mHCl + mNaCl)

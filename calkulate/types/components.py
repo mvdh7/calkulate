@@ -2,6 +2,7 @@
 # Copyright (C) 2019-2020  Matthew P. Humphreys  (GNU GPLv3)
 """Classes for the different components of a titration."""
 
+import copy
 import textwrap
 import numpy as np
 from .. import density, io
@@ -69,13 +70,21 @@ class Titrant:
         self.volume = fdata["titrant_volume"]
         self.density = density.HCl_NaCl_25C_DSC07()
         self.mass = self.volume * self.density
-        self.concentration = io.check_set(ttr, "titrant_concentration", None)
-        if self.concentration is not None:
-            self.set_molality()
         self.increments = np.size(self.mass)
+        self.concentration = io.check_set(ttr, "titrant_concentration", None)
+        self.molinity = io.check_set(ttr, "titration_molinity", None)
+        if self.concentration is not None and self.molinity is None:
+            self.set_molinity()
 
-    def set_molality(self):
-        self.molality = self.concentration / self.density
+    def set_molinity(self):
+        self.molinity = self.concentration / self.density
+
+    def subset(self, use_points=None):
+        """Return a subset of the Titrant."""
+        subtitrant = copy.deepcopy(self)
+        subtitrant.mass = self.mass[use_points].ravel()
+        subtitrant.volume = self.volume[use_points].ravel()
+        return subtitrant
 
     def __repr__(self):
         return textwrap.dedent(
@@ -83,19 +92,19 @@ class Titrant:
             calkulate.types.components.Titrant
               concentration = {:>5.3f} mol/l
                     density = {:>5.3f} kg/l
-                 increments = {}
+                   molinity = {:>5.3f} mol/kg
                        mass = from {:>5.3f} to {:>5.3f} g
-                   molality = {:>5.3f} mol/kg
-                     volume = from {:>5.3f} to {:>5.3f} ml\
+                     volume = from {:>5.3f} to {:>5.3f} ml
+                 increments = {}\
             """.format(
                 self.concentration,
                 self.density,
-                self.increments,
+                self.molinity,
                 np.min(self.mass),
                 np.max(self.mass),
-                self.molality,
                 np.min(self.volume),
                 np.max(self.volume),
+                self.increments,
             )
         )
 
@@ -109,6 +118,18 @@ class Mixture:
         if "temperature_override" in ttr:
             if ~np.isnan(ttr.temperature_override):
                 self.temperature[:] = float(ttr.temperature_override)
+
+    def subset(self, use_points=None):
+        """Return a subset of the Mixture."""
+        submixture = copy.deepcopy(self)
+        for k, v in submixture.__dict__.items():
+            if k in ["total_salts", "equilibrium_constants"]:
+                submixture.__dict__[k] = {
+                    m: w[use_points].ravel() for m, w in submixture.__dict__[k].items()
+                }
+            else:
+                submixture.__dict__[k] = v[use_points].ravel()
+        return submixture
 
     def __repr__(self):
         return textwrap.dedent(

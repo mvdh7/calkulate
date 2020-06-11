@@ -5,7 +5,7 @@
 import textwrap
 import numpy as np
 import PyCO2SYS as pyco2
-from .. import io
+from .. import convert, io, solve
 from . import components
 
 
@@ -24,6 +24,8 @@ class Potentiometric:
         self.dilute()
         self.get_total_salts()
         self.get_equilibrium_constants()
+        self.get_gran_guesses()
+        self.solve()
 
     write_dat = io.write_dat
 
@@ -33,7 +35,9 @@ class Potentiometric:
 
     def get_dilution_factor(self):
         """Factor for dilution of the analyte by the titrant."""
-        self.mixture.dilution_factor = self.analyte.mass / self.mixture.mass
+        self.mixture.dilution_factor = convert.dilution_factor(
+            self.analyte.mass, self.mixture.mass
+        )
 
     def dilute(self):
         """Calculate and apply dilution factor to total salts in the mixture.
@@ -160,6 +164,17 @@ class Potentiometric:
             conditioned["KSO4CONSTANT"],
             conditioned["KFCONSTANT"],
         )
+
+    def get_gran_guesses(self):
+        (
+            alkalinity_guess,
+            self.analyte.emf0_guess,
+            self.analyte.use_points_guess,
+        ) = solve.gran_guesses(self)
+        self.analyte.alkalinity_guess = alkalinity_guess * 1e6
+
+    def solve(self):
+        self.solved = solve.complete(self)
 
     def __repr__(self):
         return textwrap.dedent(
