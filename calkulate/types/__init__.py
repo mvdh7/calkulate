@@ -2,6 +2,7 @@
 # Copyright (C) 2019-2020  Matthew P. Humphreys  (GNU GPLv3)
 """Classes for different types of titration."""
 
+import textwrap
 import numpy as np
 import PyCO2SYS as pyco2
 from .. import io
@@ -46,6 +47,7 @@ class Potentiometric:
         self.mixture.total_phosphate = self.analyte.total_phosphate * df
         self.mixture.total_silicate = self.analyte.total_silicate * df
         self.mixture.total_sulfide = self.analyte.total_sulfide * df
+        self.mixture.salinity_analyte = self.analyte.salinity * df
         # User provides or estimated later from salinity:
         if self.analyte.total_borate is not None:
             self.mixture.total_borate = self.analyte.total_borate * df
@@ -64,11 +66,21 @@ class Potentiometric:
         """Get dict of total salt concentrations from and for PyCO2SYS."""
         conditioned, npts = pyco2.engine.condition(
             {
-                "SAL": self.analyte.salinity,
-                "NH3": self.mixture.total_ammonia,
-                "PO4": self.mixture.total_phosphate,
-                "SI": self.mixture.total_silicate,
-                "H2S": self.mixture.total_sulfide,
+                "SAL": np.insert(
+                    self.mixture.salinity_analyte, 0, self.analyte.salinity
+                ),
+                "NH3": np.insert(
+                    self.mixture.total_ammonia, 0, self.analyte.total_ammonia
+                ),
+                "PO4": np.insert(
+                    self.mixture.total_phosphate, 0, self.analyte.total_phosphate
+                ),
+                "SI": np.insert(
+                    self.mixture.total_silicate, 0, self.analyte.total_silicate
+                ),
+                "H2S": np.insert(
+                    self.mixture.total_sulfide, 0, self.analyte.total_sulfide
+                ),
                 "K1K2CONSTANTS": self.settings.carbonic_constants,
                 "BORON": self.settings.borate_ratio,
             },
@@ -76,16 +88,37 @@ class Potentiometric:
         # Include any internal overrides that have been provided
         totals = {}
         if self.analyte.total_borate is not None:
-            totals.update({"TB": self.mixture.total_borate * 1e-6})
+            totals.update(
+                {
+                    "TB": np.insert(
+                        self.mixture.total_borate, 0, self.analyte.total_borate
+                    )
+                    * 1e-6
+                }
+            )
         if self.analyte.total_fluoride is not None:
-            totals.update({"TF": self.mixture.total_fluoride * 1e-6})
+            totals.update(
+                {
+                    "TF": np.insert(
+                        self.mixture.total_fluoride, 0, self.analyte.total_fluoride
+                    )
+                    * 1e-6
+                }
+            )
         if self.analyte.total_sulfate is not None:
-            totals.update({"TSO4": self.mixture.total_sulfate * 1e-6})
+            totals.update(
+                {
+                    "TSO4": np.insert(
+                        self.mixture.total_sulfate, 0, self.analyte.total_sulfate
+                    )
+                    * 1e-6
+                }
+            )
         if len(totals) > 0:
             totals = pyco2.engine.condition(totals, npts=npts)[0]
         else:
             totals = None
-        self.mixture.total_salts = pyco2.salts.assemble(
+        all_total_salts = pyco2.salts.assemble(
             conditioned["SAL"],
             conditioned["SI"],
             conditioned["PO4"],
@@ -95,6 +128,13 @@ class Potentiometric:
             conditioned["BORON"],
             totals=totals,
         )
+        self.mixture.total_salts = {k: v[1:] for k, v in all_total_salts.items()}
+        self.analyte.total_borate = all_total_salts["TB"][0] * 1e6
+        self.mixture.total_borate = all_total_salts["TB"][1:] * 1e6
+        self.analyte.total_fluoride = all_total_salts["TF"][0] * 1e6
+        self.mixture.total_fluoride = all_total_salts["TF"][1:] * 1e6
+        self.analyte.total_sulfate = all_total_salts["TSO4"][0] * 1e6
+        self.mixture.total_sulfate = all_total_salts["TSO4"][1:] * 1e6
 
     def get_equilibrium_constants(self):
         """Get dict of equilibrium constants from and for PyCO2SYS."""
@@ -119,4 +159,18 @@ class Potentiometric:
             conditioned["K1K2CONSTANTS"],
             conditioned["KSO4CONSTANT"],
             conditioned["KFCONSTANT"],
+        )
+
+    def __repr__(self):
+        return textwrap.dedent(
+            """\
+            calkulate.types.Potentiometric
+               analyte
+                 fname = "{}"
+               mixture
+              settings
+               titrant\
+            """.format(
+                self.fname
+            )
         )
