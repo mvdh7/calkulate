@@ -6,7 +6,7 @@ import numpy as np
 from scipy.stats import linregress
 from scipy.optimize import least_squares
 import PyCO2SYS as pyco2
-from . import constants, convert
+from . import constants, convert, simulate
 
 
 def gran_estimator(titration, use_points=None):
@@ -67,7 +67,7 @@ def gran_guesses(titration):
     return alkalinity_guess, emf0_guess, G
 
 
-def _lsqfun_complete(alkalinity_emf0, mixture, titrant):
+def _lsqfun_complete_emf(alkalinity_emf0, mixture, titrant):
     alkalinity, emf0 = alkalinity_emf0
     pH = convert.emf_to_pH(mixture.emf, emf0, mixture.temperature)
     return (
@@ -82,15 +82,16 @@ def _lsqfun_complete(alkalinity_emf0, mixture, titrant):
     )
 
 
-def complete(titration):
+def complete_emf(titration, pH_range=(3, 4)):
     """Solve for alkalinity and EMF0 using the complete calculation method."""
     tt = titration
     pH_guess = convert.emf_to_pH(
         tt.mixture.emf, tt.analyte.emf0_guess, tt.mixture.temperature
     )
-    use_points = (pH_guess > 3) & (pH_guess < 4)
+    assert pH_range[0] < pH_range[1]
+    use_points = (pH_guess > pH_range[0]) & (pH_guess < pH_range[1])
     opt_result = least_squares(
-        _lsqfun_complete,
+        _lsqfun_complete_emf,
         [tt.analyte.alkalinity_guess * 1e-6, tt.analyte.emf0_guess],
         args=(tt.mixture.subset(use_points), tt.titrant.subset(use_points)),
         method="lm",
@@ -100,7 +101,55 @@ def complete(titration):
     return opt_result
 
 
-solvers = {"complete": complete}
+def complete_pH(titration, pH_range=(3, 4)):
+    """Solve for alkalinity from pH using the complete calculation method."""
+    tt = titration
+    assert pH_range[0] < pH_range[1]
+    use_points = (tt.mixture.pH > pH_range[0]) & (tt.mixture.pH < pH_range[1])
+    submixture = tt.mixture.subset(use_points=use_points)
+    subtitrant = tt.titrant.subset(use_points=use_points)
+    # # v1: PyCO2SYS - is there a problem with its alkalinity equation?!
+    # alkalinity_points = pyco2.solve.get.TAfromTCpH(
+    #     submixture.total_carbonate * 1e-6,
+    #     submixture.pH,
+    #     submixture.total_salts,
+    #     submixture.equilibrium_constants,
+    # )
+    # free_to_total = pyco2.convert.free2tot(
+    #     submixture.total_salts["TSO4"], submixture.equilibrium_constants["KSO4"]
+    # )
+    # alkalinity_components = pyco2.solve.get.AlkParts(
+    #     submixture.total_carbonate * 1e-6,
+    #     submixture.pH,
+    #     free_to_total,
+    #     submixture.total_salts,
+    #     submixture.equilibrium_constants,
+    # )
+    # h = 10.0 ** -submixture.pH
+    # alkalinity_points += alkalinity_components["Hfree"] - h
+    # hso4 = (
+    #     submixture.total_salts["TSO4"]
+    #     * h
+    #     / (submixture.equilibrium_constants["KSO4"] + h)
+    # )
+    # alkalinity_points += alkalinity_components["HSO4"] - hso4
+    # hf = submixture.total_salts["TF"] * h / (submixture.equilibrium_constants["KF"] + h)
+    # alkalinity_points += alkalinity_components["HF"] - hf
+    # v2: calk.simulate
+    alkalinity_points = simulate.alkalinity(
+        submixture.pH,
+        submixture.total_salts,
+        submixture.equilibrium_constants,
+        total_carbonate=submixture.total_carbonate * 1e-6,
+    )
+    alkalinity_points += subtitrant.mass * subtitrant.molinity / submixture.mass
+    alkalinity_points /= submixture.dilution_factor
+    return {
+        "alkalinity_points": alkalinity_points,
+        "x": np.array([np.mean(alkalinity_points)]),
+        "alkalinity_std": np.std(alkalinity_points),
+        "use_points": use_points,
+    }
 
 
 def _lsqfun_calibrate(titrant_molinity, titration, solver):
@@ -110,8 +159,6 @@ def _lsqfun_calibrate(titrant_molinity, titration, solver):
     return alkalinity - tt.analyte.alkalinity_certified
 
 
-def calibrate(titration, solver="complete", x0=0.1):
+def calibrate(titration, solver=complete_emf, x0=0.1):
     """Calibrate the acid concentration where alkalinity is known."""
-    return least_squares(
-        _lsqfun_calibrate, x0, args=(titration, solvers[solver]), method="lm"
-    )
+    return least_squares(_lsqfun_calibrate, x0, args=(titration, solver), method="lm")

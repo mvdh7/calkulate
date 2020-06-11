@@ -14,9 +14,12 @@ class Analyte:
     def __init__(self, ttr, fdata):
         self.salinity = float(ttr.salinity)
         self.temperature = float(fdata["mixture_temperature"][0])
-        self.density = density.seawater_atm_MP81(self.temperature, self.salinity)
-        self.volume = float(ttr.analyte_volume)
-        self.mass = self.volume * self.density
+        self.mass = io.check_set(ttr, "analyte_mass", None)
+        if self.mass is None:
+            self.volume = io.check_set(ttr, "analyte_volume", None)
+            self.density = density.seawater_atm_MP81(self.temperature, self.salinity)
+            self.mass = self.volume * self.density
+        self.mass *= 1e-3  # convert g to kg
         self.alkalinity_certified = io.check_set(ttr, "alkalinity_certified", None)
         if self.alkalinity_certified is not None:
             self.alkalinity_certified = float(self.alkalinity_certified)
@@ -35,11 +38,9 @@ class Analyte:
         return textwrap.dedent(
             """\
             calkulate.types.components.Analyte()
-                      density = {:>9.3f} kg/l
                          mass = {:>9.3f} g
                      salinity = {:>9.3f}
                   temperature = {:>9.3f} °C
-                       volume = {:>9.3f} ml
                 total_ammonia = {:>9.3f} μmol/kg-sw
                  total_borate = {:>9.3f} μmol/kg-sw
               total_carbonate = {:>9.3f} μmol/kg-sw
@@ -49,11 +50,9 @@ class Analyte:
                 total_sulfate = {:>9.3f} μmol/kg-sw
                 total_sulfide = {:>9.3f} μmol/kg-sw\
             """.format(
-                self.density,
-                self.mass,
+                self.mass * 1e3,
                 self.salinity,
                 self.temperature,
-                self.volume,
                 self.total_ammonia,
                 self.total_borate,
                 self.total_carbonate,
@@ -70,12 +69,17 @@ class Titrant:
     """Properties of the titrant added to the analyte."""
 
     def __init__(self, ttr, fdata):
-        self.volume = fdata["titrant_volume"]
-        self.density = density.HCl_NaCl_25C_DSC07()
-        self.mass = self.volume * self.density
+        amount_unit = io.check_set(ttr, "titrant_amount_unit", "ml")
+        assert amount_unit in ["ml", "g"]
+        if amount_unit == "ml":
+            self.volume = fdata["titrant_amount"]
+            self.density = density.HCl_NaCl_25C_DSC07()
+            self.mass = self.volume * self.density * 1e-3
+        elif amount_unit == "g":
+            self.mass = fdata["titrant_amount"] * 1e-3
         self.increments = np.size(self.mass)
         self.concentration = io.check_set(ttr, "titrant_concentration", None)
-        self.molinity = io.check_set(ttr, "titration_molinity", None)
+        self.molinity = io.check_set(ttr, "titrant_molinity", None)
         if self.concentration is not None and self.molinity is None:
             self.set_molinity()
 
@@ -86,27 +90,21 @@ class Titrant:
         """Return a subset of the Titrant."""
         subtitrant = copy.deepcopy(self)
         subtitrant.mass = self.mass[use_points].ravel()
-        subtitrant.volume = self.volume[use_points].ravel()
+        if hasattr(self, "volume"):
+            subtitrant.volume = self.volume[use_points].ravel()
         return subtitrant
 
     def __repr__(self):
         return textwrap.dedent(
             """\
             calkulate.types.components.Titrant
-              concentration = {:>5.3f} mol/l
-                    density = {:>5.3f} kg/l
                    molinity = {:>5.3f} mol/kg
                        mass = from {:>5.3f} to {:>5.3f} g
-                     volume = from {:>5.3f} to {:>5.3f} ml
                  increments = {}\
             """.format(
-                self.concentration,
-                self.density,
                 self.molinity,
-                np.min(self.mass),
-                np.max(self.mass),
-                np.min(self.volume),
-                np.max(self.volume),
+                np.min(self.mass) * 1e3,
+                np.max(self.mass) * 1e3,
                 self.increments,
             )
         )
@@ -115,12 +113,29 @@ class Titrant:
 class Mixture:
     """Properties of the titrant-analyte mixture."""
 
-    def __init__(self, ttr, fdata):
-        self.emf = fdata["mixture_emf"]
+    def __init__(self, ttr, fdata, measurement_type="EMF"):
+        if measurement_type == "EMF":
+            self.emf = fdata["mixture_measurement"]
+        elif measurement_type == "pH":
+            self.pH = fdata["mixture_measurement"]
         self.temperature = fdata["mixture_temperature"]
         if "temperature_override" in ttr:
             if ~np.isnan(ttr.temperature_override):
                 self.temperature[:] = float(ttr.temperature_override)
+        # Equilibrium constant overrides
+        self.k_ammonia = io.check_set(ttr, "k_ammonia", None)
+        self.k_boric = io.check_set(ttr, "k_boric", None)
+        self.k_carbonic_1 = io.check_set(ttr, "k_carbonic_1", None)
+        self.k_carbonic_2 = io.check_set(ttr, "k_carbonic_2", None)
+        self.k_hydrofluoric = io.check_set(ttr, "k_hydrofluoric", None)
+        self.k_phosphoric_1 = io.check_set(ttr, "k_phosphoric_1", None)
+        self.k_phosphoric_2 = io.check_set(ttr, "k_phosphoric_2", None)
+        self.k_phosphoric_3 = io.check_set(ttr, "k_phosphoric_3", None)
+        self.k_orthosilicic = io.check_set(ttr, "k_orthosilicic", None)
+        self.k_hydrosulfuric_1 = io.check_set(ttr, "k_hydrosulfuric_1", None)
+        self.k_sulfuric_2 = io.check_set(ttr, "k_sulfuric_2", None)
+        self.k_water = io.check_set(ttr, "k_water", None)
+        self.equilibrium_constants = None
 
     def subset(self, use_points=None):
         """Return a subset of the Mixture."""
@@ -130,9 +145,16 @@ class Mixture:
                 submixture.__dict__[k] = {
                     m: w[use_points].ravel() for m, w in submixture.__dict__[k].items()
                 }
+            elif k.startswith("k_"):
+                submixture.__dict__[k] = v
             else:
                 submixture.__dict__[k] = v[use_points].ravel()
         return submixture
+
+    def _overwrite_equilibrium_constant(self, equilibrium_constant, pyco2_constant):
+        overwrite_value = self.__dict__[equilibrium_constant]
+        if overwrite_value is not None:
+            self.equilibrium_constants[pyco2_constant][:] = overwrite_value
 
     def __repr__(self):
         return textwrap.dedent(

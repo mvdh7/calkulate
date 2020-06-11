@@ -4,7 +4,7 @@ import calkulate as calk
 
 
 titration_table = pd.read_csv("tests/data/titration_table.csv")
-tt = calk.Potentiometric(titration_table.loc[0])
+tt = calk.Titration(titration_table.loc[0])
 
 
 def test_self_calibration():

@@ -9,23 +9,31 @@ from .. import convert, io, solve
 from . import components
 
 
-class Potentiometric:
-    """A potentiometrically monitored titration."""
+class Titration:
+    """A titration dataset."""
 
     def __init__(self, titration_table_row, **read_dat_kwargs):
         ttr = titration_table_row  # for convenience
-        fdata = io.read_dat(ttr.fname, **read_dat_kwargs)
-        self.fname = ttr.fname
+        self.file_path = io.check_set(ttr, "file_path", "")
+        self.file_name = ttr.file_name
+        fname = self.file_path + self.file_name
+        fdata = io.read_dat(fname, **read_dat_kwargs)
+        self.fname = fname
+        self.titration_table_index = ttr.name
+        self.measurement_type = io.check_set(ttr, "measurement_type", "EMF")
+        self.solver = convert.measurementType_to_solver(self.measurement_type)
         self.settings = components.Settings(ttr, fdata)
         self.analyte = components.Analyte(ttr, fdata)
         self.titrant = components.Titrant(ttr, fdata)
-        self.mixture = components.Mixture(ttr, fdata)
+        self.mixture = components.Mixture(
+            ttr, fdata, measurement_type=self.measurement_type
+        )
         self.get_mixture_mass()
         self.dilute()
         self.get_total_salts()
         self.get_equilibrium_constants()
-        self.get_gran_guesses()
-        self.solve()
+        if self.measurement_type == "EMF":
+            self.get_gran_guesses()
 
     write_dat = io.write_dat
 
@@ -164,6 +172,19 @@ class Potentiometric:
             conditioned["KSO4CONSTANT"],
             conditioned["KFCONSTANT"],
         )
+        # Overwrite if user supplied values
+        self.mixture._overwrite_equilibrium_constant("k_ammonia", "KNH3")
+        self.mixture._overwrite_equilibrium_constant("k_boric", "KB")
+        self.mixture._overwrite_equilibrium_constant("k_carbonic_1", "K1")
+        self.mixture._overwrite_equilibrium_constant("k_carbonic_2", "K2")
+        self.mixture._overwrite_equilibrium_constant("k_hydrofluoric", "KF")
+        self.mixture._overwrite_equilibrium_constant("k_phosphoric_1", "KP1")
+        self.mixture._overwrite_equilibrium_constant("k_phosphoric_2", "KP2")
+        self.mixture._overwrite_equilibrium_constant("k_phosphoric_3", "KP3")
+        self.mixture._overwrite_equilibrium_constant("k_orthosilicic", "KSi")
+        self.mixture._overwrite_equilibrium_constant("k_hydrosulfuric_1", "KH2S")
+        self.mixture._overwrite_equilibrium_constant("k_sulfuric_2", "KSO4")
+        self.mixture._overwrite_equilibrium_constant("k_water", "KW")
 
     def get_gran_guesses(self):
         """Get initial Gran-plot guesses of alkalinity and EMF0."""
@@ -174,30 +195,31 @@ class Potentiometric:
         ) = solve.gran_guesses(self)
         self.analyte.alkalinity_guess = alkalinity_guess * 1e6
 
-    def calibrate(self, solver="complete", x0=0.1):
+    def calibrate(self, **kwargs):
         """Calibrate the titrant molinity."""
         assert (
             self.analyte.alkalinity_certified is not None
         ), "You can only calibrate if the certified alkalinity has been set."
-        self.calibrated = solve.calibrate(self, solver=solver, x0=x0)
+        self.calibrated = solve.calibrate(self, **kwargs)
 
     def set_own_titrant_molinity(self):
         """Set the titrant molinity to the value found by calibrating this sample."""
         self.titrant.molinity = self.calibrated["x"][0]
 
-    def solve(self, solver="complete"):
+    def solve(self, **kwargs):
         """Solve for total alkalinity and EMF0."""
         assert (
             self.titrant.molinity is not None
         ), "You can only solve if the titrant molinity has been set."
-        self.solved = solve.solvers[solver](self)
+        self.solved = self.solver(self, **kwargs)
         self.analyte.alkalinity = self.solved["x"][0] * 1e6
-        self.analyte.emf0 = self.solved["x"][1]
+        if self.solver == "complete_emf":
+            self.analyte.emf0 = self.solved["x"][1]
 
     def __repr__(self):
         return textwrap.dedent(
             """\
-            calkulate.types.Potentiometric
+            calkulate.types.Titration
                           fname = '{}'
                Other attributes = ['analyte', 'mixture', 'settings', 'titrant']
                         Methods = write_dat()\
