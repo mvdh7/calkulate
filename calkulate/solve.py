@@ -71,11 +71,11 @@ def _lsqfun_complete_emf(alkalinity_emf0, mixture, titrant):
     alkalinity, emf0 = alkalinity_emf0
     pH = convert.emf_to_pH(mixture.emf, emf0, mixture.temperature)
     return (
-        pyco2.solve.get.TAfromTCpH(
-            mixture.total_carbonate * 1e-6,
+        simulate.alkalinity(
             pH,
             mixture.total_salts,
             mixture.equilibrium_constants,
+            total_carbonate=mixture.total_carbonate * 1e-6,
         )
         - alkalinity * mixture.dilution_factor
         + titrant.mass * titrant.molinity / mixture.mass
