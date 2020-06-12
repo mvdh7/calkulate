@@ -30,7 +30,16 @@ class Dataset:
 
     def import_titrations(self):
         for i in self.table.index:
-            self.titrations.update({i: types.Titration(self.table.loc[i])})
+            ttr = self.table.loc[i]
+            try:
+                self.titrations.update({i: types.Titration(ttr)})
+            except IOError:
+                if "file_path" in ttr:
+                    fname = ttr.file_path + ttr.file_name
+                else:
+                    fname = ttr.file_name
+                print("File '{}' not found.".format(fname))
+                self.titrations.update({i: None})
 
     def calibrate_titrants(self):
         """Calibrate all titrations that have a certified alkalinity value."""
@@ -40,11 +49,12 @@ class Dataset:
         if "titrant_molinity_calibrated" not in self.table:
             self.table["titrant_molinity_calibrated"] = np.nan
         for i in self.table.index:
-            if ~np.isnan(self.table.loc[i].alkalinity_certified):
-                self.titrations[i].calibrate()
-                self.table.loc[i, "titrant_molinity_calibrated"] = self.titrations[
-                    i
-                ].titrant.molinity_calibrated
+            if self.titrations[i] is not None:
+                if ~np.isnan(self.table.loc[i].alkalinity_certified):
+                    self.titrations[i].calibrate()
+                    self.table.loc[i, "titrant_molinity_calibrated"] = self.titrations[
+                        i
+                    ].titrant.molinity_calibrated
 
     def calibrate_batches(self):
         """Assemble calibrated titrant molinities by batch and broadcast into table."""
@@ -72,7 +82,12 @@ class Dataset:
         if "alkalinity" not in self.table:
             self.table["alkalinity"] = np.nan
         for i in self.table.index:
-            if ~np.isnan(self.table.loc[i].titrant_molinity):
-                self.titrations[i].titrant.molinity = self.table.loc[i].titrant_molinity
-                self.titrations[i].solve()
-                self.table.loc[i, "alkalinity"] = self.titrations[i].analyte.alkalinity
+            if self.titrations[i] is not None:
+                if ~np.isnan(self.table.loc[i].titrant_molinity):
+                    self.titrations[i].titrant.molinity = self.table.loc[
+                        i
+                    ].titrant_molinity
+                    self.titrations[i].solve()
+                    self.table.loc[i, "alkalinity"] = self.titrations[
+                        i
+                    ].analyte.alkalinity
