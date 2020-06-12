@@ -91,3 +91,8 @@ class Dataset:
                     self.table.loc[i, "alkalinity"] = self.titrations[
                         i
                     ].analyte.alkalinity
+
+    def calibrate_and_solve(self):
+        """Perform all titrant calibration steps and solve all titrations for alkalinity."""
+        self.calibrate()
+        self.solve()
