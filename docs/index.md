@@ -4,7 +4,21 @@ Calkulate is a Python package for finding total alkalinity from titration data.
 
 ## Installation
 
+This documentation site is for version 3, which is in development.  For now, install with: 
+
+    pip install git+https://github.com/mvdh7/calkulate.git@v3
+
+For [version 2](https://calkulate.readthedocs.io/en/latest/), and for version 3 once initial development is complete, install with:
+
     pip install calkulate
+
+## Get started
+
+Begin by reading how to work with [datasets of multiple titrations](../datasets) and then see the additional tools available for investigating [each titration individually](../titrations).
+
+## About
+
+Calkulate is being developed mainly by [Dr Matthew Humphreys](https://mvdh.xyz) at the Royal Netherlands Institute for Sea Research ([NIOZ, Texel, the Netherlands](https://www.nioz.nl/en)).
 
 ## Citation
 
@@ -18,11 +32,6 @@ Please specify which version you are using.  To find this:
     :::python
     import calkulate as calk
     calk.say_hello()
-
-## About
-
-Calkulate is being developed mainly by [Dr Matthew Humphreys](https://mvdh.xyz) at the Royal Netherlands Institute for Sea Research ([NIOZ, Texel, the Netherlands](https://www.nioz.nl/en)).
-
 
 ## License
 
