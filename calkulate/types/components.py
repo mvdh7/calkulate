@@ -94,20 +94,20 @@ class Titrant:
             subtitrant.volume = self.volume[use_points].ravel()
         return subtitrant
 
-    def __repr__(self):
-        return textwrap.dedent(
-            """\
-            calkulate.types.components.Titrant
-                   molinity = {:>5.3f} mol/kg
-                       mass = from {:>5.3f} to {:>5.3f} g
-                 increments = {}\
-            """.format(
-                self.molinity,
-                np.min(self.mass) * 1e3,
-                np.max(self.mass) * 1e3,
-                self.increments,
-            )
-        )
+    # def __repr__(self):
+    #     return textwrap.dedent(
+    #         """\
+    #         calkulate.types.components.Titrant
+    #                molinity = {:>5.3f} mol/kg
+    #                    mass = from {:>5.3f} to {:>5.3f} g
+    #              increments = {}\
+    #         """.format(
+    #             self.molinity,
+    #             np.min(self.mass) * 1e3,
+    #             np.max(self.mass) * 1e3,
+    #             self.increments,
+    #         )
+    #     )
 
 
 class Mixture:

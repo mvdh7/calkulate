@@ -200,7 +200,8 @@ class Titration:
         assert (
             self.analyte.alkalinity_certified is not None
         ), "You can only calibrate if the certified alkalinity has been set."
-        self.calibrated = solve.calibrate(self, **kwargs)
+        self.calibrated = solve.calibrate(self, solver=self.solver, **kwargs)
+        self.titrant.molinity_calibrated = self.calibrated["x"][0]
 
     def set_own_titrant_molinity(self):
         """Set the titrant molinity to the value found by calibrating this sample."""

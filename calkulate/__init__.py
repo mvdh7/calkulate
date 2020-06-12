@@ -15,9 +15,18 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """Find total alkalinity from titration data."""
 
-from . import constants, convert, density, io, simulate, solve, types
+from . import constants, convert, datasets, density, io, simulate, solve, types
 
-__all__ = ["constants", "convert", "density", "io", "simulate", "solve", "types"]
+__all__ = [
+    "constants",
+    "convert",
+    "datasets",
+    "density",
+    "io",
+    "simulate",
+    "solve",
+    "types",
+]
 
 # Package metadata
 _authorlist = ["Humphreys, Matthew P.", "Matthews, Ruth S."]
@@ -26,3 +35,4 @@ __version__ = "3.0.0-alpha"
 
 # Aliases to top level
 Titration = types.Titration
+Dataset = datasets.Dataset
