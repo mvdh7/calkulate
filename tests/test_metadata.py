@@ -8,3 +8,4 @@ def test_authors():
 
 def test_version():
     assert isinstance(calk.__version__, str)
+    calk.say_hello()

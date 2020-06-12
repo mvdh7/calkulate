@@ -36,3 +36,7 @@ __version__ = "3.0.0-alpha"
 # Aliases to top level
 Titration = types.Titration
 Dataset = datasets.Dataset
+
+
+def say_hello():
+    print("This is Calkulate v{}.".format(__version__))

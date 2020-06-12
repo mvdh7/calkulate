@@ -9,6 +9,10 @@ repo_url: https://github.com/mvdh7/calkulate
 
 nav:
   - Overview: index.md
+  - Individual titrations: titrations.md
+  - Titration datasets: datasets.md
+  - References: references.md
+  - Version history: versions.md
 
 theme:
   name: material
@@ -20,3 +24,18 @@ theme:
   font:
     text: Noto Sans
     code: Noto Sans Mono
+
+# Extensions
+markdown_extensions:
+  - admonition
+  - pymdownx.superfences
+  - pymdownx.details
+  - codehilite:
+      guess_lang: false
+  - toc:
+      permalink: true
+  - footnotes
+  - pymdownx.inlinehilite
+  - pymdownx.arithmatex
+extra_javascript:
+  - https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML
