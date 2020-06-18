@@ -96,19 +96,23 @@ class Dataset:
         assert "titrant_molinity" in self.table, "Missing 'titrant_molinity' field."
         if "alkalinity" not in self.table:
             self.table["alkalinity"] = np.nan
+            self.table["emf0"] = np.nan
+            self.table["pH"] = np.nan
+            self.table["pH_temperature"] = np.nan
         for i in self.table.index:
-            if self.titrations[i] is not None:
+            tti = self.titrations[i]
+            if tti is not None:
                 if ~np.isnan(self.table.loc[i].titrant_molinity):
                     try:
-                        self.titrations[i].titrant.molinity = self.table.loc[
-                            i
-                        ].titrant_molinity
-                        self.titrations[i].solve()
-                        self.table.loc[i, "alkalinity"] = self.titrations[
-                            i
-                        ].analyte.alkalinity
+                        tti.titrant.molinity = self.table.loc[i].titrant_molinity
+                        tti.solve()
+                        self.table.loc[i, "alkalinity"] = tti.analyte.alkalinity
+                        if tti.measurement_type == "EMF":
+                            self.table.loc[i, "emf0"] = tti.analyte.emf0
+                            self.table.loc[i, "pH"] = tti.analyte.pH
+                            self.table.loc[i, "pH_temperature"] = tti.analyte.pH_temperature
                     except:
-                        print("Failed to solve: '{}'".format(self.titrations[i].fname))
+                        print("Failed to solve: '{}'".format(tti.fname))
 
     def calibrate_and_solve(self):
         """Perform all titrant calibration steps and solve all titrations for alkalinity."""

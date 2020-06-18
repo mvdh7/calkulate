@@ -205,6 +205,13 @@ class Titration:
         """Set the titrant molinity to the value found by calibrating this sample."""
         self.titrant.molinity = self.calibrated["x"][0]
 
+    def get_initial_pH(self):
+        """Calculate analyte pH from EMF before any titrant addition."""
+        self.analyte.pH_temperature = self.mixture.temperature[0]
+        self.analyte.pH = convert.emf_to_pH(
+            self.mixture.emf[0], self.analyte.emf0, self.analyte.pH_temperature
+        )
+
     def solve(self, **kwargs):
         """Solve for total alkalinity and EMF0."""
         assert (
@@ -212,8 +219,9 @@ class Titration:
         ), "You can only solve if the titrant molinity has been set."
         self.solved = self.solver(self, **kwargs)
         self.analyte.alkalinity = self.solved["x"][0] * 1e6
-        if self.solver == "complete_emf":
+        if self.measurement_type == "EMF":
             self.analyte.emf0 = self.solved["x"][1]
+            self.get_initial_pH()
 
     def __repr__(self):
         return textwrap.dedent(
