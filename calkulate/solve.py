@@ -31,7 +31,7 @@ def gran_guess_alkalinity(titration, use_points=None):
         tt.titrant.mass[G], gran_estimator(tt, use_points=G)
     )
     intercept_x = -intercept_y / gradient
-    alkalinity_guess = intercept_x * tt.titrant.concentration / tt.analyte.mass
+    alkalinity_guess = intercept_x * tt.titrant.molinity / tt.analyte.mass
     return alkalinity_guess
 
 
@@ -155,6 +155,8 @@ def complete_pH(titration, pH_range=(3, 4)):
 def _lsqfun_calibrate(titrant_molinity, titration, solver):
     tt = titration
     tt.titrant.molinity = titrant_molinity
+    alkalinity_guess, tt.analyte.emf0_guess, _ = gran_guesses(tt)
+    tt.analyte.alkalinity_guess = alkalinity_guess * 1e6
     alkalinity = solver(titration)["x"][0] * 1e6
     return alkalinity - tt.analyte.alkalinity_certified
 

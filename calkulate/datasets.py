@@ -29,17 +29,32 @@ class Dataset:
         self.batches = self.batch_groups.analysis_batch.agg(analysis_count="count")
 
     def import_titrations(self):
+        any_errors = False
+        if "file_good" not in self.table.columns:
+            self.table["file_good"] = True
         for i in self.table.index:
-            ttr = self.table.loc[i]
-            try:
-                self.titrations.update({i: types.Titration(ttr)})
-            except IOError:
+            if self.table.loc[i].file_good:
+                ttr = self.table.loc[i]
                 if "file_path" in ttr:
                     fname = ttr.file_path + ttr.file_name
                 else:
                     fname = ttr.file_name
-                print("File '{}' not found.".format(fname))
+                try:
+                    self.titrations.update({i: types.Titration(ttr)})
+                except IOError:
+                    print("Can't find file: '{}'.".format(fname))
+                    self.titrations.update({i: None})
+                    any_errors = True
+                except:
+                    print("Error importing file: '{}'.".format(fname))
+                    self.titrations.update({i: None})
+                    any_errors = True
+            else:
                 self.titrations.update({i: None})
+        if any_errors:
+            print("All other titration files imported successfully!")
+        else:
+            print("All titration files imported successfully!")
 
     def calibrate_titrants(self):
         """Calibrate all titrations that have a certified alkalinity value."""
@@ -84,13 +99,16 @@ class Dataset:
         for i in self.table.index:
             if self.titrations[i] is not None:
                 if ~np.isnan(self.table.loc[i].titrant_molinity):
-                    self.titrations[i].titrant.molinity = self.table.loc[
-                        i
-                    ].titrant_molinity
-                    self.titrations[i].solve()
-                    self.table.loc[i, "alkalinity"] = self.titrations[
-                        i
-                    ].analyte.alkalinity
+                    try:
+                        self.titrations[i].titrant.molinity = self.table.loc[
+                            i
+                        ].titrant_molinity
+                        self.titrations[i].solve()
+                        self.table.loc[i, "alkalinity"] = self.titrations[
+                            i
+                        ].analyte.alkalinity
+                    except:
+                        print("Failed to solve: '{}'".format(self.titrations[i].fname))
 
     def calibrate_and_solve(self):
         """Perform all titrant calibration steps and solve all titrations for alkalinity."""

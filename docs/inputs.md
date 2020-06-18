@@ -60,6 +60,9 @@ If optional column values are only needed for some of your titrations, just use 
 ??? tip "`carbonic_constants`: *which carbonic acid dissociation constants to use*"
     Sets which carbonic acid constants to use from PyCO2SYS, can be any integer from `1` to `15` inclusive.  Default is `10` for [LDK00](https://pyco2sys.readthedocs.io/en/latest/refs/#l).  See the [PyCO2SYS docs on `K1K2CONSTANTS`](https://pyco2sys.readthedocs.io/en/latest/co2sys/#settings) for details.
 
+??? tip "`file_good`: *is the titration file valid?*"
+    Where set to `False`, Calkulate does not attempt to import the corresponding titration file.
+
 ??? tip "`file_path`: *path to the titration file*"
     This is simply prefixed to `file_name`.
 
@@ -84,7 +87,7 @@ If optional column values are only needed for some of your titrations, just use 
 ??? tip "`measurement_type`: *type of measurement in the titration file*"
     Use `"EMF"` (default) for potentiometric measurements, or `"pH"` for direct pH measurements.
 
-??? tip "`temperature_override`": *titration temperature*"
+??? tip "`temperature_override`: *titration temperature*"
     Must be in °C.  If not supplied, the values in the titration file are used.  Otherwise, this value overrides them.
 
 ??? tip "`titrant_amount_unit`: *unit for the amount of titrant in the titration file*"

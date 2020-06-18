@@ -32,8 +32,6 @@ class Titration:
         self.dilute()
         self.get_total_salts()
         self.get_equilibrium_constants()
-        if self.measurement_type == "EMF":
-            self.get_gran_guesses()
 
     write_dat = io.write_dat
 
@@ -212,6 +210,7 @@ class Titration:
         assert (
             self.titrant.molinity is not None
         ), "You can only solve if the titrant molinity has been set."
+        self.get_gran_guesses()
         self.solved = self.solver(self, **kwargs)
         self.analyte.alkalinity = self.solved["x"][0] * 1e6
         if self.solver == "complete_emf":
