@@ -85,6 +85,8 @@ def _lsqfun_complete_emf(alkalinity_emf0, mixture, titrant):
 def complete_emf(titration, pH_range=(3, 4)):
     """Solve for alkalinity and EMF0 using the complete calculation method."""
     tt = titration
+    alkalinity_guess, tt.analyte.emf0_guess, _ = gran_guesses(tt)
+    tt.analyte.alkalinity_guess = alkalinity_guess * 1e6
     pH_guess = convert.emf_to_pH(
         tt.mixture.emf, tt.analyte.emf0_guess, tt.mixture.temperature
     )
@@ -155,8 +157,6 @@ def complete_pH(titration, pH_range=(3, 4)):
 def _lsqfun_calibrate(titrant_molinity, titration, solver):
     tt = titration
     tt.titrant.molinity = titrant_molinity
-    alkalinity_guess, tt.analyte.emf0_guess, _ = gran_guesses(tt)
-    tt.analyte.alkalinity_guess = alkalinity_guess * 1e6
     alkalinity = solver(titration)["x"][0] * 1e6
     return alkalinity - tt.analyte.alkalinity_certified
 

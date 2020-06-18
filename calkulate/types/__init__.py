@@ -210,7 +210,6 @@ class Titration:
         assert (
             self.titrant.molinity is not None
         ), "You can only solve if the titrant molinity has been set."
-        self.get_gran_guesses()
         self.solved = self.solver(self, **kwargs)
         self.analyte.alkalinity = self.solved["x"][0] * 1e6
         if self.solver == "complete_emf":
