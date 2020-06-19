@@ -87,6 +87,9 @@ If optional column values are only needed for some of your titrations, just use 
 ??? tip "`measurement_type`: *type of measurement in the titration file*"
     Use `"EMF"` (default) for potentiometric measurements, or `"pH"` for direct pH measurements.
 
+??? tip "`reference_good`": *use this reference material to calibrate?*
+    Set to `False` for reference materials that you do not wish to include in determining batch-averaged titrant concentrations.
+
 ??? tip "`temperature_override`: *titration temperature*"
     Must be in °C.  If not supplied, the values in the titration file are used.  Otherwise, this value overrides them.
 

@@ -76,9 +76,12 @@ class Dataset:
 
     def calibrate_batches(self):
         """Assemble calibrated titrant molinities by batch and broadcast into table."""
+        if "reference_good" not in self.table:
+            self.table["reference_good"] = True
+        good_groups = self.table[self.table.reference_good].groupby(by="analysis_batch")
         self.batches = self.batches.join(
             (
-                self.batch_groups.titrant_molinity_calibrated.agg(
+                good_groups.titrant_molinity_calibrated.agg(
                     titrant_molinity=np.mean,
                     titrant_molinity_std=np.std,
                     titrant_molinity_count=lambda x: np.sum(~np.isnan(x)),
@@ -118,14 +121,20 @@ class Dataset:
                             ] = tti.analyte.pH_temperature
                     except:
                         print("Failed to solve: '{}'".format(tti.fname))
+        if "alkalinity_certified" in self.table:
+            self.table["alkalinity_offset"] = (
+                self.table.alkalinity - self.table.alkalinity_certified
+            )
 
     def calibrate_and_solve(self):
         """Perform all titrant calibration steps and solve all titrations for alkalinity."""
         self.calibrate()
         self.solve()
 
-    def plot_calibration(self, ax=None, batches=None):
-        """Plot calibrated titrant molinities against analysis date."""
+    def plot_calibration(self, ax=None, batches=None, y_col="alkalinity_offset"):
+        """Plot offset between calibrated and certified alkalinity for reference materials against
+        the analysis date.
+        """
         if batches is not None:
             if ~isinstance(batches, list) or ~isinstance(batches, np.ndarray):
                 batches = [batches]
@@ -137,7 +146,7 @@ class Dataset:
             ax = plt.subplots()[1]
         sns.scatterplot(
             "analysis_datetime",
-            "titrant_molinity_calibrated",
+            y_col,
             alpha=0.5,
             ax=ax,
             data=ptable,
@@ -149,16 +158,11 @@ class Dataset:
         xrange = mdates.date2num(
             np.array([ptable.analysis_datetime.min(), ptable.analysis_datetime.max()])
         )
-        yrange = np.array(
-            [
-                ptable.titrant_molinity_calibrated.min(),
-                ptable.titrant_molinity_calibrated.max(),
-            ]
-        )
+        yrange = np.array([ptable[y_col].min(), ptable[y_col].max(),])
         ax.set_xlim(xrange + 0.05 * np.diff(xrange) * np.array([-1, 1]))
         ax.set_ylim(yrange + 0.05 * np.diff(yrange) * np.array([-1, 1]))
         ax.set_xlabel("")
-        ax.set_ylabel("Titrant molinity / mol/kg")
+        ax.set_ylabel("Calibrated TA offset / μmol/kg")
         ax.xaxis.set_major_locator(mdates.AutoDateLocator())
         ax.xaxis.set_major_formatter(
             mdates.ConciseDateFormatter(mdates.AutoDateLocator())
