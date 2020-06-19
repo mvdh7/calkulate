@@ -110,7 +110,9 @@ class Dataset:
                         if tti.measurement_type == "EMF":
                             self.table.loc[i, "emf0"] = tti.analyte.emf0
                             self.table.loc[i, "pH"] = tti.analyte.pH
-                            self.table.loc[i, "pH_temperature"] = tti.analyte.pH_temperature
+                            self.table.loc[
+                                i, "pH_temperature"
+                            ] = tti.analyte.pH_temperature
                     except:
                         print("Failed to solve: '{}'".format(tti.fname))
 
