@@ -3,3 +3,5 @@ numpy >= 1.17
 scipy >= 1.4
 pandas >= 1
 xlrd >= 1
+seaborn >= 0.10
+matplotlib >= 3.2

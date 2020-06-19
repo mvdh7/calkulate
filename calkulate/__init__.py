@@ -15,7 +15,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """Find total alkalinity from titration data."""
 
-from . import constants, convert, datasets, density, io, plot, simulate, solve, types
+from . import constants, convert, datasets, density, io, simulate, solve, types
 
 __all__ = [
     "constants",
@@ -23,7 +23,6 @@ __all__ = [
     "datasets",
     "density",
     "io",
-    "plot",
     "simulate",
     "solve",
     "types",

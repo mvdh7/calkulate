@@ -4,6 +4,9 @@
 
 import numpy as np
 import pandas as pd
+from matplotlib import dates as mdates
+from matplotlib import pyplot as plt
+import seaborn as sns
 from . import types
 
 
@@ -120,3 +123,44 @@ class Dataset:
         """Perform all titrant calibration steps and solve all titrations for alkalinity."""
         self.calibrate()
         self.solve()
+
+    def plot_calibration(self, ax=None, batches=None):
+        """Plot calibrated titrant molinities against analysis date."""
+        if batches is not None:
+            if ~isinstance(batches, list) or ~isinstance(batches, np.ndarray):
+                batches = [batches]
+            ptable = self.table[np.isin(self.table.analysis_batch, batches)]
+        else:
+            ptable = self.table
+        sns.set()
+        if ax is None:
+            ax = plt.subplots()[1]
+        sns.scatterplot(
+            "analysis_datetime",
+            "titrant_molinity_calibrated",
+            alpha=0.5,
+            ax=ax,
+            data=ptable,
+            edgecolor=None,
+            hue="analysis_batch",
+            legend=False,
+            palette="colorblind",
+        )
+        xrange = mdates.date2num(
+            np.array([ptable.analysis_datetime.min(), ptable.analysis_datetime.max()])
+        )
+        yrange = np.array(
+            [
+                ptable.titrant_molinity_calibrated.min(),
+                ptable.titrant_molinity_calibrated.max(),
+            ]
+        )
+        ax.set_xlim(xrange + 0.05 * np.diff(xrange) * np.array([-1, 1]))
+        ax.set_ylim(yrange + 0.05 * np.diff(yrange) * np.array([-1, 1]))
+        ax.set_xlabel("")
+        ax.set_ylabel("Titrant molinity / mol/kg")
+        ax.xaxis.set_major_locator(mdates.AutoDateLocator())
+        ax.xaxis.set_major_formatter(
+            mdates.ConciseDateFormatter(mdates.AutoDateLocator())
+        )
+        return ax
