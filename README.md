@@ -1,6 +1,6 @@
 # Calkulate v2
 
-**Calkulate v3 is in active development!  It will be much better but it will break all your v2 code.  If you're not in a rush, wait for it!**
+**Calkulate v3 is in active development!  It will be much better but it will break all your v2 code.  If you're not in a rush, wait!**
 
 [![pypi badge](https://img.shields.io/pypi/v/calkulate.svg?style=popout)](https://pypi.org/project/calkulate/) [![DOI](https://zenodo.org/badge/85561246.svg)](https://zenodo.org/badge/latestdoi/85561246)
 
