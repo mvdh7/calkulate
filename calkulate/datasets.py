@@ -144,16 +144,25 @@ class Dataset:
         sns.set()
         if ax is None:
             ax = plt.subplots()[1]
+        sc_kwargs = dict(
+            alpha=0.5, ax=ax, edgecolor=None, legend=False, palette="colorblind",
+        )
+        if "reference_good" not in ptable:
+            ptable["reference_good"] = True
         sns.scatterplot(
             "analysis_datetime",
             y_col,
-            alpha=0.5,
-            ax=ax,
-            data=ptable,
-            edgecolor=None,
+            data=ptable[ptable.reference_good],
             hue="analysis_batch",
-            legend=False,
-            palette="colorblind",
+            **sc_kwargs,
+        )
+        sns.scatterplot(
+            "analysis_datetime",
+            y_col,
+            color="k",
+            data=ptable[~ptable.reference_good],
+            marker="x",
+            **sc_kwargs,
         )
         xrange = mdates.date2num(
             np.array([ptable.analysis_datetime.min(), ptable.analysis_datetime.max()])
