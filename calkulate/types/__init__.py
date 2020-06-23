@@ -4,8 +4,9 @@
 
 import textwrap
 import numpy as np
+from matplotlib import pyplot as plt
 import PyCO2SYS as pyco2
-from .. import convert, io, solve
+from .. import convert, io, simulate, solve
 from . import components
 
 
@@ -205,12 +206,13 @@ class Titration:
         """Set the titrant molinity to the value found by calibrating this sample."""
         self.titrant.molinity = self.calibrated["x"][0]
 
-    def get_initial_pH(self):
+    def get_pH_from_EMF(self):
         """Calculate analyte pH from EMF before any titrant addition."""
         self.analyte.pH_temperature = self.mixture.temperature[0]
-        self.analyte.pH = convert.emf_to_pH(
-            self.mixture.emf[0], self.analyte.emf0, self.analyte.pH_temperature
+        self.mixture.pH = convert.emf_to_pH(
+            self.mixture.emf, self.analyte.emf0, self.analyte.pH_temperature
         )
+        self.analyte.pH = self.mixture.pH[0]
 
     def solve(self, **kwargs):
         """Solve for total alkalinity and EMF0."""
@@ -221,7 +223,59 @@ class Titration:
         self.analyte.alkalinity = self.solved["x"][0] * 1e6
         if self.measurement_type == "EMF":
             self.analyte.emf0 = self.solved["x"][1]
-            self.get_initial_pH()
+            self.get_pH_from_EMF()
+
+    def get_alkalinity_stepwise(self):
+        """Estimate total alkalinity separately at each titration step after solving."""
+        mixt = self.mixture  # for convenience
+        mixt.alkalinity_during = simulate.alkalinity(
+            mixt.pH,
+            mixt.total_salts,
+            mixt.equilibrium_constants,
+            total_carbonate=mixt.total_carbonate * 1e-6,
+        )
+        mixt.titrant_acidity = self.titrant.mass * self.titrant.molinity / mixt.mass
+        mixt.alkalinity_stepwise = (
+            1e6 * (mixt.alkalinity_during + mixt.titrant_acidity) / mixt.dilution_factor
+        )
+
+    def get_components(self):
+        """Calculate the different alkalinity components at each titration step after solving."""
+        self.mixture.alkalinity_components = simulate.alkalinity_components(
+            self.mixture.pH,
+            self.mixture.total_salts,
+            self.mixture.equilibrium_constants,
+            total_carbonate=self.mixture.total_carbonate * 1e-6,
+        )
+
+    def plot_alkalinity_stepwise(self, ax=None, **kwargs):
+        if "c" in kwargs:
+            fclr = kwargs["c"]
+            kwargs.pop("c", None)
+        else:
+            fclr = "xkcd:navy"
+        if ax is None:
+            ax = plt.subplots()[1]
+        L = self.solved.use_points
+        ax.axhline(self.analyte.alkalinity, c="k", linewidth=0.8)
+        ax.scatter(
+            self.titrant.mass[L] * 1e3,
+            self.mixture.alkalinity_stepwise[L],
+            facecolor=fclr,
+            label="Used",
+            **kwargs,
+        )
+        ax.scatter(
+            self.titrant.mass[~L] * 1e3,
+            self.mixture.alkalinity_stepwise[~L],
+            facecolor="none",
+            edgecolor=fclr,
+            label="Not used",
+            **kwargs,
+        )
+        ax.set_xlabel("Titrant mass / g")
+        ax.set_ylabel(r"Stepwise alkalinity / μmol$\cdot$kg$^{-1}$")
+        ax.legend()
 
     def __repr__(self):
         return textwrap.dedent(

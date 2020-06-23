@@ -83,9 +83,9 @@ component_multipliers = {
 }
 
 
-def alkalinity(h, total_salts, equilibrium_constants, total_carbonate=0):
-    """Solve for total alkalinity from [H+]."""
+def alkalinity(pH, total_salts, equilibrium_constants, total_carbonate=0):
+    """Estimate total alkalinity from [H+] and total salts."""
     components = alkalinity_components(
-        h, total_salts, equilibrium_constants, total_carbonate=total_carbonate
+        pH, total_salts, equilibrium_constants, total_carbonate=total_carbonate
     )
     return np.sum([v * components[k] for k, v in component_multipliers.items()], axis=0)

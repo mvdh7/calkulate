@@ -119,6 +119,7 @@ class Dataset:
                             self.table.loc[
                                 i, "pH_temperature"
                             ] = tti.analyte.pH_temperature
+                        tti.get_alkalinity_stepwise()
                     except:
                         print("Failed to solve: '{}'".format(tti.fname))
         if "alkalinity_certified" in self.table:
