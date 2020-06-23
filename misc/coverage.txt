@@ -3,12 +3,12 @@ Name                            Stmts   Miss  Cover
 calkulate/__init__.py              10      0   100%
 calkulate/constants.py              4      0   100%
 calkulate/convert.py               21      2    90%
-calkulate/datasets.py             111     29    74%
+calkulate/datasets.py             116     33    72%
 calkulate/density.py               15      0   100%
 calkulate/io.py                    28      4    86%
 calkulate/simulate.py              42      0   100%
 calkulate/solve.py                 68      2    97%
-calkulate/types/__init__.py       105      2    98%
+calkulate/types/__init__.py       128     16    88%
 calkulate/types/components.py      97      0   100%
 tests/__init__.py                   0      0   100%
 tests/test_Dickson1981.py          15      0   100%
@@ -18,4 +18,4 @@ tests/test_io.py                   52      0   100%
 tests/test_metadata.py              7      0   100%
 tests/test_table.py                32      0   100%
 ---------------------------------------------------
-TOTAL                             631     39    94%
+TOTAL                             659     57    91%
