@@ -8,7 +8,7 @@ This documentation site is for version 3, which is in development.  For now, ins
 
     pip install git+https://github.com/mvdh7/calkulate.git@v3
 
-For [version 2](https://calkulate.readthedocs.io/en/latest/), and for version 3 once initial development is complete, install with:
+For [version 2](https://calkulate.readthedocs.io/en/latest/), and for version 3 once it's ready, install with:
 
     pip install calkulate
 
@@ -25,7 +25,7 @@ Calkulate is being developed mainly by [Dr Matthew Humphreys](https://mvdh.xyz) 
 If you use Calkulate in your work, please cite it as:
 
 !!! info "Calkulate citation"
-    Humphreys, M. P., and Matthews, R. S. (2020).  Calkulate: total alkalinity from titration data in Python.  *Zenodo.*  [doi:10.5281/zenodo.2634304](https://doi.org/10.5281/zenodo.2634304).
+    Humphreys, M. P. and Matthews, R. S. (2020).  Calkulate: total alkalinity from titration data in Python.  *Zenodo.*  [doi:10.5281/zenodo.2634304](https://doi.org/10.5281/zenodo.2634304).
 
 Please specify which version you are using.  To find this:
 

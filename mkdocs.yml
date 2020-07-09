@@ -10,8 +10,8 @@ repo_url: https://github.com/mvdh7/calkulate
 nav:
   - Overview: index.md
   - Input data formatting: inputs.md
-  - Titration datasets: datasets.md
   - Individual titrations: titrations.md
+  - Titration datasets: datasets.md
   - References: references.md
   - Version history: versions.md
 
