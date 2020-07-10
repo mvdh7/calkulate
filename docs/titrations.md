@@ -1,12 +1,20 @@
 # Individual titrations
 
-To import a single titration dataset ready to work with in Calkulate, just provide the relevant row of your titration table (or the whole table if it only contains one row):
+To import a single titration dataset into Calkulate, just import or convert your titration table to a pandas DataFrame and provide the row for the titration you want to work with (or the whole table if it only contains one row):
 
     :::python
     import calkulate as calk
-    titration = calk.Titration(titration_table_row)
+    titration = calk.Titration(titration_table.loc[row_index])
 
-This imports the data from the titration data file and stores it in a `Titration` object along with the relevant information from the titration table.  Some of these values are available at the top level:
+where `row_index` is the DataFrame's index for the row you want (usually just an integer running from `0` to the height of the table).
+
+This imports the data from the titration data file and stores it in a `Titration` object along with the relevant information from the titration table.
+
+## Structure of a `Titration`
+
+### Top-level properties
+
+Some properties are top-level attributes of the `Titration`.
 
 !!! info "Top-level titration properties"
 
@@ -21,18 +29,23 @@ The remaining data are separated into several categories:
   * `titration.mixture` for properties of the titrant-analyte mixture.
   * `titration.settings` for... settings.
 
-## The analyte
+### The analyte
 
 The attributes of `titration.analyte` are all single scalar values.  At first, these include:
 
-  
 
-## The titrant
+
+### The titrant
 
 Some attributes of `titration.titrant` are single scalar values (e.g. its molinity), while others are arrays (e.g. the amount of it added to the analyte).
 
-## The mixture
+### The mixture
 
 The attributes of `titration.mixture` are all arrays.
 
-## The settings
+### The settings
+
+
+## `Titration` methods
+
+
