@@ -2,8 +2,8 @@
 
 To work with titration data in Calkulate you need to provide two things:
 
-  1.  The [**titration file(s)**](#titration-files): a text file for each titration containing the measurements. 
-  2.  A [**titration table**](#the-titration-table): the metadata for each titration.
+  1.  The [titration file(s)](#titration-files): a text file for each titration containing the measurements. 
+  2.  A [titration table](#the-titration-table): the metadata for each titration.
 
 Even if you are only using data from a single titration, you still need to make a single-row titration table to work with it in Calkulate.
 
@@ -31,29 +31,33 @@ For example, a file could contain the following:
     1.00    290.3   25.0
     1.50    343.4   25.1
 
-### Import settings
+!!! tip "Titration files in different formats"
 
-However, all these assumptions can be adjusted.  The first thing you should do is work out what adjustments you need to make, if any.  You should repeat this each time you have a titration file in a new format.
+    #### Import settings
 
-Internally, Calkulate imports titration files using:
+    All assumptions above about what your titration files look like can be adjusted.  The first thing you should do is work out what adjustments you need to make, if any.  You should repeat this each time you have a titration file in a new format.
 
-    :::python
-    import calkulate as calk
-    tt = calk.io.read_dat(
-        fname,
-        titrant_amount_col=0,
-        measurement_col=1,
-        temperature_col=2,
-        delimiter="\t",
-        skip_header=2,
-        **kwargs
-    )
+    If your titration data files come from a VINDTA, you should be able to skip this step.
 
-The only required input, `fname`, is the titration file name.  Calkulate imports the data from this file using [`numpy.genfromtxt`](), which is where inputs `delimiter`, `skip_header`, and any other `kwargs` that you may need to use are passed on to.
+    Internally, Calkulate imports titration files using:
 
-`np.genfromtxt` returns all the data in the titration file as a 2-dimensional NumPy array.  `calkulate.io.read_dat` then extracts the columns identified by `titrant_amount_col`, `measurement_col` and `temperature_col` into fields `"titrant_amount"`, `"mixture_measurement"` and `"mixture_temperature"` of a dict `tt`.
+        :::python
+        import calkulate as calk
+        tt = calk.io.read_dat(
+            fname,
+            titrant_amount_col=0,
+            measurement_col=1,
+            temperature_col=2,
+            delimiter="\t",
+            skip_header=2,
+            **kwargs
+        )
 
-Before going further with Calkulate, you should make sure that you can import one of your titration files successfully using `calk.io.read_dat`, and note down any optional settings you need to use.
+    The only required input, `fname`, is the titration file name.  Calkulate imports the data from this file using [`numpy.genfromtxt`](https://numpy.org/doc/stable/reference/generated/numpy.genfromtxt.html), which is where inputs `delimiter`, `skip_header`, and any other `kwargs` that you may need to use are passed on to.
+
+    `np.genfromtxt` returns all the data in the titration file as a 2-dimensional NumPy array.  `calkulate.io.read_dat` then extracts the columns identified by `titrant_amount_col`, `measurement_col` and `temperature_col` into fields `"titrant_amount"`, `"mixture_measurement"` and `"mixture_temperature"` of a dict `tt`.
+
+    Before going further with Calkulate, you should make sure that you can import one of your titration files successfully using `calk.io.read_dat`.  You won't actually call this function directly, but you need to know any optional settings it requires for your titration files.
 
 ## The titration table
 
