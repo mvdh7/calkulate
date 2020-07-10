@@ -14,11 +14,12 @@ For [version 2](https://calkulate.readthedocs.io/en/latest/), and for version 3 
 
 ## Get started
 
-Begin by reading how to work with [datasets of multiple titrations](../datasets) and then see the additional tools available for investigating [each titration individually](../titrations).
+  1.  Read how to import and work with data from [a single titration](../titrations).
+  2.  See the additional tools for efficiently investigating [datasets of multiple titrations](../datasets).
 
 ## About
 
-Calkulate is being developed mainly by [Dr Matthew Humphreys](https://mvdh.xyz) at the Royal Netherlands Institute for Sea Research ([NIOZ, Texel, the Netherlands](https://www.nioz.nl/en)).
+Calkulate is being developed by [Dr Matthew Humphreys](https://mvdh.xyz) at the Royal Netherlands Institute for Sea Research ([NIOZ, Texel, the Netherlands](https://www.nioz.nl/en)).
 
 ## Citation
 

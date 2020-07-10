@@ -1,11 +1,59 @@
 # Input data formatting
 
-To work with a dataset of multiple titrations you need to provide two things:
+To work with titration data in Calkulate you need to provide two things:
 
-  1.  A [**titration table**](#the-titration-table): the metadata for each titration.
-  2.  The [**titration files**](#titration-files): a text file for each titration containing the measurements. 
+  1.  The [**titration file(s)**](#titration-files): a text file for each titration containing the measurements. 
+  2.  A [**titration table**](#the-titration-table): the metadata for each titration.
 
 Even if you are only using data from a single titration, you still need to make a single-row titration table to work with it in Calkulate.
+
+## Titration files
+
+Each titration file is a text file containing the measurements of the solution carried out during a titration.  The file should contain data in columns, where each row represents a measurement after a separate titrant addition.  There must be at least three columns, containing:
+
+  1. The amount of titrant added to the analyte in ml or g.
+  2. The EMF measured across the titrant-analyte mixture in mV, or its pH.
+  3. The temperature of the titrant-analyte mixture in °C.
+
+By default, Calkulate expects that:
+
+  * There are two lines at the start of the file to be ignored before the columns begin.
+  * The above are the first three columns to appear in the text file, and in the order given.
+  * The file is tab-delimited.
+  * Nothing comes after the columns of titration data in the file.
+
+For example, a file could contain the following:
+
+    This first line is ignored.
+    This second line is also ignored.
+    0.00    183.1   25.2
+    0.50    225.4   25.1
+    1.00    290.3   25.0
+    1.50    343.4   25.1
+
+### Import settings
+
+However, all these assumptions can be adjusted.  The first thing you should do is work out what adjustments you need to make, if any.  You should repeat this each time you have a titration file in a new format.
+
+Internally, Calkulate imports titration files using:
+
+    :::python
+    import calkulate as calk
+    tt = calk.io.read_dat(
+        fname,
+        titrant_amount_col=0,
+        measurement_col=1,
+        temperature_col=2,
+        delimiter="\t",
+        skip_header=2,
+        **kwargs
+    )
+
+The only required input, `fname`, is the titration file name.  Calkulate imports the data from this file using [`numpy.genfromtxt`](), which is where inputs `delimiter`, `skip_header`, and any other `kwargs` that you may need to use are passed on to.
+
+`np.genfromtxt` returns all the data in the titration file as a 2-dimensional NumPy array.  `calkulate.io.read_dat` then extracts the columns identified by `titrant_amount_col`, `measurement_col` and `temperature_col` into fields `"titrant_amount"`, `"mixture_measurement"` and `"mixture_temperature"` of a dict `tt`.
+
+Before going further with Calkulate, you should make sure that you can import one of your titration files successfully using `calk.io.read_dat`, and note down any optional settings you need to use.
 
 ## The titration table
 
@@ -133,29 +181,3 @@ Like for the recommended columns, if optional column values are only needed for 
 
 ??? info "`titrant_molinity`: *molinity of the titrant*"
     Must be in mol/kg-solution.
-
-## Titration files
-
-Each titration file is a text file containing the measurements of the solution carried out during a titration.  The file should contain data in columns, where each row represents a measurement after a separate titrant addition.  There must be at least three columns, containing:
-
-  1. The amount of titrant added to the analyte in ml or g.
-  2. The EMF measured across the titrant-analyte mixture in mV, or its pH.
-  3. The temperature of the titrant-analyte mixture in °C.
-
-By default, Calkulate expects that:
-
-  * There are two lines at the start of the file to be ignored before the columns begin.
-  * The above are the first three columns to appear in the text file, and in the order given.
-  * The file is tab-delimited.
-  * Nothing comes after the columns of titration data in the file.
-
-For example, a file could contain the following:
-
-    This first line is ignored.
-    This second line is also ignored.
-    0.00    183.1   25.2
-    0.50    225.4   25.1
-    1.00    290.3   25.0
-    1.50    343.4   25.1
-
-However, all these assumptions can be adjusted, as described in [Individual titrations](../titrations).
