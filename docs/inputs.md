@@ -9,7 +9,7 @@ Even if you are only using data from a single titration, you still need to make 
 
 ## Titration files
 
-Each titration file is a text file containing the measurements of the solution carried out during a titration.  The file should contain data in columns, where each row represents a measurement after a separate titrant addition.  There must be at least three columns, containing:
+Each titration file is a text file containing the measurements of the solution carried out during a titration.  The file should contain data in columns, where each row represents a measurement after a separate titrant addition.  There must be at least three columns:
 
   1. The amount of titrant added to the analyte in ml or g.
   2. The EMF measured across the titrant-analyte mixture in mV, or its pH.
@@ -17,9 +17,9 @@ Each titration file is a text file containing the measurements of the solution c
 
 By default, Calkulate expects that:
 
-  * There are two lines at the start of the file to be ignored before the columns begin.
-  * The above are the first three columns to appear in the text file, and in the order given.
-  * The file is tab-delimited.
+  * There are two lines at the start of the file to be ignored before the data columns described above begin.
+  * The columns appear next, in the order given (from left to right).
+  * The columns are tab-delimited.
   * Nothing comes after the columns of titration data in the file.
 
 For example, a file could contain the following:
@@ -57,7 +57,29 @@ For example, a file could contain the following:
 
     `np.genfromtxt` returns all the data in the titration file as a 2-dimensional NumPy array.  `calkulate.io.read_dat` then extracts the columns identified by `titrant_amount_col`, `measurement_col` and `temperature_col` into fields `"titrant_amount"`, `"mixture_measurement"` and `"mixture_temperature"` of a dict `tt`.
 
-    Before going further with Calkulate, you should make sure that you can import one of your titration files successfully using `calk.io.read_dat`.  You won't actually call this function directly, but you need to know any optional settings it requires for your titration files.
+    Before going further with Calkulate, you should make sure that you can import one of your titration files successfully using `calk.io.read_dat`.  You won't actually call this function directly, but you need to know any optional settings it requires for your titration files.  Assemble these optional settings in a dict and check they work.  For example, if you needed to skip 5 header lines, not 2, your file was comma-delimited, not tab-, and there was an extra column between the measurement data and the temperature:
+
+    ```python
+    import calkulate as calk
+    
+    # Assemble input arguments
+    fname = "my_dat_file.dat"
+    read_dat_kwargs = {
+        "skip_header": 5,
+        "temperature_col": 3,
+        "delimiter": ",",
+    }
+
+    # Run the import function
+    tt = calk.io.read_dat(fname, **read_dat_kwargs)
+    
+    # Check the output looks good
+    print(tt["titrant_amount")  # prints out the amount of titrant column
+    print(tt["mixture_measurement"])  # prints out the measurement column (e.g. EMF)
+    print(tt["mixture_temperature"])  # prints out the temperature
+    ```
+
+    Keep a note of `read_dat_kwargs` - you'll need it later!
 
 ## The titration table
 

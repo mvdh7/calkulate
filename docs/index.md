@@ -14,8 +14,9 @@ For [version 2](https://calkulate.readthedocs.io/en/latest/), and for version 3 
 
 ## Get started
 
-  1.  Read how to import and work with data from [a single titration](../titrations).
-  2.  See the additional tools for efficiently investigating [datasets of multiple titrations](../datasets).
+  1.  Check what settings you need to use (if any) to [import your titration data files](../inputs).
+  2.  Read how to import and work with data from [a single titration](../titrations).
+  3.  See the additional tools for efficiently investigating [datasets of multiple titrations](../datasets).
 
 ## About
 
