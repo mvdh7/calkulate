@@ -46,7 +46,7 @@ for i in dataset.index:
 dataset.loc[:, 'alk'] *= 1e6 # convert to micromol/kg
 ```
 
-Note that the CRMs have been calibrated using the average acid concentration, not using their own indiviual calibrations, so their alkalinities are not *exactly* the same as the certified values.
+Note that the CRMs have been calibrated using the average acid concentration, not using their own individual calibrations, so their alkalinities are not *exactly* the same as the certified values.
 
 Finally, we can export the results back into a file, if required:
 
