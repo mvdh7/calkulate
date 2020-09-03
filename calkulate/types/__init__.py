@@ -20,9 +20,9 @@ class Titration:
         fname = self.file_path + self.file_name
         fdata = io.read_dat(fname, **read_dat_kwargs)
         self.fname = fname
-        self.titration_table_index = ttr.name
+        self.index = ttr.name
         self.measurement_type = io.check_set(ttr, "measurement_type", "EMF")
-        self.solver = convert.measurementType_to_solver(self.measurement_type)
+        self.solver = convert.measurement_type_to_solver(self.measurement_type)
         self.settings = components.Settings(ttr, fdata)
         self.analyte = components.Analyte(ttr, fdata)
         self.titrant = components.Titrant(ttr, fdata)

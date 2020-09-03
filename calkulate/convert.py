@@ -37,7 +37,7 @@ def f_to_dEmf0(f, temperature):
     return np.log(f) * R * temperature_K / F
 
 
-def measurementType_to_solver(measurement_type):
+def measurement_type_to_solver(measurement_type):
     m2s = {
         "EMF": solve.complete_emf,
         "pH": solve.complete_pH,
