@@ -1,6 +1,4 @@
-import pandas as pd
-import numpy as np
-import calkulate as calk
+import pandas as pd, numpy as np, calkulate as calk
 
 
 titration_table = pd.read_csv("tests/data/titration_table.csv")
