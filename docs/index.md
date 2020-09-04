@@ -1,12 +1,15 @@
 # Calkulate
 
-Calkulate is a Python package for finding total alkalinity from titration data.
+Calkulate is a Python package for finding total alkalinity from titration data using [PyCO2SYS](https://pyco2sys.rtfd.io).
 
 ## Installation
 
 This documentation site is for version 3, which is in development.  For now, install with: 
 
-    pip install git+https://github.com/mvdh7/calkulate.git@v3
+    conda create -n calkenv python=3.8 numpy scipy matplotlib seaborn pandas xlrd
+    conda activate calkenv
+    pip install PyCO2SYS==1.5.1
+    pip install https://github.com/mvdh7/calkulate/archive/v3.0.0-beta.2.tar.gz
 
 For [version 2](https://calkulate.readthedocs.io/en/latest/), and for version 3 once it's ready, install with:
 
@@ -14,7 +17,7 @@ For [version 2](https://calkulate.readthedocs.io/en/latest/), and for version 3 
 
 ## Get started very quickly
 
-If you had a perfect [titration table](../inputs/#the-titration-table) set up and your .dat files were all VINDTA-formatted, then all you need for Calkulate is:
+If you had a perfect [titration table](../inputs/#the-titration-table) set up and your .dat files were all VINDTA-formatted, then all you need to do with Calkulate is:
 
 ```python
 import calkulate as calk
@@ -24,7 +27,7 @@ tdata.calibrate_and_solve()
 
 All the results you need are stored in a standard pandas DataFrame at `tdata.table`.
 
-We have to put a little more preparatory work in to start from e.g. a VINDTA dbs file, but it's essentially the same process as above:
+However, we have to put a little more preparatory work in to start from e.g. a VINDTA dbs file, but it's essentially the same process as above:
 
 ```python
 import calkulate as calk
