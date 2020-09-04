@@ -7,7 +7,7 @@ import pandas as pd
 from matplotlib import dates as mdates
 from matplotlib import pyplot as plt
 import seaborn as sns
-from . import types
+from . import io, types
 
 
 class Dataset:
@@ -21,6 +21,8 @@ class Dataset:
                 self.table = pd.read_csv(df, **read_kwargs)
             elif df.endswith(".xlsx") or df.endswith(".xls"):
                 self.table = pd.read_excel(df, **read_kwargs)
+            elif df.endswith(".dbs"):
+                self.table = io.read_dbs(df, **read_kwargs)
         else:
             self.table = pd.DataFrame(df)
         self.titrations = {}
@@ -176,4 +178,6 @@ class Dataset:
         ax.xaxis.set_major_formatter(
             mdates.ConciseDateFormatter(mdates.AutoDateLocator())
         )
+        ax.axhline(0, c="k", linewidth=0.8)
+        ax.grid(alpha=0.3)
         return ax
