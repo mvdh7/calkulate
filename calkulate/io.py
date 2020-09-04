@@ -111,11 +111,17 @@ def get_VINDTA_filenames(dbs):
     return dbs
 
 
-def read_dbs(fname):
+def read_dbs(fname, analyte_volume=100.0, analyte_mass=None, file_path=None):
     """Import one .dbs file as single DataFrame."""
     headers = np.genfromtxt(fname, delimiter="\t", dtype=str, max_rows=1)
     dbs = pd.read_table(fname, header=0, names=headers, usecols=headers)
     dbs["dbs_fname"] = fname
     dbs = add_func_cols(dbs, dbs_datetime)
     dbs = get_VINDTA_filenames(dbs)
+    if analyte_mass is None:
+        dbs["analyte_volume"] = analyte_volume
+    else:
+        dbs["analyte_mass"] = analyte_mass
+    if file_path is not None:
+        dbs["file_path"] = file_path
     return dbs
