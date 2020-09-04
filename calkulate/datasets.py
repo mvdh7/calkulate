@@ -142,7 +142,6 @@ class Dataset:
             ptable = self.table[np.isin(self.table.analysis_batch, batches)]
         else:
             ptable = self.table
-        sns.set()
         if ax is None:
             ax = plt.subplots()[1]
         sc_kwargs = dict(
