@@ -160,6 +160,7 @@ class Titration:
                 "K1K2CONSTANTS": self.settings.carbonic_constants,
                 "KSO4CONSTANT": self.settings.bisulfate_constant,
                 "KFCONSTANT": self.settings.fluoride_constant,
+                "opt_gas_constant": 3,
             }
         )[0]
         self.mixture.equilibrium_constants = pyco2.equilibria.assemble(
@@ -170,6 +171,7 @@ class Titration:
             conditioned["K1K2CONSTANTS"],
             conditioned["KSO4CONSTANT"],
             conditioned["KFCONSTANT"],
+            conditioned["opt_gas_constant"],
         )
         # Overwrite if user supplied values
         self.mixture._overwrite_equilibrium_constant("k_ammonia", "KNH3")
