@@ -14,6 +14,18 @@ For [version 2](https://calkulate.readthedocs.io/en/latest/), and for version 3 
 
 ## Get started very quickly
 
+If you had a perfect [titration table](../inputs/#the-titration-table) set up and your .dat files were all VINDTA-formatted, then all you need for Calkulate is:
+
+```python
+import calkulate as calk
+tdata = calk.Dataset("titration-table.csv")
+tdata.calibrate_and_solve()
+```
+
+All the results you need are stored in a standard pandas DataFrame at `tdata.table`.
+
+We have to put a little more preparatory work in to start from e.g. a VINDTA dbs file, but it's essentially the same process as above:
+
 ```python
 import calkulate as calk
 
