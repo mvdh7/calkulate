@@ -156,7 +156,7 @@ def complete_pH(titration, pH_range=(3, 4)):
 
 def _lsqfun_calibrate(titrant_molinity, titration, solver):
     tt = titration
-    tt.titrant.molinity = titrant_molinity
+    tt.titrant.molinity = titrant_molinity[0]
     alkalinity = solver(titration)["x"][0] * 1e6
     return alkalinity - tt.analyte.alkalinity_certified
 
