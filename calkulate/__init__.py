@@ -31,7 +31,7 @@ __all__ = [
 # Package metadata
 _authorlist = ["Humphreys, Matthew P.", "Matthews, Ruth S."]
 __author__ = " and ".join(_authorlist)
-__version__ = "3.0.0-alpha"
+__version__ = "3.0.0-alpha.1"
 
 # Aliases to top level
 Titration = types.Titration
