@@ -11,7 +11,7 @@ This documentation site is for version 3, which is in development.  For now, ins
     pip install PyCO2SYS==1.5.1
     pip install https://github.com/mvdh7/calkulate/archive/v3.0.0-beta.2.tar.gz
 
-For [version 2](https://calkulate.readthedocs.io/en/latest/), and for version 3 once it's ready, install with:
+For [version 2](https://calkulate.readthedocs.io/en/latest/), install with:
 
     pip install calkulate
 
