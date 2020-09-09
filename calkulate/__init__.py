@@ -14,10 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from . import io
+from . import density, io
 from .io import read_csv, read_dat, read_dbs, read_excel, write_dat
 
-__all__ = ["io"]
+__all__ = ["density", "io"]
 
 
 # Package metadata
