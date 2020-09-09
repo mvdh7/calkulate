@@ -15,7 +15,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from . import io
-from .io import read_csv, read_dat, read_excel, write_dat
+from .io import read_csv, read_dat, read_dbs, read_excel, write_dat
 
 __all__ = ["io"]
 
