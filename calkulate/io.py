@@ -141,5 +141,6 @@ def read_dbs(fname, analyte_volume=100.0, analyte_mass=None, file_path=None):
     else:
         dbs["analyte_mass"] = analyte_mass
     if file_path is not None:
+        assert isinstance(file_path, str), "file_path must be a string."
         dbs["file_path"] = file_path
     return Dataset(dbs)
