@@ -119,7 +119,7 @@ def dbs_datetime(dbsx):
 
 
 def get_VINDTA_filenames(dbs):
-    """Determine VINDTA filenames assuming defaults were used based on the dbs."""
+    """Determine VINDTA filenames, assuming defaults were used, based on the dbs."""
     dbs["file_name"] = dbs.apply(
         lambda x: "{}-{}  {}  ({}){}.dat".format(
             x.station, x.cast, x.niskin, x.depth, x.bottle
