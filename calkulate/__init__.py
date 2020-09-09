@@ -13,29 +13,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""Find total alkalinity from titration data."""
-
-from . import constants, convert, datasets, density, io, simulate, solve, types
-
-__all__ = [
-    "constants",
-    "convert",
-    "datasets",
-    "density",
-    "io",
-    "simulate",
-    "solve",
-    "types",
-]
 
 # Package metadata
 _authorlist = ["Humphreys, Matthew P.", "Matthews, Ruth S."]
 __author__ = " and ".join(_authorlist)
-__version__ = "3.0.0-beta.2"
-
-# Aliases to top level
-Titration = types.Titration
-Dataset = datasets.Dataset
+__version__ = "3.0.0-beta.3"
 
 
 def say_hello():

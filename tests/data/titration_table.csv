@@ -1,6 +1,0 @@
-analysis_batch,measurement_type,file_path,file_name,salinity,analyte_volume,analyte_mass,total_carbonate,total_phosphate,total_silicate,total_borate,total_fluoride,total_sulfate,borate_ratio,titrant_concentration,titrant_molinity,temperature_override,alkalinity_certified,k_boric,k_carbonic_1,k_carbonic_2,k_hydrofluoric,k_sulfuric_2,k_phosphoric_1,k_phosphoric_2,k_phosphoric_3,k_water,titrant_amount_unit
-1,EMF,tests/data/,CRM-144-0435-4.dat,33.571,100,NaN,2031.53,0.31,2.5,NaN,NaN,NaN,1,0.1,NaN,NaN,2238.60,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
-1,EMF,tests/data/,CRM-144-0435-4-copy.dat,33.571,100,NaN,2031.53,0.31,2.5,NaN,NaN,NaN,1,0.1,NaN,NaN,2238.60,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
-1,EMF,tests/data/,CRM-144-0435-4.dat,33.571,100,NaN,2031.53,0.31,2.5,414.9,65.5,27082.6,NaN,0.1,NaN,25,2238.60,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
-2,pH,tests/data/,Dickson-1981-pH-no_phosphate.dat,35,NaN,200,2200,0,0,420,70,28240,NaN,NaN,0.3,NaN,2450,1.78e-9,1e-6,8.2e-10,0.0024509803921568627,0.08130081300813008,NaN,NaN,NaN,4.32e-14,g
-2,pH,tests/data/,Dickson-1981-pH-with_phosphate.dat,35,NaN,200,2200,10,0,420,70,28240,NaN,NaN,0.3,NaN,2450,1.78e-9,1e-6,8.2e-10,0.0024509803921568627,0.08130081300813008,0.017605633802816902,8e-7,1.65e-9,4.32e-14,g
