@@ -9,6 +9,7 @@ repo_url: https://github.com/mvdh7/calkulate
 
 nav:
   - Overview: index.md
+  - Import and export: io.md
   - References: references.md
   - Version history: versions.md
 

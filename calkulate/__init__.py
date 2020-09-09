@@ -14,6 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from . import io
+from .io import read_dat, write_dat
+
+__all__ = ["io"]
+
+
 # Package metadata
 _authorlist = ["Humphreys, Matthew P.", "Matthews, Ruth S."]
 __author__ = " and ".join(_authorlist)
