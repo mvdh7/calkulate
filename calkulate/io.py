@@ -2,7 +2,37 @@
 # Copyright (C) 2019-2020  Matthew P. Humphreys  (GNU GPLv3)
 """Import and export titration data."""
 
-import numpy as np
+import numpy as np, pandas as pd
+
+
+class DatDict(dict):
+    def write(self, fname, **kwargs):
+        write_dat(self, fname, **kwargs)
+
+
+class Dataset(pd.DataFrame):
+    def get_dat_files(self, **read_dat_kwargs):
+        """(Re-)import all .dat files."""
+        if "file_good" not in self:
+            self["file_good"] = True
+        if "dat_dict" in self:
+            self.drop(columns="dat_dict", inplace=True)
+        dats = {}
+        for i, row in self.iterrows():
+            if row.file_good:
+                if "file_path" in row:
+                    fname = row.file_path + row.file_name
+                else:
+                    fname = row.file_name
+                try:
+                    dats[i] = read_dat(fname, **read_dat_kwargs)
+                except IOError:
+                    print("Can't find file: '{}'.".format(fname))
+                    dats[i] = None
+                except:
+                    print("Error importing file: '{}'.".format(fname))
+                    dats[i] = None
+        return Dataset(self.join(pd.DataFrame({"dat_dict": dats})))
 
 
 def write_dat(
@@ -37,11 +67,6 @@ def write_dat(
             )
 
 
-class DatDict(dict):
-    def write(self, fname, **kwargs):
-        write_dat(self, fname, **kwargs)
-
-
 def read_dat(
     fname,
     titrant_amount_col=0,
@@ -61,3 +86,13 @@ def read_dat(
         }
     )
     return dat_dict
+
+
+def read_csv(filepath_or_buffer, **kwargs):
+    """Import a Dataset from an Excel file using pandas.read_csv."""
+    return Dataset(pd.read_csv(filepath_or_buffer, **kwargs))
+
+
+def read_excel(*args, **kwargs):
+    """Import a Dataset from an Excel file using pandas.read_excel."""
+    return Dataset(pd.read_excel(*args, **kwargs))
