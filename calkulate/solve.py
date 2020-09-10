@@ -96,7 +96,7 @@ def _lsqfun_complete_emf(
 def subset(d, use_points):
     return {
         k: v[use_points] if np.shape(v) == np.shape(use_points) else v
-        for k, v in use_points.items()
+        for k, v in d.items()
     }
 
 
@@ -114,14 +114,14 @@ def complete_emf(
         args=(
             subset(titrant, G),
             subset(analyte, G),
-            emf,
-            temperature,
-            totals,
-            k_constants,
+            emf[G],
+            temperature[G],
+            subset(totals, G),
+            subset(k_constants, G),
         ),
         kwargs={
             "dilution_factor": convert.dilution_factor(
-                analyte["mass"], analyte["mass"] + titrant["mass"]
+                analyte["mass"], analyte["mass"] + titrant["mass"][G]
             ),
         },
         method="lm",
@@ -139,7 +139,7 @@ def complete_pH(
     G = (pH > pH_range[0]) & (pH < pH_range[1])
     alkalinity_points = simulate.alkalinity(
         pH, totals, k_constants, dic=analyte["dic"] * 1e-6
-    )
+    )[G]
     submixture_mass = titrant["mass"][G] + analyte["mass"]
     alkalinity_points += titrant["mass"][G] * titrant["molinity"] / submixture_mass
     alkalinity_points /= convert.dilution_factor(analyte["mass"], submixture_mass)
@@ -171,7 +171,6 @@ def _lsqfun_calibrate(
             temperature,
             totals,
             k_constants,
-            solver=solver,
             pH_range=pH_range,
         )["x"][0]
         * 1e6
