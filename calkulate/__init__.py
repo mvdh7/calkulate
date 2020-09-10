@@ -14,10 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from . import density, io
+from . import density, io, simulate
 from .io import read_csv, read_dat, read_dbs, read_excel, write_dat
 
-__all__ = ["density", "io"]
+__all__ = ["density", "io", "simulate"]
 
 
 # Package metadata
@@ -27,4 +27,5 @@ __version__ = "3.0.0-beta.3"
 
 
 def say_hello():
+    """Report the version number."""
     print("This is Calkulate v{}.".format(__version__))
