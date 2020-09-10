@@ -38,11 +38,10 @@ def alkalinity_components(pH, totals, k_constants, dic=0):
     borate = TB * KB / (KB + h)
     bisulfate = TSO4 * h / (KSO4 + h)
     hydrogen_fluoride = TF * h / (KF + h)
-    phosphoric_0 = TPO4 / (1 + KP1 / h + KP1 * KP2 / h ** 2 + KP1 * KP1 * KP3 / h ** 3)
-    phosphoric_2 = TPO4 / (h ** 2 / (KP1 * KP2) + h / KP2 + 1 + KP3 / h)
-    phosphoric_3 = TPO4 / (
-        h ** 3 / (KP1 * KP2 * KP3) + h ** 2 / (KP2 * KP3) + h / KP3 + 1
-    )
+    phosphoric_denom = h ** 3 + KP1 * h ** 2 + KP1 * KP2 * h + KP1 * KP2 * KP3
+    phosphoric_0 = TPO4 * h ** 3 / phosphoric_denom
+    phosphoric_2 = TPO4 * KP1 * KP2 * h / phosphoric_denom
+    phosphoric_3 = TPO4 * KP1 * KP2 * KP3 / phosphoric_denom
     silicate = TSi * KSi / (KSi + h)
     ammonia = TNH3 * KNH3 / (KNH3 + h)
     hydrogen_sulfide = TH2S * KH2S / (KH2S + h)
