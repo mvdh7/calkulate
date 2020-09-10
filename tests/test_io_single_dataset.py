@@ -51,3 +51,6 @@ test_get_dat_twice()
 test_get_dat_inplace()
 test_table_excel()
 test_table_dbs()
+
+tt.prepare_rows()  # <==== TODO next: test this!
+tt.prepare()  # < ==== and this!
