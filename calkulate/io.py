@@ -4,36 +4,12 @@
 
 import numpy as np, pandas as pd
 from matplotlib import dates as mdates
+from . import datasets
 
 
 class DatDict(dict):
     def write(self, fname, **kwargs):
         write_dat(self, fname, **kwargs)
-
-
-class Dataset(pd.DataFrame):
-    def get_dat_files(self, **read_dat_kwargs):
-        """(Re-)import all .dat files."""
-        if "file_good" not in self:
-            self["file_good"] = True
-        if "dat_dict" in self:
-            self.drop(columns="dat_dict", inplace=True)
-        dats = {}
-        for i, row in self.iterrows():
-            if row.file_good:
-                if "file_path" in row:
-                    fname = row.file_path + row.file_name
-                else:
-                    fname = row.file_name
-                try:
-                    dats[i] = read_dat(fname, **read_dat_kwargs)
-                except IOError:
-                    print("Can't find file: '{}'.".format(fname))
-                    dats[i] = None
-                except:
-                    print("Error importing file: '{}'.".format(fname))
-                    dats[i] = None
-        return Dataset(self.join(pd.DataFrame({"dat_dict": dats})))
 
 
 def write_dat(
@@ -91,12 +67,12 @@ def read_dat(
 
 def read_csv(filepath_or_buffer, **kwargs):
     """Import a Dataset from an Excel file using pandas.read_csv."""
-    return Dataset(pd.read_csv(filepath_or_buffer, **kwargs))
+    return datasets.Dataset(pd.read_csv(filepath_or_buffer, **kwargs))
 
 
 def read_excel(*args, **kwargs):
     """Import a Dataset from an Excel file using pandas.read_excel."""
-    return Dataset(pd.read_excel(*args, **kwargs))
+    return datasets.Dataset(pd.read_excel(*args, **kwargs))
 
 
 def add_func_cols(df, func, *args, **kwargs):
@@ -143,4 +119,4 @@ def read_dbs(fname, analyte_volume=100.0, analyte_mass=None, file_path=None):
     if file_path is not None:
         assert isinstance(file_path, str), "file_path must be a string."
         dbs["file_path"] = file_path
-    return Dataset(dbs)
+    return datasets.Dataset(dbs)
