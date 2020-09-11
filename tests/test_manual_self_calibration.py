@@ -1,8 +1,24 @@
-import calkulate as calk, PyCO2SYS as pyco2, numpy as np, pandas as pd
+# import calkulate as calk, PyCO2SYS as pyco2, numpy as np, pandas as pd
 
-# Import data
-tf = calk.read_csv("tests/data/titration_table.csv").calkulate()
-x = tf.titration[0]
+# # Import data
+# tf = calk.read_csv("tests/data/titration_table.csv").calkulate()
+
+# # tf.loc[0, "titrant_molinity"] = 0.1
+# # alkalinity_guess, emf0_guess, G = calk.solve.gran_guesses(x, tf.loc[0])
+
+# i = 0
+# tf.loc[i, "titrant_molinity"] = 0.1
+# x = tf.titration[i]
+# test = calk.solve.complete_emf(tf.titration[i], tf.loc[i])["x"][0] * 1e6
+
+
+# i = 4
+# x = tf.titration[i]
+# test2 = calk.solve.complete_pH(tf.titration[i], tf.loc[i])["x"][0]
+
+
+# tf.loc[0, "titrant_molinity"] = calk.solve.calibrate(tf.titration[0], tf.loc[0])['x'][0]
+# tf.solve()
 
 # tf.apply(_get_totals, axis=1)
 # print(tf.titration[0])

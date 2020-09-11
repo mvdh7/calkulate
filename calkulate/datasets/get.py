@@ -2,10 +2,20 @@ import pandas as pd, numpy as np, PyCO2SYS as pyco2
 from .. import convert, density, options, titrations
 
 
+def get_measurement_type(dataset):
+    if "measurement_type" not in dataset:
+        dataset["measurement_type"] = "emf"
+    dataset["measurement_type"] = np.where(
+        np.isin(dataset.measurement_type, ["pH", "ph", "PH"]), "pH", "emf",
+    )
+    return dataset
+
+
 def get_titrations(dataset, **read_dat_kwargs):
     """(Re-)import all .dat files."""
     if "file_good" not in dataset:
         dataset["file_good"] = True
+    dataset.get_measurement_type()
     dats = {}
     for i, row in dataset.iterrows():
         if row.file_good:
@@ -15,6 +25,7 @@ def get_titrations(dataset, **read_dat_kwargs):
                 fname = row.file_name
             try:
                 dats[i] = titrations.read_dat(fname, **read_dat_kwargs)
+                dats[i][row.measurement_type] = dats[i].measurement
             except IOError:
                 print("Can't find file: '{}'.".format(fname))
                 dats[i] = None
@@ -49,6 +60,9 @@ def get_analyte_temperature(dataset):
 
 
 def get_analyte_mass(dataset):
+    """Calculate analyte mass in kg."""
+    if "analyte_temperature" not in dataset:
+        dataset.get_analyte_temperature()
     if "analyte_mass" not in dataset:
         dataset["analyte_mass"] = np.nan
         assert (
@@ -57,12 +71,65 @@ def get_analyte_mass(dataset):
     if "analyte_volume" in dataset:
         dataset["analyte_mass"] = np.where(
             np.isnan(dataset.analyte_mass),
-            dataset.analyte_volume
+            1e-3
+            * dataset.analyte_volume
             * density.seawater_1atm_MP81(
                 temperature=dataset.analyte_temperature, salinity=dataset.salinity
             ),
             dataset.analyte_mass,
         )
+    return dataset
+
+
+def get_titrant_density(dataset):
+    if "molinity_HCl" not in dataset:
+        dataset["molinity_HCl"] = options.molinity_HCl
+    else:
+        dataset["molinity_HCl"] = np.where(
+            np.isnan(dataset.molinity_HCl), options.molinity_HCl, dataset.molinity_HCl
+        )
+    if "molinity_NaCl" not in dataset:
+        dataset["molinity_NaCl"] = options.molinity_NaCl
+    else:
+        dataset["molinity_NaCl"] = np.where(
+            np.isnan(dataset.molinity_NaCl),
+            options.molinity_NaCl,
+            dataset.molinity_NaCl,
+        )
+    if "titrant_density" not in dataset:
+        dataset["titrant_density"] = np.nan
+    dataset["titrant_density"] = np.where(
+        np.isnan(dataset.titrant_density),
+        density.HCl_NaCl_25C_DSC07(
+            molinity_HCl=dataset.molinity_HCl, molinity_NaCl=dataset.molinity_NaCl
+        ),
+        dataset.titrant_density,
+    )
+    return dataset
+
+
+def _get_titrant_mass(row):
+    if row.titration is not None:
+        if str(row.titrant_amount_unit).lower() == "g":
+            row.titration["titrant_mass"] = row.titration.titrant_amount
+        elif str(row.titrant_amount_unit).lower() == "ml":
+            row.titration["titrant_mass"] = (
+                row.titration.titrant_amount * row.titrant_density * 1e-3
+            )
+        else:
+            row.titration["titrant_mass"] = (
+                row.titration.titrant_amount * row.titrant_density * 1e-3
+            )
+            print("Error: titrant_amount_unit must be either 'g' or 'ml'.")
+
+
+def get_titrant_mass(dataset):
+    """Calculate titrant mass in kg."""
+    if "titrant_density" not in dataset:
+        dataset.get_titrant_density()
+    if "titrant_amount_unit" not in dataset:
+        dataset["titrant_amount_unit"] = "ml"
+    dataset.apply(_get_titrant_mass, axis=1)
     return dataset
 
 
@@ -235,8 +302,8 @@ def calkulate(dataset, read_dat_kwargs=None):
     if read_dat_kwargs is None:
         read_dat_kwargs = {}
     dataset.get_titrations(**read_dat_kwargs)
-    dataset.get_analyte_temperature()
     dataset.get_analyte_mass()
+    dataset.get_titrant_mass()
     dataset.get_totals()
     dataset.get_k_constants()
     return dataset

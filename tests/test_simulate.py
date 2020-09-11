@@ -53,8 +53,7 @@ titration = calk.Titration({**totals_calk, **k_constants}).rename(
 
 # Solve the CO2 system both ways (with Calkulate and with PyCO2SYS)
 pH = np.append(rng.uniform(size=npts - 1, low=3, high=10), 8.1)
-dic = np.append(rng.uniform(size=npts - 1, low=0, high=5000), 0)
-titration["dic"] = dic
+dic = titration["dic"] = np.append(rng.uniform(size=npts - 1, low=0, high=5000), 0)
 alkalinity_calk = calk.simulate.alkalinity(pH, titration) * 1e6
 # ... switch to the fixed TA equation in PyCO2SYS before comparing
 pyco2.solve.get.TAfromTCpH = pyco2.solve.get.TAfromTCpH_fixed
