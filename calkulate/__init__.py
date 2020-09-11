@@ -14,15 +14,23 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from . import constants, convert, datasets, density, io, simulate, solve
-from .io import read_csv, read_dat, read_dbs, read_excel, write_dat
+from . import constants, convert, datasets, density, simulate, solve, titrations
+from .titrations import Titration, read_dat, to_dat
+from .datasets import Dataset, read_csv, read_dbs, read_excel, get_titrations
 
-__all__ = ["constants", "convert", "datasets", "density", "io", "simulate", "solve"]
+__all__ = [
+    "constants",
+    "convert",
+    "datasets",
+    "density",
+    "simulate",
+    "solve",
+    "titrations",
+]
 
 
 # Package metadata
-_authorlist = ["Humphreys, Matthew P.", "Matthews, Ruth S."]
-__author__ = " and ".join(_authorlist)
+__author__ = "Matthew P. Humphreys"
 __version__ = "3.0.0-beta.3"
 
 
