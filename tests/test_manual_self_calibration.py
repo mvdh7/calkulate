@@ -1,7 +1,12 @@
-# import calkulate as calk, PyCO2SYS as pyco2, numpy as np
+import calkulate as calk, PyCO2SYS as pyco2, numpy as np, pandas as pd
 
-# # Import data
-# tt = calk.read_csv("tests/data/titration_table.csv")
+# Import data
+tf = calk.read_csv("tests/data/titration_table.csv").calkulate()
+x = tf.titration[0]
+
+# tf.apply(_get_totals, axis=1)
+# print(tf.titration[0])
+# print(tf.titration[0].columns)
 
 # # # Manually prepare inputs for low-level functions
 # # titrant = {

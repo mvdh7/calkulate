@@ -14,19 +14,30 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from . import constants, convert, datasets, density, simulate, solve, titrations
+from . import (
+    constants,
+    convert,
+    datasets,
+    density,
+    options,
+    simulate,
+    solve,
+    titrations,
+)
 from .titrations import Titration, read_dat, to_dat
-from .datasets import Dataset, read_csv, read_dbs, read_excel, get_titrations
-
-__all__ = [
-    "constants",
-    "convert",
-    "datasets",
-    "density",
-    "simulate",
-    "solve",
-    "titrations",
-]
+from .datasets import (
+    Dataset,
+    read_csv,
+    read_dbs,
+    read_excel,
+    get_titrations,
+    get_analyte_temperature,
+    get_analyte_mass,
+    get_analyte_totals,
+    get_titration_totals,
+    get_totals,
+    get_k_constants,
+)
 
 
 # Package metadata

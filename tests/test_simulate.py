@@ -45,17 +45,24 @@ k_constants = pyco2.equilibria.assemble(
     pyco2_kwargs["opt_gas_constant"],
 )
 
+# Put everything into a DataFrame for Calkulate
+totals_calk = {k: v * 1e6 for k, v in totals.items() if k != "Sal"}
+titration = calk.Titration({**totals_calk, **k_constants}).rename(
+    mapper=calk.convert.pyco2_to_calk, axis=1
+)
+
+# Solve the CO2 system both ways (with Calkulate and with PyCO2SYS)
+pH = np.append(rng.uniform(size=npts - 1, low=3, high=10), 8.1)
+dic = np.append(rng.uniform(size=npts - 1, low=0, high=5000), 0)
+titration["dic"] = dic
+alkalinity_calk = calk.simulate.alkalinity(pH, titration) * 1e6
+# ... switch to the fixed TA equation in PyCO2SYS before comparing
+pyco2.solve.get.TAfromTCpH = pyco2.solve.get.TAfromTCpH_fixed
+alkalinity_pyco2 = pyco2.CO2SYS_nd(pH, dic, 3, 2, **pyco2_kwargs)["alkalinity"]
+
 
 def test_alkalinity_from_pH():
     """Does Calkulate's alkalinity simulator agree with PyCO2SYS?"""
-    pH = np.append(rng.uniform(size=npts - 1, low=3, high=9), 8.1)
-    dic = np.append(rng.uniform(size=npts - 1, low=0, high=5000), 0)
-    alkalinity_calk = (
-        calk.simulate.alkalinity(pH, totals, k_constants, dic=dic * 1e-6) * 1e6
-    )
-    # Switch to the fixed TA equation in PyCO2SYS before comparing
-    pyco2.solve.get.TAfromTCpH = pyco2.solve.get.TAfromTCpH_fixed
-    alkalinity_pyco2 = pyco2.CO2SYS_nd(pH, dic, 3, 2, **pyco2_kwargs)["alkalinity"]
     assert np.all(np.isclose(alkalinity_calk, alkalinity_pyco2, rtol=0, atol=1e-10))
 
 

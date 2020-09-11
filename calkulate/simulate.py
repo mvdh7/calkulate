@@ -5,30 +5,30 @@
 import numpy as np
 
 
-def alkalinity_components(pH, totals, k_constants, dic=0):
+def alkalinity_components(pH, titration):
     """Calculate chemical speciation from pH."""
-    # Unpack total salts (these should already include the dilution correction)
-    TCO2 = dic
-    TB = totals["TB"]
-    TSO4 = totals["TSO4"]
-    TF = totals["TF"]
-    TPO4 = totals["TPO4"]
-    TSi = totals["TSi"]
-    TNH3 = totals["TNH3"]
-    TH2S = totals["TH2S"]
-    # Unpack equilibrium constants (should be on the Free scale)
-    KW = k_constants["KW"]
-    K1 = k_constants["K1"]
-    K2 = k_constants["K2"]
-    KB = k_constants["KB"]
-    KSO4 = k_constants["KSO4"]
-    KF = k_constants["KF"]
-    KP1 = k_constants["KP1"]
-    KP2 = k_constants["KP2"]
-    KP3 = k_constants["KP3"]
-    KSi = k_constants["KSi"]
-    KNH3 = k_constants["KNH3"]
-    KH2S = k_constants["KH2S"]
+    # Unpack total salts (these should already include any dilution correction)
+    TCO2 = titration["dic"].values * 1e-6
+    TB = titration["total_borate"].values * 1e-6
+    TSO4 = titration["total_sulfate"].values * 1e-6
+    TF = titration["total_fluoride"].values * 1e-6
+    TPO4 = titration["total_phosphate"].values * 1e-6
+    TSi = titration["total_silicate"].values * 1e-6
+    TNH3 = titration["total_ammonia"].values * 1e-6
+    TH2S = titration["total_sulfide"].values * 1e-6
+    # Unpack equilibrium constants (should all be on the Free scale)
+    KW = titration["k_water"].values
+    K1 = titration["k_carbonic_1"].values
+    K2 = titration["k_carbonic_2"].values
+    KB = titration["k_borate"].values
+    KSO4 = titration["k_bisulfate"].values
+    KF = titration["k_fluoride"].values
+    KP1 = titration["k_phosphate_1"].values
+    KP2 = titration["k_phosphate_2"].values
+    KP3 = titration["k_phosphate_3"].values
+    KSi = titration["k_silicate"].values
+    KNH3 = titration["k_ammonia"].values
+    KH2S = titration["k_sulfide"].values
     # Calculate components
     h = 10.0 ** -pH
     hydroxide = KW / h
@@ -48,7 +48,7 @@ def alkalinity_components(pH, totals, k_constants, dic=0):
     return {
         "H": h,
         "OH": hydroxide,
-        "CO2aq": aqueous_CO2,
+        "CO2": aqueous_CO2,
         "HCO3": bicarbonate,
         "CO3": carbonate,
         "BOH4": borate,
@@ -82,7 +82,7 @@ component_multipliers = {
 }
 
 
-def alkalinity(pH, totals, k_constants, dic=0):
+def alkalinity(pH, titration):
     """Estimate total alkalinity from [H+] and total salts."""
-    components = alkalinity_components(pH, totals, k_constants, dic=dic)
+    components = alkalinity_components(pH, titration)
     return np.sum([v * components[k] for k, v in component_multipliers.items()], axis=0)

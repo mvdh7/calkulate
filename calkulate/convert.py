@@ -43,3 +43,28 @@ def measurement_type_to_solver(measurement_type):
         "pH": solve.complete_pH,
     }
     return m2s[measurement_type]
+
+
+calk_to_pyco2 = {
+    "total_ammonia": "TNH3",
+    "total_phosphate": "TPO4",
+    "total_silicate": "TSi",
+    "total_sulfide": "TH2S",
+    "total_borate": "TB",
+    "total_fluoride": "TF",
+    "total_sulfate": "TSO4",
+    "k_ammonia": "KNH3",
+    "k_borate": "KB",
+    "k_bisulfate": "KSO4",
+    "k_carbonic_1": "K1",
+    "k_carbonic_2": "K2",
+    "k_fluoride": "KF",
+    "k_phosphate_1": "KP1",
+    "k_phosphate_2": "KP2",
+    "k_phosphate_3": "KP3",
+    "k_silicate": "KSi",
+    "k_sulfide": "KH2S",
+    "k_water": "KW",
+}
+
+pyco2_to_calk = {v: k for k, v in calk_to_pyco2.items()}
