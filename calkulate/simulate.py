@@ -8,27 +8,27 @@ import numpy as np
 def alkalinity_components(pH, titration):
     """Calculate chemical speciation from pH."""
     # Unpack total salts (these should already include any dilution correction)
-    TCO2 = titration["dic"].values * 1e-6
-    TB = titration["total_borate"].values * 1e-6
-    TSO4 = titration["total_sulfate"].values * 1e-6
-    TF = titration["total_fluoride"].values * 1e-6
-    TPO4 = titration["total_phosphate"].values * 1e-6
-    TSi = titration["total_silicate"].values * 1e-6
-    TNH3 = titration["total_ammonia"].values * 1e-6
-    TH2S = titration["total_sulfide"].values * 1e-6
+    TCO2 = titration["dic"] * 1e-6
+    TB = titration["total_borate"] * 1e-6
+    TSO4 = titration["total_sulfate"] * 1e-6
+    TF = titration["total_fluoride"] * 1e-6
+    TPO4 = titration["total_phosphate"] * 1e-6
+    TSi = titration["total_silicate"] * 1e-6
+    TNH3 = titration["total_ammonia"] * 1e-6
+    TH2S = titration["total_sulfide"] * 1e-6
     # Unpack equilibrium constants (should all be on the Free scale)
-    KW = titration["k_water"].values
-    K1 = titration["k_carbonic_1"].values
-    K2 = titration["k_carbonic_2"].values
-    KB = titration["k_borate"].values
-    KSO4 = titration["k_bisulfate"].values
-    KF = titration["k_fluoride"].values
-    KP1 = titration["k_phosphate_1"].values
-    KP2 = titration["k_phosphate_2"].values
-    KP3 = titration["k_phosphate_3"].values
-    KSi = titration["k_silicate"].values
-    KNH3 = titration["k_ammonia"].values
-    KH2S = titration["k_sulfide"].values
+    KW = titration["k_water"]
+    K1 = titration["k_carbonic_1"]
+    K2 = titration["k_carbonic_2"]
+    KB = titration["k_borate"]
+    KSO4 = titration["k_bisulfate"]
+    KF = titration["k_fluoride"]
+    KP1 = titration["k_phosphate_1"]
+    KP2 = titration["k_phosphate_2"]
+    KP3 = titration["k_phosphate_3"]
+    KSi = titration["k_silicate"]
+    KNH3 = titration["k_ammonia"]
+    KH2S = titration["k_sulfide"]
     # Calculate components
     h = 10.0 ** -pH
     hydroxide = KW / h

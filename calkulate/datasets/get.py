@@ -111,6 +111,8 @@ def get_titrant_density(dataset):
 def _get_titrant_mass(row):
     if row.titration is not None:
         if str(row.titrant_amount_unit).lower() == "g":
+            row.titration["titrant_mass"] = row.titration.titrant_amount * 1e-3
+        elif str(row.titrant_amount_unit).lower() == "kg":
             row.titration["titrant_mass"] = row.titration.titrant_amount
         elif str(row.titrant_amount_unit).lower() == "ml":
             row.titration["titrant_mass"] = (
@@ -184,7 +186,7 @@ def get_analyte_totals(dataset):
 def _get_titration_totals(row):
     if row.titration is not None:
         row.titration["dilution_factor"] = convert.dilution_factor(
-            row.analyte_mass, row.analyte_mass + row.titration.titrant_amount
+            row.analyte_mass, row.analyte_mass + row.titration.titrant_mass
         )
         for salt in [
             "dic",
@@ -294,16 +296,4 @@ def get_k_constants(dataset):
             dataset.opt_gas_constant,
         )
     dataset.apply(_get_k_constants, axis=1)
-    return dataset
-
-
-def calkulate(dataset, read_dat_kwargs=None):
-    """Do absolutely everything in one go."""
-    if read_dat_kwargs is None:
-        read_dat_kwargs = {}
-    dataset.get_titrations(**read_dat_kwargs)
-    dataset.get_analyte_mass()
-    dataset.get_titrant_mass()
-    dataset.get_totals()
-    dataset.get_k_constants()
     return dataset

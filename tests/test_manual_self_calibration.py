@@ -1,104 +1,39 @@
-# import calkulate as calk, PyCO2SYS as pyco2, numpy as np, pandas as pd
+import copy
+import calkulate as calk, numpy as np
 
-# # Import data
-# tf = calk.read_csv("tests/data/titration_table.csv").calkulate()
-
-# # tf.loc[0, "titrant_molinity"] = 0.1
-# # alkalinity_guess, emf0_guess, G = calk.solve.gran_guesses(x, tf.loc[0])
-
-# i = 0
-# tf.loc[i, "titrant_molinity"] = 0.1
-# x = tf.titration[i]
-# test = calk.solve.complete_emf(tf.titration[i], tf.loc[i])["x"][0] * 1e6
+# Import data and self-calibrate
+tf = calk.read_csv("tests/data/titration_table.csv").prepare()
+tf.calibrate()
+tf["titrant_molinity"] = tf["titrant_molinity_here"]
+tf.solve()
 
 
-# i = 4
-# x = tf.titration[i]
-# test2 = calk.solve.complete_pH(tf.titration[i], tf.loc[i])["x"][0]
+def test_manual_self_calibration():
+    """Can we successfully calibrate samples with themselves?"""
+    l = ~np.isnan(tf.alkalinity)
+    assert np.all(
+        np.isclose(tf.alkalinity_certified[l], tf.alkalinity[l], rtol=0, atol=1e-6)
+    )
 
 
-# tf.loc[0, "titrant_molinity"] = calk.solve.calibrate(tf.titration[0], tf.loc[0])['x'][0]
-# tf.solve()
-
-# tf.apply(_get_totals, axis=1)
-# print(tf.titration[0])
-# print(tf.titration[0].columns)
-
-# # # Manually prepare inputs for low-level functions
-# # titrant = {
-# #     "mass": tt.dat_dict["titrant_amount"] * 1e-3 / calk.density.HCl_NaCl_25C_DSC07(),
-# # }
-# # analyte = {
-# #     "alkalinity_certified": tt.alkalinity_certified,
-# #     "dic": tt.dic,
-# #     "mass": tt.analyte_volume
-# #     * 1e-3
-# #     / calk.density.seawater_1atm_MP81(
-# #         temperature=tt.dat_dict["mixture_temperature"][0], salinity=tt.salinity
-# #     ),
-# # }
-
-# # # Evaluate PyCO2SYS intermediates
-# # total_ammonia = 5
-# # total_sulfide = 3
-# # opt_k_carbonic = 16
-# # totals = pyco2.salts.assemble(
-# #     tt["salinity"],
-# #     tt["total_silicate"],
-# #     tt["total_phosphate"],
-# #     total_ammonia,
-# #     total_sulfide,
-# #     opt_k_carbonic,
-# #     tt["opt_total_borate"],
-# # )
-# # dilution_factor = calk.convert.dilution_factor(
-# #     analyte["mass"], analyte["mass"] + titrant["mass"]
-# # )
-# # totals = {k: v * dilution_factor if k != "Sal" else v for k, v in totals.items()}
-# # pressure = 0
-# # opt_pH_scale = 3
-# # opt_k_bisulfate = 1
-# # opt_k_fluoride = 1
-# # opt_gas_constant = 3
-# # k_constants = pyco2.equilibria.assemble(
-# #     tt.dat_dict["mixture_temperature"],
-# #     pressure,
-# #     totals,
-# #     opt_pH_scale,
-# #     opt_k_carbonic,
-# #     opt_k_bisulfate,
-# #     opt_k_fluoride,
-# #     opt_gas_constant,
-# # )
-
-# # # Calibrate the sample with itself
-# # calibrated = calk.solve.calibrate(
-# #     titrant,
-# #     analyte,
-# #     tt.dat_dict["mixture_measurement"],
-# #     tt.dat_dict["mixture_temperature"],
-# #     totals,
-# #     k_constants,
-# # )
-# # titrant["molinity"] = calibrated["x"][0]
-
-# # # Solve the sample from its own calibration
-# # solved = calk.solve.complete_emf(
-# #     titrant,
-# #     analyte,
-# #     tt.dat_dict["mixture_measurement"],
-# #     tt.dat_dict["mixture_temperature"],
-# #     totals,
-# #     k_constants,
-# # )
-# # alkalinity_calibrated = solved["x"][0] * 1e6
+test_manual_self_calibration()
 
 
-# # def test_manual_self_calibration():
-# #     """Can we successfully calibrate a sample with itself?"""
-# #     assert np.isclose(
-# #         alkalinity_calibrated, analyte["alkalinity_certified"], rtol=0, atol=1e-8
-# #     )
+def test_Dickson_via_EMF():
+    """Can we still return correct alkalinity and EMF from the Dickson data if we first
+    convert it from pH to EMF with some arbitrary EMF0?"""
+    emf0_i = 678
+    tf2 = copy.deepcopy(tf)
+    i = 5
+    tf2.loc[i, "measurement_type"] = "emf"
+    tf2.loc[i].titration["emf"] = calk.convert.h_to_emf(
+        10.0 ** -tf2.loc[i].titration["pH"], emf0_i, tf2.loc[i].titration["temperature"]
+    )
+    alkalinity, emf0 = calk.solve.complete_emf(tf2.loc[i])["x"]
+    assert np.isclose(
+        alkalinity * 1e6, tf2.loc[i].alkalinity_certified, rtol=0, atol=1e-3
+    )
+    assert np.isclose(emf0, emf0_i, rtol=0, atol=1e-4)
 
 
-# # test_manual_self_calibration()
+test_Dickson_via_EMF()
