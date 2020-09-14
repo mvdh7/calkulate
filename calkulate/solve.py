@@ -3,12 +3,13 @@
 """Solve titration data for total alkalinity."""
 
 import warnings
-import numpy as np, PyCO2SYS as pyco2
+import numpy as np
 from scipy.stats import linregress
 from scipy.optimize import least_squares
 from . import constants, convert, options, simulate
 
-pyco2.solve.get.TAfromTCpH = pyco2.solve.get.TAfromTCpH_fixed
+# import PyCO2SYS as pyco2
+# pyco2.solve.get.TAfromTCpH = pyco2.solve.get.TAfromTCpH_fixed
 
 
 def gran_estimator(mixture_mass, emf, temperature, use_points=None):
@@ -147,145 +148,145 @@ def complete_pH(dataset_row, titrant_molinity=None, pH_range=(3, 4)):
     }
 
 
-def _get_PyCO2SYS_inputs(titration, salinity):
-    totals = {
-        convert.calk_to_pyco2[t]: titration[t].values * 1e-6
-        for t in [
-            "total_silicate",
-            "total_phosphate",
-            "total_ammonia",
-            "total_sulfide",
-            "total_sulfate",
-            "total_borate",
-            "total_fluoride",
-        ]
-    }
-    k_constants = {
-        convert.calk_to_pyco2[k]: titration[k].values
-        for k in [
-            "k_ammonia",
-            "k_borate",
-            "k_bisulfate",
-            "k_carbonic_1",
-            "k_carbonic_2",
-            "k_fluoride",
-            "k_phosphate_1",
-            "k_phosphate_2",
-            "k_phosphate_3",
-            "k_silicate",
-            "k_sulfide",
-            "k_water",
-        ]
-    }
-    k_constants = pyco2.convert.get_pHfactor_to_Free(
-        titration["temperature"].values,
-        salinity,
-        totals,
-        k_constants,
-        3,
-        options.pyco2_opt_k_carbonic,
-    )
-    return totals, k_constants
+# def _get_PyCO2SYS_inputs(titration, salinity):
+#     totals = {
+#         convert.calk_to_pyco2[t]: titration[t].values * 1e-6
+#         for t in [
+#             "total_silicate",
+#             "total_phosphate",
+#             "total_ammonia",
+#             "total_sulfide",
+#             "total_sulfate",
+#             "total_borate",
+#             "total_fluoride",
+#         ]
+#     }
+#     k_constants = {
+#         convert.calk_to_pyco2[k]: titration[k].values
+#         for k in [
+#             "k_ammonia",
+#             "k_borate",
+#             "k_bisulfate",
+#             "k_carbonic_1",
+#             "k_carbonic_2",
+#             "k_fluoride",
+#             "k_phosphate_1",
+#             "k_phosphate_2",
+#             "k_phosphate_3",
+#             "k_silicate",
+#             "k_sulfide",
+#             "k_water",
+#         ]
+#     }
+#     k_constants = pyco2.convert.get_pHfactor_to_Free(
+#         titration["temperature"].values,
+#         salinity,
+#         totals,
+#         k_constants,
+#         3,
+#         options.pyco2_opt_k_carbonic,
+#     )
+#     return totals, k_constants
 
 
-def _lsqfun_calibrate_emf(
-    titrant_molinity__emf0,
-    titrant_mass,
-    emf,
-    temperature,
-    dic,
-    analyte_mass,
-    alkalinity_certified,
-    totals,
-    k_constants,
-):
-    titrant_molinity, emf0 = titrant_molinity__emf0
-    mixture_alkalinity = (
-        alkalinity_certified * analyte_mass - titrant_mass * titrant_molinity * 1e6
-    ) / (analyte_mass + titrant_mass)
-    pH_emf0 = -np.log10(convert.emf_to_h(emf, emf0, temperature))
-    pH_alk = pyco2.solve.get.pHfromTATC(
-        mixture_alkalinity * 1e-6, dic * 1e-6, totals, k_constants
-    )
-    return pH_emf0 - pH_alk
+# def _lsqfun_calibrate_emf(
+#     titrant_molinity__emf0,
+#     titrant_mass,
+#     emf,
+#     temperature,
+#     dic,
+#     analyte_mass,
+#     alkalinity_certified,
+#     totals,
+#     k_constants,
+# ):
+#     titrant_molinity, emf0 = titrant_molinity__emf0
+#     mixture_alkalinity = (
+#         alkalinity_certified * analyte_mass - titrant_mass * titrant_molinity * 1e6
+#     ) / (analyte_mass + titrant_mass)
+#     pH_emf0 = -np.log10(convert.emf_to_h(emf, emf0, temperature))
+#     pH_alk = pyco2.solve.get.pHfromTATC(
+#         mixture_alkalinity * 1e-6, dic * 1e-6, totals, k_constants
+#     )
+#     return pH_emf0 - pH_alk
 
 
-def calibrate_emf(dataset_row, titrant_molinity_guess=0.1, pH_range=(3, 4)):
-    """Calibrate the titrant molinity where alkalinity is known for EMF data."""
-    dsr = dataset_row
-    tt = dataset_row["titration"]
-    mixture_mass = tt["titrant_mass"] + dsr["analyte_mass"]
-    estimator = gran_estimator(mixture_mass, tt["emf"], tt["temperature"])
-    G = (estimator > 0.1 * np.max(estimator)) & (estimator < 0.9 * np.max(estimator))
-    emf0_guess = np.mean(
-        gran_guess_emf0(
-            tt["titrant_mass"],
-            tt["emf"],
-            tt["temperature"],
-            dsr["analyte_mass"],
-            titrant_molinity_guess,
-            use_points=G,
-        )
-    )
-    totals, k_constants = _get_PyCO2SYS_inputs(tt[G], dsr["salinity"])
-    return least_squares(
-        _lsqfun_calibrate_emf,
-        [titrant_molinity_guess, emf0_guess],
-        args=(
-            tt["titrant_mass"][G].to_numpy(),
-            tt["emf"][G].to_numpy(),
-            tt["temperature"][G].to_numpy(),
-            tt["dic"][G].to_numpy(),
-            dsr["analyte_mass"],
-            dsr["alkalinity_certified"],
-            totals,
-            k_constants,
-        ),
-        method=options.solver_method,
-    )
+# def calibrate_emf(dataset_row, titrant_molinity_guess=0.1, pH_range=(3, 4)):
+#     """Calibrate the titrant molinity where alkalinity is known for EMF data."""
+#     dsr = dataset_row
+#     tt = dataset_row["titration"]
+#     mixture_mass = tt["titrant_mass"] + dsr["analyte_mass"]
+#     estimator = gran_estimator(mixture_mass, tt["emf"], tt["temperature"])
+#     G = (estimator > 0.1 * np.max(estimator)) & (estimator < 0.9 * np.max(estimator))
+#     emf0_guess = np.mean(
+#         gran_guess_emf0(
+#             tt["titrant_mass"],
+#             tt["emf"],
+#             tt["temperature"],
+#             dsr["analyte_mass"],
+#             titrant_molinity_guess,
+#             use_points=G,
+#         )
+#     )
+#     totals, k_constants = _get_PyCO2SYS_inputs(tt[G], dsr["salinity"])
+#     return least_squares(
+#         _lsqfun_calibrate_emf,
+#         [titrant_molinity_guess, emf0_guess],
+#         args=(
+#             tt["titrant_mass"][G].to_numpy(),
+#             tt["emf"][G].to_numpy(),
+#             tt["temperature"][G].to_numpy(),
+#             tt["dic"][G].to_numpy(),
+#             dsr["analyte_mass"],
+#             dsr["alkalinity_certified"],
+#             totals,
+#             k_constants,
+#         ),
+#         method=options.solver_method,
+#     )
 
 
-def _lsqfun_calibrate_pH(
-    titrant_molinity,
-    titrant_mass,
-    pH,
-    dic,
-    analyte_mass,
-    alkalinity_certified,
-    totals,
-    k_constants,
-):
-    mixture_alkalinity = (
-        alkalinity_certified * analyte_mass - titrant_mass * titrant_molinity * 1e6
-    ) / (analyte_mass + titrant_mass)
-    pH_alk = pyco2.solve.get.pHfromTATC(
-        mixture_alkalinity * 1e-6, dic * 1e-6, totals, k_constants
-    )
-    return pH - pH_alk
+# def _lsqfun_calibrate_pH(
+#     titrant_molinity,
+#     titrant_mass,
+#     pH,
+#     dic,
+#     analyte_mass,
+#     alkalinity_certified,
+#     totals,
+#     k_constants,
+# ):
+#     mixture_alkalinity = (
+#         alkalinity_certified * analyte_mass - titrant_mass * titrant_molinity * 1e6
+#     ) / (analyte_mass + titrant_mass)
+#     pH_alk = pyco2.solve.get.pHfromTATC(
+#         mixture_alkalinity * 1e-6, dic * 1e-6, totals, k_constants
+#     )
+#     return pH - pH_alk
 
 
-def calibrate_pH(dataset_row, titrant_molinity_guess=0.1, pH_range=(3, 4)):
-    """Calibrate the titrant molinity where alkalinity is known for pH data."""
-    dsr = dataset_row
-    tt = dataset_row["titration"]
-    assert pH_range[0] < pH_range[1]
-    G = (tt["pH"] > pH_range[0]) & (tt["pH"] < pH_range[1])
-    assert sum(G) > 0, "No titration points fall in the specified pH range!"
-    totals, k_constants = _get_PyCO2SYS_inputs(tt[G], dsr["salinity"])
-    return least_squares(
-        _lsqfun_calibrate_pH,
-        titrant_molinity_guess,
-        args=(
-            tt["titrant_mass"][G].to_numpy(),
-            tt["pH"][G].to_numpy(),
-            tt["dic"][G].to_numpy(),
-            dsr["analyte_mass"],
-            dsr["alkalinity_certified"],
-            totals,
-            k_constants,
-        ),
-        method=options.solver_method,
-    )
+# def calibrate_pH(dataset_row, titrant_molinity_guess=0.1, pH_range=(3, 4)):
+#     """Calibrate the titrant molinity where alkalinity is known for pH data."""
+#     dsr = dataset_row
+#     tt = dataset_row["titration"]
+#     assert pH_range[0] < pH_range[1]
+#     G = (tt["pH"] > pH_range[0]) & (tt["pH"] < pH_range[1])
+#     assert sum(G) > 0, "No titration points fall in the specified pH range!"
+#     totals, k_constants = _get_PyCO2SYS_inputs(tt[G], dsr["salinity"])
+#     return least_squares(
+#         _lsqfun_calibrate_pH,
+#         titrant_molinity_guess,
+#         args=(
+#             tt["titrant_mass"][G].to_numpy(),
+#             tt["pH"][G].to_numpy(),
+#             tt["dic"][G].to_numpy(),
+#             dsr["analyte_mass"],
+#             dsr["alkalinity_certified"],
+#             totals,
+#             k_constants,
+#         ),
+#         method=options.solver_method,
+#     )
 
 
 def _lsqfun_calibrate(titrant_molinity, dataset_row, solver, pH_range):

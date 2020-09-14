@@ -1,5 +1,5 @@
 import numpy as np, pandas as pd
-from .. import options, solve
+from .. import convert, options, solve
 
 
 def calibrate_all(dataset, pH_range=(3, 4), verbose=options.verbose):
@@ -30,6 +30,8 @@ def solve_all(dataset, pH_range=(3, 4), verbose=options.verbose):
     """Determine alkalinity for all samples that have a titrant molinity value."""
     alkalinity = {}
     emf0 = {}
+    pH_initial = {}
+    pH_initial_temperature = {}
     for i, row in dataset.iterrows():
         if row.titration is not None and ~np.isnan(row.titrant_molinity):
             if verbose:
@@ -38,14 +40,26 @@ def solve_all(dataset, pH_range=(3, 4), verbose=options.verbose):
                 solved = solve.complete_pH(row, pH_range=pH_range)
                 alkalinity[i] = solved["x"][0]
                 emf0[i] = None
+                pH_initial[i] = row.titration.iloc[0].pH
+                pH_initial_temperature[i] = row.titration.iloc[0].temperature
             elif row.measurement_type == "emf":
                 solved = solve.complete_emf(row, pH_range=pH_range)
                 alkalinity[i], emf0[i] = solved["x"]
+                pH_initial[i] = convert.emf_to_pH(
+                    row.titration.iloc[0].emf,
+                    emf0[i],
+                    row.titration.iloc[0].temperature,
+                )
+                pH_initial_temperature[i] = row.titration.iloc[0].temperature
         else:
             alkalinity[i] = None
             emf0[i] = None
+            pH_initial[i] = None
+            pH_initial_temperature[i] = None
     dataset["alkalinity"] = pd.Series(alkalinity) * 1e6
     dataset["emf0"] = pd.Series(emf0)
+    dataset["pH_initial"] = pd.Series(pH_initial)
+    dataset["pH_initial_temperature"] = pd.Series(pH_initial_temperature)
     if verbose:
         print("Calkulate: solving complete!")
     return dataset

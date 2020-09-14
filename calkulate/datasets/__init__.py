@@ -1,4 +1,4 @@
-from .dataset import Dataset
+from .dataset import Dataset, prepare, calibrate, solve
 from .read import read_csv, read_dbs, read_excel
 from .get import (
     get_measurement_type,
