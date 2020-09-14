@@ -1,4 +1,11 @@
-from .dataset import Dataset, prepare, calibrate, solve
+from .dataset import (
+    Dataset,
+    prepare,
+    calibrate,
+    solve,
+    calkulate,
+    set_batch_mean_molinity,
+)
 from .read import read_csv, read_dbs, read_excel
 from .get import (
     get_measurement_type,
@@ -12,3 +19,4 @@ from .get import (
     get_totals,
     get_k_constants,
 )
+from .quantify import solve_all, calibrate_all

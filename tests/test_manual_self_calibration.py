@@ -29,7 +29,7 @@ def test_Dickson_via_EMF():
     tf2.loc[i].titration["emf"] = calk.convert.h_to_emf(
         10.0 ** -tf2.loc[i].titration["pH"], emf0_i, tf2.loc[i].titration["temperature"]
     )
-    alkalinity, emf0 = calk.solve.complete_emf(tf2.loc[i])["x"]
+    alkalinity, emf0 = calk.solvers.complete_emf(tf2.loc[i])["x"]
     assert np.isclose(
         alkalinity * 1e6, tf2.loc[i].alkalinity_certified, rtol=0, atol=1e-3
     )

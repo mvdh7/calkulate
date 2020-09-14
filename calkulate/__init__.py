@@ -13,6 +13,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""Determine (sea)water total alkalinity from titration data."""
 
 from . import (
     constants,
@@ -21,7 +22,7 @@ from . import (
     density,
     options,
     simulate,
-    solve,
+    solvers,
     titrations,
 )
 from .titrations import Titration, read_dat, to_dat
@@ -37,8 +38,16 @@ from .datasets import (
     get_titration_totals,
     get_totals,
     get_k_constants,
+    set_batch_mean_molinity,
     prepare,
+    solve,
+    solve_all,
+    calibrate,
+    calibrate_all,
+    calkulate,
 )
+
+calibrate_and_solve = calkulate
 
 
 # Package metadata

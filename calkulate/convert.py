@@ -3,7 +3,7 @@
 """Convert between various properties."""
 
 import numpy as np
-from . import constants, solve
+from . import constants, solvers
 
 F = constants.faraday
 R = constants.ideal_gas
@@ -39,8 +39,8 @@ def f_to_dEmf0(f, temperature):
 
 def measurement_type_to_solver(measurement_type):
     m2s = {
-        "EMF": solve.complete_emf,
-        "pH": solve.complete_pH,
+        "EMF": solvers.complete_emf,
+        "pH": solvers.complete_pH,
     }
     return m2s[measurement_type]
 

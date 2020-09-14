@@ -1,5 +1,5 @@
 import numpy as np, pandas as pd
-from .. import convert, options, solve
+from .. import convert, options, solvers
 
 
 def calibrate_all(dataset, pH_range=(3, 4), verbose=options.verbose):
@@ -10,12 +10,12 @@ def calibrate_all(dataset, pH_range=(3, 4), verbose=options.verbose):
             if verbose:
                 print("Calkulate: calibrating {}...".format(row.file_name))
             if row.measurement_type == "pH":
-                titrant_molinity[i] = solve.calibrate(
-                    row, pH_range=pH_range, solver=solve.complete_pH
+                titrant_molinity[i] = solvers.calibrate(
+                    row, pH_range=pH_range, solver=solvers.complete_pH
                 )["x"][0]
             else:  # if row.measurement_type == "emf":
-                titrant_molinity[i] = solve.calibrate(
-                    row, pH_range=pH_range, solver=solve.complete_emf
+                titrant_molinity[i] = solvers.calibrate(
+                    row, pH_range=pH_range, solver=solvers.complete_emf
                 )["x"][0]
         else:
             titrant_molinity[i] = None
@@ -37,13 +37,13 @@ def solve_all(dataset, pH_range=(3, 4), verbose=options.verbose):
             if verbose:
                 print("Calkulate: solving {}...".format(row.file_name))
             if row.measurement_type == "pH":
-                solved = solve.complete_pH(row, pH_range=pH_range)
+                solved = solvers.complete_pH(row, pH_range=pH_range)
                 alkalinity[i] = solved["x"][0]
                 emf0[i] = None
                 pH_initial[i] = row.titration.iloc[0].pH
                 pH_initial_temperature[i] = row.titration.iloc[0].temperature
             elif row.measurement_type == "emf":
-                solved = solve.complete_emf(row, pH_range=pH_range)
+                solved = solvers.complete_emf(row, pH_range=pH_range)
                 alkalinity[i], emf0[i] = solved["x"]
                 pH_initial[i] = convert.emf_to_pH(
                     row.titration.iloc[0].emf,
