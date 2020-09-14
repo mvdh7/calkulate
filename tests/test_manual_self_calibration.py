@@ -4,7 +4,7 @@ import calkulate as calk, numpy as np
 # Import data and self-calibrate
 tf = calk.read_csv("tests/data/titration_table.csv").prepare()
 tf.calibrate()
-tf["titrant_molinity"] = tf["titrant_molinity_here"]
+tf["titrant_molinity"] = tf["titrant_molinity_here"]  # just for these tests
 tf.solve()
 
 

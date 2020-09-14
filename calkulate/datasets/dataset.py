@@ -1,4 +1,5 @@
-import pandas as pd
+import pandas as pd, numpy as np
+from .. import options
 
 
 def prepare(dataset, read_dat_kwargs=None):
@@ -13,23 +14,47 @@ def prepare(dataset, read_dat_kwargs=None):
     return dataset
 
 
-def calibrate(dataset, index=None):
+def calibrate(dataset, index=None, pH_range=(3, 4), verbose=options.verbose):
+    """Calibrate titrant molinity for all samples with known alkalinity."""
     if index is None:
-        dataset.calibrate_all()
+        dataset.calibrate_all(pH_range=pH_range, verbose=verbose)
+    dataset.set_batch_mean_molinity()
     return dataset
 
 
-def solve(dataset, index=None):
+def solve(dataset, index=None, pH_range=(3, 4), verbose=options.verbose):
+    """Solve all samples with known titrant molinity for total alkalinity."""
     if index is None:
-        dataset.solve_all()
+        dataset.solve_all(pH_range=pH_range, verbose=verbose)
     return dataset
 
 
-def calkulate(dataset, read_dat_kwargs=None):
+def set_batch_mean_molinity(dataset):
+    """Calculate mean titrant molinity for each analysis batch and apply to all samples
+    in that batch.
+    """
+    if "analysis_batch" not in dataset:
+        dataset["analysis_batch"] = 0
+    use_titrations = ~np.isnan(dataset.titrant_molinity_here)
+    if "reference_good" in dataset:
+        use_titrations &= dataset["reference_good"]
+    batches = (
+        dataset[["analysis_batch", "titrant_molinity_here"]][use_titrations]
+        .groupby("analysis_batch")
+        .agg(["mean", "std", "count"])
+    )
+    dataset["titrant_molinity"] = batches.loc[
+        dataset.analysis_batch.values, "titrant_molinity_here"
+    ]["mean"].values
+    return dataset
+
+
+def calkulate(dataset, read_dat_kwargs=None, pH_range=(3, 4), verbose=options.verbose):
     """Do absolutely everything in one go."""
-    dataset.prepare()
-    dataset.calibrate_all()
-    dataset.solve_all()
+    dataset.prepare(read_dat_kwargs=read_dat_kwargs)
+    dataset.calibrate_all(pH_range=pH_range, verbose=verbose)
+    dataset.set_batch_mean_molinity()
+    dataset.solve_all(pH_range=pH_range, verbose=verbose)
     return dataset
 
 
@@ -50,5 +75,6 @@ class Dataset(pd.DataFrame):
 
     prepare = prepare
     calibrate = calibrate
+    set_batch_mean_molinity = set_batch_mean_molinity
     solve = solve
     calkulate = calkulate

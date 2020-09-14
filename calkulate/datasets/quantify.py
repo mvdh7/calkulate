@@ -20,6 +20,7 @@ def calibrate_all(dataset, pH_range=(3, 4), verbose=options.verbose):
         else:
             titrant_molinity[i] = None
     dataset["titrant_molinity_here"] = pd.Series(titrant_molinity)
+    dataset.set_batch_mean_molinity()
     if verbose:
         print("Calkulate: calibrations complete!")
     return dataset
