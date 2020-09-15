@@ -25,7 +25,7 @@ from . import (
     solvers,
     titrations,
 )
-from .titrations import Titration, read_dat, to_dat
+from .titrations import Titration, read_dat, to_dat, kwargs_TiTouch
 from .datasets import (
     Dataset,
     read_csv,
