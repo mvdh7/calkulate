@@ -32,7 +32,7 @@ ds = calk.read_dbs("path/to/metadata_file.dbs")
 
 `read_dbs` also renames several columns from their defaults to the names expected by Calkulate.
 
-The columns in the Dataset [must be named in a specific way]().
+The columns in the Dataset [must be named in a specific way](../metadata/#dataset-column-names).
 
 ## Individual titration data files
 

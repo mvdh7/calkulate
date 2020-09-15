@@ -28,6 +28,7 @@ Calkulate is in active development and new features that should be added soon in
 
   * Different alkalinity-solving algorithms.
   * Visualisation functions.
+  * Documentation of the lower-level controls for fine-tuning your analysis.
 
 ## About
 
