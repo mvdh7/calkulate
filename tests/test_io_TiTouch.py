@@ -35,9 +35,8 @@ def test_TiTouch_dataset():
     )
     assert isinstance(ds, calk.Dataset)
     crm = ~np.isnan(ds.alkalinity_certified)
-    print(ds.alkalinity[crm] - ds.alkalinity_certified[crm])
     assert np.all(
-        np.isclose(ds.alkalinity[crm], ds.alkalinity_certified[crm], rtol=0, atol=1e-8)
+        np.isclose(ds.alkalinity[crm], ds.alkalinity_certified[crm], rtol=0, atol=1e-7)
     )
     assert np.all((ds.alkalinity > 1500) & (ds.alkalinity < 3000))
     assert np.all((ds.titrant_molinity > 0.08) & (ds.titrant_molinity < 0.12))
