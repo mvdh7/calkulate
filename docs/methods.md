@@ -93,3 +93,18 @@ ds["titrant_molinity"] = ...
 # Solve for alkalinity
 ds.solve()
 ```
+
+Alternatively, if your metadata is coming from a VINDTA dbs file, you may need to add extra columns to it before processing:
+
+```python
+# Import metadata
+ds = calk.read_dbs("path/to/metadata_file.dbs")
+
+# Add extra columns
+ds["analysis_batch"] = ...
+ds["alkalinity_certified"] = ...
+# etc.
+
+# Calkulate!
+ds.calkulate()
+```

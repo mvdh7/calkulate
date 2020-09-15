@@ -1,8 +1,10 @@
 # The Dataset of titration metadata
 
-A Calkulate Dataset is just a [pandas DataFrame](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html) with [some extra methods added](methods).
+A Calkulate Dataset is just a [pandas DataFrame](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html) with [some extra methods added](../methods).
 
 You can make a dataset [from an existing DataFrame](../io/#convert-from-a-dataframe) or by [importing a spreadsheet from various formats](../io/#import-from-excel-csv-or-dbs).
+
+There are some example Dataset spreadsheets in various formats to look at [on GitHub](https://github.com/mvdh7/calkulate/tree/master/tests/data).
 
 Whichever way you do it, each row of the Dataset corresponds to a separate titration, and each column contains a different piece of metadata.  Some columns are required, others are optional.  The columns must be named as follows.
 
