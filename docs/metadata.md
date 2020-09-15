@@ -22,7 +22,7 @@ Extra columns will be ignored by Calkulate and should not cause any problems.
 ??? success "`salinity` : *practical salinity of the analyte*"
     This is dimensionless.
 
-??? question "`analyte_mass` or `analyte_volume` : *mass or volume of the analyte*"
+??? question "`analyte_mass` or `analyte_volume` : *mass (kg) or volume (ml) of the analyte*"
     **Mass must be in kg and volume in ml.**
     
     If volume is provided, it is converted into mass following [MP81](../references/#m).
@@ -39,7 +39,7 @@ Not strictly essential, but you'll need these most of the time.  If values are o
 ??? tip "`analysis_batch` : *identifies subsets that can be calibrated together*"
     A list of analysis batch names or numbers.  It is assumed that all titrations with the same `analysis_batch` value have a common titrant.  If nothing is provided, all titrations are assumed to have a common titrant.
 
-??? tip "`dic` : *dissolved inorganic carbon*"
+??? tip "`dic` : *dissolved inorganic carbon (μmol/kg-solution)*"
     In μmol/kg-solution.
 
     Defaults to zero if not provided.
@@ -47,7 +47,7 @@ Not strictly essential, but you'll need these most of the time.  If values are o
 ??? tip "`file_path` : *path to the titration file*"
     This is prefixed to `file_name`.
 
-??? tip "`total_*` : *total salt concentrations*"
+??? tip "`total_*` : *total salt concentrations (μmol/kg-solution)*"
     These must all be in μmol/kg-solution.
 
     Some default to zero if not provided:

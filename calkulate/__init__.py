@@ -51,10 +51,21 @@ calibrate_and_solve = calkulate
 
 
 # Package metadata
-__author__ = "Matthew P. Humphreys"
-__version__ = "3.0.0-beta.3"
+_authorlist = ["Humphreys, Matthew P.", "Matthews, Ruth S."]
+__author__ = " and ".join(_authorlist)
+__version__ = "3.0.0"
 
 
 def say_hello():
     """Report the version number."""
-    print("This is Calkulate v{}.".format(__version__))
+    print(r"""
+   .--.     . .         .      .      
+  :         | |         |     _|_     
+  |    .-.  | |.-. .  . | .-.  |  .-. 
+  :   (   ) | |-.' |  | |(   ) | (.-' 
+   `--'`-'`-`-'  `-`--`-`-`-'`-`-'`--'
+
+       doi:10.5281/zenodo.2634304
+       
+             Version {}
+""".format(__version__))

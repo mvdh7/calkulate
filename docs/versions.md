@@ -6,6 +6,13 @@ Calkulate v3 switches to an object-oriented approach.  This makes working with i
 
 [PyCO2SYS](https://PyCO2SYS.rtfd.io) is now used to determine equilibrium constants and estimate total salt concentrations from salinity, instead of replicating those functions in Calkulate.
 
+### v3.0.0 (15 Sep 2020)
+
+!!! info "Release notes for v3.0.0"
+
+    * Introduces object-oriented approach in which most Calkulate functions are extensions to pandas DataFrames.
+    * Uses PyCO2SYS to evaluate all equilibrium constants and salt concentrations from salinity and temperature.
+
 ## Version 2: Python
 
 Calkulate v2 transitioned from MATLAB to Python and added several additional alkalinity solvers.  Despite being implemented in Python, the style was still rather MATLAB-esque.
