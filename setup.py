@@ -12,7 +12,14 @@ setuptools.setup(
     description="Seawater total alkalinity from titration data",
     url="https://github.com/mvdh7/calkulate",
     packages=setuptools.find_packages(),
-    install_requires=["numpy>=1.17", "PyCO2SYS>=1.5.1", "scipy>=1.4", "pandas>=1"],
+    install_requires=[
+        "numpy>=1.17",
+        "PyCO2SYS>=1.5.1",
+        "scipy>=1.4",
+        "pandas>=1",
+        "xlrd>=1.2",
+        "matplotlib>=3.2",
+    ],
     long_description=long_description,
     long_description_content_type="text/markdown",
     classifiers=[
