@@ -1,0 +1,7 @@
+analysis_batch,measurement_type,file_path,file_name,salinity,analyte_volume,analyte_mass,dic,total_phosphate,total_silicate,total_borate,total_fluoride,total_sulfate,opt_total_borate,titrant_concentration,titrant_molinity,temperature_override,alkalinity_certified,k_borate,k_carbonic_1,k_carbonic_2,k_fluoride,k_bisulfate,k_phosphate_1,k_phosphate_2,k_phosphate_3,k_water,titrant_amount_unit
+1,EMF,tests/data/,seawater-CRM-144.dat,33.571,100,NaN,2031.53,0.31,2.5,,,,1,0.1,NaN,NaN,2238.6,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,
+1,EMF,tests/data/,filename-does-not-exist.dat,33.571,100,NaN,2031.53,0.31,2.5,,,,1,0.1,NaN,NaN,2238.6,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,
+1,EMF,tests/data/,seawater-CRM-144-function.dat,33.571,100,NaN,2031.53,0.31,2.5,,,,1,0.1,NaN,NaN,2238.6,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,
+1,EMF,tests/data/,seawater-CRM-144-method.dat,33.571,100,NaN,2031.53,0.31,2.5,414.9,65.5,27082.6,NaN,0.1,NaN,25,2238.6,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,
+2,pH,tests/data/,Dickson-1981-pH-no_phosphate.dat,35,NaN,0.2,2200,0,0,420,70,28240,NaN,NaN,0.3,NaN,2450,1.78E-09,1.00E-06,8.20E-10,0.00245098,0.081300813,NaN,NaN,NaN,4.32E-14,g
+2,pH,tests/data/,Dickson-1981-pH-with_phosphate.dat,35,NaN,0.2,2200,10,0,420,70,28240,NaN,NaN,0.3,NaN,2450,1.78E-09,1.00E-06,8.20E-10,0.00245098,0.081300813,0.017605634,8.00E-07,1.65E-09,4.32E-14,g

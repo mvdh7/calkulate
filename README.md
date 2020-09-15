@@ -1,37 +1,48 @@
-# Calkulate v2
+# Calkulate
 
-**Calkulate v3 is in active development!  It will be much better but it will break all your v2 code.  If you're not in a rush, wait!**
+[![PyPI version](https://badge.fury.io/py/Calkulate.svg)](https://badge.fury.io/py/Calkulate)
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.2634304-informational)](https://doi.org/10.5281/zenodo.2634304)
+[![Docs](https://readthedocs.org/projects/calkulate/badge/?version=v3&style=flat)](https://calkulate.readthedocs.io/en/v3/)
+[![Build Status](https://travis-ci.org/mvdh7/calkulate.svg?branch=v3)](https://travis-ci.org/mvdh7/calkulate)
+[![Coverage](https://github.com/mvdh7/calkulate/blob/v3/misc/coverage.svg)](https://github.com/mvdh7/calkulate/blob/v3/misc/coverage.txt)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-[![pypi badge](https://img.shields.io/pypi/v/calkulate.svg?style=popout)](https://pypi.org/project/calkulate/) [![DOI](https://zenodo.org/badge/85561246.svg)](https://zenodo.org/badge/latestdoi/85561246)
-
-Calkulate calculates alkalinity from potentiometric titration data.
-
-For v1.0.2 (for MATLAB, and only implementing the half-Gran solver) [see the relevant branch](https://github.com/mvdh7/calkulate/tree/1.0.2).
-
-Documentation is available at [calkulate.readthedocs.io](https://calkulate.readthedocs.io/en/latest/).
-
+Calkulate is a Python package for finding total alkalinity from titration data using [PyCO2SYS](https://PyCO2SYS.rtfd.io).
 
 ## Installation
 
     pip install calkulate
 
-## Upgrade
+## Use
 
-    pip install calkulate --upgrade --no-cache-dir
+If the data for each individual titration is in its own text file and you have a spreadsheet containing the metadata for each titration on separate rows — all formatted as expected — then all you need to do with Calkulate is:
+
+```python
+import calkulate as calk
+data = calk.read_csv("path/to/metadata_file.csv").calkulate()
+data["alkalinity"]  # <== here are your alkalinity results
+```
+
+For more detail, see [the online documentation](https://calkulate.readthedocs.io/en/latest/).
+
+## About
+
+Calkulate is being developed by [Dr Matthew Humphreys](https://mvdh.xyz) at the Royal Netherlands Institute for Sea Research ([NIOZ, Texel, the Netherlands](https://www.nioz.nl/en)).
 
 ## Citation
 
-A paper describing Calkulate v2 is in preparation. For now, if you use the current version of Calkulate in your research, please cite it as:
+If you use Calkulate in your work, please cite it as:
 
-  * Humphreys, M. P. and Matthews, R. S. (2020). Total alkalinity from titration data in Python with Calkulate v2.3.0. [doi:10.5281/zenodo.3737874](https://doi.org/10.5281/zenodo.3737874).
+> Humphreys, M. P. and Matthews, R. S. (2020).  Calkulate: total alkalinity from titration data in Python.  *Zenodo.*  [doi:10.5281/zenodo.2634304](https://doi.org/10.5281/zenodo.2634304).
 
-For older Python versions, replace the version, year and DOI as follows:
+Please specify which version you are using.  To find this:
 
-  * v2.2.0, 2020, [doi:10.5281/zenodo.3719139](https://doi.org/10.5281/zenodo.3719139).
-  * v2.1.0, 2019, [doi:10.5281/zenodo.3361437](https://doi.org/10.5281/zenodo.3361437).
+```python
+import calkulate as calk
+calk.say_hello()
+```
 
-For the original MATLAB version, please cite:
+## License
 
-  * Humphreys, M. P. (2015). "Calculating seawater total alkalinity from open-cell titration data using a modified Gran plot technique," in *Measurements and Concepts in Marine Carbonate Chemistry* (PhD Thesis, Ocean and Earth Science, University of Southampton, UK), 25–44.
-
-But please do check back here for any updates first (or [get in touch](https://mvdh.xyz/contact/))!
+Calkulate is licensed under the [GNU General Public License version 3 (GPLv3)](https://www.gnu.org/licenses/gpl-3.0.en.html).
