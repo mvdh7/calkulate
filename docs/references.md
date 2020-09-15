@@ -4,6 +4,9 @@ Click on each reference to see the full citation.
 
 ### D
 
+??? info "D81: Dickson (1981) *Deep-Sea Res. Pt A*"
+    Dickson, A. G. (1981).  An exact definition of total alkalinity and a procedure for the estimation of alkalinity and total inorganic carbon from titration data.  *Deep Sea Research Part A. Oceanographic Research Papers* 28(6), 609–623.  [doi:10.1016/0198-0149(81)90121-7](https://doi.org/10.1016/0198-0149(81)90121-7).
+
 ??? info "DAA03: Dickson et al. (2003) *Mar. Chem.*"
     Dickson, A. G., Afghan, J. D., and Anderson, G. C. (2003).  Reference materials for oceanic CO<sub>2</sub> analysis: a method for the certification of total alkalinity.  *Marine Chemistry* 80(2–3), 185–197.  [doi:10.1016/S0304-4203(02)00133-0](https://doi.org/10.1016/S0304-4203(02)00133-0).
 

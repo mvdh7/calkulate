@@ -12,6 +12,7 @@ nav:
   - Import data: io.md
   - Metadata contents and format: metadata.md
   - Dataset methods: methods.md
+  - Validation: validate.md
   - References: references.md
   - Version history: versions.md
 
