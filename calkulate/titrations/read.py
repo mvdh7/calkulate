@@ -28,7 +28,7 @@ def read_dat(
             )
         )
     elif method == "fread":
-        with open(filepath_or_buffer, "r") as f:
+        with open(filepath_or_buffer, mode="r", encoding="ISO-8859-1") as f:
             raw_text = f.read().splitlines()
         ix = np.where(np.array(raw_text) == fread_start_line)[0][0] + 1
         data = []
