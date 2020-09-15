@@ -6,7 +6,7 @@ def prepare(dataset, read_dat_kwargs=None):
     """Do everything except for calibrating and solving."""
     if read_dat_kwargs is None:
         read_dat_kwargs = {}
-    dataset.get_titrations(**read_dat_kwargs)
+    dataset.get_titrations(read_dat_kwargs=read_dat_kwargs)
     dataset.get_analyte_mass()
     dataset.get_titrant_mass()
     dataset.get_totals()

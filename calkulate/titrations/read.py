@@ -11,14 +11,14 @@ def read_dat(
     header=None,
     method="pandas",
     fread_start_line="$S Mode 1\t01\tDET U\tV1.0",
-    **read_func_kwargs
+    **read_dat_kwargs
 ):
     """Read titration data from a text file."""
     assert method in ["pandas", "fread"], "Method must be 'pandas' or 'fread'."
     if method == "pandas":
         titration = Titration(
             pd.read_table(
-                filepath_or_buffer, skiprows=skiprows, header=header, **read_func_kwargs
+                filepath_or_buffer, skiprows=skiprows, header=header, **read_dat_kwargs
             ).rename(
                 columns={
                     titrant_amount_col: "titrant_amount",

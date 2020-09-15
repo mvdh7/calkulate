@@ -22,9 +22,18 @@ test_read_TiTouch()
 
 def test_TiTouch_dataset():
     """Can we import a Dataset of Ti-Touch-style files and calibrate them?"""
+    ds = calk.read_excel("tests/data/TiTouch.xlsx").get_titrations(
+        read_dat_kwargs=calk.kwargs_TiTouch
+    )
+    assert isinstance(ds, calk.Dataset)
+    ds = calk.read_excel("tests/data/TiTouch.xlsx").prepare(
+        read_dat_kwargs=calk.kwargs_TiTouch
+    )
+    assert isinstance(ds, calk.Dataset)
     ds = calk.read_excel("tests/data/TiTouch.xlsx").calkulate(
         read_dat_kwargs=calk.kwargs_TiTouch
     )
+    assert isinstance(ds, calk.Dataset)
     crm = ~np.isnan(ds.alkalinity_certified)
     assert np.all(
         np.isclose(ds.alkalinity[crm], ds.alkalinity_certified[crm], rtol=0, atol=1e-8)

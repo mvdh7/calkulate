@@ -11,10 +11,12 @@ def get_measurement_type(dataset):
     return dataset
 
 
-def get_titrations(dataset, **read_dat_kwargs):
+def get_titrations(dataset, read_dat_kwargs=None):
     """(Re-)import all .dat files."""
     if "file_good" not in dataset:
         dataset["file_good"] = True
+    if read_dat_kwargs is None:
+        read_dat_kwargs = {}
     dataset.get_measurement_type()
     dats = {}
     for i, row in dataset.iterrows():
