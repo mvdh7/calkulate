@@ -34,6 +34,8 @@ def get_titrations(dataset, read_dat_kwargs=None):
             except:
                 print("Error importing file: '{}'.".format(fname))
                 dats[i] = None
+        else:
+            dats[i] = None
     dataset["titration"] = pd.Series(dats)
     return dataset
 
