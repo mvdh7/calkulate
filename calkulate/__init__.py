@@ -53,12 +53,13 @@ calibrate_and_solve = calkulate
 # Package metadata
 _authorlist = ["Humphreys, Matthew P.", "Matthews, Ruth S."]
 __author__ = " and ".join(_authorlist)
-__version__ = "3.0.0"
+__version__ = "3.0.1"
 
 
 def say_hello():
     """Report the version number."""
-    print(r"""
+    print(
+        r"""
    .--.     . .         .      .      
   :         | |         |     _|_     
   |    .-.  | |.-. .  . | .-.  |  .-. 
@@ -68,4 +69,7 @@ def say_hello():
        doi:10.5281/zenodo.2634304
        
              Version {}
-""".format(__version__))
+""".format(
+            __version__
+        )
+    )

@@ -34,6 +34,8 @@ def get_titrations(dataset, read_dat_kwargs=None):
             except:
                 print("Error importing file: '{}'.".format(fname))
                 dats[i] = None
+        else:
+            dats[i] = None
     dataset["titration"] = pd.Series(dats)
     return dataset
 
@@ -50,7 +52,11 @@ def _get_analyte_temperature(row):
             analyte_temperature = None
         # If there isn't an override temperature, get it from the titration itself
         if analyte_temperature is None:
-            analyte_temperature = row.titration.iloc[0].temperature
+            try:
+                analyte_temperature = float(row.titration.iloc[0].temperature)
+            except ValueError:
+                analyte_temperature = None
+                print("Invalid temperature in file: '{}'".format(row.file_name))
     else:
         analyte_temperature = None
     return pd.Series({"analyte_temperature": analyte_temperature})
@@ -65,6 +71,9 @@ def get_analyte_mass(dataset):
     """Calculate analyte mass in kg."""
     if "analyte_temperature" not in dataset:
         dataset.get_analyte_temperature()
+    if "file_good" not in dataset:
+        dataset["file_good"] = True
+    dataset["file_good"] &= ~np.isnan(dataset.analyte_temperature)
     if "analyte_mass" not in dataset:
         dataset["analyte_mass"] = np.nan
         assert (
@@ -112,19 +121,22 @@ def get_titrant_density(dataset):
 
 def _get_titrant_mass(row):
     if row.titration is not None:
-        if str(row.titrant_amount_unit).lower() == "g":
-            row.titration["titrant_mass"] = row.titration.titrant_amount * 1e-3
-        elif str(row.titrant_amount_unit).lower() == "kg":
-            row.titration["titrant_mass"] = row.titration.titrant_amount
-        elif str(row.titrant_amount_unit).lower() == "ml":
-            row.titration["titrant_mass"] = (
-                row.titration.titrant_amount * row.titrant_density * 1e-3
-            )
-        else:
-            row.titration["titrant_mass"] = (
-                row.titration.titrant_amount * row.titrant_density * 1e-3
-            )
-            print("Error: titrant_amount_unit must be either 'g' or 'ml'.")
+        try:
+            if str(row.titrant_amount_unit).lower() == "g":
+                row.titration["titrant_mass"] = row.titration.titrant_amount * 1e-3
+            elif str(row.titrant_amount_unit).lower() == "kg":
+                row.titration["titrant_mass"] = row.titration.titrant_amount
+            elif str(row.titrant_amount_unit).lower() == "ml":
+                row.titration["titrant_mass"] = (
+                    row.titration.titrant_amount * row.titrant_density * 1e-3
+                )
+            else:
+                row.titration["titrant_mass"] = (
+                    row.titration.titrant_amount * row.titrant_density * 1e-3
+                )
+                print("Error: titrant_amount_unit must be either 'g' or 'ml'.")
+        except TypeError:
+            print("Invalid titration data in file: '{}'.".format(row.file_name))
 
 
 def get_titrant_mass(dataset):
@@ -182,25 +194,27 @@ def get_analyte_totals(dataset):
             )
         else:
             dataset[salt] = totals[convert.calk_to_pyco2[salt]] * 1e6
+    dataset["dic"] = np.where(np.isnan(dataset.dic), 0, dataset.dic)
     return dataset
 
 
 def _get_titration_totals(row):
     if row.titration is not None:
-        row.titration["dilution_factor"] = convert.dilution_factor(
-            row.analyte_mass, row.analyte_mass + row.titration.titrant_mass
-        )
-        for salt in [
-            "dic",
-            "total_silicate",
-            "total_phosphate",
-            "total_ammonia",
-            "total_sulfide",
-            "total_sulfate",
-            "total_borate",
-            "total_fluoride",
-        ]:
-            row.titration[salt] = row[salt] * row.titration.dilution_factor
+        if "titrant_mass" in row.titration:
+            row.titration["dilution_factor"] = convert.dilution_factor(
+                row.analyte_mass, row.analyte_mass + row.titration.titrant_mass
+            )
+            for salt in [
+                "dic",
+                "total_silicate",
+                "total_phosphate",
+                "total_ammonia",
+                "total_sulfide",
+                "total_sulfate",
+                "total_borate",
+                "total_fluoride",
+            ]:
+                row.titration[salt] = row[salt] * row.titration.dilution_factor
 
 
 def get_titration_totals(dataset):
@@ -218,48 +232,49 @@ def get_totals(dataset):
 
 def _get_k_constants(row):
     if row.titration is not None:
-        totals = {
-            "Sal": row.salinity,
-            "TNH3": row.titration.total_ammonia.values,
-            "TPO4": row.titration.total_phosphate.values,
-            "TSi": row.titration.total_silicate.values,
-            "TH2S": row.titration.total_sulfide.values,
-            "TB": row.titration.total_borate.values,
-            "TF": row.titration.total_fluoride.values,
-            "TSO4": row.titration.total_sulfate.values,
-        }
-        k_constants = {}
-        for k in [
-            "k_ammonia",
-            "k_borate",
-            "k_bisulfate",
-            "k_carbonic_1",
-            "k_carbonic_2",
-            "k_fluoride",
-            "k_phosphate_1",
-            "k_phosphate_2",
-            "k_phosphate_3",
-            "k_silicate",
-            "k_sulfide",
-            "k_water",
-        ]:
-            if k in row:
-                if ~np.isnan(row[k]):
-                    k_constants[convert.calk_to_pyco2[k]] = row[k]
-        k_constants = pyco2.equilibria.assemble(
-            row.titration.temperature,
-            0,  # pressure
-            totals,
-            3,  # opt_pH_scale (i.e. Free)
-            row.opt_k_carbonic,
-            row.opt_k_bisulfate,
-            row.opt_k_fluoride,
-            row.opt_gas_constant,
-            Ks=k_constants,
-        )
-        for k, v in k_constants.items():
-            if k in convert.pyco2_to_calk:
-                row.titration[convert.pyco2_to_calk[k]] = v
+        if "titrant_mass" in row.titration:
+            totals = {
+                "Sal": row.salinity,
+                "TNH3": row.titration.total_ammonia.values,
+                "TPO4": row.titration.total_phosphate.values,
+                "TSi": row.titration.total_silicate.values,
+                "TH2S": row.titration.total_sulfide.values,
+                "TB": row.titration.total_borate.values,
+                "TF": row.titration.total_fluoride.values,
+                "TSO4": row.titration.total_sulfate.values,
+            }
+            k_constants = {}
+            for k in [
+                "k_ammonia",
+                "k_borate",
+                "k_bisulfate",
+                "k_carbonic_1",
+                "k_carbonic_2",
+                "k_fluoride",
+                "k_phosphate_1",
+                "k_phosphate_2",
+                "k_phosphate_3",
+                "k_silicate",
+                "k_sulfide",
+                "k_water",
+            ]:
+                if k in row:
+                    if ~np.isnan(row[k]):
+                        k_constants[convert.calk_to_pyco2[k]] = row[k]
+            k_constants = pyco2.equilibria.assemble(
+                row.titration.temperature,
+                0,  # pressure
+                totals,
+                3,  # opt_pH_scale (i.e. Free)
+                row.opt_k_carbonic,
+                row.opt_k_bisulfate,
+                row.opt_k_fluoride,
+                row.opt_gas_constant,
+                Ks=k_constants,
+            )
+            for k, v in k_constants.items():
+                if k in convert.pyco2_to_calk:
+                    row.titration[convert.pyco2_to_calk[k]] = v
 
 
 def get_k_constants(dataset):
