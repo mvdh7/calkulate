@@ -10,7 +10,10 @@ Calkulate v3 switches to an object-oriented approach.  This makes working with i
 
 !!! info "Changes in v3.0.1"
 
-    * Fixes bug in handling `data["file_good"] = False` cases.
+    ***Bug fixes***
+
+    * Fix bug in handling `data["file_good"] = False` cases.
+    * Set DIC to zero where its value is NaN.
 
 ### v3.0.0 (15 Sep 2020)
 

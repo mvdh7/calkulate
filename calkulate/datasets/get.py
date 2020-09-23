@@ -184,6 +184,7 @@ def get_analyte_totals(dataset):
             )
         else:
             dataset[salt] = totals[convert.calk_to_pyco2[salt]] * 1e6
+    dataset["dic"] = np.where(np.isnan(dataset.dic), 0, dataset.dic)
     return dataset
 
 
