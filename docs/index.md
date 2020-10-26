@@ -18,7 +18,7 @@ data["alkalinity"]  # <== here are your alkalinity results
 
 `data` is then a pandas DataFrame based on the metadata file you provided but with some extra columns added such as `data.alkalinity`, which contains the fully calibrated total alkalinity for each sample.
 
-Other read-in functions are also available (e.g. for [Excel spreadsheets](io/#titration-metadata) and [VINDTA .dbs](io/#titration-metadata) files).
+Other read-in functions are also available (e.g. for [Excel spreadsheets and VINDTA .dbs files](io/#import-from-excel-csv-or-dbs)).
 
 See [Dataset methods](methods) for more information on what `calkulate` does.
 
