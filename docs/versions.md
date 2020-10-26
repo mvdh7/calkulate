@@ -6,13 +6,18 @@ Calkulate v3 switches to an object-oriented approach.  This makes working with i
 
 [PyCO2SYS](https://PyCO2SYS.rtfd.io) is now used to determine equilibrium constants and estimate total salt concentrations from salinity, instead of replicating those functions in Calkulate.
 
-### v3.1.0 (forthcoming)
+### v3.1.0 (26 Oct 2020)
 
 !!! info "Changes in v3.1.0"
+
+    ***Bug fix***
+
+    * Fixed unit conversion bug when evaluating equilibrium constants in PyCO2SYS.  **All results calculated using v3.0.X should be redetermined!**
 
     ***Better consistency with PyCO2SYS***
 
     * Updated for compatability with PyCO2SYS v1.6.0.
+    * Renamed various internal variables for better consistency.
 
 ### v3.0.1 (23 Sep 2020)
 

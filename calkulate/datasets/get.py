@@ -235,13 +235,13 @@ def _get_k_constants(row):
         if "titrant_mass" in row.titration:
             totals = {
                 "Sal": row.salinity,
-                "TNH3": row.titration.total_ammonia.values,
-                "TPO4": row.titration.total_phosphate.values,
-                "TSi": row.titration.total_silicate.values,
-                "TH2S": row.titration.total_sulfide.values,
-                "TB": row.titration.total_borate.values,
-                "TF": row.titration.total_fluoride.values,
-                "TSO4": row.titration.total_sulfate.values,
+                "TNH3": row.titration.total_ammonia.values * 1e-6,
+                "TPO4": row.titration.total_phosphate.values * 1e-6,
+                "TSi": row.titration.total_silicate.values * 1e-6,
+                "TH2S": row.titration.total_sulfide.values * 1e-6,
+                "TB": row.titration.total_borate.values * 1e-6,
+                "TF": row.titration.total_fluoride.values * 1e-6,
+                "TSO4": row.titration.total_sulfate.values * 1e-6,
             }
             k_constants = {}
             for k in [
