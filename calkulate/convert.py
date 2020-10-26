@@ -65,6 +65,10 @@ calk_to_pyco2 = {
     "k_silicate": "KSi",
     "k_sulfide": "KH2S",
     "k_water": "KW",
+    "k_alpha": "k_alpha",
+    "k_beta": "k_beta",
+    "total_alpha": "total_alpha",
+    "total_beta": "total_beta",
 }
 
 pyco2_to_calk = {v: k for k, v in calk_to_pyco2.items()}

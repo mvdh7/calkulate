@@ -19,6 +19,11 @@ pyco2_kwargs = {
     "opt_k_bisulfate": rng.integers(size=npts, low=1, high=2, endpoint=True),
     "opt_k_fluoride": rng.integers(size=npts, low=1, high=2, endpoint=True),
     "opt_gas_constant": 3,
+    "buffers_mode": "none",
+    "total_alpha": rng.uniform(size=npts, low=0, high=100),
+    "k_alpha": rng.uniform(size=npts, low=2, high=12),
+    "total_beta": rng.uniform(size=npts, low=0, high=100),
+    "k_beta": rng.uniform(size=npts, low=2, high=12),
 }
 # Remove Peng options (bad alkalinity equation!)
 opt_kc = pyco2_kwargs["opt_k_carbonic"]
@@ -47,6 +52,10 @@ k_constants = pyco2.equilibria.assemble(
 
 # Put everything into a DataFrame for Calkulate
 totals_calk = {k: v * 1e6 for k, v in totals.items() if k != "Sal"}
+totals_calk.update({k: pyco2_kwargs[k] for k in ["total_alpha", "total_beta"]})
+k_constants.update({k: pyco2_kwargs[k] for k in ["k_alpha", "k_beta"]})
+k_constants.pop("alpha")
+k_constants.pop("beta")
 titration = calk.Titration({**totals_calk, **k_constants}).rename(
     mapper=calk.convert.pyco2_to_calk, axis=1
 )
@@ -55,8 +64,6 @@ titration = calk.Titration({**totals_calk, **k_constants}).rename(
 pH = np.append(rng.uniform(size=npts - 1, low=3, high=10), 8.1)
 dic = titration["dic"] = np.append(rng.uniform(size=npts - 1, low=0, high=5000), 0)
 alkalinity_calk = calk.simulate.alkalinity(pH, titration) * 1e6
-# ... switch to the fixed TA equation in PyCO2SYS before comparing
-pyco2.solve.get.TAfromTCpH = pyco2.solve.get.TAfromTCpH_fixed
 alkalinity_pyco2 = pyco2.CO2SYS_nd(pH, dic, 3, 2, **pyco2_kwargs)["alkalinity"]
 
 

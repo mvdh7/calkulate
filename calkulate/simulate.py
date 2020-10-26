@@ -16,6 +16,8 @@ def alkalinity_components(pH, titration):
     TSi = titration["total_silicate"] * 1e-6
     TNH3 = titration["total_ammonia"] * 1e-6
     TH2S = titration["total_sulfide"] * 1e-6
+    total_alpha = titration["total_alpha"] * 1e-6
+    total_beta = titration["total_beta"] * 1e-6
     # Unpack equilibrium constants (should all be on the Free scale)
     KW = titration["k_water"]
     K1 = titration["k_carbonic_1"]
@@ -29,6 +31,8 @@ def alkalinity_components(pH, titration):
     KSi = titration["k_silicate"]
     KNH3 = titration["k_ammonia"]
     KH2S = titration["k_sulfide"]
+    k_alpha = titration["k_alpha"]
+    k_beta = titration["k_beta"]
     # Calculate components
     h = 10.0 ** -pH
     hydroxide = KW / h
@@ -45,6 +49,13 @@ def alkalinity_components(pH, titration):
     silicate = TSi * KSi / (KSi + h)
     ammonia = TNH3 * KNH3 / (KNH3 + h)
     hydrogen_sulfide = TH2S * KH2S / (KH2S + h)
+    zlp = 4.5  # pK of 'zero level of protons' [WZK07]
+    alpha = total_alpha * k_alpha / (k_alpha + h)
+    alphaH = total_alpha - alpha
+    beta = total_beta * k_beta / (k_beta + h)
+    betaH = total_beta - beta
+    alk_alpha = np.where(-np.log10(k_alpha) <= zlp, -alphaH, alpha)
+    alk_beta = np.where(-np.log10(k_beta) <= zlp, -betaH, beta)
     return {
         "H": h,
         "OH": hydroxide,
@@ -60,6 +71,8 @@ def alkalinity_components(pH, titration):
         "SiOOH3": silicate,
         "NH3": ammonia,
         "HS": hydrogen_sulfide,
+        "alk_alpha": alk_alpha,
+        "alk_beta": alk_beta,
     }
 
 
@@ -79,6 +92,8 @@ component_multipliers = {
     "SiOOH3": +1,
     "NH3": +1,
     "HS": +1,
+    "alk_alpha": +1,
+    "alk_beta": +1,
 }
 
 
