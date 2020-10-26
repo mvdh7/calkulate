@@ -67,29 +67,8 @@ Not strictly essential, but you'll need these most of the time.  If values are o
 
 Like for the recommended columns, if optional column values are only needed for some of your titrations, just use `np.nan` in rows where they are not required.
 
-??? info "`bisulfate_constant` : *which bisulfate dissociation constant to use*"
-    Sets whether the bisulfate dissociation constant is estimated from salinity and temperature by [PyCO2SYS](https://PyCO2SYS.rtfd.io) following:
-    
-    * `1` : [D90a](https://PyCO2SYS.readthedocs.io/en/latest/refs/#d) (default), or
-    * `2` : [KRCB77](https://PyCO2SYS.readthedocs.io/en/latest/refs/#k).
-
-??? info "`borate_ratio` : *which total borate:salinity relationship to use*"
-    Sets whether total borate is estimated from salinity by [PyCO2SYS](https://PyCO2SYS.rtfd.io) following:
-    
-    * `1` : [U74](https://PyCO2SYS.readthedocs.io/en/latest/refs/#u), or
-    * `2` : [LKB10](https://PyCO2SYS.readthedocs.io/en/latest/refs/#l) (default).
-
-??? info "`carbonic_constants` : *which carbonic acid dissociation constants to use*"
-    Sets which carbonic acid constants to use from PyCO2SYS, can be any integer from `1` to `15` inclusive.  Default is `10` for [LDK00](https://pyco2sys.readthedocs.io/en/latest/refs/#l).  See the [PyCO2SYS docs on `K1K2CONSTANTS`](https://pyco2sys.readthedocs.io/en/latest/co2sys/#settings) for details.
-
 ??? info "`file_good` : *is the titration file valid?*"
     Where set to `False`, Calkulate does not attempt to import the corresponding titration file.
-
-??? info "`fluoride_constant` : *which HF dissociation constant to use*"
-    Sets whether the HF dissociation constant is estimated from salinity and temperature by [PyCO2SYS](https://PyCO2SYS.rtfd.io) following:
-    
-    * `1` : [DR79](https://PyCO2SYS.readthedocs.io/en/latest/refs/#d) (default), or
-    * `2` : [PF87](https://PyCO2SYS.readthedocs.io/en/latest/refs/#p).
 
 ??? info "`k_*` : *stoichiometric equilibrium constants*"
     If not provided, then these are calculated from temperature and salinity by [PyCO2SYS](https://PyCO2SYS.rtfd.io).
@@ -113,6 +92,27 @@ Like for the recommended columns, if optional column values are only needed for 
 
 ??? info "`molinity_NaCl` : *approximate NaCl molinity in the titrant*"
     In mol/kg-solution.  Defaults to 0.6 mol/kg-solution if not provided.  Used to estimate titrant density.
+
+??? info "`opt_k_bisulfate` : *which bisulfate dissociation constant to use*"
+    Sets whether the bisulfate dissociation constant is estimated from salinity and temperature by [PyCO2SYS](https://PyCO2SYS.rtfd.io) following:
+    
+    * `1` : [D90a](https://PyCO2SYS.readthedocs.io/en/latest/refs/#d) (default), or
+    * `2` : [KRCB77](https://PyCO2SYS.readthedocs.io/en/latest/refs/#k).
+
+??? info "`opt_k_carbonic` : *which carbonic acid dissociation constants to use*"
+    Sets which carbonic acid constants to use from PyCO2SYS, can be any integer from `1` to `16` inclusive.  Default is `16` for [SLH20](https://pyco2sys.readthedocs.io/en/latest/refs/#s).  See the [PyCO2SYS docs on `opt_k_carbonic`](https://pyco2sys.readthedocs.io/en/latest/co2sys_nd/#settings) for details.
+
+??? info "`opt_k_fluoride` : *which HF dissociation constant to use*"
+    Sets whether the HF dissociation constant is estimated from salinity and temperature by [PyCO2SYS](https://PyCO2SYS.rtfd.io) following:
+    
+    * `1` : [DR79](https://PyCO2SYS.readthedocs.io/en/latest/refs/#d) (default), or
+    * `2` : [PF87](https://PyCO2SYS.readthedocs.io/en/latest/refs/#p).
+
+??? info "`opt_total_borate` : *which total borate:salinity relationship to use*"
+    Sets whether total borate is estimated from salinity by [PyCO2SYS](https://PyCO2SYS.rtfd.io) following:
+    
+    * `1` : [U74](https://PyCO2SYS.readthedocs.io/en/latest/refs/#u) (default), or
+    * `2` : [LKB10](https://PyCO2SYS.readthedocs.io/en/latest/refs/#l).
 
 ??? info "`reference_good` : *use this reference material to calibrate?*"
     Set to `False` for reference materials that you do not wish to include in determining batch-mean titrant concentrations.
