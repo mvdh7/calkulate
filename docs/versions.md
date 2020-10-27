@@ -24,7 +24,7 @@ Calkulate v3 switches to an object-oriented approach.  This makes working with i
 
 ### 3.0
 
-#### 3.0.1 (23 Sep 2020)
+#### 3.0.1 (23 September 2020)
 
 !!! info "Changes in v3.0.1"
 
@@ -34,7 +34,7 @@ Calkulate v3 switches to an object-oriented approach.  This makes working with i
     * Set DIC to zero where its value is NaN.
     * Skip over errors in titration files with a warning rather than throw a breaking error.
 
-#### 3.0.0 (15 Sep 2020)
+#### 3.0.0 (15 September 2020)
 
 !!! info "Release notes for v3.0.0"
 
