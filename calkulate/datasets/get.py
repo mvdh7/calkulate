@@ -157,9 +157,12 @@ def get_analyte_totals(dataset):
         "total_phosphate",
         "total_ammonia",
         "total_sulfide",
+        "total_alpha",
+        "total_beta",
     ]:
         if salt not in dataset:
             dataset[salt] = 0
+        dataset[salt] = np.where(np.isnan(dataset[salt]), 0, dataset[salt])
     if "opt_k_carbonic" not in dataset:
         dataset["opt_k_carbonic"] = options.pyco2_opt_k_carbonic
     else:
@@ -213,6 +216,8 @@ def _get_titration_totals(row):
                 "total_sulfate",
                 "total_borate",
                 "total_fluoride",
+                "total_alpha",
+                "total_beta",
             ]:
                 row.titration[salt] = row[salt] * row.titration.dilution_factor
 
@@ -235,13 +240,15 @@ def _get_k_constants(row):
         if "titrant_mass" in row.titration:
             totals = {
                 "Sal": row.salinity,
-                "TNH3": row.titration.total_ammonia.values,
-                "TPO4": row.titration.total_phosphate.values,
-                "TSi": row.titration.total_silicate.values,
-                "TH2S": row.titration.total_sulfide.values,
-                "TB": row.titration.total_borate.values,
-                "TF": row.titration.total_fluoride.values,
-                "TSO4": row.titration.total_sulfate.values,
+                "TNH3": row.titration.total_ammonia.values * 1e-6,
+                "TPO4": row.titration.total_phosphate.values * 1e-6,
+                "TSi": row.titration.total_silicate.values * 1e-6,
+                "TH2S": row.titration.total_sulfide.values * 1e-6,
+                "TB": row.titration.total_borate.values * 1e-6,
+                "TF": row.titration.total_fluoride.values * 1e-6,
+                "TSO4": row.titration.total_sulfate.values * 1e-6,
+                "alpha": row.titration.total_alpha.values * 1e-6,
+                "beta": row.titration.total_beta.values * 1e-6,
             }
             k_constants = {}
             for k in [
@@ -251,12 +258,14 @@ def _get_k_constants(row):
                 "k_carbonic_1",
                 "k_carbonic_2",
                 "k_fluoride",
-                "k_phosphate_1",
-                "k_phosphate_2",
-                "k_phosphate_3",
+                "k_phosphoric_1",
+                "k_phosphoric_2",
+                "k_phosphoric_3",
                 "k_silicate",
                 "k_sulfide",
                 "k_water",
+                "k_alpha",
+                "k_beta",
             ]:
                 if k in row:
                     if ~np.isnan(row[k]):
@@ -312,5 +321,13 @@ def get_k_constants(dataset):
             options.pyco2_opt_gas_constant,
             dataset.opt_gas_constant,
         )
+    for extra in ["alpha", "beta"]:
+        k_extra = "k_" + extra
+        if k_extra not in dataset:
+            dataset[k_extra] = 1e-7
+        else:
+            dataset[k_extra] = np.where(
+                np.isnan(dataset[k_extra]), 1e-7, dataset[k_extra],
+            )
     dataset.apply(_get_k_constants, axis=1)
     return dataset

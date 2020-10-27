@@ -59,12 +59,16 @@ calk_to_pyco2 = {
     "k_carbonic_1": "K1",
     "k_carbonic_2": "K2",
     "k_fluoride": "KF",
-    "k_phosphate_1": "KP1",
-    "k_phosphate_2": "KP2",
-    "k_phosphate_3": "KP3",
+    "k_phosphoric_1": "KP1",
+    "k_phosphoric_2": "KP2",
+    "k_phosphoric_3": "KP3",
     "k_silicate": "KSi",
     "k_sulfide": "KH2S",
     "k_water": "KW",
+    "k_alpha": "k_alpha",
+    "k_beta": "k_beta",
+    "total_alpha": "total_alpha",
+    "total_beta": "total_beta",
 }
 
 pyco2_to_calk = {v: k for k, v in calk_to_pyco2.items()}
