@@ -6,7 +6,9 @@ Calkulate v3 switches to an object-oriented approach.  This makes working with i
 
 [PyCO2SYS](https://PyCO2SYS.rtfd.io) is now used to determine equilibrium constants and estimate total salt concentrations from salinity, instead of replicating those functions in Calkulate.
 
-### v3.1.0 (forthcoming)
+### 3.1
+
+#### 3.1.0 (27 October 2020)
 
 !!! info "Changes in v3.1.0"
 
@@ -20,7 +22,9 @@ Calkulate v3 switches to an object-oriented approach.  This makes working with i
     * Added two optional extra alkalinity components.
     * Renamed various internal variables for better consistency.
 
-### v3.0.1 (23 Sep 2020)
+### 3.0
+
+#### 3.0.1 (23 Sep 2020)
 
 !!! info "Changes in v3.0.1"
 
@@ -30,7 +34,7 @@ Calkulate v3 switches to an object-oriented approach.  This makes working with i
     * Set DIC to zero where its value is NaN.
     * Skip over errors in titration files with a warning rather than throw a breaking error.
 
-### v3.0.0 (15 Sep 2020)
+#### 3.0.0 (15 Sep 2020)
 
 !!! info "Release notes for v3.0.0"
 
