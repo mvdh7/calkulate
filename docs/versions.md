@@ -8,6 +8,14 @@ Calkulate v3 switches to an object-oriented approach.  This makes working with i
 
 ### 3.1
 
+#### 3.1.1 (forthcoming)
+
+!!! info "changes in v3.1.1"
+
+    ***Bug fixes***
+
+    * `dataset.solve()` and `dataset.calibrate()` now ignore files with `"file_good"` set to `False`.
+
 #### 3.1.0 (27 October 2020)
 
 !!! info "Changes in v3.1.0"

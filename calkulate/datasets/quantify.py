@@ -6,7 +6,11 @@ def calibrate_all(dataset, pH_range=(3, 4), verbose=options.verbose):
     """Determine titrant molinity for all samples that have a certified alkalinity."""
     titrant_molinity = {}
     for i, row in dataset.iterrows():
-        if row.titration is not None and ~np.isnan(row.alkalinity_certified):
+        if (
+            row.titration is not None
+            and ~np.isnan(row.alkalinity_certified)
+            and row.file_good
+        ):
             if verbose:
                 print("Calkulate: calibrating {}...".format(row.file_name))
             if row.measurement_type == "pH":
@@ -33,7 +37,11 @@ def solve_all(dataset, pH_range=(3, 4), verbose=options.verbose):
     pH_initial = {}
     pH_initial_temperature = {}
     for i, row in dataset.iterrows():
-        if row.titration is not None and ~np.isnan(row.titrant_molinity):
+        if (
+            row.titration is not None
+            and ~np.isnan(row.titrant_molinity)
+            and row.file_good
+        ):
             if verbose:
                 print("Calkulate: solving {}...".format(row.file_name))
             if row.measurement_type == "pH":
