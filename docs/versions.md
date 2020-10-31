@@ -1,90 +1,58 @@
-# 2.3
+# Version history
 
-Calkulate v2.3 introduces a new `Potentiometric` class that titration datasets can be imported into, enabling easier high-level analysis using the existing array-based functions. This is not yet properly documented, although there is a working example script in the Github repo (*examples/stepwise-alkalinity.py*).
+## Version 3: Pythonic
 
-## 2.3.0
+Calkulate v3 switches to an object-oriented approach.  This makes working with individual titrations and handling large collections of them much less cumbersome.
 
-**Release date:** 2020-04-02
+[PyCO2SYS](https://PyCO2SYS.rtfd.io) is now used to determine equilibrium constants and estimate total salt concentrations from salinity, instead of replicating those functions in Calkulate.
 
-[doi:10.5281/zenodo.3737874](https://doi.org/10.5281/zenodo.3737874)
+### 3.1
 
-  * Added `convert` module with convenience functions to convert acid and sample volumes into masses.
-  * Relocated EMF to [H<sup>+</sup>] conversion functions from `solve` to `convert`, with aliases to maintain backwards compatibility.
-  * Added `titration` module with new `Potentiometric` class for higher-level manipulation of titration datasets.
-  * Added plotting functions for `Potentiometric` titration objects into the `plot` module.
+#### 3.1.1 (forthcoming)
 
----
+!!! info "changes in v3.1.1"
 
-# 2.2
+    ***Bug fixes***
 
-The main advance in Calkulate v2.2 is switching to using [PyCO2SYS](https://github.com/mvdh7/PyCO2SYS) to evaluate all equilibrium constants and solute concentrations from temperature and salinity, instead of having an independent set of equivalent functions written into Calkulate itself.
+    * `dataset.solve()` and `dataset.calibrate()` now ignore files with `"file_good"` set to `False`.
 
-## 2.2.0
+#### 3.1.0 (27 October 2020)
 
-**Release date:** 2020-03-20
+!!! info "Changes in v3.1.0"
 
-[doi:10.5281/zenodo.3719139](https://doi.org/10.5281/zenodo.3719139)
+    ***Major bug fix***
 
-  * Updated `concentrations.concTotals` and `dissociation.eqConstants` to use [PyCO2SYS](https://github.com/mvdh7/PyCO2SYS) functions to calculate things instead of functions built in to Calkulate.
-  * Removed all equilibrium constant and concentration functions that were previously internally in Calkulate.
-  * Added optional total ammonia and hydrogen sulfide concentration inputs. If values are provided, these equilibria will now be taken into account by the `complete` solver.
-  * Fixed `io.writeDat` function to correctly delimit .dat files with tabs (not spaces).
-  * Added `simulate.titration` function to directly simulate a titration dataset.
-  * Updated solver functions to optionally accept `concTotals['C']` as an array.
-  * Renamed module `vindta` to `datfile`, but added alias to avoid breaking existing code.
+    * Fixed unit conversion bug when evaluating equilibrium constants in PyCO2SYS.  **All results calculated using v3.0.X should be redetermined!**
 
----
+    ***Better consistency with PyCO2SYS***
 
-# 2.1
+    * Updated for compatability with PyCO2SYS v1.6.0.
+    * Added two optional extra alkalinity components.
+    * Renamed various internal variables for better consistency.
 
-Calkulate v2.1 is the first stable version in Python! New features will continue to be added, documentation developed, and bugs fixed, but the API of existing functions will no longer be changed.
+### 3.0
 
-## 2.1.0
+#### 3.0.1 (23 September 2020)
 
-**Release date:** 2019-08-06
+!!! info "Changes in v3.0.1"
 
-[doi:10.5281/zenodo.3361437](https://doi.org/10.5281/zenodo.3361437)
+    ***Bug fixes***
 
-  * Renamed many functions and variables, as now described in the [conventions](../conventions) documentation;
-  * Added **plot** module to visualise titration results;
-  * Updated `halfGran` solver to return values in dict field `'x'` for consistency;
-  * Fixed fatal bug in `Dickson1981` solver;
-  * Fixed incorrect `eqConstants['P1']` value in D81 dataset loading function;
-  * Combined all calibration and VINDTA-style functions into generic functions that can implement any solving method;
-  * Major documentation overhaul, and added workflow examples.
+    * Fix bug in handling `data["file_good"] = False` cases.
+    * Set DIC to zero where its value is NaN.
+    * Skip over errors in titration files with a warning rather than throw a breaking error.
 
----
+#### 3.0.0 (15 September 2020)
 
-# 2.0 (Python, beta)
+!!! info "Release notes for v3.0.0"
 
-Despite the version number, Calkulate v2.0 is still a beta, as the original MATLAB program is extended and converted to Python.
+    * Introduces object-oriented approach in which most Calkulate functions are extensions to pandas DataFrames.
+    * Uses PyCO2SYS to evaluate all equilibrium constants and salt concentrations from salinity and temperature.
 
-## 2.0.22
+## Version 2: Python
 
-**Release date:** 2019-04-09
+Calkulate v2 transitioned from MATLAB to Python and added several additional alkalinity solvers.  Despite being implemented in Python, the style was still rather MATLAB-esque.
 
-[doi:10.5281/zenodo.2634305](https://doi.org/10.5281/zenodo.2634305)
+## Version 1: MATLAB
 
-  * Added full outline documentation and function docstrings;
-  * Added **meta** module, with single-source-of-truth version number;
-  * Converted lists of solute concentrations (`XT`) and dissociation constants (`KX`) to dicts;
-  * Renamed *MPH* functions to *complete*;
-  * Updated various aspects of nomenclature throughout;
-  * Switched pH simulator to solve for pH, not [H<sup>+</sup>];
-  * Active efforts towards MATLAB integration paused.
-
-## 2.0.21
-
-**Release date:** 2019-01-15
-
-  * All functionality from original MATLAB version converted to Python, with equivalent results;
-  * Tested all solvers successfully against simulated titration data from Dickson (1981);
-  * Final release before starting to track updates here in the version history.
-
----
-
-# 1.0.2 (MATLAB)
-
-**Release date:** 2015
-
-The original Calkulate v1.0.2 is a MATLAB-only implementation of the half-Gran alkalinity solver, as described by Humphreys (2015). The final version will remain freely available: see [the appropriate project branch on GitHub](https://github.com/mvdh7/calkulate/tree/1.0.2).
+The original Calkulate v1 was a MATLAB implementation of the "half-Gran" alkalinity solver described by [H15](../references/#h). The final version (v1.0.2) remains [freely available](https://github.com/mvdh7/calkulate/tree/1.0.2).

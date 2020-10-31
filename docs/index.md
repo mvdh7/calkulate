@@ -1,73 +1,54 @@
-# <img src="img/logo_transparent.png" style="vertical-align:sub" width="105px" /> v2.3.0
+# Calkulate
 
-Calkulate is a Python 3.6+ package for determining total alkalinity from seawater titration data.
+Calkulate is a Python package for finding total alkalinity from titration data using [PyCO2SYS](https://pyco2sys.rtfd.io).
 
 [![pypi badge](https://img.shields.io/pypi/v/calkulate.svg?style=popout)](https://pypi.org/project/calkulate/) [![DOI](https://zenodo.org/badge/85561246.svg)](https://zenodo.org/badge/latestdoi/85561246)
 
 ## Installation
 
-If you're using Conda, first create a new environment with Python 3.6+, NumPy 1.15+, and SciPy 1.1+ - or you can just allow Pip to install these dependencies for you. Other similar versions are probably fine, but untested. Then, to install:
-
     pip install calkulate
 
-To upgrade in existing installation when there is a new release:
+## Basic use
 
-    pip install calkulate --upgrade --no-cache-dir
-
-Since v2.2.0, Calkulate also requires [PyCO2SYS](https://github.com/mvdh7/PyCO2SYS) v1.1.1 or greater. This will be automatically installed by Pip if you don't have it.
-
-## Get Calkulating!
-
-This documentation is intended to present a broad overview of how Calkulate works, rather than provide a detailed syntactic reference for every constituent module and function.
-
-Within Python, the import convention is:
+If the [data for each individual titration](io/#individual-titration-data-files) is in its own text file and you have [a spreadsheet containing the metadata](metadata) for each titration on separate rows — all formatted as expected — then all you need to do with Calkulate is:
 
 ```python
 import calkulate as calk
+data = calk.read_csv("path/to/metadata_file.csv").calkulate()
+data["alkalinity"]  # <== here are your alkalinity results
 ```
 
-To quickly get started with some analysis, jump straight to the [workflow examples](../examples/compare-all-solvers). These examples illustrate the different parts of Calkulate that you may need to use, and provide a framework that you can quickly modify to suit your own requirements.
+`data` is then a pandas DataFrame based on the metadata file you provided but with some extra columns added such as `data.alkalinity`, which contains the fully calibrated total alkalinity for each sample.
 
-To find out more about the principles by which Calkulate calculates things, take a look at the other parts of the documentation. These explain:
+Other read-in functions are also available (e.g. for [Excel spreadsheets and VINDTA .dbs files](io/#import-from-excel-csv-or-dbs)).
 
-  * [Variables and conventions](conventions): the conventions for naming and defining the input and output variables;
-  * [Data import](io): how to import titration data to work with;
-  * [Total concentrations](concentrations): estimating total concentrations from salinity, or defining your own;
-  * [Equilibrium constants](dissociation): defining stoichiometric equilibrium constants for the alkalinity solvers;
-  * [Alkalinity solvers](solvers): the different methods by which alkalinity can be estimated from titration data;
-  * [Titrant calibration](calibration): how to calibrate the acid titrant's concentration;
-  * [Version history](versions): changes from version to version; and
-  * [Literature references](references): a key to the codes used for citations.
+See [Dataset methods](methods) for more information on what `calkulate` does.
+
+## Coming soon
+
+Calkulate is in active development and new features that should be added soon include:
+
+  * Different alkalinity-solving algorithms.
+  * Visualisation functions.
+  * Documentation of the lower-level controls for fine-tuning your analysis.
+
+## About
+
+Calkulate is being developed by [Dr Matthew Humphreys](https://mvdh.xyz) at the Royal Netherlands Institute for Sea Research ([NIOZ, Texel, the Netherlands](https://www.nioz.nl/en)).
 
 ## Citation
 
-A paper describing Calkulate v2 is in preparation. For now, if you use the current version of Calkulate in your research, please cite it as:
+If you use Calkulate in your work, please cite it as:
 
-  * Humphreys, M. P. and Matthews, R. S. (2020). Total alkalinity from titration data in Python with Calkulate v2.3.0. [doi:10.5281/zenodo.3737874](https://doi.org/10.5281/zenodo.3737874).
+> Humphreys, M. P. and Matthews, R. S. (2020).  Calkulate: total alkalinity from titration data in Python.  *Zenodo.*  [doi:10.5281/zenodo.2634304](https://doi.org/10.5281/zenodo.2634304).
 
-For older Python versions, replace the version, year and DOI as follows:
+Please specify which version you are using.  To find this:
 
-  * v2.2.0, 2020, [doi:10.5281/zenodo.3719139](https://doi.org/10.5281/zenodo.3719139).
-  * v2.1.0, 2019, [doi:10.5281/zenodo.3361437](https://doi.org/10.5281/zenodo.3361437).
-
-For the original MATLAB version, please cite:
-
-> Humphreys, M. P. (2015). "Calculating seawater total alkalinity from open-cell titration data using a modified Gran plot technique," in *Measurements and Concepts in Marine Carbonate Chemistry* (PhD Thesis, Ocean and Earth Science, University of Southampton, UK), 25–44.
-
-But please do check back here for any updates first (or [get in touch](https://mvdh.xyz/contact/))!
-
-## Acknowledgements
-
-Calkulate is maintained by [Dr Matthew P. Humphreys](https://mvdh.xyz) at the NIOZ Royal Netherlands Institute for Sea Research (Texel, the Netherlands), and [Ruth Matthews](https://people.uea.ac.uk/ruth_matthews) at the University of East Anglia (Norwich, UK).
-
-Its ongoing development has been indirectly funded by the [Natural Environment Research Council](https://nerc.ukri.org/) (NERC, UK) and the [Dutch Research Council](https://www.nwo.nl/en) (NWO, the Netherlands).
-
-<!--
-  * Originally through a PhD studentship to Matthew P. Humphreys (NE/J500112/1),
-  * Followed by *CaNDyFloSS: Carbon and Nutrient Dynamics and Fluxes over Shelf Systems* (NE/K00185X/1) and *RAGNARoCC: Radiatively active gases from the North Atlantic Region and Climate Change* (NE/K002546/1),
-  * Then through *NSFGEO-NERC: A Thermodynamic Chemical Speciation Model for the Oceans, Seas, and Estuaries* (NE/P012361/1).
--->
+```python
+import calkulate as calk
+calk.say_hello()
+```
 
 ## License
 
-The entirety of Calkulate is licensed under the [GNU General Public License version 3 (GPLv3)](https://www.gnu.org/licenses/gpl-3.0.en.html).
+Calkulate is licensed under the [GNU General Public License version 3 (GPLv3)](https://www.gnu.org/licenses/gpl-3.0.en.html).

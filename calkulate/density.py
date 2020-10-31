@@ -1,61 +1,59 @@
-# Calkulate: seawater total alkalinity from titration data.
-# Copyright (C) 2019-2020  Matthew Paul Humphreys  (GNU GPLv3)
-"""Estimate seawater and acid densities from temperature and salinity."""
-from numpy import sqrt
+# Calkulate: seawater total alkalinity from titration data
+# Copyright (C) 2019-2020  Matthew P. Humphreys  (GNU GPLv3)
+"""The densities of various solutions."""
 
-def sw(tempK, pSal):
-    """Seawater density at 1 atm in kg/l (Millero and Poisson, 1981)."""
-    # 0 < T < 40 degC & 0.5 < S < 43
-    tempC = tempK - 273.15
-    return (999.842594
-          +   6.793952e-2 * tempC
-          -   9.095290e-3 * tempC**2
-          +   1.001685e-4 * tempC**3
-          -   1.120083e-6 * tempC**4
-          +   6.536336e-9 * tempC**5
-      + (     0.824493
-          -   4.0899e-3   * tempC
-          +   7.6438e-5   * tempC**2
-          -   8.2467e-7   * tempC**3
-          +   5.3875e-9   * tempC**4 ) * pSal
-      + ( -   5.72466e-3
-          +   1.0227e-4   * tempC
-          -   1.6546e-6   * tempC**2 ) * pSal**1.5
-      +       4.8314e-4                * pSal**2   ) * 1e-3
+import numpy as np
 
-# --- Estimate HCl titrant density --------------------------------------------
-# Output in kg/l
-# Uses a second-order polynomial, fit through temperature/density points:
-# tempK = [288.15, 290.65, 293.15, 295.65, 298.15, 300.65,
-#       303.15, 305.65, 308.15] # K
-# D  = [1.025664, 1.025079, 1.024442, 1.023754, 1.023018, 1.022235,
-#       1.021408, 1.020538, 1.019627] # kg/l
-# These density points were calculated using E-AIM
-#  [http://www.aim.env.uea.ac.uk/aim/density/density_electrolyte.php]
-#  with option "rho, at the total solute mass fraction"
-#  and the concentrations:
-#    H+ : 0.1 mol/l
-#   Na+ : 0.6 mol/l
-#   Cl- : 0.7 mol/l
-# This represents (approximately) a 0.1 molar HCl titrant in an NaCl solution
-#  with ionic strength equal to that of seawater (cf. DAA03)
-def acid(tempK):
-    return (- 3.7239826839826254e-06*tempK**2
-            + 1.9182242077921724e-03*tempK
-            + 7.8213696227965890e-01)
 
-# Or just at 25 degC, following Dickson et al. (2007), Chapter 5, Section 4.4:
-# (note incorrect check value is returned; should be 1.02056 for (0.2, 0.5))
-def acid25(mHCl, mNaCl):
-    rhow25 = 0.99704 # g / cm**3
-    m = mHCl + mNaCl # mol / kg-H2O
-    # Eqs. (16) and (17):
-    phiHCl  = 17.854 + 1.460*sqrt(m) - 0.307*m
-    phiNaCl = 16.613 + 1.811*sqrt(m) + 0.094*m
-    # Eqs. (14) and (15):
-    mT = (36.46*mHCl + 58.44*mNaCl)/(mHCl + mNaCl)
-    phimix = (mHCl*phiHCl + mNaCl*phiNaCl)/(mHCl + mNaCl)
-    # Eq. (13):
-    rho25 = (rhow25*(1e3 + mT*(mHCl + mNaCl)) /
-        (1e3 + phimix*(mHCl + mNaCl)*rhow25))
-    return rho25 # g / cm**3
+def seawater_1atm_MP81(temperature=25, salinity=35):
+    """Seawater density at 1 atm in kg/l following MP81.
+    
+    Validity:
+      *  0 < temperature < 40 °C
+      *  0.5 < salinity < 43
+    """
+    if np.any(temperature < 0) or np.any(temperature > 40):
+        print("Warning: some temperature values fall outside the valid range")
+        print("for the MP81 density equation (0–40 °C).")
+    if np.any(salinity < 0.5) or np.any(salinity > 43):
+        print("Warning: some salinity values fall outside the valid range")
+        print("for the MP81 density equation (0.5–43).")
+    return (
+        999.842594
+        + 6.793952e-2 * temperature
+        - 9.095290e-3 * temperature ** 2
+        + 1.001685e-4 * temperature ** 3
+        - 1.120083e-6 * temperature ** 4
+        + 6.536336e-9 * temperature ** 5
+        + (
+            0.824493
+            - 4.0899e-3 * temperature
+            + 7.6438e-5 * temperature ** 2
+            - 8.2467e-7 * temperature ** 3
+            + 5.3875e-9 * temperature ** 4
+        )
+        * salinity
+        + (-5.72466e-3 + 1.0227e-4 * temperature - 1.6546e-6 * temperature ** 2)
+        * salinity ** 1.5
+        + 4.8314e-4 * salinity ** 2
+    ) * 1e-3
+
+
+def HCl_NaCl_25C_DSC07(molinity_HCl=0.1, molinity_NaCl=0.6):
+    """Density of a mixture of HCl and NaCl at 25 °C and 1 atm following DSC07."""
+    rhow25 = 0.99704  # g / cm**3
+    # For convenience:
+    mHCl = molinity_HCl
+    mNaCl = molinity_NaCl
+    molinity_total = mHCl + mNaCl  # mol / kg-H2O
+    # DSC07 eqs. 16 and 17:
+    phiHCl = 17.854 + 1.460 * np.sqrt(molinity_total) - 0.307 * molinity_total
+    phiNaCl = 16.613 + 1.811 * np.sqrt(molinity_total) + 0.094 * molinity_total
+    # DSC07 eqs. 14 and 15:
+    mT = (36.46 * mHCl + 58.44 * mNaCl) / (mHCl + mNaCl)
+    phi_mix = (mHCl * phiHCl + mNaCl * phiNaCl) / (mHCl + mNaCl)
+    # DSC07 eq. 13:
+    rho25 = (
+        rhow25 * (1e3 + mT * (mHCl + mNaCl)) / (1e3 + phi_mix * (mHCl + mNaCl) * rhow25)
+    )
+    return rho25

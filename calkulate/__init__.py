@@ -1,5 +1,5 @@
 # Calkulate: seawater total alkalinity from titration data
-# Copyright (C) 2019-2020  Matthew Paul Humphreys  (GNU GPLv3)
+# Copyright (C) 2019-2020  Matthew P. Humphreys  (GNU GPLv3)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,42 +13,63 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""Seawater total alkalinity from titration data."""
+"""Determine (sea)water total alkalinity from titration data."""
 
-# Define and import modules
-__all__ = [
-    'calibrate',
-    'concentrations',
-    'constants',
-    'convert',
-    'datfile',
-    'density',
-    'dissociation',
-    'io',
-    'meta',
-    'plot',
-    'simulate',
-    'solve',
-    'titration',
-]
 from . import (
-    calibrate,
-    concentrations,
     constants,
     convert,
-    datfile,
+    datasets,
     density,
-    dissociation,
-    io,
-    meta,
-    plot,
+    options,
     simulate,
-    solve,
-    titration,
+    solvers,
+    titrations,
 )
-# Add alias for backwards compatibility
-vindta = datfile
+from .titrations import Titration, read_dat, to_dat, kwargs_TiTouch
+from .datasets import (
+    Dataset,
+    read_csv,
+    read_dbs,
+    read_excel,
+    get_titrations,
+    get_analyte_temperature,
+    get_analyte_mass,
+    get_analyte_totals,
+    get_titration_totals,
+    get_totals,
+    get_k_constants,
+    set_batch_mean_molinity,
+    prepare,
+    solve,
+    solve_all,
+    calibrate,
+    calibrate_all,
+    calkulate,
+)
 
-# Metadata
-__author__ = 'Matthew P. Humphreys and Ruth S. Matthews'
-__version__ = meta.version
+calibrate_and_solve = calkulate
+
+
+# Package metadata
+_authorlist = ["Humphreys, Matthew P.", "Matthews, Ruth S."]
+__author__ = " and ".join(_authorlist)
+__version__ = "3.1.1"
+
+
+def say_hello():
+    """Report the version number."""
+    print(
+        r"""
+   .--.     . .         .      .      
+  :         | |         |     _|_     
+  |    .-.  | |.-. .  . | .-.  |  .-. 
+  :   (   ) | |-.' |  | |(   ) | (.-' 
+   `--'`-'`-`-'  `-`--`-`-`-'`-`-'`--'
+
+       doi:10.5281/zenodo.2634304
+       
+             Version {}
+""".format(
+            __version__
+        )
+    )

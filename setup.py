@@ -1,33 +1,34 @@
 import setuptools
-from calkulate import __author__, __version__
+import calkulate as calk
 
-with open('README.md', 'r') as fh:
+with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name = 'Calkulate',
-    version = __version__,
-    author = __author__,
-    author_email = 'm.p.humphreys@icloud.com',
-    description = 'Seawater total alkalinity from titration data',
-    url = 'https://github.com/mvdh7/calkulate',
-    packages = setuptools.find_packages(),
-    install_requires = [
-        'matplotlib>=3',
-        'numpy>=1.15',
-        'scipy>=1.1',
-        'PyCO2SYS>=1.1.1',
+    name="Calkulate",
+    version=calk.__version__,
+    author=calk.__author__,
+    author_email="m.p.humphreys@icloud.com",
+    description="Seawater total alkalinity from titration data",
+    url="https://github.com/mvdh7/calkulate",
+    packages=setuptools.find_packages(),
+    install_requires=[
+        "numpy>=1.17",
+        "PyCO2SYS>=1.6.0",
+        "scipy>=1.5",
+        "pandas>=1",
+        "xlrd>=1",
+        "matplotlib>=3.3",
     ],
-    long_description = long_description,
-    long_description_content_type = 'text/markdown',
-    classifiers = [
-        'Development Status :: 5 - Production/Stable',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
-        'Operating System :: OS Independent',
-        'Natural Language :: English',
-        'Intended Audience :: Science/Research',
-        'Topic :: Scientific/Engineering :: Chemistry',
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    classifiers=[
+        "Development Status :: 5 - Production/Stable",
+        "Programming Language :: Python :: 3.8",
+        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+        "Operating System :: OS Independent",
+        "Natural Language :: English",
+        "Intended Audience :: Science/Research",
+        "Topic :: Scientific/Engineering :: Chemistry",
     ],
 )

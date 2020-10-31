@@ -1,26 +1,43 @@
 site_name: Calkulate
 site_author: Matthew P. Humphreys
-site_description: Seawater total alkalinity from titration data.
-copyright: Copyright &copy; 2019 Matthew P. Humphreys (GNU GPLv3).
-
+site_description: Total alkalinity from titration data.
 site_url: https://calkulate.readthedocs.io/
+copyright: Copyright &copy; 2019—2020  Matthew P. Humphreys  (GNU GPLv3)
+
+repo_name: mvdh7/calkulate
 repo_url: https://github.com/mvdh7/calkulate
 
-theme: readthedocs
-
 nav:
-  - Overview and installation: index.md
-  - Workflow examples:
-    - Compare all solvers: examples/compare-all-solvers.md
-    - Simulate a titration: examples/resimulate-d81.md
-    - Calibrate a CRM: examples/self-calibrate-crm.md
-    - Solve a series of measurements: examples/dataset-loop.md
-  - Give me a bit more detail!:
-    - Variables and conventions: conventions.md
-    - Data import: io.md
-    - Total concentrations: concentrations.md
-    - Equilibrium constants: dissociation.md
-    - Alkalinity solvers: solvers.md
-    - Titrant calibration: calibration.md
-  - Version history: versions.md
+  - Overview: index.md
+  - Import data: io.md
+  - Metadata contents and format: metadata.md
+  - Dataset methods: methods.md
+  - Validation: validate.md
   - References: references.md
+  - Version history: versions.md
+
+theme:
+  name: material
+  language: en
+  palette:
+    scheme: slate
+    primary: cyan
+    accent: yellow
+  font:
+    text: Open Sans
+    code: Noto Sans Mono
+
+# Extensions
+markdown_extensions:
+  - admonition
+  - pymdownx.superfences
+  - pymdownx.details
+  - codehilite:
+      guess_lang: false
+  - toc:
+      permalink: true
+  - footnotes
+  - pymdownx.inlinehilite
+  - pymdownx.arithmatex
+extra_javascript:
+  - https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML
