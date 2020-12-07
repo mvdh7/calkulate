@@ -15,6 +15,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """Determine (sea)water total alkalinity from titration data."""
 
+from . import constants, io, solve
+from .io import read_dat
+from .solve import gran_estimator
+
+
 # Package metadata
 _authorlist = ["Humphreys, Matthew P.", "Matthews, Ruth S."]
 __author__ = " and ".join(_authorlist)
