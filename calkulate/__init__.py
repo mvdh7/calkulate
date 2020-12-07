@@ -53,10 +53,10 @@ calibrate_and_solve = calkulate
 # Package metadata
 _authorlist = ["Humphreys, Matthew P.", "Matthews, Ruth S."]
 __author__ = " and ".join(_authorlist)
-__version__ = "3.1.1"
+__version__ = "3.2.0"
 
 
-def say_hello():
+def hello():
     """Report the version number."""
     print(
         r"""
@@ -73,3 +73,7 @@ def say_hello():
             __version__
         )
     )
+
+
+# For backwards-compatibility
+say_hello = hello

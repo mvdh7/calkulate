@@ -6,15 +6,22 @@ Calkulate v3 switches to an object-oriented approach.  This makes working with i
 
 [PyCO2SYS](https://PyCO2SYS.rtfd.io) is now used to determine equilibrium constants and estimate total salt concentrations from salinity, instead of replicating those functions in Calkulate.
 
-### 3.1
+### 3.2
 
-#### 3.1.1 (forthcoming)
+#### 3.2.0 (forthcoming)
 
-!!! info "changes in v3.1.1"
+!!! info "Changes in v3.2.0"
+
+    ***Internal restructuring***
+
+    * Titration data files now opened on-the-fly when they are needed, instead of loading them all permanently into the titration metadata table, to improve performance.
+    * Core solver functions rewritten to take NumPy array inputs for each variable, instead of a pandas DataArray.
 
     ***Bug fixes***
 
     * `dataset.solve()` and `dataset.calibrate()` now ignore files with `"file_good"` set to `False`.
+
+### 3.1
 
 #### 3.1.0 (27 October 2020)
 
