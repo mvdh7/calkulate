@@ -1,19 +1,19 @@
 from calkulate import v3_2 as calk
 
-tt = calk.read_dat("tests/data/seawater-CRM-144.dat")
-
-test = calk.gran_estimator(
-    mixture_mass="titrant_amount",
-    emf="measurement",
-    # temperature="temperature",
-    data=tt,
-    # use_points=None,
+# Define metadata
+metadata = calk.prepare_metadata(
+    {
+        "file_name": "tests/data/seawater-CRM-144.dat",
+        "salinity": 33.3,
+        "analyte_volume": 0.1,
+    }
 )
 
-test2 = calk.gran_estimator(
-    mixture_mass=tt.titrant_amount,
-    emf=tt.measurement,
-    temperature=tt.temperature,
-    # data=None,
-    # use_points=None,
-)
+
+# Long-winded
+tt = calk.read_dat(metadata["file_name"])
+tt = calk.prepare_titration(metadata, tt)
+gran_1 = calk.gran_estimator(tt["mixture_mass"], tt["emf"], tt["temperature"])
+
+# Wrapped
+gran_2 = calk.get_gran_estimator(metadata)

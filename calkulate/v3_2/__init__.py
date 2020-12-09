@@ -15,9 +15,15 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """Determine (sea)water total alkalinity from titration data."""
 
-from . import constants, io, solve
+from . import constants, density, io, solve, wrap
 from .io import read_dat
 from .solve import gran_estimator
+from .wrap import (
+    get_gran_estimator,
+    get_titrant_mass,
+    prepare_metadata,
+    prepare_titration,
+)
 
 
 # Package metadata
