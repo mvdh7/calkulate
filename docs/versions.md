@@ -6,7 +6,7 @@ Calkulate v3 went too far overboard with the OO approach and ended up being very
 
 ### 23.0
 
-#### 23.0.0 (18 February 2021)
+#### 23.0.0 (forthcoming)
 
 !!! info "Introduction of v23.0.0"
 
