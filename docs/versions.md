@@ -1,25 +1,23 @@
 # Version history
 
-## Version 3: Pythonic
+## Version 23: the best bits of v2 and v3
+
+Calkulate v3 went too far overboard with the OO approach and ended up being very slow and overly complex behind the scenes as a result.  Calkulate v23 therefore mashes together the best bits of v2 and v3 for the ultimate alkalinity solving experience
+
+### 23.0
+
+#### 23.0.0 (18 February 2021)
+
+!!! info "Introduction of v23.0.0"
+
+    * Object-oriented syntax from v3 is available to quickly work with datasets of many titrations at once.
+    * Underlying functions work much faster with raw NumPy arrays as in v2.
+
+## Version 3: poorly Pythonic
 
 Calkulate v3 switches to an object-oriented approach.  This makes working with individual titrations and handling large collections of them much less cumbersome.
 
 [PyCO2SYS](https://PyCO2SYS.rtfd.io) is now used to determine equilibrium constants and estimate total salt concentrations from salinity, instead of replicating those functions in Calkulate.
-
-### 3.2
-
-#### 3.2.0 (forthcoming)
-
-!!! info "Changes in v3.2.0"
-
-    ***Internal restructuring***
-
-    * Titration data files now opened on-the-fly when they are needed, instead of loading them all permanently into the titration metadata table, to improve performance.
-    * Core solver functions rewritten to take NumPy array inputs for each variable, instead of a pandas DataArray.
-
-    ***Bug fixes***
-
-    * `dataset.solve()` and `dataset.calibrate()` now ignore files with `"file_good"` set to `False`.
 
 ### 3.1
 

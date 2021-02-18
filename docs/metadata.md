@@ -2,7 +2,7 @@
 
 A Calkulate Dataset is just a [pandas DataFrame](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html) with [some extra methods added](../methods).
 
-You can make a dataset [from an existing DataFrame](../io/#convert-from-a-dataframe) or by [importing a spreadsheet from various formats](../io/#import-from-excel-csv-or-dbs).
+You can make a Dataset [from an existing DataFrame](../io/#convert-from-a-dataframe) or by [importing a spreadsheet from various formats](../io/#import-from-excel-csv-or-dbs).
 
 There are some example Dataset spreadsheets in various formats to look at [on GitHub](https://github.com/mvdh7/calkulate/tree/master/tests/data).
 
@@ -71,7 +71,7 @@ Like for the recommended columns, if optional column values are only needed for 
     Where set to `False`, Calkulate does not attempt to import the corresponding titration file.
 
 ??? info "`k_*` : *stoichiometric equilibrium constants*"
-    If not provided, then these are calculated from temperature and salinity by [PyCO2SYS](https://PyCO2SYS.rtfd.io).
+    If not provided, then these are calculated from temperature and salinity by [PyCO2SYS](https://pyco2sys.readthedocs.io/en/latest/co2sys_nd/#equilibrium-constants).
 
     They must all be on the Free pH scale.
 
@@ -79,13 +79,10 @@ Like for the recommended columns, if optional column values are only needed for 
     * `k_carbonic_1` and `k_carbonic_2` : carbonic acid dissociation constants.
     * `k_fluoride` : HF equilibrium constant.
     * `k_phosphoric_1`, `k_phosphoric_2` and `k_phosphoric_3` : phosphoric acic dissociation constants.
-    * `k_orthosilicic` : silicate equilibrium constant.
+    * `k_silicate` : orthosilicic acid equilibrium constant.
     * `k_sulfide` : hydrogen sulfide equilibrium constant.
     * `k_bisulfate` : bisulfate dissociation constant.
     * `k_water` : water equilibrium constant.
-
-??? info "`measurement_type` : *type of measurement in the titration file*"
-    Use `"emf"` (default) for potentiometric measurements, or `"pH"` for direct pH measurements.
 
 ??? info "`molinity_HCl` : *approximate HCl molinity in the titrant*"
     In mol/kg-solution.  Defaults to 0.1 mol/kg-solution if not provided.  Only used to estimate titrant density, not for calibration.
@@ -124,9 +121,6 @@ Like for the recommended columns, if optional column values are only needed for 
     Either `"ml"` (default) for volume in ml or `"g"` / `"kg"` for mass in g / kg.
     
     If volume is provided, it is converted into mass following [DSC07](../references/#d), assuming the acid contains 0.6&nbsp;M NaCl and 0.1&nbsp;M HCl.  If you used a different ratio, use the columns `molinity_NaCl` and `molinity_HCl` to set this.
-
-??? info "`titrant_concentration` : *concentration of the titrant*"
-    Must be in mol/l.  Is converted to mol/kg-solution following [DSC07](../references/#d).
 
 ??? info "`titrant_molinity` : *molinity of the titrant*"
     Must be in mol/kg-solution.
