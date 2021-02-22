@@ -1,17 +1,18 @@
 # Version history
 
-## Version 23: the best bits of v2 and v3
+## Version 23: the best of v2 and v3
 
 Calkulate v3 went too far overboard with the OO approach and ended up being very slow and overly complex behind the scenes as a result.  Calkulate v23 therefore mashes together the best bits of v2 and v3 for the ultimate alkalinity solving experience
 
 ### 23.0
 
-#### 23.0.0 (forthcoming)
+#### 23.0.0 (22 February 2020)
 
 !!! info "Introduction of v23.0.0"
 
     * Object-oriented syntax from v3 is available to quickly work with datasets of many titrations at once.
     * Underlying functions work much faster with raw NumPy arrays as in v2.
+    * Some basic plotting functions added.
 
 ## Version 3: poorly Pythonic
 
