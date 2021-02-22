@@ -30,6 +30,8 @@ For more detail, see [the online documentation](https://calkulate.readthedocs.io
 
 Calkulate is being developed primarily by [Dr Matthew P. Humphreys](https://mvdh.xyz) at the Royal Netherlands Institute for Sea Research ([NIOZ, Texel, the Netherlands](https://www.nioz.nl/en)).
 
+While its results should be reliable, the package is still a work-in-progress intended primarily for the developers' own use, and not everything is documented.  You are therefore strongly encouraged to get in touch if you're using it.  Contributions are welcome!
+
 ## Citation
 
 If you use Calkulate in your work, please cite it as:
