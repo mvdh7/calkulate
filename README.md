@@ -28,7 +28,7 @@ For more detail, see [the online documentation](https://calkulate.readthedocs.io
 
 ## About
 
-Calkulate is being developed by [Dr Matthew P. Humphreys](https://mvdh.xyz) at the Royal Netherlands Institute for Sea Research ([NIOZ, Texel, the Netherlands](https://www.nioz.nl/en)).
+Calkulate is being developed primarily by [Dr Matthew P. Humphreys](https://mvdh.xyz) at the Royal Netherlands Institute for Sea Research ([NIOZ, Texel, the Netherlands](https://www.nioz.nl/en)).
 
 ## Citation
 
