@@ -1,6 +1,0 @@
-PyCO2SYS >= 1.6.0
-numpy >= 1.17
-scipy >= 1.5
-pandas >= 1
-xlrd >= 1
-matplotlib >= 3.3
