@@ -24,40 +24,9 @@ The method `calkulate` does *everything:*
 ds.calkulate()
 ```
 
-If you need to provide any [extra kwargs for reading the titration data files](../io/#dealing-with-other-formats), you should do that here as a dict:
-
-```python
-read_dat_kwargs = dict(
-    # whatever kwargs you need...
-)
-ds.calkulate(read_dat_kwargs=read_dat_kwargs)
-```
-
 ## ... or do it step-by-step
 
-But what do we mean by *everything?*  Here's a break-down of the individual steps that are part of `ds.calkulate()`, which you can also run yourself separately if you prefer.
-
-### Import individual titrations' data
-
-```python
-ds.get_titrations(read_dat_kwargs=None)
-```
-
-Adds a column `titration` that contains the full titration data for each file, imported from the individual text files.
-
-A warning will print for any files that can't be found or imported, but this won't cause an error — the code will continue to run.
-
-You should provide any [extra kwargs needed for reading your titration data files](../io/#dealing-with-other-formats) as a dict.
-
-### Import and prepare for calibration and solving
-
-```python
-ds.prepare(read_dat_kwargs=None)
-```
-
-Runs `ds.get_titrations()`, converts analyte and titrant to volumes to masses, and calculates total salt molinities (accounting for dilution by the titrant) and equilibrium constants throughout each titration.
-
-As always, you should provide any [extra kwargs needed for reading your titration data files](../io/#dealing-with-other-formats) as a dict.
+But what do we mean by *everything?*  This includes two main steps: calibration and solving.  You can also run yourself separately if you prefer.
 
 ### Calibrate titrant molinity
 
@@ -85,7 +54,7 @@ You may wish to use the step-by-step approach if you need to do any intermediate
 import calkulate as calk
 
 # Import data and calibrate individual titrant molinities
-ds = calk.read_excel("path/to/metadata_file.xlsx").prepare().calibrate()
+ds = calk.read_excel("path/to/metadata_file.xlsx").calibrate()
 
 # Update the titrant molinity values to whatever they should be
 ds["titrant_molinity"] = ...

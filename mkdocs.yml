@@ -2,7 +2,7 @@ site_name: Calkulate
 site_author: Matthew P. Humphreys
 site_description: Total alkalinity from titration data.
 site_url: https://calkulate.readthedocs.io/
-copyright: Copyright &copy; 2019—2020  Matthew P. Humphreys  (GNU GPLv3)
+copyright: Copyright &copy; 2019—2021  Matthew P. Humphreys  (GNU GPLv3)
 
 repo_name: mvdh7/calkulate
 repo_url: https://github.com/mvdh7/calkulate
@@ -12,6 +12,7 @@ nav:
   - Import data: io.md
   - Metadata contents and format: metadata.md
   - Dataset methods: methods.md
+  - Visualisation: plot.md
   - Validation: validate.md
   - References: references.md
   - Version history: versions.md

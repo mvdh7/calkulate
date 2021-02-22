@@ -15,39 +15,15 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """Determine (sea)water total alkalinity from titration data."""
 
-from . import (
-    constants,
-    convert,
-    datasets,
-    density,
-    options,
-    simulate,
-    solvers,
-    titrations,
+from . import constants, density, io, solve, wrap
+from .io import read_dat
+from .solve import gran_estimator
+from .wrap import (
+    get_gran_estimator,
+    get_titrant_mass,
+    prepare_metadata,
+    prepare_titration,
 )
-from .titrations import Titration, read_dat, to_dat, kwargs_TiTouch
-from .datasets import (
-    Dataset,
-    read_csv,
-    read_dbs,
-    read_excel,
-    get_titrations,
-    get_analyte_temperature,
-    get_analyte_mass,
-    get_analyte_totals,
-    get_titration_totals,
-    get_totals,
-    get_k_constants,
-    set_batch_mean_molinity,
-    prepare,
-    solve,
-    solve_all,
-    calibrate,
-    calibrate_all,
-    calkulate,
-)
-
-calibrate_and_solve = calkulate
 
 
 # Package metadata
@@ -67,7 +43,6 @@ def hello():
    `--'`-'`-`-'  `-`--`-`-`-'`-`-'`--'
 
        doi:10.5281/zenodo.2634304
-       
              Version {}
 """.format(
             __version__

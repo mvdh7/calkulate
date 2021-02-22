@@ -1,6 +1,20 @@
 # Version history
 
-## Version 3: Pythonic
+## Version 23: the best of v2 and v3
+
+Calkulate v3 went too far overboard with the OO approach and ended up being very slow and overly complex behind the scenes as a result.  Calkulate v23 therefore mashes together the best bits of v2 and v3 for the ultimate alkalinity solving experience
+
+### 23.0
+
+#### 23.0.0 (22 February 2020)
+
+!!! info "Introduction of v23.0.0"
+
+    * Object-oriented syntax from v3 is available to quickly work with datasets of many titrations at once.
+    * Underlying functions work much faster with raw NumPy arrays as in v2.
+    * Some basic plotting functions added.
+
+## Version 3: poorly Pythonic
 
 Calkulate v3 switches to an object-oriented approach.  This makes working with individual titrations and handling large collections of them much less cumbersome.
 
@@ -24,7 +38,7 @@ Calkulate v3 switches to an object-oriented approach.  This makes working with i
 
 ### 3.0
 
-#### 3.0.1 (23 Sep 2020)
+#### 3.0.1 (23 September 2020)
 
 !!! info "Changes in v3.0.1"
 
@@ -34,7 +48,7 @@ Calkulate v3 switches to an object-oriented approach.  This makes working with i
     * Set DIC to zero where its value is NaN.
     * Skip over errors in titration files with a warning rather than throw a breaking error.
 
-#### 3.0.0 (15 Sep 2020)
+#### 3.0.0 (15 September 2020)
 
 !!! info "Release notes for v3.0.0"
 
