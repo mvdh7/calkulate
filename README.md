@@ -1,6 +1,6 @@
 # Calkulate
 
-![Tests](https://github.com/mvdh7/PyCO2SYS/workflows/Tests/badge.svg)
+![Tests](https://github.com/mvdh7/calkulate/workflows/Tests/badge.svg)
 [![PyPI version](https://img.shields.io/pypi/v/calkulate.svg?style=popout)](https://pypi.org/project/calkulate/)
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.2634304-informational)](https://doi.org/10.5281/zenodo.2634304)
 [![Docs](https://readthedocs.org/projects/calkulate/badge/?version=latest&style=flat)](https://calkulate.readthedocs.io/en/latest/)
@@ -21,7 +21,7 @@ If the data for each individual titration is in its own text file and you have a
 ```python
 import calkulate as calk
 data = calk.read_csv("path/to/metadata_file.csv").calkulate()
-data["alkalinity"]  # <== here are your alkalinity results
+data.alkalinity  # <== here are your alkalinity results
 ```
 
 For more detail, see [the online documentation](https://calkulate.readthedocs.io/en/latest/).
