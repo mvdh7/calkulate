@@ -6,6 +6,12 @@ Calkulate v3 went too far overboard with the OO approach and ended up being very
 
 ### 23.0
 
+#### 23.0.1 (25 February 2020)
+
+!!! info "Changes in v23.0.1"
+
+    * More informative error messages when titration data files cannot be found.
+
 #### 23.0.0 (22 February 2020)
 
 !!! info "Introduction of v23.0.0"

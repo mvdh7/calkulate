@@ -96,6 +96,10 @@ def calibrate_row(
                 least_squares_kwargs=least_squares_kwargs,
                 **prepare_kwargs,
             )
+        except FileNotFoundError:
+            print("Calkulate: file not found: '{}'".format(ds_row.file_name))
+            titrant_molinity_here = np.nan
+            analyte_mass = ds_row.analyte_mass 
         except:
             print("Calkulate: ERROR calibrating '{}'!".format(ds_row.file_name))
             titrant_molinity_here = np.nan
@@ -221,6 +225,10 @@ def solve_row(
                 least_squares_kwargs=least_squares_kwargs,
                 **prepare_kwargs,
             )
+        except FileNotFoundError:
+            print("Calkulate: file not found: '{}'".format(ds_row.file_name))
+            alkalinity = emf0 = pH_initial = temperature_initial = np.nan
+            analyte_mass = ds_row.analyte_mass
         except:
             print("Calkulate: ERROR solving '{}'!".format(ds_row.file_name))
             alkalinity = emf0 = pH_initial = temperature_initial = np.nan
