@@ -4,7 +4,7 @@
 
 _authorlist = ["Humphreys, Matthew P.", "Matthews, Ruth S."]
 __author__ = " and ".join(_authorlist)
-__version__ = "23.0.0"
+__version__ = "23.0.1"
 
 
 def hello():
