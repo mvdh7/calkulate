@@ -10,7 +10,8 @@ Calkulate v3 went too far overboard with the OO approach and ended up being very
 
 !!! info "Changes in v23.0.1"
 
-    * More informative error messages when titration data files cannot be found.
+    * Print more informative error messages when titration data files cannot be found.
+    * Use `read_dat_genfromtxt` by default if `read_dat_method` not recognised, instead of throwing an error.
 
 #### 23.0.0 (22 February 2020)
 

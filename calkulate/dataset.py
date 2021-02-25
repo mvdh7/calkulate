@@ -99,7 +99,7 @@ def calibrate_row(
         except FileNotFoundError:
             print("Calkulate: file not found: '{}'".format(ds_row.file_name))
             titrant_molinity_here = np.nan
-            analyte_mass = ds_row.analyte_mass 
+            analyte_mass = ds_row.analyte_mass
         except:
             print("Calkulate: ERROR calibrating '{}'!".format(ds_row.file_name))
             titrant_molinity_here = np.nan

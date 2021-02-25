@@ -62,15 +62,11 @@ methods = {"genfromtxt": read_dat_genfromtxt, "pclims": read_dat_pclims}
 
 def read_dat(file_name, method=default.read_dat_method, **kwargs):
     """Import a titration dataset from a .dat file."""
-    if method in methods:
-        titrant_amount, measurement, temperature = methods[method](file_name, **kwargs)
-    else:
-        print("method '{}' not recognised.".format(method))
-        titrant_amount = measurement = temperature = None
+    if method not in methods:
+        method = "genfromtxt"
+        print("method '{}' not recognised, using 'genfromtxt'.".format(method))
+    titrant_amount, measurement, temperature = methods[method](file_name, **kwargs)
     return titrant_amount, measurement, temperature
-
-
-import pandas as pd
 
 
 def write_dat(
