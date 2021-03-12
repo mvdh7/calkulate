@@ -133,12 +133,15 @@ def add_func_cols(df, func, *args, **kwargs):
     return df.join(df.apply(lambda x: func(x, *args, **kwargs), axis=1))
 
 
-def dbs_datetime(dbsx):
+def dbs_datetime(dbs_row):
     """Convert date and time from .dbs file into datetime and datenum."""
-    dspl = dbsx["date"].split("/")
-    analysis_datetime = np.datetime64(
-        "-".join(("20" + dspl[2], dspl[0], dspl[1])) + "T" + dbsx["time"]
-    )
+    try:
+        dspl = dbs_row["date"].split("/")
+        analysis_datetime = np.datetime64(
+            "-".join(("20" + dspl[2], dspl[0], dspl[1])) + "T" + dbs_row["time"]
+        )
+    except AttributeError:
+        analysis_datetime = np.datetime64("NaT")
     return pd.Series(
         {
             "analysis_datetime": analysis_datetime,
