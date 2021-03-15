@@ -134,7 +134,7 @@ def add_func_cols(df, func, *args, **kwargs):
 
 
 def dbs_datetime(dbs_row):
-    """Convert date and time from .dbs file into datetime and datenum."""
+    """Convert date and time from .dbs file into datetime."""
     try:
         dspl = dbs_row["date"].split("/")
         analysis_datetime = np.datetime64(
@@ -145,7 +145,6 @@ def dbs_datetime(dbs_row):
     return pd.Series(
         {
             "analysis_datetime": analysis_datetime,
-            "analysis_datenum": mdates.date2num(analysis_datetime),
         }
     )
 
@@ -167,6 +166,7 @@ def read_dbs(fname, analyte_volume=100.0, analyte_mass=None, file_path=None):
     dbs = pd.read_table(fname, header=0, names=headers, usecols=headers)
     dbs["dbs_fname"] = fname
     dbs = add_func_cols(dbs, dbs_datetime)
+    dbs["analysis_datenum"] = mdates.date2num(dbs.analysis_datetime)
     dbs = get_VINDTA_filenames(dbs)
     if analyte_mass is None:
         dbs["analyte_volume"] = analyte_volume
