@@ -142,18 +142,14 @@ def dbs_datetime(dbs_row):
         )
     except AttributeError:
         analysis_datetime = np.datetime64("NaT")
-    return pd.Series(
-        {
-            "analysis_datetime": analysis_datetime,
-        }
-    )
+    return pd.Series({"analysis_datetime": analysis_datetime,})
 
 
 def get_VINDTA_filenames(dbs):
     """Determine VINDTA filenames, assuming defaults were used, based on the dbs."""
     dbs["file_name"] = dbs.apply(
         lambda x: "{}-{}  {}  ({}){}.dat".format(
-            x.station, x.cast, x.niskin, x.depth, x.bottle
+            int(x.station), int(x.cast), int(x.niskin), x.depth, x.bottle
         ),
         axis=1,
     )
