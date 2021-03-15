@@ -58,7 +58,7 @@ def titrant_molinity(
         )
         ax.legend()
     if show_batches:
-        batches = dataset.get_batch_calibrations(data)
+        batches = dataset.get_batches(data)
         for batch in batches.index:
             B = (data.analysis_batch == batch).to_numpy()
             ax.plot(xdata[B], data.titrant_molinity[B], c="xkcd:navy")
@@ -89,7 +89,7 @@ def alkalinity_offset(
     else:
         G = np.full(np.size(xdata), True)
     if show_batches:
-        batches = dataset.get_batch_calibrations(data)
+        batches = dataset.get_batches(data)
         clr = np.full(np.size(xdata), -1)
         for b, batch in enumerate(batches.index):
             B = (data.analysis_batch == batch).to_numpy()
