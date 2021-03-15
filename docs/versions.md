@@ -6,6 +6,13 @@ Calkulate v3 went too far overboard with the OO approach and ended up being very
 
 ### 23.0
 
+#### 23.0.2 (15 March 2020)
+
+!!! info "Changes in v23.0.2"
+
+    * Better handling of missing dates in files imported with `read_dbs`.
+    * Minor adjustments and bug fixes in a few internal functions.
+
 #### 23.0.1 (25 February 2020)
 
 !!! info "Changes in v23.0.1"

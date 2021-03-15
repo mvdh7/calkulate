@@ -280,6 +280,8 @@ def solve(
     )
     for k, v in solved_rows.iteritems():
         ds[k] = v
+    if "alkalinity_certified" in ds:
+        ds["alkalinity_offset"] = ds.alkalinity - ds.alkalinity_certified
     print("Calkulate: solving complete!")
     return ds
 

@@ -133,25 +133,23 @@ def add_func_cols(df, func, *args, **kwargs):
     return df.join(df.apply(lambda x: func(x, *args, **kwargs), axis=1))
 
 
-def dbs_datetime(dbsx):
-    """Convert date and time from .dbs file into datetime and datenum."""
-    dspl = dbsx["date"].split("/")
-    analysis_datetime = np.datetime64(
-        "-".join(("20" + dspl[2], dspl[0], dspl[1])) + "T" + dbsx["time"]
-    )
-    return pd.Series(
-        {
-            "analysis_datetime": analysis_datetime,
-            "analysis_datenum": mdates.date2num(analysis_datetime),
-        }
-    )
+def dbs_datetime(dbs_row):
+    """Convert date and time from .dbs file into datetime."""
+    try:
+        dspl = dbs_row["date"].split("/")
+        analysis_datetime = np.datetime64(
+            "-".join(("20" + dspl[2], dspl[0], dspl[1])) + "T" + dbs_row["time"]
+        )
+    except AttributeError:
+        analysis_datetime = np.datetime64("NaT")
+    return pd.Series({"analysis_datetime": analysis_datetime,})
 
 
 def get_VINDTA_filenames(dbs):
     """Determine VINDTA filenames, assuming defaults were used, based on the dbs."""
     dbs["file_name"] = dbs.apply(
         lambda x: "{}-{}  {}  ({}){}.dat".format(
-            x.station, x.cast, x.niskin, x.depth, x.bottle
+            int(x.station), int(x.cast), int(x.niskin), x.depth, x.bottle
         ),
         axis=1,
     )
@@ -164,6 +162,7 @@ def read_dbs(fname, analyte_volume=100.0, analyte_mass=None, file_path=None):
     dbs = pd.read_table(fname, header=0, names=headers, usecols=headers)
     dbs["dbs_fname"] = fname
     dbs = add_func_cols(dbs, dbs_datetime)
+    dbs["analysis_datenum"] = mdates.date2num(dbs.analysis_datetime)
     dbs = get_VINDTA_filenames(dbs)
     if analyte_mass is None:
         dbs["analyte_volume"] = analyte_volume
