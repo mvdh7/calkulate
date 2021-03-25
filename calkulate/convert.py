@@ -15,22 +15,61 @@ def get_dilution_factor(titrant_mass, analyte_mass):
     return analyte_mass / (titrant_mass + analyte_mass)
 
 
-def dilute_totals(totals, titrant_mass, analyte_mass):
+def dilute_totals(
+    totals, titrant_mass, analyte_mass, titrant="HCl", titrant_molinity=None
+):
     """Apply the dilution factor to all elements of totals."""
     dilution_factor = get_dilution_factor(titrant_mass, analyte_mass)
-    return {k: v * dilution_factor for k, v in totals.items()}
+    if titrant == "H2SO4":
+        assert titrant_molinity is not None
+        totals = {
+            k: v * dilution_factor
+            if k != "total_sulfate"
+            else (v * analyte_mass + titrant_molinity * titrant_mass)
+            / (analyte_mass + titrant_mass)
+            for k, v in totals.items()
+        }
+    else:
+        totals = {k: v * dilution_factor for k, v in totals.items()}
+    return totals
 
 
-def dilute_totals_pyco2(totals_pyco2, titrant_mass, analyte_mass):
+def dilute_totals_pyco2(
+    totals_pyco2, titrant_mass, analyte_mass, titrant="HCl", titrant_molinity=None
+):
     """Apply the dilution factor to the appropriate elements of totals_pyco2."""
     dilution_factor = get_dilution_factor(titrant_mass, analyte_mass)
-    return {
-        k: v * dilution_factor
-        if k
-        in ("TB", "TF", "TSO4", "TCa", "alpha", "beta", "TPO4", "TSi", "TNH3", "TH2S",)
-        else v
-        for k, v in totals_pyco2.items()
-    }
+    if titrant == "H2SO4":
+        assert titrant_molinity is not None
+        totals_pyco2 = {
+            k: v * dilution_factor
+            if k in ("TB", "TF", "TCa", "alpha", "beta", "TPO4", "TSi", "TNH3", "TH2S",)
+            else v
+            for k, v in totals_pyco2.items()
+        }
+        totals_pyco2["TSO4"] = (
+            totals_pyco2["TSO4"] * analyte_mass + titrant_molinity * titrant_mass
+        ) / (analyte_mass + titrant_mass)
+    else:
+        totals_pyco2 = {
+            k: v * dilution_factor
+            if k
+            in (
+                "TB",
+                "TF",
+                "TSO4",
+                "TCa",
+                "alpha",
+                "beta",
+                "TPO4",
+                "TSi",
+                "TNH3",
+                "TH2S",
+            )
+            else v
+            for k, v in totals_pyco2.items()
+        }
+    return totals_pyco2
 
 
 def emf_to_h(emf, emf0, temperature):
