@@ -79,6 +79,15 @@ calk.write_dat(
     mode="w",
     measurement_fmt=".4f",
 )
+file_name_ml = "tests/data/test_simulate_sulfate_ml.dat"
+calk.write_dat(
+    file_name_ml,
+    titrant_mass * 1000 * calk.density.H2SO4_25C_EAIM(titrant_molinity),  # ml
+    emf,  # mV
+    temperature,  # °C
+    mode="w",
+    measurement_fmt=".4f",
+)
 
 # Get totals and k_constants
 totals, totals_pyco2 = calk.interface.get_totals(salinity, dic=dic)
@@ -152,6 +161,9 @@ ds["dic"] = co2sys_core["dic"]
 ds["titrant"] = "H2SO4"
 ds.calkulate()
 
+# And again for the volume version
+dsv = copy.deepcopy(ds)
+
 
 def test_calibrate_H2SO4():
     """Do the H2SO4 calibrators find the correct titrant_molinity for a simulated
@@ -176,7 +188,7 @@ def test_solve_H2SO4():
     assert np.isclose(emf0, ds.emf0, rtol=0, atol=1e-4)
     assert np.isclose(pH_free[0], pH_initial_tcal, rtol=0, atol=1e-6)
     assert np.isclose(pH_free[0], ds.pH_initial, rtol=0, atol=1e-6)
-    assert np.isclose(0, ds.alkalinity_offset, rtol=0, atol=1e-12)
+    assert np.isclose(0, ds.alkalinity_offset, rtol=0, atol=1e-10)
 
 
 test_calibrate_H2SO4()
