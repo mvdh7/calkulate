@@ -96,7 +96,6 @@ def get_totals_k_constants(
     # Get k_constants from PyCO2SYS
     k_constants = interface.get_k_constants(
         totals_pyco2,
-        salinity,
         temperature,
         k_alpha=k_alpha,
         k_ammonia=k_ammonia,

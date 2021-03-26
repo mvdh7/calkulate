@@ -85,26 +85,61 @@ totals, totals_pyco2 = calk.interface.get_totals(salinity, dic=dic)
 totals = calk.convert.dilute_totals_H2SO4(
     totals, titrant_molinity, titrant_mass, analyte_mass
 )
-totals_pyco2 = calk.convert.dilute_totals_pyco2_H2SO4(
-    totals_pyco2, titrant_molinity, titrant_mass, analyte_mass
+totals_pyco2 = calk.convert.totals_to_pyco2(totals, salinity)
+k_constants = calk.interface.get_k_constants(totals_pyco2, temperature)
+
+# Calibrate!
+opt_result_calibrate = calk.core.calibrate_H2SO4(
+    alkalinity_core,
+    titrant_mass,
+    emf,
+    temperature,
+    analyte_mass,
+    kwargs_titration["total_sulfate"][0] * 1e-6,
+    salinity,
+    totals,
+    k_constants,
 )
-k_constants = calk.interface.get_k_constants(totals_pyco2, salinity, temperature)
+titrant_molinity_calibrated = opt_result_calibrate["x"][0]
 
 # Solve!
-opt_result = calk.core.solve_emf_complete_H2SO4(
+opt_result_solve = calk.core.solve_emf_complete_H2SO4(
     titrant_molinity, titrant_mass, emf, temperature, analyte_mass, totals, k_constants,
 )
-alkalinity_solved, emf0_solved = opt_result["x"]
+alkalinity_solved, emf0_solved = opt_result_solve["x"]
 alkalinity_solved *= 1e6
+
+# And again with the calibrated titrant_molinity
+opt_result_cal_solve = calk.core.solve_emf_complete_H2SO4(
+    titrant_molinity_calibrated,
+    titrant_mass,
+    emf,
+    temperature,
+    analyte_mass,
+    totals,
+    k_constants,
+)
+alkalinity_cal_solved, emf0_cal_solved = opt_result_cal_solve["x"]
+alkalinity_cal_solved *= 1e6
+
+
+def test_core_calibration_H2SO4():
+    """Does the core H2SO4 calibrator find the correct titrant_molinity for a
+    simulated titration?
+    """
+    assert np.isclose(titrant_molinity, titrant_molinity_calibrated, rtol=0, atol=1e-8)
 
 
 def test_core_solver_H2SO4():
     """Does the core H2SO4 solver correctly solve a simulated titration?"""
     assert np.isclose(alkalinity_core, alkalinity_solved, rtol=0, atol=1e-8)
     assert np.isclose(emf0, emf0_solved, rtol=0, atol=1e-8)
+    assert np.isclose(alkalinity_core, alkalinity_cal_solved, rtol=0, atol=1e-8)
+    assert np.isclose(emf0, emf0_cal_solved, rtol=0, atol=1e-8)
 
 
-# test_core_solver_H2SO4()
+test_core_calibration_H2SO4()
+test_core_solver_H2SO4()
 
 # # Import as a Calkulate Dataset
 # ds = pd.DataFrame({"file_name": [file_name]})

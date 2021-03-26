@@ -6,7 +6,7 @@ import copy
 import numpy as np
 from scipy.stats import linregress
 from scipy.optimize import least_squares
-from . import constants, convert, default, simulate
+from . import constants, convert, default, interface, simulate
 
 
 def gran_estimator(mixture_mass, emf, temperature):
@@ -283,6 +283,78 @@ def calibrate(
             temperature,
             analyte_mass,
             totals,
+            k_constants,
+            solver_kwargs,
+        ),
+        **least_squares_kwargs,
+    )
+
+
+def _lsqfun_calibrate_H2SO4(
+    titrant_molinity,
+    alkalinity_certified,
+    titrant_mass,
+    emf,
+    temperature,
+    analyte_mass,
+    analyte_total_sulfate,
+    analyte_salinity,
+    totals,
+    k_constants,
+    solver_kwargs,
+):
+    """Calculate residuals for the calibrator."""
+    # Update sulfate dilution by titrant and its consequences
+    totals["total_sulfate"] = (
+        analyte_total_sulfate * analyte_mass + titrant_molinity * titrant_mass
+    ) / (analyte_mass + titrant_mass)
+    totals_pyco2 = convert.totals_to_pyco2(totals, analyte_salinity)
+    k_constants = interface.get_k_constants(totals_pyco2, temperature)
+    # Solve for alkalinity
+    alkalinity = solve_emf_complete_H2SO4(
+        titrant_molinity[0],
+        titrant_mass,
+        emf,
+        temperature,
+        analyte_mass,
+        totals,
+        k_constants,
+        **solver_kwargs,
+    )["x"][0]
+    # Return residual
+    return alkalinity * 1e6 - alkalinity_certified
+
+
+def calibrate_H2SO4(
+    alkalinity_certified,
+    titrant_mass,
+    emf,
+    temperature,
+    analyte_mass,
+    analyte_total_sulfate,
+    analyte_salinity,
+    totals,
+    k_constants,
+    titrant_molinity_guess=None,
+    least_squares_kwargs=default.least_squares_kwargs,
+    solver_kwargs={},
+):
+    """Solve for titrant_molinity given alkalinity_certified."""
+    if titrant_molinity_guess is None:
+        titrant_molinity_guess = copy.deepcopy(default.titrant_molinity_guess)
+    solver_kwargs["least_squares_kwargs"] = least_squares_kwargs
+    return least_squares(
+        _lsqfun_calibrate_H2SO4,
+        [titrant_molinity_guess],
+        args=(
+            alkalinity_certified,
+            titrant_mass,
+            emf,
+            temperature,
+            analyte_mass,
+            analyte_total_sulfate,
+            analyte_salinity,
+            totals.copy(),
             k_constants,
             solver_kwargs,
         ),

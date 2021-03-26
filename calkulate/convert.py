@@ -3,7 +3,7 @@
 """Convert between various properties."""
 
 import numpy as np
-from . import constants, default
+from . import constants, default, interface
 
 # For convenience
 F = constants.faraday
@@ -31,6 +31,16 @@ def dilute_totals_pyco2(totals_pyco2, titrant_mass, analyte_mass):
         else v
         for k, v in totals_pyco2.items()
     }
+
+
+def totals_to_pyco2(totals, salinity):
+    """Convert Calkulate-style totals into PyCO2SYS-style totals_pyco2."""
+    totals_pyco2 = {
+        p: totals[c] if c in totals else 0.0
+        for p, c in interface.pyco2_to_calk__totals.items()
+    }
+    totals_pyco2["Sal"] = salinity
+    return totals_pyco2
 
 
 def dilute_totals_H2SO4(totals, titrant_molinity, titrant_mass, analyte_mass):
