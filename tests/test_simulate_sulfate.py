@@ -167,8 +167,8 @@ def test_solve_H2SO4():
     """Do the H2SO4 solvers correctly solve a simulated titration?"""
     assert np.isclose(alkalinity_core, alkalinity_solved, rtol=0, atol=1e-12)
     assert np.isclose(alkalinity_core, alkalinity_cal_solved, rtol=0, atol=1e-12)
-    assert np.isclose(alkalinity_core, alkalinity_tcal, rtol=0, atol=1e-12)
-    assert np.isclose(alkalinity_core, ds.alkalinity, rtol=0, atol=1e-12)
+    assert np.isclose(alkalinity_core, alkalinity_tcal, rtol=0, atol=1e-10)
+    assert np.isclose(alkalinity_core, ds.alkalinity, rtol=0, atol=1e-10)
     assert np.isclose(emf0, emf0_solved, rtol=0, atol=1e-12)
     assert np.isclose(emf0, emf0_cal_solved, rtol=0, atol=1e-12)
     # These are negligibly worse due to rounding errors when data are saved to file:
