@@ -22,7 +22,11 @@ def gran_estimator(mixture_mass, emf, temperature):
 
 
 def gran_guess_alkalinity(
-    titrant_mass, gran_estimates, analyte_mass, titrant_molinity,
+    titrant_mass,
+    gran_estimates,
+    analyte_mass,
+    titrant_molinity,
+    titrant=default.titrant,
 ):
     """Simple Gran-plot first-guess of alkalinity.
     Uses all provided data points.
@@ -42,6 +46,7 @@ def gran_guesses_emf0(
     analyte_mass,
     titrant_molinity,
     alkalinity_guess=None,
+    titrant=default.titrant,
     HF=0,
     HSO4=0,
 ):
@@ -55,13 +60,22 @@ def gran_guesses_emf0(
         alkalinity_guess = gran_guess_alkalinity(
             titrant_mass, gran_estimates, analyte_mass, titrant_molinity,
         )
+        if titrant == "H2SO4":
+            alkalinity_guess *= 2
+    if titrant == "H2SO4":
+        titrant_normality = 2
+    else:
+        titrant_normality = 1
     # Calculate first-guesses of EMF0
     temperature_K = temperature + constants.absolute_zero
     emf0_guesses = emf - (
         constants.ideal_gas * temperature_K / constants.faraday
     ) * np.log(
         (
-            (titrant_mass * titrant_molinity - analyte_mass * alkalinity_guess)
+            (
+                titrant_mass * titrant_molinity * titrant_normality
+                - analyte_mass * alkalinity_guess
+            )
             - analyte_mass * (HF + HSO4)
         )
         / mixture_mass
@@ -70,7 +84,14 @@ def gran_guesses_emf0(
 
 
 def gran_guesses(
-    titrant_mass, emf, temperature, analyte_mass, titrant_molinity, HF=0, HSO4=0,
+    titrant_mass,
+    emf,
+    temperature,
+    analyte_mass,
+    titrant_molinity,
+    titrant=default.titrant,
+    HF=0,
+    HSO4=0,
 ):
     """Simple Gran-plot first guesses for alkalinity, EMF0 and pH.
     Uses a subset of the provided data points.
@@ -86,6 +107,8 @@ def gran_guesses(
     alkalinity_guess = gran_guess_alkalinity(
         titrant_mass[G], gran_estimates[G], analyte_mass, titrant_molinity,
     )
+    if titrant == "H2SO4":
+        alkalinity_guess *= 2
     if np.size(temperature) == 1:
         temperature = np.full(np.size(titrant_mass), temperature)
     emf0_guess = np.mean(
@@ -96,6 +119,7 @@ def gran_guesses(
             analyte_mass,
             titrant_molinity,
             alkalinity_guess=alkalinity_guess,
+            titrant=titrant,
             HF=HF,
             HSO4=HSO4,
         )
@@ -205,7 +229,7 @@ def solve_emf_complete_H2SO4(
     """Solve for alkalinity and EMF0 using the complete-calculation method."""
     # Get initial guesses
     alkalinity_guess, emf0_guess, pH_guesses = gran_guesses(
-        titrant_mass, emf, temperature, analyte_mass, titrant_molinity,
+        titrant_mass, emf, temperature, analyte_mass, titrant_molinity, titrant="H2SO4",
     )[:-1]
     # Set which data points to use in the final solver
     G = (pH_guesses >= pH_range[0]) & (pH_guesses <= pH_range[1])
