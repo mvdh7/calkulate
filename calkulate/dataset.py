@@ -86,11 +86,22 @@ def calibrate_row(
         if "titrant_molinity_guess" in ds_row:
             if ~pd.isnull(ds_row.titrant_molinity_guess):
                 titrant_molinity_guess = ds_row.titrant_molinity_guess
+        titrant = default.titrant
+        analyte_total_sulfate = None
+        if "titrant" in ds_row:
+            if ~pd.isnull(ds_row.titrant):
+                titrant = ds_row.titrant
+                if titrant == "H2SO4":
+                    assert "total_sulfate" in ds_row
+                    assert ~pd.isnull(ds_row.total_sulfate)
+                    analyte_total_sulfate = ds_row.total_sulfate
         try:
             titrant_molinity_here, analyte_mass = titration.calibrate(
                 file_name,
                 ds_row.salinity,
                 ds_row.alkalinity_certified,
+                analyte_total_sulfate=analyte_total_sulfate,
+                titrant=titrant,
                 titrant_molinity_guess=titrant_molinity_guess,
                 pH_range=pH_range,
                 least_squares_kwargs=least_squares_kwargs,
@@ -210,6 +221,15 @@ def solve_row(
             file_name = ds_row.file_path + ds_row.file_name
         else:
             file_name = ds_row.file_name
+        titrant = default.titrant
+        analyte_total_sulfate = None
+        if "titrant" in ds_row:
+            if ~pd.isnull(ds_row.titrant):
+                titrant = ds_row.titrant
+                if titrant == "H2SO4":
+                    assert "total_sulfate" in ds_row
+                    assert ~pd.isnull(ds_row.total_sulfate)
+                    analyte_total_sulfate = ds_row.total_sulfate
         try:
             (
                 alkalinity,
@@ -221,6 +241,8 @@ def solve_row(
                 file_name,
                 ds_row.salinity,
                 ds_row.titrant_molinity,
+                analyte_total_sulfate=analyte_total_sulfate,
+                titrant=titrant,
                 pH_range=pH_range,
                 least_squares_kwargs=least_squares_kwargs,
                 **prepare_kwargs,

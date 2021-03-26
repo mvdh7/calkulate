@@ -139,49 +139,45 @@ alkalinity_tcal, emf0_tcal, pH_initial_tcal = calk.titration.solve(
 )[:3]
 
 
+# Import as a Calkulate Dataset, self-calibrate and solve
+ds = calk.Dataset({"file_name": [file_name]})
+ds["salinity"] = co2sys_core["salinity"]
+ds["alkalinity_certified"] = alkalinity_core
+ds["analyte_mass"] = analyte_mass
+ds["titrant_molinity"] = titrant_molinity
+ds["titrant_amount_unit"] = "g"
+ds["opt_total_borate"] = 1
+ds["opt_k_carbonic"] = 16
+ds["dic"] = co2sys_core["dic"]
+ds["titrant"] = "H2SO4"
+ds["total_sulfate"] = kwargs_titration["total_sulfate"][0]
+ds.calkulate()
+
+
 def test_calibrate_H2SO4():
     """Do the H2SO4 calibrators find the correct titrant_molinity for a simulated
     titration?
     """
     assert np.isclose(titrant_molinity, titrant_molinity_calibrated, rtol=0, atol=1e-12)
+    # These are negligibly worse due to rounding errors when data are saved to file:
     assert np.isclose(titrant_molinity, titrant_molinity_tcal, rtol=0, atol=1e-6)
-    # ^ this one is negligibly worse due to rounding errors when data are saved to file
+    assert np.isclose(titrant_molinity, ds.titrant_molinity_here, rtol=0, atol=1e-6)
 
 
 def test_solve_H2SO4():
     """Do the H2SO4 solvers correctly solve a simulated titration?"""
     assert np.isclose(alkalinity_core, alkalinity_solved, rtol=0, atol=1e-12)
-    assert np.isclose(emf0, emf0_solved, rtol=0, atol=1e-12)
     assert np.isclose(alkalinity_core, alkalinity_cal_solved, rtol=0, atol=1e-12)
-    assert np.isclose(emf0, emf0_cal_solved, rtol=0, atol=1e-12)
     assert np.isclose(alkalinity_core, alkalinity_tcal, rtol=0, atol=1e-12)
+    assert np.isclose(alkalinity_core, ds.alkalinity, rtol=0, atol=1e-12)
+    assert np.isclose(emf0, emf0_solved, rtol=0, atol=1e-12)
+    assert np.isclose(emf0, emf0_cal_solved, rtol=0, atol=1e-12)
+    # These are negligibly worse due to rounding errors when data are saved to file:
     assert np.isclose(emf0, emf0_tcal, rtol=0, atol=1e-4)
-    # ^ this one is negligibly worse due to rounding errors when data are saved to file
+    assert np.isclose(emf0, ds.emf0, rtol=0, atol=1e-4)
     assert np.isclose(pH_free[0], pH_initial_tcal, rtol=0, atol=1e-6)
+    assert np.isclose(pH_free[0], ds.pH_initial, rtol=0, atol=1e-6)
 
 
 test_calibrate_H2SO4()
 test_solve_H2SO4()
-
-# # Import as a Calkulate Dataset
-# ds = calk.Dataset({"file_name": [file_name]})
-# ds["salinity"] = co2sys_core["salinity"]
-# ds["analyte_mass"] = analyte_mass
-# ds["titrant_molinity"] = titrant_molinity
-# ds["titrant_amount_unit"] = "g"
-# ds["opt_total_borate"] = 1
-# ds["opt_k_carbonic"] = 16
-# ds["dic"] = co2sys_core["dic"]
-# ds["titrant"] = "H2SO4"
-# ds.solve()
-# co2sys_core["alkalinity_titration"] = alkalinity_solved = ds.alkalinity.to_numpy()[0]
-# co2sys_core["emf0"] = ds.emf0.to_numpy()
-# co2sys_core["alkalinity_offset"] = co2sys_core["alkalinity_titration"] - alkalinity_core
-
-
-# def test_simulate_then_solve():
-#     assert np.isclose(co2sys_core["emf0"], emf0, rtol=0, atol=1e-4)
-#     assert np.isclose(co2sys_core["alkalinity_offset"], 0, rtol=0, atol=1e-3)
-
-
-# # test_simulate_then_solve()
