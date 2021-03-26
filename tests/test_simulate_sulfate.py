@@ -73,19 +73,21 @@ emf = calk.convert.pH_to_emf(pH_titrations, emf0, kwargs_titration["temperature"
 file_name = "tests/data/test_simulate_sulfate.dat"
 calk.write_dat(
     file_name,
-    titrant_mass * 1000,  # g
+    titrant_mass * 1e3,  # g
     emf,  # mV
     temperature,  # °C
     mode="w",
     measurement_fmt=".4f",
 )
-file_name_ml = "tests/data/test_simulate_sulfate_ml.dat"
+file_name_v = "tests/data/test_simulate_sulfate_ml.dat"
+titrant_volume = titrant_mass / calk.density.H2SO4_25C_EAIM(titrant_molinity)
 calk.write_dat(
-    file_name_ml,
-    titrant_mass * 1000 * calk.density.H2SO4_25C_EAIM(titrant_molinity),  # ml
+    file_name_v,
+    titrant_volume * 1e3,  # ml
     emf,  # mV
     temperature,  # °C
     mode="w",
+    titrant_amount_fmt=".8f",
     measurement_fmt=".4f",
 )
 
@@ -136,7 +138,6 @@ prepare_kwargs = dict(
     analyte_mass=analyte_mass,
     analyte_total_sulfate=kwargs_titration["total_sulfate"][0],
     dic=dic,
-    molinity_H2SO4=titrant_molinity,
     titrant="H2SO4",
     titrant_amount_unit="g",
 )
@@ -147,13 +148,27 @@ alkalinity_tcal, emf0_tcal, pH_initial_tcal = calk.titration.solve(
     file_name, salinity, titrant_molinity_tcal, **prepare_kwargs,
 )[:3]
 
+# Now volume version
+prepare_kwargs_v = dict(
+    analyte_mass=analyte_mass,
+    analyte_total_sulfate=kwargs_titration["total_sulfate"][0],
+    dic=dic,
+    molinity_H2SO4=titrant_molinity,
+    titrant="H2SO4",
+    titrant_amount_unit="ml",
+)
+titrant_molinity_tcal_v = calk.titration.calibrate(
+    file_name_v, salinity, alkalinity_core, **prepare_kwargs_v,
+)[0]
+alkalinity_tcal_v, emf0_tcal_v, pH_initial_tcal_v = calk.titration.solve(
+    file_name_v, salinity, titrant_molinity_tcal_v, **prepare_kwargs_v,
+)[:3]
 
 # Import as a Calkulate Dataset, self-calibrate and solve
 ds = calk.Dataset({"file_name": [file_name]})
 ds["salinity"] = co2sys_core["salinity"]
 ds["alkalinity_certified"] = alkalinity_core
 ds["analyte_mass"] = analyte_mass
-ds["titrant_molinity"] = titrant_molinity
 ds["titrant_amount_unit"] = "g"
 ds["opt_total_borate"] = 1
 ds["opt_k_carbonic"] = 16
@@ -162,7 +177,17 @@ ds["titrant"] = "H2SO4"
 ds.calkulate()
 
 # And again for the volume version
-dsv = copy.deepcopy(ds)
+ds_v = calk.Dataset({"file_name": [file_name_v]})
+ds_v["salinity"] = co2sys_core["salinity"]
+ds_v["alkalinity_certified"] = alkalinity_core
+ds_v["analyte_mass"] = analyte_mass
+ds_v["titrant_amount_unit"] = "ml"
+ds_v["opt_total_borate"] = 1
+ds_v["opt_k_carbonic"] = 16
+ds_v["dic"] = co2sys_core["dic"]
+ds_v["titrant"] = "H2SO4"
+ds_v["molinity_H2SO4"] = titrant_molinity
+ds_v.calkulate()
 
 
 def test_calibrate_H2SO4():
@@ -172,7 +197,9 @@ def test_calibrate_H2SO4():
     assert np.isclose(titrant_molinity, titrant_molinity_calibrated, rtol=0, atol=1e-12)
     # These are negligibly worse due to rounding errors when data are saved to file:
     assert np.isclose(titrant_molinity, titrant_molinity_tcal, rtol=0, atol=1e-6)
+    assert np.isclose(titrant_molinity, titrant_molinity_tcal_v, rtol=0, atol=1e-6)
     assert np.isclose(titrant_molinity, ds.titrant_molinity_here, rtol=0, atol=1e-6)
+    assert np.isclose(titrant_molinity, ds_v.titrant_molinity_here, rtol=0, atol=1e-6)
 
 
 def test_solve_H2SO4():
@@ -180,15 +207,22 @@ def test_solve_H2SO4():
     assert np.isclose(alkalinity_core, alkalinity_solved, rtol=0, atol=1e-12)
     assert np.isclose(alkalinity_core, alkalinity_cal_solved, rtol=0, atol=1e-12)
     assert np.isclose(alkalinity_core, alkalinity_tcal, rtol=0, atol=1e-10)
+    assert np.isclose(alkalinity_core, alkalinity_tcal_v, rtol=0, atol=1e-10)
     assert np.isclose(alkalinity_core, ds.alkalinity, rtol=0, atol=1e-10)
+    assert np.isclose(alkalinity_core, ds_v.alkalinity, rtol=0, atol=1e-10)
     assert np.isclose(emf0, emf0_solved, rtol=0, atol=1e-12)
     assert np.isclose(emf0, emf0_cal_solved, rtol=0, atol=1e-12)
     # These are negligibly worse due to rounding errors when data are saved to file:
     assert np.isclose(emf0, emf0_tcal, rtol=0, atol=1e-4)
+    assert np.isclose(emf0, emf0_tcal_v, rtol=0, atol=1e-4)
     assert np.isclose(emf0, ds.emf0, rtol=0, atol=1e-4)
+    assert np.isclose(emf0, ds_v.emf0, rtol=0, atol=1e-4)
     assert np.isclose(pH_free[0], pH_initial_tcal, rtol=0, atol=1e-6)
+    assert np.isclose(pH_free[0], pH_initial_tcal_v, rtol=0, atol=1e-6)
     assert np.isclose(pH_free[0], ds.pH_initial, rtol=0, atol=1e-6)
+    assert np.isclose(pH_free[0], ds_v.pH_initial, rtol=0, atol=1e-6)
     assert np.isclose(0, ds.alkalinity_offset, rtol=0, atol=1e-10)
+    assert np.isclose(0, ds_v.alkalinity_offset, rtol=0, atol=1e-10)
 
 
 test_calibrate_H2SO4()
