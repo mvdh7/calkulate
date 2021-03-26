@@ -117,6 +117,9 @@ Like for the recommended columns, if optional column values are only needed for 
 ??? info "`temperature_override` : *titration temperature*"
     Must be in °C.  If not supplied, the values in the titration file are used.  Otherwise, this value overrides them.
 
+??? info "`titrant` : *The titrant being used*"
+    Use `"HCl"` (default) for hydrochloric acid or `"H2SO4"` for sulfuric acid.
+
 ??? info "`titrant_amount_unit` : *unit for the amount of titrant in the titration file*"
     Either `"ml"` (default) for volume in ml or `"g"` / `"kg"` for mass in g / kg.
     
