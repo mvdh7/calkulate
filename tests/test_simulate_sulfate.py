@@ -150,7 +150,6 @@ ds["opt_total_borate"] = 1
 ds["opt_k_carbonic"] = 16
 ds["dic"] = co2sys_core["dic"]
 ds["titrant"] = "H2SO4"
-ds["total_sulfate"] = kwargs_titration["total_sulfate"][0]
 ds.calkulate()
 
 
@@ -177,6 +176,7 @@ def test_solve_H2SO4():
     assert np.isclose(emf0, ds.emf0, rtol=0, atol=1e-4)
     assert np.isclose(pH_free[0], pH_initial_tcal, rtol=0, atol=1e-6)
     assert np.isclose(pH_free[0], ds.pH_initial, rtol=0, atol=1e-6)
+    assert np.isclose(0, ds.alkalinity_offset, rtol=0, atol=1e-12)
 
 
 test_calibrate_H2SO4()

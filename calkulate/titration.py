@@ -10,7 +10,7 @@ def get_dat_data(
     file_name,
     molinity_HCl=default.molinity_HCl,
     molinity_NaCl=default.molinity_NaCl,
-    molinity_H2SO4=None,
+    molinity_H2SO4=default.molinity_H2SO4,
     temperature_override=None,
     titrant=default.titrant,
     titrant_amount_unit=default.titrant_amount_unit,
@@ -27,7 +27,6 @@ def get_dat_data(
     # Get titrant mass
     if titrant_amount_unit == "ml":
         if titrant == "H2SO4":
-            assert molinity_H2SO4 is not None
             titrant_mass = (
                 titrant_amount * density.H2SO4_25C_EAIM(molinity_H2SO4) * 1e-3
             )
@@ -158,7 +157,7 @@ def prepare(
     k_water=None,
     molinity_HCl=default.molinity_HCl,
     molinity_NaCl=default.molinity_NaCl,
-    molinity_H2SO4=None,
+    molinity_H2SO4=default.molinity_H2SO4,
     temperature_override=None,
     titrant=default.titrant,
     titrant_amount_unit=default.titrant_amount_unit,
