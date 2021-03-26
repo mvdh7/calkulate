@@ -12,7 +12,7 @@ opt_pH_scale = 3  # for PyCO2SYS
 opt_total_borate = 1  # for PyCO2SYS
 pressure = 0  # in-water pressure in dbar
 pH_range = (3, 4)  # pH range to use for solving alkalinity
-least_squares_kwargs = {"method": "lm"}
+least_squares_kwargs = dict(method="lm", gtol=1e-12, xtol=1e-12)
 molinity_HCl = 0.1  # for acid density
 molinity_NaCl = 0.6  # for acid density
 read_dat_method = "genfromtxt"
