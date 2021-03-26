@@ -228,11 +228,11 @@ def calibrate(
     file_name,
     salinity,
     alkalinity_certified,
+    analyte_total_sulfate=None,
     titrant=default.titrant,
     titrant_molinity_guess=None,
     pH_range=default.pH_range,
     least_squares_kwargs=default.least_squares_kwargs,
-    solver=core.solve_emf_complete,
     **prepare_kwargs,
 ):
     """Calibrate titrant_molinity for a titration file given alkalinity_certified."""
@@ -244,13 +244,14 @@ def calibrate(
         "least_squares_kwargs": least_squares_kwargs,
     }
     if titrant == "H2SO4":
+        assert analyte_total_sulfate is not None
         titrant_molinity = core.calibrate_H2SO4(
             alkalinity_certified,
             titrant_mass,
             emf,
             temperature,
             analyte_mass,
-            analyte_total_sulfate,  # CONTINUE FROM HERE --- PROVIDE THIS VALUE!
+            analyte_total_sulfate * 1e-6,
             salinity,
             totals,
             k_constants,
@@ -278,6 +279,8 @@ def solve(
     file_name,
     salinity,
     titrant_molinity,
+    analyte_total_sulfate=None,
+    titrant=default.titrant,
     pH_range=default.pH_range,
     least_squares_kwargs=default.least_squares_kwargs,
     **prepare_kwargs,
@@ -287,19 +290,41 @@ def solve(
     Results in micromol/kg-solution, mV, and on the Free scale.
     """
     titrant_mass, emf, temperature, analyte_mass, totals, k_constants = prepare(
-        file_name, salinity, **prepare_kwargs
+        file_name, salinity, titrant=titrant, **prepare_kwargs
     )
-    opt_result = core.solve_emf_complete(
-        titrant_molinity,
-        titrant_mass,
-        emf,
-        temperature,
-        analyte_mass,
-        totals,
-        k_constants,
-        least_squares_kwargs=least_squares_kwargs,
-        pH_range=pH_range,
-    )
+    if titrant == "H2SO4":
+        # Update sulfate dilution by titrant and its consequences
+        assert analyte_total_sulfate is not None
+        totals["total_sulfate"] = (
+            1e-6 * analyte_total_sulfate * analyte_mass
+            + titrant_molinity * titrant_mass
+        ) / (analyte_mass + titrant_mass)
+        totals_pyco2 = convert.totals_to_pyco2(totals, salinity)
+        k_constants = interface.get_k_constants(totals_pyco2, temperature)
+        # Solve for alkalinity and EMF0
+        opt_result = core.solve_emf_complete_H2SO4(
+            titrant_molinity,
+            titrant_mass,
+            emf,
+            temperature,
+            analyte_mass,
+            totals,
+            k_constants,
+            least_squares_kwargs=least_squares_kwargs,
+            pH_range=pH_range,
+        )
+    else:
+        opt_result = core.solve_emf_complete(
+            titrant_molinity,
+            titrant_mass,
+            emf,
+            temperature,
+            analyte_mass,
+            totals,
+            k_constants,
+            least_squares_kwargs=least_squares_kwargs,
+            pH_range=pH_range,
+        )
     alkalinity, emf0 = opt_result["x"]
     # Calculate initial pH
     pH_initial = convert.emf_to_pH(emf[0], emf0, temperature[0])
