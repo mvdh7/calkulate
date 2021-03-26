@@ -2,7 +2,17 @@
 
 ## Version 23: best of v2 and v3
 
-Calkulate v3 went too far overboard with the OO approach and ended up being very slow and overly complex behind the scenes as a result.  Calkulate v23 therefore mashes together the best bits of v2 and v3 for the ultimate alkalinity solving experience
+Calkulate v3 went too far overboard with the OO approach and ended up being very slow and overly complex behind the scenes as a result.  Calkulate v23 therefore mashes together the best bits of v2 and v3 for the ultimate alkalinity solving experience.
+
+### 23.1
+
+Adds solvers for titrations with an H<sub>2</sub>SO<sub>4</sub> titrant.
+
+#### 23.1.0 (forthcoming)
+
+!!! info "Changes in v23.1.0"
+
+    * Add solvers for titrations with an H<sub>2</sub>SO<sub>4</sub> titrant.
 
 ### 23.0
 

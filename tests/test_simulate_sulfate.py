@@ -6,12 +6,12 @@ import PyCO2SYS as pyco2, calkulate as calk
 # Function inputs
 dic = np.array([2000.0])
 pH_free = np.array([8.1])
-temperature = 25.0
 salinity = 35.0
 # For the titration
 analyte_mass = 0.2  # kg
 titrant_molinity = 0.15  # mol/kg
 titrant_mass = np.arange(0, 2.51, 0.05) * 1e-3  # kg
+temperature = np.full_like(titrant_mass, 25.0)
 titrant_alkalinity_factor = 2  # for H2SO4
 emf0 = 300  # mV
 # ===============
@@ -22,7 +22,7 @@ if np.isscalar(temperature):
 if np.isscalar(salinity):
     salinity = np.array([salinity])
 kwargs_core = dict(
-    temperature=temperature,
+    temperature=temperature[0],
     salinity=salinity,
     opt_pH_scale=3,
     opt_k_carbonic=16,
@@ -75,10 +75,36 @@ calk.write_dat(
     file_name,
     titrant_mass * 1000,  # g
     emf,  # mV
-    co2sys_titrations["temperature"],  # °C
+    temperature,  # °C
     mode="w",
     measurement_fmt=".4f",
 )
+
+# Get totals and k_constants
+totals, totals_pyco2 = calk.interface.get_totals(salinity, dic=dic)
+totals = calk.convert.dilute_totals_H2SO4(
+    totals, titrant_molinity, titrant_mass, analyte_mass
+)
+totals_pyco2 = calk.convert.dilute_totals_pyco2_H2SO4(
+    totals_pyco2, titrant_molinity, titrant_mass, analyte_mass
+)
+k_constants = calk.interface.get_k_constants(totals_pyco2, salinity, temperature)
+
+# Solve!
+opt_result = calk.core.solve_emf_complete_H2SO4(
+    titrant_molinity, titrant_mass, emf, temperature, analyte_mass, totals, k_constants,
+)
+alkalinity_solved, emf0_solved = opt_result["x"]
+alkalinity_solved *= 1e6
+
+
+def test_core_solver_H2SO4():
+    """Does the core H2SO4 solver correctly solve a simulated titration?"""
+    assert np.isclose(alkalinity_core, alkalinity_solved, rtol=0, atol=1e-8)
+    assert np.isclose(emf0, emf0_solved, rtol=0, atol=1e-8)
+
+
+# test_core_solver_H2SO4()
 
 # # Import as a Calkulate Dataset
 # ds = pd.DataFrame({"file_name": [file_name]})

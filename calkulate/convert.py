@@ -33,6 +33,38 @@ def dilute_totals_pyco2(totals_pyco2, titrant_mass, analyte_mass):
     }
 
 
+def dilute_totals_H2SO4(totals, titrant_molinity, titrant_mass, analyte_mass):
+    """Apply the dilution factor to all elements of totals when the titrant is H2SO4."""
+    dilution_factor = get_dilution_factor(titrant_mass, analyte_mass)
+    totals = {
+        k: v * dilution_factor
+        if k != "total_sulfate"
+        else (v * analyte_mass + titrant_molinity * titrant_mass)
+        / (analyte_mass + titrant_mass)
+        for k, v in totals.items()
+    }
+    return totals
+
+
+def dilute_totals_pyco2_H2SO4(
+    totals_pyco2, titrant_molinity, titrant_mass, analyte_mass
+):
+    """Apply the dilution factor to the appropriate elements of totals_pyco2
+    when the titrant is H2SO4.
+    """
+    dilution_factor = get_dilution_factor(titrant_mass, analyte_mass)
+    totals_pyco2 = {
+        k: v * dilution_factor
+        if k in ("TB", "TF", "TCa", "alpha", "beta", "TPO4", "TSi", "TNH3", "TH2S",)
+        else v
+        for k, v in totals_pyco2.items()
+    }
+    totals_pyco2["TSO4"] = (
+        totals_pyco2["TSO4"] * analyte_mass + titrant_molinity * titrant_mass
+    ) / (analyte_mass + titrant_mass)
+    return totals_pyco2
+
+
 def emf_to_h(emf, emf0, temperature):
     """Convert EMF to [H+]."""
     # DAA03 Eq. (13) with typo corrected (i.e. EMF and EMF0 switched)
