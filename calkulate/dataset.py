@@ -37,7 +37,6 @@ prepare_defaults = dict(
     molinity_HCl=default.molinity_HCl,
     molinity_NaCl=default.molinity_NaCl,
     temperature_override=None,
-    titrant="HCl",
     titrant_amount_unit=default.titrant_amount_unit,
     opt_k_bisulfate=default.opt_k_bisulfate,
     opt_k_carbonic=default.opt_k_carbonic,
@@ -75,7 +74,7 @@ def calibrate_row(
     """
     if ~np.isnan(ds_row.alkalinity_certified) & ds_row.file_good:
         if verbose:
-            print("Calkulate: calibrating '{}'...".format(ds_row.file_name))
+            print("Calkulate: calibrating {}...".format(ds_row.file_name))
         prepare_kwargs = get_prepare_kwargs(ds_row)
         prepare_kwargs["read_dat_kwargs"] = read_dat_kwargs
         # Calibrate titrant molinity
@@ -167,10 +166,6 @@ def calibrate(
             default.titrant_amount_unit,
             ds.titrant_amount_unit,
         )
-    if "titrant" not in ds:
-        ds["titrant"] = "HCl"
-    else:
-        ds["titrant"] = np.where(pd.isnull(ds.titrant), "HCl", ds.titrant)
     # Calibrate titrant_molinity_here for each row with an alkalinity_certified
     if "file_good" not in ds:
         ds["file_good"] = True

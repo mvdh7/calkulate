@@ -104,7 +104,7 @@ def gran_guesses(
     return alkalinity_guess, emf0_guess, pH_guesses, G
 
 
-def _lsqfun_solve_emf_complete_HCl(
+def _lsqfun_solve_emf_complete(
     alkalinity_emf0,
     titrant_molinity,
     titrant_mass,
@@ -127,29 +127,6 @@ def _lsqfun_solve_emf_complete_HCl(
     return residual
 
 
-def _lsqfun_solve_emf_complete_H2SO4(
-    alkalinity_emf0,
-    titrant_molinity,
-    titrant_mass,
-    emf,
-    temperature,
-    analyte_mass,
-    totals,
-    k_constants,
-):
-    """Calculate residuals for the complete-calculation solver."""
-    alkalinity, emf0 = alkalinity_emf0
-    pH = convert.emf_to_pH(emf, emf0, temperature)
-    mixture_mass = titrant_mass + analyte_mass
-    dilution_factor = convert.get_dilution_factor(titrant_mass, analyte_mass)
-    residual = (
-        simulate.alkalinity(pH, totals, k_constants)
-        - alkalinity * dilution_factor
-        + 2 * titrant_mass * titrant_molinity / mixture_mass
-    )
-    return residual
-
-
 def solve_emf_complete(
     titrant_molinity,
     titrant_mass,
@@ -158,7 +135,6 @@ def solve_emf_complete(
     analyte_mass,
     totals,
     k_constants,
-    titrant="HCl",
     least_squares_kwargs=default.least_squares_kwargs,
     pH_range=default.pH_range,
 ):
@@ -172,38 +148,21 @@ def solve_emf_complete(
     totals_G = {k: v[G] if np.size(v) > 1 else v for k, v in totals.items()}
     k_constants_G = {k: v[G] if np.size(v) > 1 else v for k, v in k_constants.items()}
     # Solve for alkalinity and EMF0
-    if titrant == "H2SO4":
-        opt_result = least_squares(
-            _lsqfun_solve_emf_complete_H2SO4,
-            [alkalinity_guess, emf0_guess],
-            args=(
-                titrant_molinity,
-                titrant_mass[G],
-                emf[G],
-                temperature[G],
-                analyte_mass,
-                totals_G,
-                k_constants_G,
-            ),
-            x_scale=[1e-6, 1],
-            **least_squares_kwargs,
-        )
-    else:
-        opt_result = least_squares(
-            _lsqfun_solve_emf_complete_HCl,
-            [alkalinity_guess, emf0_guess],
-            args=(
-                titrant_molinity,
-                titrant_mass[G],
-                emf[G],
-                temperature[G],
-                analyte_mass,
-                totals_G,
-                k_constants_G,
-            ),
-            x_scale=[1e-6, 1],
-            **least_squares_kwargs,
-        )
+    opt_result = least_squares(
+        _lsqfun_solve_emf_complete,
+        [alkalinity_guess, emf0_guess],
+        args=(
+            titrant_molinity,
+            titrant_mass[G],
+            emf[G],
+            temperature[G],
+            analyte_mass,
+            totals_G,
+            k_constants_G,
+        ),
+        x_scale=[1e-6, 1],
+        **least_squares_kwargs,
+    )
     # Add which data points were used to the output
     opt_result["data_used"] = G
     return opt_result

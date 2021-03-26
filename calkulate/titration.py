@@ -11,7 +11,6 @@ def get_dat_data(
     molinity_HCl=default.molinity_HCl,
     molinity_NaCl=default.molinity_NaCl,
     temperature_override=None,
-    titrant="HCl",
     titrant_amount_unit=default.titrant_amount_unit,
     read_dat_method=default.read_dat_method,
     read_dat_kwargs={},
@@ -25,21 +24,13 @@ def get_dat_data(
         temperature = np.full_like(titrant_amount, temperature_override)
     # Get titrant mass
     if titrant_amount_unit == "ml":
-        if titrant == "HCl":
-            titrant_mass = (
-                titrant_amount
-                * density.HCl_NaCl_25C_DSC07(
-                    molinity_HCl=molinity_HCl, molinity_NaCl=molinity_NaCl,
-                )
-                * 1e-3
+        titrant_mass = (
+            titrant_amount
+            * density.HCl_NaCl_25C_DSC07(
+                molinity_HCl=molinity_HCl, molinity_NaCl=molinity_NaCl,
             )
-        # elif titrant == "H2SO4":
-        #     ...
-        else:
-            titrant_mass = titrant_amount * 1.0
-            print(
-                "Titrant {} not recognised!  Assuming density = 1 kg/l.".format(titrant)
-            )
+            * 1e-3
+        )
     elif titrant_amount_unit == "g":
         titrant_mass = titrant_amount * 1e-3
     elif titrant_amount_unit == "kg":
@@ -82,8 +73,6 @@ def get_totals_k_constants(
     opt_k_carbonic=default.opt_k_carbonic,
     opt_k_fluoride=default.opt_k_fluoride,
     opt_total_borate=default.opt_total_borate,
-    titrant="HCl",
-    titrant_molinity=None,
 ):
     # Get totals from PyCO2SYS
     totals, totals_pyco2 = interface.get_totals(
@@ -102,20 +91,8 @@ def get_totals_k_constants(
         opt_total_borate=opt_total_borate,
     )
     # Dilute totals with titrant
-    totals = convert.dilute_totals(
-        totals,
-        titrant_mass,
-        analyte_mass,
-        titrant=titrant,
-        titrant_molinity=titrant_molinity,
-    )
-    totals_pyco2 = convert.dilute_totals_pyco2(
-        totals_pyco2,
-        titrant_mass,
-        analyte_mass,
-        titrant=titrant,
-        titrant_molinity=titrant_molinity,
-    )
+    totals = convert.dilute_totals(totals, titrant_mass, analyte_mass)
+    totals_pyco2 = convert.dilute_totals_pyco2(totals_pyco2, titrant_mass, analyte_mass)
     # Get k_constants from PyCO2SYS
     k_constants = interface.get_k_constants(
         totals_pyco2,
@@ -175,8 +152,6 @@ def prepare(
     molinity_HCl=default.molinity_HCl,
     molinity_NaCl=default.molinity_NaCl,
     temperature_override=None,
-    titrant="HCl",
-    titrant_molinity=None,
     titrant_amount_unit=default.titrant_amount_unit,
     opt_k_bisulfate=default.opt_k_bisulfate,
     opt_k_carbonic=default.opt_k_carbonic,
@@ -191,7 +166,6 @@ def prepare(
         molinity_HCl=molinity_HCl,
         molinity_NaCl=molinity_NaCl,
         temperature_override=temperature_override,
-        titrant=titrant,
         titrant_amount_unit=titrant_amount_unit,
         read_dat_method=read_dat_method,
         read_dat_kwargs=read_dat_kwargs,
@@ -235,8 +209,6 @@ def prepare(
         opt_k_carbonic=opt_k_carbonic,
         opt_k_fluoride=opt_k_fluoride,
         opt_total_borate=opt_total_borate,
-        titrant=titrant,
-        titrant_molinity=titrant_molinity,
     )
     return titrant_mass, emf, temperature, analyte_mass, totals, k_constants
 
@@ -245,7 +217,6 @@ def calibrate(
     file_name,
     salinity,
     alkalinity_certified,
-    titrant="HCl",
     titrant_molinity_guess=None,
     pH_range=default.pH_range,
     least_squares_kwargs=default.least_squares_kwargs,
@@ -254,16 +225,11 @@ def calibrate(
 ):
     """Calibrate titrant_molinity for a titration file given alkalinity_certified."""
     titrant_mass, emf, temperature, analyte_mass, totals, k_constants = prepare(
-        file_name,
-        salinity,
-        titrant=titrant,
-        titrant_molinity=titrant_molinity_guess,
-        **prepare_kwargs,
+        file_name, salinity, **prepare_kwargs
     )
     solver_kwargs = {
         "pH_range": pH_range,
         "least_squares_kwargs": least_squares_kwargs,
-        "titrant": titrant,
     }
     titrant_molinity = core.calibrate(
         alkalinity_certified,
@@ -284,7 +250,6 @@ def solve(
     file_name,
     salinity,
     titrant_molinity,
-    titrant="HCl",
     pH_range=default.pH_range,
     least_squares_kwargs=default.least_squares_kwargs,
     **prepare_kwargs,
@@ -294,11 +259,7 @@ def solve(
     Results in micromol/kg-solution, mV, and on the Free scale.
     """
     titrant_mass, emf, temperature, analyte_mass, totals, k_constants = prepare(
-        file_name,
-        salinity,
-        titrant=titrant,
-        titrant_molinity=titrant_molinity,
-        **prepare_kwargs,
+        file_name, salinity, **prepare_kwargs
     )
     opt_result = core.solve_emf_complete(
         titrant_molinity,
@@ -308,7 +269,6 @@ def solve(
         analyte_mass,
         totals,
         k_constants,
-        titrant=titrant,
         least_squares_kwargs=least_squares_kwargs,
         pH_range=pH_range,
     )
