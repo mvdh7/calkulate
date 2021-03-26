@@ -16,14 +16,13 @@ least_squares_kwargs = {"method": "lm"}
 molinity_HCl = 0.1  # for acid density
 molinity_NaCl = 0.6  # for acid density
 read_dat_method = "genfromtxt"
+salinity = 35
 total_ammonia = 0
 total_phosphate = 0
 total_silicate = 0
 total_sulfide = 0
+titrant = "HCl"
 titrant_amount_unit = "ml"
 titrant_molinity_guess = 0.1  # mol / kg-solution
 verbose = False
 zlp = 4.5  # pK of 'zero level of protons' [WZK07]
-
-
-salinity = 0

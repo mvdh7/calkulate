@@ -10,7 +10,9 @@ def get_dat_data(
     file_name,
     molinity_HCl=default.molinity_HCl,
     molinity_NaCl=default.molinity_NaCl,
+    molinity_H2SO4=None,
     temperature_override=None,
+    titrant=default.titrant,
     titrant_amount_unit=default.titrant_amount_unit,
     read_dat_method=default.read_dat_method,
     read_dat_kwargs={},
@@ -24,13 +26,19 @@ def get_dat_data(
         temperature = np.full_like(titrant_amount, temperature_override)
     # Get titrant mass
     if titrant_amount_unit == "ml":
-        titrant_mass = (
-            titrant_amount
-            * density.HCl_NaCl_25C_DSC07(
-                molinity_HCl=molinity_HCl, molinity_NaCl=molinity_NaCl,
+        if titrant == "H2SO4":
+            assert molinity_H2SO4 is not None
+            titrant_mass = (
+                titrant_amount * density.H2SO4_25C_EAIM(molinity_H2SO4) * 1e-3
             )
-            * 1e-3
-        )
+        else:
+            titrant_mass = (
+                titrant_amount
+                * density.HCl_NaCl_25C_DSC07(
+                    molinity_HCl=molinity_HCl, molinity_NaCl=molinity_NaCl,
+                )
+                * 1e-3
+            )
     elif titrant_amount_unit == "g":
         titrant_mass = titrant_amount * 1e-3
     elif titrant_amount_unit == "kg":
@@ -150,7 +158,9 @@ def prepare(
     k_water=None,
     molinity_HCl=default.molinity_HCl,
     molinity_NaCl=default.molinity_NaCl,
+    molinity_H2SO4=None,
     temperature_override=None,
+    titrant=default.titrant,
     titrant_amount_unit=default.titrant_amount_unit,
     opt_k_bisulfate=default.opt_k_bisulfate,
     opt_k_carbonic=default.opt_k_carbonic,
@@ -164,7 +174,9 @@ def prepare(
         file_name,
         molinity_HCl=molinity_HCl,
         molinity_NaCl=molinity_NaCl,
+        molinity_H2SO4=molinity_H2SO4,
         temperature_override=temperature_override,
+        titrant=titrant,
         titrant_amount_unit=titrant_amount_unit,
         read_dat_method=read_dat_method,
         read_dat_kwargs=read_dat_kwargs,
@@ -216,6 +228,7 @@ def calibrate(
     file_name,
     salinity,
     alkalinity_certified,
+    titrant=default.titrant,
     titrant_molinity_guess=None,
     pH_range=default.pH_range,
     least_squares_kwargs=default.least_squares_kwargs,
@@ -224,24 +237,40 @@ def calibrate(
 ):
     """Calibrate titrant_molinity for a titration file given alkalinity_certified."""
     titrant_mass, emf, temperature, analyte_mass, totals, k_constants = prepare(
-        file_name, salinity, **prepare_kwargs
+        file_name, salinity, titrant=titrant, **prepare_kwargs
     )
     solver_kwargs = {
         "pH_range": pH_range,
         "least_squares_kwargs": least_squares_kwargs,
     }
-    titrant_molinity = core.calibrate(
-        alkalinity_certified,
-        titrant_mass,
-        emf,
-        temperature,
-        analyte_mass,
-        totals,
-        k_constants,
-        titrant_molinity_guess=titrant_molinity_guess,
-        least_squares_kwargs=least_squares_kwargs,
-        solver_kwargs=solver_kwargs,
-    )["x"][0]
+    if titrant == "H2SO4":
+        titrant_molinity = core.calibrate_H2SO4(
+            alkalinity_certified,
+            titrant_mass,
+            emf,
+            temperature,
+            analyte_mass,
+            analyte_total_sulfate,  # CONTINUE FROM HERE --- PROVIDE THIS VALUE!
+            salinity,
+            totals,
+            k_constants,
+            titrant_molinity_guess=titrant_molinity_guess,
+            least_squares_kwargs=least_squares_kwargs,
+            solver_kwargs=solver_kwargs,
+        )["x"][0]
+    else:
+        titrant_molinity = core.calibrate(
+            alkalinity_certified,
+            titrant_mass,
+            emf,
+            temperature,
+            analyte_mass,
+            totals,
+            k_constants,
+            titrant_molinity_guess=titrant_molinity_guess,
+            least_squares_kwargs=least_squares_kwargs,
+            solver_kwargs=solver_kwargs,
+        )["x"][0]
     return titrant_molinity, analyte_mass
 
 
