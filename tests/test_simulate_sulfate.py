@@ -225,5 +225,5 @@ def test_solve_H2SO4():
     assert np.isclose(0, ds_v.alkalinity_offset, rtol=0, atol=1e-10)
 
 
-test_calibrate_H2SO4()
-test_solve_H2SO4()
+# test_calibrate_H2SO4()
+# test_solve_H2SO4()
