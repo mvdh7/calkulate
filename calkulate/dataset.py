@@ -40,6 +40,7 @@ prepare_defaults = dict(
     molinity_H2SO4=default.molinity_H2SO4,
     temperature_override=None,
     titrant_amount_unit=default.titrant_amount_unit,
+    titrant_density=None,
     opt_k_bisulfate=default.opt_k_bisulfate,
     opt_k_carbonic=default.opt_k_carbonic,
     opt_k_fluoride=default.opt_k_fluoride,

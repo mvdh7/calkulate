@@ -126,7 +126,14 @@ Like for the recommended columns, if optional column values are only needed for 
 ??? info "`titrant_amount_unit` : *unit for the amount of titrant in the titration file*"
     Either `"ml"` (default) for volume in ml or `"g"` / `"kg"` for mass in g / kg.
     
-    If volume is provided, it is converted into mass following [DSC07](../references/#d), assuming the acid contains 0.6&nbsp;M NaCl and 0.1&nbsp;M HCl.  If you used a different ratio, use the columns `molinity_NaCl` and `molinity_HCl` to set this.
+    If volume is provided, then if `titrant="HCl"` or by default, it is converted into mass following [DSC07](../references/#d), assuming the acid contains 0.6&nbsp;M NaCl and 0.1&nbsp;M HCl and is at 25 °C.  If you used a different ratio, use the columns `molinity_NaCl` and `molinity_HCl` to set this.
+
+    If you used `titrant="H2SO4"`, then titrant density is calculated at 25 °C following a basic parameterisation of [E-AIM](http://www.aim.env.uea.ac.uk/aim/aim.php) results against molinity.
+
+    Regardless of the `titrant`, these density equations can also be overwritten with a specific value in the `titrant_density` column.
+
+??? info "`titrant_density` : *density of the titrant*"
+    Titrant density in kg/dm<sup>3</sup>.  If provided, this is used only when `titrant_amount_unit="ml"`, and it takes precedence over density calculated from the equations described in that section.
 
 ??? info "`titrant_molinity` : *molinity of the titrant*"
     Must be in mol/kg-solution.

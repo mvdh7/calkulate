@@ -182,6 +182,8 @@ ds_v["salinity"] = co2sys_core["salinity"]
 ds_v["alkalinity_certified"] = alkalinity_core
 ds_v["analyte_mass"] = analyte_mass
 ds_v["titrant_amount_unit"] = "ml"
+ds_v["titrant_density"] = np.nan
+ds_v["temperature_override"] = np.nan
 ds_v["opt_total_borate"] = 1
 ds_v["opt_k_carbonic"] = 16
 ds_v["dic"] = co2sys_core["dic"]
@@ -225,5 +227,5 @@ def test_solve_H2SO4():
     assert np.isclose(0, ds_v.alkalinity_offset, rtol=0, atol=1e-10)
 
 
-# test_calibrate_H2SO4()
-# test_solve_H2SO4()
+test_calibrate_H2SO4()
+test_solve_H2SO4()

@@ -14,6 +14,7 @@ def get_dat_data(
     temperature_override=None,
     titrant=default.titrant,
     titrant_amount_unit=default.titrant_amount_unit,
+    titrant_density=None,
     read_dat_method=default.read_dat_method,
     read_dat_kwargs={},
 ):
@@ -22,22 +23,25 @@ def get_dat_data(
     titrant_amount, emf, temperature = io.read_dat(
         file_name, method=read_dat_method, **read_dat_kwargs
     )
-    if temperature_override is not None:
+    if not pd.isnull(temperature_override):
         temperature = np.full_like(titrant_amount, temperature_override)
     # Get titrant mass
     if titrant_amount_unit == "ml":
-        if titrant == "H2SO4":
-            titrant_mass = (
-                titrant_amount * density.H2SO4_25C_EAIM(molinity_H2SO4) * 1e-3
-            )
+        if not pd.isnull(titrant_density):
+            titrant_mass = titrant_amount * titrant_density * 1e-3
         else:
-            titrant_mass = (
-                titrant_amount
-                * density.HCl_NaCl_25C_DSC07(
-                    molinity_HCl=molinity_HCl, molinity_NaCl=molinity_NaCl,
+            if titrant == "H2SO4":
+                titrant_mass = (
+                    titrant_amount * density.H2SO4_25C_EAIM(molinity_H2SO4) * 1e-3
                 )
-                * 1e-3
-            )
+            else:
+                titrant_mass = (
+                    titrant_amount
+                    * density.HCl_NaCl_25C_DSC07(
+                        molinity_HCl=molinity_HCl, molinity_NaCl=molinity_NaCl,
+                    )
+                    * 1e-3
+                )
     elif titrant_amount_unit == "g":
         titrant_mass = titrant_amount * 1e-3
     elif titrant_amount_unit == "kg":
@@ -161,6 +165,7 @@ def prepare(
     temperature_override=None,
     titrant=default.titrant,
     titrant_amount_unit=default.titrant_amount_unit,
+    titrant_density=None,
     opt_k_bisulfate=default.opt_k_bisulfate,
     opt_k_carbonic=default.opt_k_carbonic,
     opt_k_fluoride=default.opt_k_fluoride,
@@ -176,6 +181,7 @@ def prepare(
         molinity_H2SO4=molinity_H2SO4,
         temperature_override=temperature_override,
         titrant=titrant,
+        titrant_density=titrant_density,
         titrant_amount_unit=titrant_amount_unit,
         read_dat_method=read_dat_method,
         read_dat_kwargs=read_dat_kwargs,
