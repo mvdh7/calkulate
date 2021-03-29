@@ -2,25 +2,36 @@
 
 ## Version 23: best of v2 and v3
 
-Calkulate v3 went too far overboard with the OO approach and ended up being very slow and overly complex behind the scenes as a result.  Calkulate v23 therefore mashes together the best bits of v2 and v3 for the ultimate alkalinity solving experience
+Calkulate v3 went too far overboard with the OO approach and ended up being very slow and overly complex behind the scenes as a result.  Calkulate v23 therefore mashes together the best bits of v2 and v3 for the ultimate alkalinity solving experience.
+
+### 23.1
+
+Adds solvers for titrations with an H<sub>2</sub>SO<sub>4</sub> titrant.
+
+#### 23.1.0 (29 March 2021)
+
+!!! info "Changes in v23.1.0"
+
+    * Add solvers for titrations with an H<sub>2</sub>SO<sub>4</sub> titrant (see optional `titrant` column in the [metadata contents](../metadata/#optional-columns)).
+    * Added optional `titrant_density` column to overwrite the internally calculated titrant density with a user-specified value.
 
 ### 23.0
 
-#### 23.0.2 (15 March 2020)
+#### 23.0.2 (15 March 2021)
 
 !!! info "Changes in v23.0.2"
 
     * Better handling of missing dates in files imported with `read_dbs`.
     * Minor adjustments and bug fixes in a few internal functions.
 
-#### 23.0.1 (25 February 2020)
+#### 23.0.1 (25 February 2021)
 
 !!! info "Changes in v23.0.1"
 
     * Print more informative error messages when titration data files cannot be found.
     * Use `read_dat_genfromtxt` by default if `read_dat_method` not recognised, instead of throwing an error.
 
-#### 23.0.0 (22 February 2020)
+#### 23.0.0 (22 February 2021)
 
 !!! info "Introduction of v23.0.0"
 

@@ -84,11 +84,14 @@ Like for the recommended columns, if optional column values are only needed for 
     * `k_bisulfate` : bisulfate dissociation constant.
     * `k_water` : water equilibrium constant.
 
-??? info "`molinity_HCl` : *approximate HCl molinity in the titrant*"
-    In mol/kg-solution.  Defaults to 0.1 mol/kg-solution if not provided.  Only used to estimate titrant density, not for calibration.
+??? info "`molinity_HCl` : *approximate HCl molinity in the HCl titrant*"
+    In mol/kg-solution.  Defaults to 0.1 mol/kg-solution if not provided.  Used only to estimate titrant density, not for calibration.
 
-??? info "`molinity_NaCl` : *approximate NaCl molinity in the titrant*"
-    In mol/kg-solution.  Defaults to 0.6 mol/kg-solution if not provided.  Used to estimate titrant density.
+??? info "`molinity_NaCl` : *approximate NaCl molinity in the HCl titrant*"
+    In mol/kg-solution.  Defaults to 0.6 mol/kg-solution if not provided.  Used only to estimate titrant density.
+
+??? info "`molinity_H2SO4` : *approximate NaCl molinity in the H<sub>2</sub>SO<sub>4</sub> titrant*"
+    In mol/kg-solution.  Defaults to 0.1 mol/kg-solution if not provided.  Used only to estimate titrant density, not for calibration.
 
 ??? info "`opt_k_bisulfate` : *which bisulfate dissociation constant to use*"
     Sets whether the bisulfate dissociation constant is estimated from salinity and temperature by [PyCO2SYS](https://PyCO2SYS.rtfd.io) following:
@@ -117,10 +120,20 @@ Like for the recommended columns, if optional column values are only needed for 
 ??? info "`temperature_override` : *titration temperature*"
     Must be in °C.  If not supplied, the values in the titration file are used.  Otherwise, this value overrides them.
 
+??? info "`titrant` : *The titrant being used*"
+    Use `"HCl"` (default) for hydrochloric acid or `"H2SO4"` for sulfuric acid.
+
 ??? info "`titrant_amount_unit` : *unit for the amount of titrant in the titration file*"
     Either `"ml"` (default) for volume in ml or `"g"` / `"kg"` for mass in g / kg.
     
-    If volume is provided, it is converted into mass following [DSC07](../references/#d), assuming the acid contains 0.6&nbsp;M NaCl and 0.1&nbsp;M HCl.  If you used a different ratio, use the columns `molinity_NaCl` and `molinity_HCl` to set this.
+    If volume is provided, then if `titrant="HCl"` or by default, it is converted into mass following [DSC07](../references/#d), assuming the acid contains 0.6&nbsp;M NaCl and 0.1&nbsp;M HCl and is at 25 °C.  If you used a different ratio, use the columns `molinity_NaCl` and `molinity_HCl` to set this.
+
+    If you used `titrant="H2SO4"`, then titrant density is calculated at 25 °C following a basic parameterisation of [E-AIM](http://www.aim.env.uea.ac.uk/aim/aim.php) results against molinity.
+
+    Regardless of the `titrant`, these density equations can also be overwritten with a specific value in the `titrant_density` column.
+
+??? info "`titrant_density` : *density of the titrant*"
+    Titrant density in kg/dm<sup>3</sup>.  If provided, this is used only when `titrant_amount_unit="ml"`, and it takes precedence over density calculated from the equations described in that section.
 
 ??? info "`titrant_molinity` : *molinity of the titrant*"
     Must be in mol/kg-solution.

@@ -102,7 +102,6 @@ def get_totals(
 
 def get_k_constants(
     totals_pyco2,
-    salinity,
     temperature,
     k_alpha=None,
     k_ammonia=None,

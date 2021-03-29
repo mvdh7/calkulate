@@ -60,3 +60,14 @@ def HCl_NaCl_25C_DSC07(
         rhow25 * (1e3 + mT * (mHCl + mNaCl)) / (1e3 + phi_mix * (mHCl + mNaCl) * rhow25)
     )
     return rho25
+
+
+def H2SO4_25C_EAIM(titrant_molinity):
+    """Density of H2SO4 at 25 °C and 1 atm based on a quadratic parameterisation of data
+    calculated with E-AIM: http://www.aim.env.uea.ac.uk/aim/model1/model1c.php
+    """
+    if (titrant_molinity < 0.05) or (titrant_molinity > 3):
+        print("Warning: titrant_molinity out of parameterisation range!")
+    return (
+        0.99750018 + 0.06181819 * titrant_molinity - 0.00285491 * titrant_molinity ** 2
+    )

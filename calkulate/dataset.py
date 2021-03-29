@@ -4,6 +4,7 @@
 
 import copy
 import numpy as np, pandas as pd
+import PyCO2SYS as pyco2
 from . import default, titration
 
 
@@ -36,14 +37,45 @@ prepare_defaults = dict(
     k_water=None,
     molinity_HCl=default.molinity_HCl,
     molinity_NaCl=default.molinity_NaCl,
+    molinity_H2SO4=default.molinity_H2SO4,
     temperature_override=None,
     titrant_amount_unit=default.titrant_amount_unit,
+    titrant_density=None,
     opt_k_bisulfate=default.opt_k_bisulfate,
     opt_k_carbonic=default.opt_k_carbonic,
     opt_k_fluoride=default.opt_k_fluoride,
     opt_total_borate=default.opt_total_borate,
     read_dat_method=default.read_dat_method,
 )
+
+
+def get_total_salts(ds, inplace=True):
+    """Estimate total salt contents from salinity using PyCO2SYS, without overwriting
+    existing values.
+    """
+    assert "salinity" in ds, "ds must contain a 'salinity' column!"
+    if "opt_total_borate" in ds:
+        opt_total_borate = ds.opt_total_borate.where(
+            ~pd.isnull(ds.opt_total_borate), default.opt_total_borate
+        ).to_numpy()
+    else:
+        opt_total_borate = default.opt_total_borate
+    results = pyco2.sys(
+        8,
+        2000,
+        3,
+        2,
+        salinity=ds.salinity.to_numpy(),
+        opt_total_borate=opt_total_borate,
+    )
+    if not inplace:
+        ds = copy.deepcopy(ds)
+    salts = ["total_sulfate", "total_borate", "total_fluoride"]
+    for salt in salts:
+        if salt not in ds:
+            ds[salt] = np.nan
+        ds[salt].where(~pd.isnull(ds[salt]), other=results[salt], inplace=True)
+    return ds
 
 
 def get_prepare_kwargs(ds_row):
@@ -86,11 +118,24 @@ def calibrate_row(
         if "titrant_molinity_guess" in ds_row:
             if ~pd.isnull(ds_row.titrant_molinity_guess):
                 titrant_molinity_guess = ds_row.titrant_molinity_guess
+        # Deal with H2SO4 titrant special case
+        titrant = default.titrant
+        analyte_total_sulfate = None
+        if "titrant" in ds_row:
+            if ~pd.isnull(ds_row.titrant):
+                titrant = ds_row.titrant
+                if titrant == "H2SO4":
+                    assert "total_sulfate" in ds_row
+                    assert ~pd.isnull(ds_row.total_sulfate)
+                    analyte_total_sulfate = ds_row.total_sulfate
+        # Calibrate!
         try:
             titrant_molinity_here, analyte_mass = titration.calibrate(
                 file_name,
                 ds_row.salinity,
                 ds_row.alkalinity_certified,
+                analyte_total_sulfate=analyte_total_sulfate,
+                titrant=titrant,
                 titrant_molinity_guess=titrant_molinity_guess,
                 pH_range=pH_range,
                 least_squares_kwargs=least_squares_kwargs,
@@ -210,6 +255,15 @@ def solve_row(
             file_name = ds_row.file_path + ds_row.file_name
         else:
             file_name = ds_row.file_name
+        titrant = default.titrant
+        analyte_total_sulfate = None
+        if "titrant" in ds_row:
+            if ~pd.isnull(ds_row.titrant):
+                titrant = ds_row.titrant
+                if titrant == "H2SO4":
+                    assert "total_sulfate" in ds_row
+                    assert ~pd.isnull(ds_row.total_sulfate)
+                    analyte_total_sulfate = ds_row.total_sulfate
         try:
             (
                 alkalinity,
@@ -221,6 +275,8 @@ def solve_row(
                 file_name,
                 ds_row.salinity,
                 ds_row.titrant_molinity,
+                analyte_total_sulfate=analyte_total_sulfate,
+                titrant=titrant,
                 pH_range=pH_range,
                 least_squares_kwargs=least_squares_kwargs,
                 **prepare_kwargs,
@@ -295,6 +351,7 @@ def calkulate(
     verbose=default.verbose,
 ):
     """Calibrate and solve all titrations in a dataset."""
+    ds = get_total_salts(ds, inplace=inplace)
     ds = calibrate(
         ds,
         pH_range=pH_range,
@@ -318,6 +375,7 @@ class Dataset(pd.DataFrame):
     """pandas DataFrame with dataset functions available as methods."""
 
     get_batches = get_batches
+    get_total_salts = get_total_salts
     calibrate = calibrate
     solve = solve
     calkulate = calkulate

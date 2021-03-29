@@ -34,7 +34,7 @@ totals_pyco2 = calk.convert.dilute_totals_pyco2(
     totals_pyco2, titrant_mass, analyte_mass
 )
 k_constants = calk.interface.get_k_constants(
-    totals_pyco2, salinity, temperature, k_alpha=k_alpha, k_beta=k_beta,
+    totals_pyco2, temperature, k_alpha=k_alpha, k_beta=k_beta,
 )
 
 # Solve for titrant_molinity
