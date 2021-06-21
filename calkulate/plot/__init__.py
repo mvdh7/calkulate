@@ -5,6 +5,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 from .. import meta, dataset
+from . import single
 
 
 def add_credit(ax):
