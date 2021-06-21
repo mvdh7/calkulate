@@ -54,7 +54,7 @@ def get_totals(
     opt_total_borate=default.opt_total_borate,
 ):
     """Get dict of total substance contents (undiluted) from inputs and PyCO2SYS.
-    
+
     Inputs in micromol/kg-solution, outputs in mol/kg-solution.
     """
     # Create raw totals dict using PyCO2SYS

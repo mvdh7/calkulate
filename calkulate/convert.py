@@ -27,7 +27,18 @@ def dilute_totals_pyco2(totals_pyco2, titrant_mass, analyte_mass):
     return {
         k: v * dilution_factor
         if k
-        in ("TB", "TF", "TSO4", "TCa", "alpha", "beta", "TPO4", "TSi", "TNH3", "TH2S",)
+        in (
+            "TB",
+            "TF",
+            "TSO4",
+            "TCa",
+            "alpha",
+            "beta",
+            "TPO4",
+            "TSi",
+            "TNH3",
+            "TH2S",
+        )
         else v
         for k, v in totals_pyco2.items()
     }
@@ -65,7 +76,18 @@ def dilute_totals_pyco2_H2SO4(
     dilution_factor = get_dilution_factor(titrant_mass, analyte_mass)
     totals_pyco2 = {
         k: v * dilution_factor
-        if k in ("TB", "TF", "TCa", "alpha", "beta", "TPO4", "TSi", "TNH3", "TH2S",)
+        if k
+        in (
+            "TB",
+            "TF",
+            "TCa",
+            "alpha",
+            "beta",
+            "TPO4",
+            "TSi",
+            "TNH3",
+            "TH2S",
+        )
         else v
         for k, v in totals_pyco2.items()
     }

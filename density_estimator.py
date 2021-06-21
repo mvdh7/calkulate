@@ -4,9 +4,31 @@ from matplotlib import pyplot as plt
 
 # Density for H2SO4 at 298.15 K calculated with E-AIM Model Ic:
 # http://www.aim.env.uea.ac.uk/aim/model1/model1c.php
-molality = np.array([0.05, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.5, 3,])
+molality = np.array(
+    [
+        0.05,
+        0.1,
+        0.2,
+        0.5,
+        1,
+        1.5,
+        2,
+        2.5,
+        3,
+    ]
+)
 density = np.array(
-    [1.00043, 1.00361, 1.00983, 1.02785, 1.05653, 1.08378, 1.10964, 1.13410, 1.15736,]
+    [
+        1.00043,
+        1.00361,
+        1.00983,
+        1.02785,
+        1.05653,
+        1.08378,
+        1.10964,
+        1.13410,
+        1.15736,
+    ]
 )
 
 # Generate fit

@@ -118,6 +118,10 @@ def calibrate_row(
         if "titrant_molinity_guess" in ds_row:
             if ~pd.isnull(ds_row.titrant_molinity_guess):
                 titrant_molinity_guess = ds_row.titrant_molinity_guess
+        emf0_guess = None
+        if "emf0_guess" in ds_row:
+            if ~pd.isnull(ds_row.emf0_guess):
+                emf0_guess = ds_row.emf0_guess
         # Deal with H2SO4 titrant special case
         titrant = default.titrant
         analyte_total_sulfate = None
@@ -139,6 +143,7 @@ def calibrate_row(
                 titrant_molinity_guess=titrant_molinity_guess,
                 pH_range=pH_range,
                 least_squares_kwargs=least_squares_kwargs,
+                emf0_guess=emf0_guess,
                 **prepare_kwargs,
             )
         except FileNotFoundError:
@@ -154,7 +159,10 @@ def calibrate_row(
         titrant_molinity_here = np.nan
         analyte_mass = ds_row.analyte_mass
     return pd.Series(
-        {"titrant_molinity_here": titrant_molinity_here, "analyte_mass": analyte_mass,}
+        {
+            "titrant_molinity_here": titrant_molinity_here,
+            "analyte_mass": analyte_mass,
+        }
     )
 
 
@@ -264,6 +272,10 @@ def solve_row(
                     assert "total_sulfate" in ds_row
                     assert ~pd.isnull(ds_row.total_sulfate)
                     analyte_total_sulfate = ds_row.total_sulfate
+        emf0_guess = None
+        if "emf0_guess" in ds_row:
+            if ~pd.isnull(ds_row.emf0_guess):
+                emf0_guess = ds_row.emf0_guess
         try:
             (
                 alkalinity,
@@ -279,6 +291,7 @@ def solve_row(
                 titrant=titrant,
                 pH_range=pH_range,
                 least_squares_kwargs=least_squares_kwargs,
+                emf0_guess=emf0_guess,
                 **prepare_kwargs,
             )
         except FileNotFoundError:

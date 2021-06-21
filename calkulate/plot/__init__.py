@@ -4,7 +4,7 @@
 
 import numpy as np
 from matplotlib import pyplot as plt
-from . import meta, dataset
+from .. import meta, dataset
 
 
 def add_credit(ax):
@@ -23,7 +23,11 @@ def add_credit(ax):
 
 
 def titrant_molinity(
-    data, xvar=None, show_bad=True, show_batches=True, figure_fname=None,
+    data,
+    xvar=None,
+    show_bad=True,
+    show_batches=True,
+    figure_fname=None,
 ):
     """Plot the individually calibrated titrant_molinity values and batch averages."""
     if xvar is None:
@@ -73,7 +77,11 @@ def titrant_molinity(
 
 
 def alkalinity_offset(
-    data, xvar=None, show_bad=True, show_batches=True, figure_fname=None,
+    data,
+    xvar=None,
+    show_bad=True,
+    show_batches=True,
+    figure_fname=None,
 ):
     """Plot the offset between measured and certified values for reference materials
     after solving with batch-averaged titrant_molinity.

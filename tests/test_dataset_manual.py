@@ -23,7 +23,11 @@ alkalinity_certified = 2345  # micromol/kg-solution
 
 # Compare with calk.titration functions
 ctf_kwargs = dict(
-    analyte_mass=analyte_mass, dic=dic, **nutrients, k_alpha=k_alpha, k_beta=k_beta,
+    analyte_mass=analyte_mass,
+    dic=dic,
+    **nutrients,
+    k_alpha=k_alpha,
+    k_beta=k_beta,
 )
 titrant_molinity__ctf, analyte_mass__ctf = calk.titration.calibrate(
     file_name, salinity, alkalinity_certified, **ctf_kwargs

@@ -3,7 +3,7 @@ Name                                Stmts   Miss  Cover
 calkulate/__init__.py                   6      0   100%
 calkulate/constants.py                  4      0   100%
 calkulate/convert.py                   40      6    85%
-calkulate/core.py                      88      5    94%
+calkulate/core.py                      92      5    95%
 calkulate/dataset.py                  153     21    86%
 calkulate/default.py                   25      0   100%
 calkulate/density.py                   26      5    81%
@@ -15,7 +15,7 @@ calkulate/simulate.py                  65      0   100%
 calkulate/titration.py                 51      5    90%
 tests/__init__.py                       0      0   100%
 tests/test_convert.py                  21      0   100%
-tests/test_core.py                     36      0   100%
+tests/test_core.py                     42      0   100%
 tests/test_dataset_io.py               13      0   100%
 tests/test_dataset_manual.py           61      0   100%
 tests/test_dbs_calk.py                 14      0   100%
@@ -26,4 +26,4 @@ tests/test_simulate.py                 22      0   100%
 tests/test_simulate_sulfate.py        103      1    99%
 tests/test_simulate_then_solve.py      46      0   100%
 -------------------------------------------------------
-TOTAL                                1025    120    88%
+TOTAL                                1035    120    88%

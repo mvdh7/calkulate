@@ -38,7 +38,8 @@ def get_dat_data(
                 titrant_mass = (
                     titrant_amount
                     * density.HCl_NaCl_25C_DSC07(
-                        molinity_HCl=molinity_HCl, molinity_NaCl=molinity_NaCl,
+                        molinity_HCl=molinity_HCl,
+                        molinity_NaCl=molinity_NaCl,
                     )
                     * 1e-3
                 )
@@ -189,7 +190,10 @@ def prepare(
     if pd.isnull(analyte_mass):
         analyte_mass = (
             analyte_volume
-            * density.seawater_1atm_MP81(temperature=temperature[0], salinity=salinity,)
+            * density.seawater_1atm_MP81(
+                temperature=temperature[0],
+                salinity=salinity,
+            )
             * 1e-3
         )
     totals, k_constants = get_totals_k_constants(
@@ -238,6 +242,7 @@ def calibrate(
     titrant_molinity_guess=None,
     pH_range=default.pH_range,
     least_squares_kwargs=default.least_squares_kwargs,
+    emf0_guess=None,
     **prepare_kwargs,
 ):
     """Calibrate titrant_molinity for a titration file given alkalinity_certified."""
@@ -247,6 +252,7 @@ def calibrate(
     solver_kwargs = {
         "pH_range": pH_range,
         "least_squares_kwargs": least_squares_kwargs,
+        "emf0_guess": emf0_guess,
     }
     if titrant == "H2SO4":
         assert analyte_total_sulfate is not None
@@ -288,10 +294,11 @@ def solve(
     titrant=default.titrant,
     pH_range=default.pH_range,
     least_squares_kwargs=default.least_squares_kwargs,
+    emf0_guess=None,
     **prepare_kwargs,
 ):
     """Solve alkalinity, EMF0 and initial pH for a titration file given titrant_molinity.
-    
+
     Results in micromol/kg-solution, mV, and on the Free scale.
     """
     titrant_mass, emf, temperature, analyte_mass, totals, k_constants = prepare(
@@ -317,6 +324,7 @@ def solve(
             k_constants,
             least_squares_kwargs=least_squares_kwargs,
             pH_range=pH_range,
+            emf0_guess=emf0_guess,
         )
     else:
         opt_result = core.solve_emf_complete(
@@ -329,6 +337,7 @@ def solve(
             k_constants,
             least_squares_kwargs=least_squares_kwargs,
             pH_range=pH_range,
+            emf0_guess=emf0_guess,
         )
     alkalinity, emf0 = opt_result["x"]
     # Calculate initial pH
