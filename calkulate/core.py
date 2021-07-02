@@ -36,7 +36,7 @@ def gran_guess_alkalinity(
     # Find alkalinity guess from the x-axis intercept
     intercept_x = -intercept_y / gradient
     alkalinity_guess = intercept_x * titrant_molinity / analyte_mass
-    return alkalinity_guess
+    return alkalinity_guess, gradient, intercept_y
 
 
 def gran_guesses_emf0(
@@ -62,7 +62,7 @@ def gran_guesses_emf0(
             gran_estimates,
             analyte_mass,
             titrant_molinity,
-        )
+        )[0]
         if titrant == "H2SO4":
             alkalinity_guess *= 2
     if titrant == "H2SO4":
@@ -113,7 +113,7 @@ def gran_guesses(
         gran_estimates[G],
         analyte_mass,
         titrant_molinity,
-    )
+    )[0]
     if titrant == "H2SO4":
         alkalinity_guess *= 2
     if np.size(temperature) == 1:

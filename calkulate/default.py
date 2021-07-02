@@ -4,6 +4,7 @@
 
 
 dic = 0  # micromol / kg-solution
+dpi = 300  # resolution of figures
 opt_gas_constant = 3  # for PyCO2SYS
 opt_k_bisulfate = 1  # for PyCO2SYS
 opt_k_carbonic = 16  # for PyCO2SYS
