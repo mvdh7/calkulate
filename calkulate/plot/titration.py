@@ -28,7 +28,7 @@ class Styler:
 
     def fill_between(self):
         kwargs = {
-            "alpha": self.alpha,
+            "alpha": self.alpha * 0.3,
             "color": self.color,
             "edgecolor": "none",
         }
@@ -88,8 +88,8 @@ def pH(tt, ax=None, show_gran=True, **scatter_kwargs):
         **final_styler.scatter(),
     )
     pH_range = (
-        tt.calibrate_kwargs["pH_range"]
-        if "pH_range" in tt.calibrate_kwargs
+        tt.solve_kwargs["pH_range"]
+        if "pH_range" in tt.solve_kwargs
         else default.pH_range
     )
     xlim = ax.get_xlim()
