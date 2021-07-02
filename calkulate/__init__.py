@@ -41,6 +41,7 @@ from .io import (
     write_dat,
 )
 from .meta import __author__, __version__, hello
+from .titration import Titration
 
 # For backwards-compatibility
 say_hello = hello

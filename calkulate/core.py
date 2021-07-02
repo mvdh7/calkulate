@@ -133,7 +133,6 @@ def gran_guesses(
             )
         )
     pH_guesses = convert.emf_to_pH(emf, emf0_guess, temperature)
-    print(pH_guesses[0])
     return alkalinity_guess, emf0_guess, pH_guesses, G
 
 

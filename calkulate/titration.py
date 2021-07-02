@@ -343,3 +343,85 @@ def solve(
     # Calculate initial pH
     pH_initial = convert.emf_to_pH(emf[0], emf0, temperature[0])
     return alkalinity * 1e6, emf0, pH_initial, temperature[0], analyte_mass
+
+
+class Titration:
+    def __init__(
+        self,
+        file_name="",
+        file_path="",
+        salinity=35,
+        analyte_mass=None,
+        analyte_volume=None,
+        **prepare_kwargs,
+    ):
+        assert analyte_mass is not None or analyte_volume is not None
+        self.file_name = file_name
+        self.file_path = file_path
+        self.salinity = salinity
+        self.prepare_kwargs = prepare_kwargs.copy()
+        self.prepare_kwargs["analyte_volume"] = analyte_volume
+        self.prepare_kwargs["analyte_mass"] = analyte_mass
+        if analyte_volume is not None:
+            self.analyte_volume = analyte_volume
+        (
+            titrant_mass,
+            emf,
+            temperature,
+            self.analyte_mass,
+            totals,
+            k_constants,
+        ) = prepare(
+            file_path + file_name,
+            salinity,
+            analyte_mass=analyte_mass,
+            analyte_volume=analyte_volume,
+            **prepare_kwargs,
+        )
+        self.titration = pd.DataFrame(
+            {
+                "titrant_mass": titrant_mass,
+                "emf": emf,
+                "temperature": temperature,
+            }
+        )
+        for k, v in totals.items():
+            self.titration[k] = v
+        for k, v in k_constants.items():
+            self.titration[k] = v
+
+    def calibrate(self, alkalinity_certified, **calibrate_kwargs):
+        self.alkalinity_certified = alkalinity_certified
+        self.calibrate_kwargs = calibrate_kwargs.copy()
+        self.titrant_molinity = calibrate(
+            self.file_path + self.file_name,
+            self.salinity,
+            alkalinity_certified,
+            **self.calibrate_kwargs,
+            **self.prepare_kwargs,
+        )[0]
+
+    def set_titrant_molinity(self, titrant_molinity):
+        self.titrant_molinity = titrant_molinity
+
+    def solve(self, titrant_molinity=None, **solve_kwargs):
+        if titrant_molinity is not None:
+            self.set_titrant_molinity(titrant_molinity)
+        self.solve_kwargs = solve_kwargs.copy()
+        (
+            self.alkalinity,
+            self.emf0,
+            self.pH_initial,
+            self.pH_initial_temperature,
+            self.analyte_mass,
+        ) = solve(
+            self.file_path + self.file_name,
+            self.salinity,
+            self.titrant_molinity,
+            **self.solve_kwargs,
+            **self.prepare_kwargs,
+        )
+
+    def calkulate(self, alkalinity_certified, calibrate_kwargs={}, solve_kwargs={}):
+        self.calibrate(alkalinity_certified, **calibrate_kwargs)
+        self.solve(**solve_kwargs)
