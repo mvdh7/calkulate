@@ -36,7 +36,7 @@ def gran_guess_alkalinity(
     # Find alkalinity guess from the x-axis intercept
     intercept_x = -intercept_y / gradient
     alkalinity_guess = intercept_x * titrant_molinity / analyte_mass
-    return alkalinity_guess, (gradient, intercept_x, intercept_y)
+    return alkalinity_guess
 
 
 def gran_guesses_emf0(
@@ -62,7 +62,7 @@ def gran_guesses_emf0(
             gran_estimates,
             analyte_mass,
             titrant_molinity,
-        )[0]
+        )
         if titrant == "H2SO4":
             alkalinity_guess *= 2
     if titrant == "H2SO4":
@@ -86,13 +86,6 @@ def gran_guesses_emf0(
     return emf0_guesses
 
 
-def get_gran_G(gran_estimates):
-    """Select which data points to use for first guesses."""
-    return (gran_estimates >= 0.1 * np.max(gran_estimates)) & (
-        gran_estimates <= 0.9 * np.max(gran_estimates)
-    )
-
-
 def gran_guesses(
     titrant_mass,
     emf,
@@ -103,8 +96,6 @@ def gran_guesses(
     HF=0,
     HSO4=0,
     emf0_guess=None,
-    ax_alkalinity_guess=None,
-    ax_emf0_guess=None,
 ):
     """Simple Gran-plot first guesses for alkalinity, EMF0 and pH.
     Uses a subset of the provided data points.
@@ -112,9 +103,12 @@ def gran_guesses(
     # Get simple Gran-plot estimator
     mixture_mass = titrant_mass + analyte_mass
     gran_estimates = gran_estimator(mixture_mass, emf, temperature)
-    G = get_gran_G(gran_estimates)
+    # Select which data points to use for first guesses
+    G = (gran_estimates >= 0.1 * np.max(gran_estimates)) & (
+        gran_estimates <= 0.9 * np.max(gran_estimates)
+    )
     # Make first guesses
-    alkalinity_guess, (gradient, intercept_x, intercept_y) = gran_guess_alkalinity(
+    alkalinity_guess = gran_guess_alkalinity(
         titrant_mass[G],
         gran_estimates[G],
         analyte_mass,
@@ -139,16 +133,7 @@ def gran_guesses(
             )
         )
     pH_guesses = convert.emf_to_pH(emf, emf0_guess, temperature)
-    if ax_alkalinity_guess is not None:
-        ax = ax_alkalinity_guess
-        ax.scatter(titrant_mass, gran_estimates[~G])
-        ax.scatter(titrant_mass, gran_estimates[G])
-        plot_x = np.array([intercept_x, np.max(gran_estimates[G])])
-        plot_y = plot_x * gradient + intercept_y
-        ax.plot(plot_x, plot_y)
-        ax.axhline(0, c="k", lw=0.8)
-    if ax_emf0_guess is not None:
-        ax = ax_emf0
+    print(pH_guesses[0])
     return alkalinity_guess, emf0_guess, pH_guesses, G
 
 

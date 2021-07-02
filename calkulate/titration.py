@@ -48,8 +48,7 @@ def get_dat_data(
     elif titrant_amount_unit == "kg":
         titrant_mass = titrant_amount
     else:
-        print("titrant_amount_unit not recognised, assuming kg.")
-        titrant_mass = titrant_amount
+        print("titrant_amount_unit not recognised.")
     return titrant_mass, emf, temperature
 
 
