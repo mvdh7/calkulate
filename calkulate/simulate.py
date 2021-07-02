@@ -96,6 +96,7 @@ component_multipliers = {
     "HS": +1,
     "alk_alpha": +1,
     "alk_beta": +1,
+    "alkalinity_estimate": +1,  # for plotting
 }
 
 

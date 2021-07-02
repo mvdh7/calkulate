@@ -52,6 +52,7 @@ results_pyco2["alk_beta"] = results_pyco2["alkalinity_beta"]
 compare_components = {
     k: np.array([results_pyco2[k], components_calk[k] * 1e6])
     for k in calk.simulate.component_multipliers
+    if k != "alkalinity_estimate"
 }
 
 

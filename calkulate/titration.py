@@ -388,7 +388,7 @@ class Titration:
             }
         )
         self.titration["dilution_factor"] = convert.get_dilution_factor(
-            titrant_mass, analyte_mass
+            titrant_mass, self.analyte_mass
         )
         for k, v in totals.items():
             self.titration[k] = v
@@ -531,7 +531,23 @@ class Titration:
             **totals,
             **k_constants,
         )
-        st["alkalinity"] = results["alkalinity"] * 1e-6
+        for co2sysvar in [
+            "alkalinity",
+            "HCO3",
+            "CO3",
+            "BOH4",
+            "PO4",
+            "HPO4",
+            "H3PO4",
+            "HSO4",
+            "HF",
+            "H3SiO4",
+            "OH",
+        ]:
+            st[co2sysvar] = results[co2sysvar] * 1e-6
+        st["H"] = 10 ** -st.pH
+        st["alk_alpha"] = results["alkalinity_alpha"] * 1e-6
+        st["alk_beta"] = results["alkalinity_beta"] * 1e-6
         st["alkalinity_estimate"] = (
             st.alkalinity
             + st.titrant_mass
@@ -548,3 +564,5 @@ class Titration:
     plot_pH = plot.titration.pH
     plot_gran_emf0 = plot.titration.gran_emf0
     plot_gran_alkalinity = plot.titration.gran_alkalinity
+    plot_alkalinity = plot.titration.alkalinity
+    plot_components = plot.titration.components

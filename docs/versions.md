@@ -12,7 +12,8 @@ Adds `Titration` class for investigating single titrations.
 
 !!! info "Changes in v23.2.0"
 
-    * Add `Titration` class for investigating single titrations.
+    * Adds `Titration` class for investigating single titrations.
+    * Adds (as yet undocumented) plotting functions for `Titration` objects.
 
 ### 23.1
 

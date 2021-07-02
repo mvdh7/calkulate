@@ -384,6 +384,35 @@ def calkulate(
     return ds
 
 
+def to_Titration(ds, index):
+    """Create a Titration object from one row of a Dataset."""
+    dsr = ds.loc[index]
+    prepare_kwargs = {}
+    for k, v in prepare_defaults.items():
+        if k in dsr:
+            if ~pd.isnull(dsr[k]):
+                prepare_kwargs[k] = dsr[k]
+            else:
+                prepare_kwargs[k] = v
+        else:
+            prepare_kwargs[k] = v
+    tt = titration.Titration(
+        file_name=dsr.file_name,
+        file_path=dsr.file_path if "file_path" in dsr else "",
+        salinity=dsr.salinity,
+        **prepare_kwargs,
+    )
+    print(dsr)
+    if "titrant_molinity" in dsr:
+        if ~pd.isnull(dsr.titrant_molinity):
+            tt.solve(titrant_molinity=dsr.titrant_molinity)
+    if "alkalinity_certified" in dsr:
+        tt.alkalinity_certified = dsr.alkalinity_certified
+        if not tt.solved:
+            tt.calibrate(tt.alkalinity_certified)
+    return tt
+
+
 class Dataset(pd.DataFrame):
     """pandas DataFrame with dataset functions available as methods."""
 
@@ -392,6 +421,7 @@ class Dataset(pd.DataFrame):
     calibrate = calibrate
     solve = solve
     calkulate = calkulate
+    to_Titration = to_Titration
 
     from .plot import (
         titrant_molinity as plot_titrant_molinity,
