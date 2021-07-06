@@ -8,11 +8,11 @@ Calkulate v3 went too far overboard with the OO approach and ended up being very
 
 Adds `Titration` class for investigating single titrations.
 
-### 23.2.0 (forthcoming)
+### 23.2.0 (6 July 2021)
 
 !!! info "Changes in v23.2.0"
 
-    * Adds `Titration` class for investigating single titrations.
+    * Adds (as yet undocumented) `Titration` class for investigating single titrations.
     * Adds (as yet undocumented) plotting functions for `Titration` objects.
 
 ### 23.1
