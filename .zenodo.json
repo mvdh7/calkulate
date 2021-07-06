@@ -1,0 +1,15 @@
+{
+    "title": "Calkulate: total alkalinity from titration data in Python", 
+    "license": "GPL-3.0-only", 
+    "creators": [
+        {
+            "affiliation": "NIOZ Royal Netherlands Institute for Sea Research, Texel, the Netherlands", 
+            "name": "Humphreys, Matthew P.",
+            "orcid": "0000-0002-9371-7128"
+        },
+        {
+            "affiliation": "University of East Anglia, Norwich, UK", 
+            "name": "Matthews, Ruth S."
+        }
+    ]
+}

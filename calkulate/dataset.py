@@ -118,6 +118,10 @@ def calibrate_row(
         if "titrant_molinity_guess" in ds_row:
             if ~pd.isnull(ds_row.titrant_molinity_guess):
                 titrant_molinity_guess = ds_row.titrant_molinity_guess
+        emf0_guess = None
+        if "emf0_guess" in ds_row:
+            if ~pd.isnull(ds_row.emf0_guess):
+                emf0_guess = ds_row.emf0_guess
         # Deal with H2SO4 titrant special case
         titrant = default.titrant
         analyte_total_sulfate = None
@@ -139,6 +143,7 @@ def calibrate_row(
                 titrant_molinity_guess=titrant_molinity_guess,
                 pH_range=pH_range,
                 least_squares_kwargs=least_squares_kwargs,
+                emf0_guess=emf0_guess,
                 **prepare_kwargs,
             )
         except FileNotFoundError:
@@ -154,7 +159,10 @@ def calibrate_row(
         titrant_molinity_here = np.nan
         analyte_mass = ds_row.analyte_mass
     return pd.Series(
-        {"titrant_molinity_here": titrant_molinity_here, "analyte_mass": analyte_mass,}
+        {
+            "titrant_molinity_here": titrant_molinity_here,
+            "analyte_mass": analyte_mass,
+        }
     )
 
 
@@ -264,6 +272,10 @@ def solve_row(
                     assert "total_sulfate" in ds_row
                     assert ~pd.isnull(ds_row.total_sulfate)
                     analyte_total_sulfate = ds_row.total_sulfate
+        emf0_guess = None
+        if "emf0_guess" in ds_row:
+            if ~pd.isnull(ds_row.emf0_guess):
+                emf0_guess = ds_row.emf0_guess
         try:
             (
                 alkalinity,
@@ -279,6 +291,7 @@ def solve_row(
                 titrant=titrant,
                 pH_range=pH_range,
                 least_squares_kwargs=least_squares_kwargs,
+                emf0_guess=emf0_guess,
                 **prepare_kwargs,
             )
         except FileNotFoundError:
@@ -371,6 +384,35 @@ def calkulate(
     return ds
 
 
+def to_Titration(ds, index):
+    """Create a Titration object from one row of a Dataset."""
+    dsr = ds.loc[index]
+    prepare_kwargs = {}
+    for k, v in prepare_defaults.items():
+        if k in dsr:
+            if ~pd.isnull(dsr[k]):
+                prepare_kwargs[k] = dsr[k]
+            else:
+                prepare_kwargs[k] = v
+        else:
+            prepare_kwargs[k] = v
+    tt = titration.Titration(
+        file_name=dsr.file_name,
+        file_path=dsr.file_path if "file_path" in dsr else "",
+        salinity=dsr.salinity,
+        **prepare_kwargs,
+    )
+    print(dsr)
+    if "titrant_molinity" in dsr:
+        if ~pd.isnull(dsr.titrant_molinity):
+            tt.solve(titrant_molinity=dsr.titrant_molinity)
+    if "alkalinity_certified" in dsr:
+        tt.alkalinity_certified = dsr.alkalinity_certified
+        if not tt.solved:
+            tt.calibrate(tt.alkalinity_certified)
+    return tt
+
+
 class Dataset(pd.DataFrame):
     """pandas DataFrame with dataset functions available as methods."""
 
@@ -379,6 +421,7 @@ class Dataset(pd.DataFrame):
     calibrate = calibrate
     solve = solve
     calkulate = calkulate
+    to_Titration = to_Titration
 
     from .plot import (
         titrant_molinity as plot_titrant_molinity,

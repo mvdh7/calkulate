@@ -4,16 +4,33 @@
 
 Calkulate v3 went too far overboard with the OO approach and ended up being very slow and overly complex behind the scenes as a result.  Calkulate v23 therefore mashes together the best bits of v2 and v3 for the ultimate alkalinity solving experience.
 
+### 23.2
+
+Adds `Titration` class for investigating single titrations.
+
+### 23.2.0 (6 July 2021)
+
+!!! info "Changes in v23.2.0"
+
+    * Adds (as yet undocumented) `Titration` class for investigating single titrations.
+    * Adds (as yet undocumented) plotting functions for `Titration` objects.
+
 ### 23.1
 
 Adds solvers for titrations with an H<sub>2</sub>SO<sub>4</sub> titrant.
+
+#### 23.1.1 (7 June 2021)
+
+!!! info "Changes in v23.1.1"
+
+   * Now compatible with PyCO2SYS v1.7.0.
 
 #### 23.1.0 (29 March 2021)
 
 !!! info "Changes in v23.1.0"
 
-    * Add solvers for titrations with an H<sub>2</sub>SO<sub>4</sub> titrant (see optional `titrant` column in the [metadata contents](../metadata/#optional-columns)).
-    * Added optional `titrant_density` column to overwrite the internally calculated titrant density with a user-specified value.
+    * Adds solvers for titrations with an H<sub>2</sub>SO<sub>4</sub> titrant (see optional `titrant` column in the [metadata contents](../metadata/#optional-columns)).
+    * Adds optional `titrant_density` column to overwrite the internally calculated titrant density with a user-specified value.
 
 ### 23.0
 

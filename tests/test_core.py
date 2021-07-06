@@ -34,7 +34,10 @@ totals_pyco2 = calk.convert.dilute_totals_pyco2(
     totals_pyco2, titrant_mass, analyte_mass
 )
 k_constants = calk.interface.get_k_constants(
-    totals_pyco2, temperature, k_alpha=k_alpha, k_beta=k_beta,
+    totals_pyco2,
+    temperature,
+    k_alpha=k_alpha,
+    k_beta=k_beta,
 )
 
 # Solve for titrant_molinity
@@ -53,10 +56,30 @@ titrant_molinity = res_titrant_molinity["x"][0]
 
 # Solve for alkalinity with self-calibrated titrant_molinity
 opt_result = calk.core.solve_emf_complete(
-    titrant_molinity, titrant_mass, emf, temperature, analyte_mass, totals, k_constants,
+    titrant_molinity,
+    titrant_mass,
+    emf,
+    temperature,
+    analyte_mass,
+    totals,
+    k_constants,
 )
 alkalinity, emf0 = opt_result["x"]
 alkalinity *= 1e6
+
+# Solve for alkalinity with self-calibrated titrant_molinity and user's EMF0 guess
+opt_result__emf0_user = calk.core.solve_emf_complete(
+    titrant_molinity,
+    titrant_mass,
+    emf,
+    temperature,
+    analyte_mass,
+    totals,
+    k_constants,
+    emf0_guess=emf0 + 10,
+)
+alkalinity__emf0_user, emf0__emf0_user = opt_result["x"]
+alkalinity__emf0_user *= 1e6
 
 
 def test_self_calibration():
@@ -65,9 +88,19 @@ def test_self_calibration():
     assert 600 < emf0 < 700  # a sensible range for the test file
 
 
+def test_user_emf0():
+    """Do we get the solution with a user-provided first EMF0 guess?"""
+    assert np.isclose(alkalinity, alkalinity__emf0_user, rtol=0, atol=1e-6)
+    assert np.isclose(emf0, emf0__emf0_user, rtol=0, atol=1e-6)
+
+
 # Compare with calk.titration functions
 ctf_kwargs = dict(
-    analyte_mass=analyte_mass, dic=dic, **nutrients, k_alpha=k_alpha, k_beta=k_beta,
+    analyte_mass=analyte_mass,
+    dic=dic,
+    **nutrients,
+    k_alpha=k_alpha,
+    k_beta=k_beta,
 )
 titrant_molinity__ctf, analyte_mass__ctf = calk.titration.calibrate(
     file_name, salinity, alkalinity_certified, **ctf_kwargs
@@ -90,4 +123,5 @@ def test_calibrate_titration():
 
 # test_imported_file()
 # test_self_calibration()
+# test_user_emf0()
 # test_calibrate_titration()

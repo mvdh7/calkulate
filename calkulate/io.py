@@ -28,7 +28,11 @@ def read_dat_genfromtxt(
 
 
 def read_dat_pclims(
-    file_name, titrant_amount_col=1, measurement_col=2, temperature_col=5, n_cols=6,
+    file_name,
+    titrant_amount_col=1,
+    measurement_col=2,
+    temperature_col=5,
+    n_cols=6,
 ):
     """Import a titration dataset from a PC LIMS Report."""
     # Import full data file
@@ -98,7 +102,9 @@ def write_dat(
                     + temperature_fmt
                     + "}\n"
                 ).format(
-                    titrant_amount_i, measurement_i, temperature_i,
+                    titrant_amount_i,
+                    measurement_i,
+                    temperature_i,
                 )
             )
 
@@ -142,7 +148,11 @@ def dbs_datetime(dbs_row):
         )
     except AttributeError:
         analysis_datetime = np.datetime64("NaT")
-    return pd.Series({"analysis_datetime": analysis_datetime,})
+    return pd.Series(
+        {
+            "analysis_datetime": analysis_datetime,
+        }
+    )
 
 
 def get_VINDTA_filenames(dbs):

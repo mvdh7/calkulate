@@ -115,7 +115,13 @@ titrant_molinity_calibrated = opt_result_calibrate["x"][0]
 
 # Solve!
 opt_result_solve = calk.core.solve_emf_complete_H2SO4(
-    titrant_molinity, titrant_mass, emf, temperature, analyte_mass, totals, k_constants,
+    titrant_molinity,
+    titrant_mass,
+    emf,
+    temperature,
+    analyte_mass,
+    totals,
+    k_constants,
 )
 alkalinity_solved, emf0_solved = opt_result_solve["x"]
 alkalinity_solved *= 1e6
@@ -142,10 +148,16 @@ prepare_kwargs = dict(
     titrant_amount_unit="g",
 )
 titrant_molinity_tcal = calk.titration.calibrate(
-    file_name, salinity, alkalinity_core, **prepare_kwargs,
+    file_name,
+    salinity,
+    alkalinity_core,
+    **prepare_kwargs,
 )[0]
 alkalinity_tcal, emf0_tcal, pH_initial_tcal = calk.titration.solve(
-    file_name, salinity, titrant_molinity_tcal, **prepare_kwargs,
+    file_name,
+    salinity,
+    titrant_molinity_tcal,
+    **prepare_kwargs,
 )[:3]
 
 # Now volume version
@@ -158,10 +170,16 @@ prepare_kwargs_v = dict(
     titrant_amount_unit="ml",
 )
 titrant_molinity_tcal_v = calk.titration.calibrate(
-    file_name_v, salinity, alkalinity_core, **prepare_kwargs_v,
+    file_name_v,
+    salinity,
+    alkalinity_core,
+    **prepare_kwargs_v,
 )[0]
 alkalinity_tcal_v, emf0_tcal_v, pH_initial_tcal_v = calk.titration.solve(
-    file_name_v, salinity, titrant_molinity_tcal_v, **prepare_kwargs_v,
+    file_name_v,
+    salinity,
+    titrant_molinity_tcal_v,
+    **prepare_kwargs_v,
 )[:3]
 
 # Import as a Calkulate Dataset, self-calibrate and solve

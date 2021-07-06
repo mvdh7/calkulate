@@ -8,7 +8,7 @@ from . import default
 
 def seawater_1atm_MP81(temperature=25, salinity=35):
     """Seawater density at 1 atm in kg/l following MP81.
-    
+
     Validity:
       *  0 < temperature < 40 °C
       *  0.5 < salinity < 43

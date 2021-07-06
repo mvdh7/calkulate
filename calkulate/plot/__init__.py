@@ -4,26 +4,16 @@
 
 import numpy as np
 from matplotlib import pyplot as plt
-from . import meta, dataset
-
-
-def add_credit(ax):
-    """Add Calkulate credit to figures."""
-    ax.text(
-        1.005,
-        0,
-        "Calkulate v{}".format(meta.__version__),
-        alpha=0.2,
-        c="k",
-        ha="left",
-        va="bottom",
-        rotation=-90,
-        transform=ax.transAxes,
-    )
+from .. import meta, dataset
+from . import titration, misc
 
 
 def titrant_molinity(
-    data, xvar=None, show_bad=True, show_batches=True, figure_fname=None,
+    data,
+    xvar=None,
+    show_bad=True,
+    show_batches=True,
+    figure_fname=None,
 ):
     """Plot the individually calibrated titrant_molinity values and batch averages."""
     if xvar is None:
@@ -63,7 +53,7 @@ def titrant_molinity(
             B = (data.analysis_batch == batch).to_numpy()
             ax.plot(xdata[B], data.titrant_molinity[B], c="xkcd:navy")
     ax.grid(alpha=0.3)
-    add_credit(ax)
+    misc.add_credit(ax)
     ax.set_xlabel(xlabel)
     ax.set_ylabel(r"Titrant molinity / mol$\cdot$kg$^{-1}$")
     plt.tight_layout()
@@ -73,7 +63,11 @@ def titrant_molinity(
 
 
 def alkalinity_offset(
-    data, xvar=None, show_bad=True, show_batches=True, figure_fname=None,
+    data,
+    xvar=None,
+    show_bad=True,
+    show_batches=True,
+    figure_fname=None,
 ):
     """Plot the offset between measured and certified values for reference materials
     after solving with batch-averaged titrant_molinity.
@@ -121,7 +115,7 @@ def alkalinity_offset(
         ax.legend()
     ax.grid(alpha=0.3)
     ax.axhline(0, c="k", lw=0.8)
-    add_credit(ax)
+    misc.add_credit(ax)
     ax.set_xlabel(xlabel)
     ax.set_ylabel(r"$\Delta$ Alkalinity (measured $-$ certified) / mol$\cdot$kg$^{-1}$")
     plt.tight_layout()
