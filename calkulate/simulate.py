@@ -3,17 +3,30 @@
 """Simulate solution properties during a titration."""
 
 import numpy as np
+import PyCO2SYS as pyco2
 from . import default
 
 
-def alkalinity_components(pH, totals, k_constants):
+def alkalinity_components(pH, totals, k_constants, opt_pH_scale=default.opt_pH_scale):
     """Calculate chemical speciation from pH.
 
     totals should include dilution correction and be in mol/kg-solution.
-    k_constants should be on the Free scale.
 
-    Outputs are in mol/kg-solution.
+    k_constants should be on the scale specified by opt_pH_scale, with:
+        1 = Total                pH = -log10([H+] + [HSO4-])
+        2 = Seawater             pH = -log10([H+] + [HSO4-] + [HF])
+        3 = Free      [default]  pH = -log10([H+])
+    Note that when using the Total scale, k_fluoride must also be on the Total scale
+    (this does not happen by default in PyCO2SYS!).
+
+    Outputs are substance contents in mol/kg-solution.
     """
+    # Check opt_pH_scale is valid
+    opt_pH_scales = [1, 2, 3]
+    assert (
+        opt_pH_scale in opt_pH_scales
+    ), "opt_pH_scale must be 1 (Total), 2 (Seawater) or 3 (Free)."
+    # Build up dict of solution components
     components = {}
     h = components["H"] = 10.0 ** -pH
     if "k_water" in k_constants:
@@ -29,14 +42,6 @@ def alkalinity_components(pH, totals, k_constants):
         TB = totals["total_borate"]
         KB = k_constants["k_borate"]
         components["BOH4"] = TB * KB / (KB + h)
-    if "total_sulfate" in totals:
-        TSO4 = totals["total_sulfate"]
-        KSO4 = k_constants["k_bisulfate"]
-        components["HSO4"] = TSO4 * h / (KSO4 + h)
-    if "total_fluoride" in totals:
-        TF = totals["total_fluoride"]
-        KF = k_constants["k_fluoride"]
-        components["HF"] = TF * h / (KF + h)
     if "total_phosphate" in totals:
         TPO4 = totals["total_phosphate"]
         KP1 = k_constants["k_phosphoric_1"]
@@ -74,6 +79,17 @@ def alkalinity_components(pH, totals, k_constants):
         components["alk_beta"] = np.where(
             -np.log10(k_beta) <= default.zlp, -betaH, beta
         )
+    # pH-scale-dependent components
+    if opt_pH_scale in [1, 3]:
+        if "total_fluoride" in totals:
+            TF = totals["total_fluoride"]
+            KF = k_constants["k_fluoride"]
+            components["HF"] = TF * h / (KF + h)
+    if opt_pH_scale == 3:
+        if "total_sulfate" in totals:
+            TSO4 = totals["total_sulfate"]
+            KSO4 = k_constants["k_bisulfate"]
+            components["HSO4"] = TSO4 * h / (KSO4 + h)
     return components
 
 
@@ -100,7 +116,9 @@ component_multipliers = {
 }
 
 
-def alkalinity(pH, totals, k_constants):
+def alkalinity(pH, totals, k_constants, opt_pH_scale=default.opt_pH_scale):
     """Estimate total alkalinity from pH and total salts in mol/kg-solution."""
-    components = alkalinity_components(pH, totals, k_constants)
+    components = alkalinity_components(
+        pH, totals, k_constants, opt_pH_scale=opt_pH_scale
+    )
     return np.sum([v * component_multipliers[k] for k, v in components.items()], axis=0)

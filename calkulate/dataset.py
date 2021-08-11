@@ -44,6 +44,7 @@ prepare_defaults = dict(
     opt_k_bisulfate=default.opt_k_bisulfate,
     opt_k_carbonic=default.opt_k_carbonic,
     opt_k_fluoride=default.opt_k_fluoride,
+    opt_pH_scale=default.opt_pH_scale,
     opt_total_borate=default.opt_total_borate,
     read_dat_method=default.read_dat_method,
 )
