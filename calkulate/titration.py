@@ -86,6 +86,7 @@ def get_totals_k_constants(
     opt_k_bisulfate=default.opt_k_bisulfate,
     opt_k_carbonic=default.opt_k_carbonic,
     opt_k_fluoride=default.opt_k_fluoride,
+    opt_pH_scale=default.opt_pH_scale,
     opt_total_borate=default.opt_total_borate,
 ):
     # Get totals from PyCO2SYS
@@ -128,6 +129,7 @@ def get_totals_k_constants(
         opt_k_bisulfate=opt_k_bisulfate,
         opt_k_carbonic=opt_k_carbonic,
         opt_k_fluoride=opt_k_fluoride,
+        opt_pH_scale=opt_pH_scale,
         opt_total_borate=opt_total_borate,
     )
     return totals, k_constants
@@ -172,6 +174,7 @@ def prepare(
     opt_k_bisulfate=default.opt_k_bisulfate,
     opt_k_carbonic=default.opt_k_carbonic,
     opt_k_fluoride=default.opt_k_fluoride,
+    opt_pH_scale=default.opt_pH_scale,
     opt_total_borate=default.opt_total_borate,
     read_dat_kwargs={},
     read_dat_method=default.read_dat_method,
@@ -230,6 +233,7 @@ def prepare(
         opt_k_bisulfate=opt_k_bisulfate,
         opt_k_carbonic=opt_k_carbonic,
         opt_k_fluoride=opt_k_fluoride,
+        opt_pH_scale=opt_pH_scale,
         opt_total_borate=opt_total_borate,
     )
     return titrant_mass, emf, temperature, analyte_mass, totals, k_constants
@@ -344,7 +348,7 @@ def solve(
     alkalinity, emf0 = opt_result["x"]
     # Calculate initial pH
     pH_initial = convert.emf_to_pH(emf[0], emf0, temperature[0])
-    return alkalinity * 1e6, emf0, pH_initial, temperature[0], analyte_mass
+    return alkalinity * 1e6, emf0, pH_initial, temperature[0], analyte_mass, opt_result
 
 
 class Titration:
@@ -490,6 +494,7 @@ class Titration:
             self.pH_initial,
             self.pH_initial_temperature,
             self.analyte_mass,
+            self.opt_result,
         ) = solve(
             self.file_path + self.file_name,
             self.salinity,

@@ -2,7 +2,7 @@
 
 ## Automatic tests
 
-Several of the [automatic tests](https://github.com/mvdh7/calkulate/tree/master/tests) include checks on whether Calkulate does self-consistent calibrations, for example solving a sample where the titrant was calibrated with itself, which should return exactly the correct alkalinity.
+Several of the [automatic tests](https://github.com/mvdh7/calkulate/tree/main/tests) include checks on whether Calkulate does self-consistent calibrations, for example solving a sample where the titrant was calibrated with itself, which should return exactly the correct alkalinity.
 
 So if the Tests badge below says "passing":
 

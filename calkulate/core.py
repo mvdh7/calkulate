@@ -201,8 +201,10 @@ def solve_emf_complete(
         x_scale=[1e-6, 1],
         **least_squares_kwargs,
     )
-    # Add which data points were used to the output
+    # Add which data points were used and initial guesses to the output
     opt_result["data_used"] = G
+    opt_result["alkalinity_gran"] = alkalinity_guess * 1e6
+    opt_result["emf0_gran"] = emf0_guess
     return opt_result
 
 
@@ -274,6 +276,8 @@ def solve_emf_complete_H2SO4(
     )
     # Add which data points were used to the output
     opt_result["data_used"] = G
+    opt_result["alkalinity_gran"] = alkalinity_guess * 1e6
+    opt_result["emf0_gran"] = emf0_guess
     return opt_result
 
 

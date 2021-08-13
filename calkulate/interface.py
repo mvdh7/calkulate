@@ -120,6 +120,7 @@ def get_k_constants(
     opt_k_bisulfate=default.opt_k_bisulfate,
     opt_k_carbonic=default.opt_k_carbonic,
     opt_k_fluoride=default.opt_k_fluoride,
+    opt_pH_scale=default.opt_pH_scale,
     opt_total_borate=default.opt_total_borate,
 ):
     """Get dict of equilibrium constants from inputs and PyCO2SYS."""
@@ -157,7 +158,7 @@ def get_k_constants(
         temperature,
         0,  # assume 1 atm pressure i.e. zero in-water pressure
         totals_pyco2,  # this contains salinity
-        3,  # pH_scale always Free for Calkulate
+        opt_pH_scale,
         opt_k_carbonic,
         opt_k_bisulfate,
         opt_k_fluoride,
@@ -170,4 +171,8 @@ def get_k_constants(
         for k, v in calk_to_pyco2__k_constants.items()
         if v in k_constants_pyco2
     }
+    # Convert k_fluoride to the Total scale if needed
+    if (opt_pH_scale == 1) and "TSO4" in totals_pyco2:
+        pH_free_to_total = 1 + totals_pyco2["TSO4"] / k_constants["k_bisulfate"]
+        k_constants["k_fluoride"] = k_constants["k_fluoride"] * pH_free_to_total
     return k_constants
