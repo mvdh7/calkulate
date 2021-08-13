@@ -348,7 +348,7 @@ def solve(
     alkalinity, emf0 = opt_result["x"]
     # Calculate initial pH
     pH_initial = convert.emf_to_pH(emf[0], emf0, temperature[0])
-    return alkalinity * 1e6, emf0, pH_initial, temperature[0], analyte_mass
+    return alkalinity * 1e6, emf0, pH_initial, temperature[0], analyte_mass, opt_result
 
 
 class Titration:
@@ -494,6 +494,7 @@ class Titration:
             self.pH_initial,
             self.pH_initial_temperature,
             self.analyte_mass,
+            self.opt_result,
         ) = solve(
             self.file_path + self.file_name,
             self.salinity,

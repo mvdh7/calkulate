@@ -44,7 +44,7 @@ prepare_defaults = dict(
     opt_k_bisulfate=default.opt_k_bisulfate,
     opt_k_carbonic=default.opt_k_carbonic,
     opt_k_fluoride=default.opt_k_fluoride,
-    opt_pH_scale=default.opt_pH_scale,
+    # opt_pH_scale=default.opt_pH_scale,  # doesn't work yet
     opt_total_borate=default.opt_total_borate,
     read_dat_method=default.read_dat_method,
 )
@@ -256,6 +256,7 @@ def solve_row(
     """Solve alkalinity, EMF0 and initial pH for one titration in a dataset."""
     if verbose:
         print("Calkulate: solving {}...".format(ds_row.file_name))
+    solved = False
     if ~np.isnan(ds_row.titrant_molinity) & ds_row.file_good:
         prepare_kwargs = get_prepare_kwargs(ds_row)
         prepare_kwargs["read_dat_kwargs"] = read_dat_kwargs
@@ -284,6 +285,7 @@ def solve_row(
                 pH_initial,
                 temperature_initial,
                 analyte_mass,
+                opt_result,
             ) = titration.solve(
                 file_name,
                 ds_row.salinity,
@@ -295,27 +297,39 @@ def solve_row(
                 emf0_guess=emf0_guess,
                 **prepare_kwargs,
             )
+            solved = True
         except FileNotFoundError:
             print("Calkulate: file not found: '{}'".format(ds_row.file_name))
-            alkalinity = emf0 = pH_initial = temperature_initial = np.nan
-            analyte_mass = ds_row.analyte_mass
         except:
             print("Calkulate: ERROR solving '{}'!".format(ds_row.file_name))
-            alkalinity = emf0 = pH_initial = temperature_initial = np.nan
-            analyte_mass = ds_row.analyte_mass
+    if solved:
+        return pd.Series(
+            {
+                "alkalinity_gran": opt_result["alkalinity_gran"],
+                "emf0_gran": opt_result["emf0_gran"],
+                "alkalinity": alkalinity,
+                "alkalinity_std": np.std(opt_result["fun"]) * 1e6,
+                "alkalinity_npts": sum(opt_result["data_used"]),
+                "emf0": emf0,
+                "pH_initial": pH_initial,
+                "temperature_initial": temperature_initial,
+                "analyte_mass": analyte_mass,
+            }
+        )
     else:
-        # If alkalinity_certified not provided for this ds_row
-        alkalinity = emf0 = pH_initial = temperature_initial = np.nan
-        analyte_mass = ds_row.analyte_mass
-    return pd.Series(
-        {
-            "alkalinity": alkalinity,
-            "emf0": emf0,
-            "pH_initial": pH_initial,
-            "temperature_initial": temperature_initial,
-            "analyte_mass": analyte_mass,
-        }
-    )
+        return pd.Series(
+            {
+                "alkalinity_gran_estimate": np.nan,
+                "emf0_gran_estimate": np.nan,
+                "alkalinity": np.nan,
+                "alkalinity_std": np.nan,
+                "alkalinity_npts": 0,
+                "emf0": np.nan,
+                "pH_initial": np.nan,
+                "temperature_initial": np.nan,
+                "analyte_mass": ds_row.analyte_mass,
+            }
+        )
 
 
 def solve(

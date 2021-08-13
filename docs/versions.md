@@ -4,19 +4,15 @@
 
 Calkulate v3 went too far overboard with the OO approach and ended up being very slow and overly complex behind the scenes as a result.  Calkulate v23 therefore mashes together the best bits of v2 and v3 for the ultimate alkalinity solving experience.
 
-### 23.3
-
-Enables solving on different pH scales.
-
-#### 23.3.0 (forthcoming)
-
-!!! info "Changes in v23.3.0"
-
-    ...
-
 ### 23.2
 
 Adds `Titration` class for investigating single titrations.
+
+#### 23.2.1 (13 August 2021)
+
+!!! info "Changes in v23.2.1"
+
+    * Solver functions return additional diagnostic information about each titration.
 
 #### 23.2.0 (6 July 2021)
 

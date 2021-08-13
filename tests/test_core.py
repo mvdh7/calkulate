@@ -111,6 +111,7 @@ titrant_molinity__ctf, analyte_mass__ctf = calk.titration.calibrate(
     pH__ctf,
     temperature0__ctf,
     analyte_mass__ctf,
+    opt_result__ctf,
 ) = calk.titration.solve(file_name, salinity, titrant_molinity__ctf, **ctf_kwargs)
 
 
