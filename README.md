@@ -4,7 +4,7 @@
 [![PyPI version](https://img.shields.io/pypi/v/calkulate.svg?style=popout)](https://pypi.org/project/calkulate/)
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.2634304-informational)](https://doi.org/10.5281/zenodo.2634304)
 [![Docs](https://readthedocs.org/projects/calkulate/badge/?version=latest&style=flat)](https://calkulate.readthedocs.io/en/latest/)
-[![Coverage](https://github.com/mvdh7/calkulate/blob/master/.misc/coverage.svg)](https://github.com/mvdh7/calkulate/blob/master/.misc/coverage.txt)
+[![Coverage](https://github.com/mvdh7/calkulate/blob/main/.misc/coverage.svg)](https://github.com/mvdh7/calkulate/blob/main/.misc/coverage.txt)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
