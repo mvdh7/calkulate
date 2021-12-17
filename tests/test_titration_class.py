@@ -62,12 +62,12 @@ iy = interpolate.pchip_interpolate(
 )
 
 # Model loss of DIC
-k_loss = 2.9e-6
+k_loss = 3
 idic = np.full_like(iy, np.nan)
 idic[0] = ttt.dic_loss.iloc[0]
 idic[0] = ttt.dic.iloc[0] * 1e6
 for i in range(1, len(idic)):
-    idic[i] = idic[i - 1] * idilute - k_loss * iy[i - 1]
+    idic[i] = idic[i - 1] * idilute - k_loss * iy[i - 1] * dx
 
 # Forecast future DIC loss
 def get_delta_fCO2_from_dic_pH(dic, pH, k0, k1, k2):
@@ -94,7 +94,7 @@ fy = get_delta_fCO2_from_dic_pH(fdic, fpH, fk0, fk1, fk2)
 
 
 for i in range(len(fdic) - 1):
-    fdic[i + 1] = fdic[i] * idilute - k_loss * fy[i]
+    fdic[i + 1] = fdic[i] * idilute - k_loss * fy[i] * dx
     fy[i + 1] = get_delta_fCO2_from_dic_pH(
         fdic[i + 1], fpH[i + 1], fk0[i + 1], fk1[i + 1], fk2[i + 1]
     )
@@ -109,7 +109,7 @@ ax.scatter(0, tt.titration.dic.iloc[0] * 1e6)
 ax.plot(ix, idic)
 ax.plot(fx, fdic)
 ax.set_ylim([800, 2500])
-ax.set_ylim([1800, 2100])
+ax.set_ylim([1850, 2050])
 # ax.set_ylim([1600, 2100])
 ax = axs[1]
 ax.plot("titrant_mass", "delta_fCO2_loss", data=ttt)
