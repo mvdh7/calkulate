@@ -505,8 +505,15 @@ class Titration:
         self.titration["pH"] = convert.emf_to_pH(
             self.titration.emf, self.emf0, self.titration.temperature
         )
+        self.get_alkalinity_from_acid()
         self.do_CO2SYS()
         self.solved = True
+
+    def get_alkalinity_from_acid(self):
+        self.titration["alkalinity_from_acid"] = (
+            1e-6 * self.alkalinity * self.analyte_mass
+            - self.titration.titrant_mass * self.titrant_molinity
+        ) / (self.analyte_mass + self.titration.titrant_mass)
 
     def do_CO2SYS(self):
         st = self.titration
@@ -536,8 +543,9 @@ class Titration:
             **totals,
             **k_constants,
         )
+        st["alkalinity_from_pH"] = results["alkalinity"] * 1e-6
+        st["k_CO2"] = results["k_CO2"]
         for co2sysvar in [
-            "alkalinity",
             "HCO3",
             "CO3",
             "BOH4",
@@ -554,17 +562,36 @@ class Titration:
         st["alk_alpha"] = results["alkalinity_alpha"] * 1e-6
         st["alk_beta"] = results["alkalinity_beta"] * 1e-6
         st["alkalinity_estimate"] = (
-            st.alkalinity
+            st.alkalinity_from_pH
             + st.titrant_mass
             * self.titrant_molinity
             / (st.titrant_mass + self.analyte_mass)
         ) / st.dilution_factor
+        dic_loss = pyco2.sys(
+            par1=st.alkalinity_from_acid.to_numpy() * 1e6,
+            par2=st.pH.to_numpy(),
+            par1_type=1,
+            par2_type=3,
+            opt_pH_scale=3,
+            salinity=self.salinity,
+            temperature=st.temperature,
+            **totals,
+            **k_constants,
+            uncertainty_from={"par1": 2, "par2": 0.01},
+            uncertainty_into=["dic"],
+        )
+        st["dic_loss"] = dic_loss["dic"]
+        st["dic_loss_u"] = dic_loss["u_dic"]
+        st["dic_loss_lo"] = st.dic_loss - st.dic_loss_u
+        st.dic_loss_lo.where(st.dic_loss_lo > 0, other=0, inplace=True)
+        st["dic_loss_hi"] = st.dic_loss + st.dic_loss_u
+        st["fCO2_loss"] = dic_loss["fCO2"]
 
     def calkulate(self, alkalinity_certified, calibrate_kwargs={}, solve_kwargs={}):
         self.calibrate(alkalinity_certified, **calibrate_kwargs)
         self.solve(**solve_kwargs)
 
-    # Plotting functions
+    # Assign plotting functions
     plot_emf = plot.titration.emf
     plot_pH = plot.titration.pH
     plot_gran_emf0 = plot.titration.gran_emf0
