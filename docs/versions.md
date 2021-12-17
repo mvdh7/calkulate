@@ -8,6 +8,12 @@ Calkulate v3 went too far overboard with the OO approach and ended up being very
 
 Adds `Titration` class for investigating single titrations.
 
+#### 23.2.2 (forthcoming)
+
+!!! info "Changes in v23.2.2"
+
+    * More properties calculated during titrations.
+
 #### 23.2.1 (13 August 2021)
 
 !!! info "Changes in v23.2.1"
