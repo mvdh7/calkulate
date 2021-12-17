@@ -52,7 +52,6 @@ ttt["delta_fCO2_loss"] = ttt.fCO2_loss - fCO2_air
 # Titrant mass as proxy for titration time
 dx = 1e-6
 ix = np.arange(0, 0.0018, dx)
-idilute = calk.convert.get_dilution_factor(dx, tt.analyte_mass)
 idic_raw = interpolate.pchip_interpolate(
     ttt.titrant_mass.values, ttt.dic_loss.values, ix
 )
@@ -67,6 +66,7 @@ idic = np.full_like(iy, np.nan)
 idic[0] = ttt.dic_loss.iloc[0]
 idic[0] = ttt.dic.iloc[0] * 1e6
 for i in range(1, len(idic)):
+    idilute = calk.convert.get_dilution_factor(dx, tt.analyte_mass + ix[i - 1])
     idic[i] = idic[i - 1] * idilute - k_loss * iy[i - 1] * dx
 
 # Forecast future DIC loss
@@ -94,30 +94,45 @@ fy = get_delta_fCO2_from_dic_pH(fdic, fpH, fk0, fk1, fk2)
 
 
 for i in range(len(fdic) - 1):
+    idilute = calk.convert.get_dilution_factor(dx, tt.analyte_mass + fx[i - 1])
     fdic[i + 1] = fdic[i] * idilute - k_loss * fy[i] * dx
     fy[i + 1] = get_delta_fCO2_from_dic_pH(
         fdic[i + 1], fpH[i + 1], fk0[i + 1], fk1[i + 1], fk2[i + 1]
     )
 
 # Draw figure
-fig, axs = plt.subplots(dpi=300, nrows=2)
+fig, axs = plt.subplots(dpi=300, nrows=2, figsize=(6, 5))
 ax = axs[0]
-ax.fill_between("titrant_mass", "dic_loss_lo", y2="dic_loss_hi", data=ttt, alpha=0.3)
-ax.plot(ttt.titrant_mass, ttt.dic * 1e6, c="k")
-ax.plot("titrant_mass", "dic_loss", data=ttt)
+ax.plot(ttt.titrant_mass, ttt.dic * 1e6, c="k", label="Dilution only")
+ax.plot("titrant_mass", "dic_loss", data=ttt, label="Calc. from pH")
+ax.fill_between(
+    "titrant_mass",
+    "dic_loss_lo",
+    y2="dic_loss_hi",
+    data=ttt,
+    alpha=0.3,
+    label="Calc. uncertainty",
+    zorder=-1,
+)
 ax.scatter(0, tt.titration.dic.iloc[0] * 1e6)
-ax.plot(ix, idic)
-ax.plot(fx, fdic)
-ax.set_ylim([800, 2500])
-ax.set_ylim([1850, 2050])
-# ax.set_ylim([1600, 2100])
+ax.plot(ix, idic, label="Model, 'fitted'")
+ax.plot(fx, fdic, label="Model, projected")
+# ax.set_ylim([800, 2500])
+# ax.set_ylim([1850, 2050])
+ax.set_ylabel("DIC / $\mu$mol/kg")
+ax.legend(fontsize=7)
+ax.set_ylim([1450, 2050])
 ax = axs[1]
-ax.plot("titrant_mass", "delta_fCO2_loss", data=ttt)
-ax.plot(ix, iy)
-ax.plot(fx, fy)
+ax.plot("titrant_mass", "delta_fCO2_loss", data=ttt, label="Calc. from pH")
+ax.plot(ix, iy, label="Model, 'fitted'")
+ax.plot(fx, fy, label="Model, projected")
+ax.set_ylabel("$\Delta f$CO$_2$ / $\mu$atm")
 ax.set_ylim([0, 100000])
+ax.legend(fontsize=7)
 for ax in axs:
     ax.grid(alpha=0.3)
+    ax.set_xlabel("Titrant mass / kg")
 plt.tight_layout()
+plt.savefig("tests/figures/test_dic_loss.png")
 
 #%%
