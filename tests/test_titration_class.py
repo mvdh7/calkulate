@@ -2,12 +2,14 @@ import pandas as pd
 import calkulate as calk
 
 tt = calk.Titration(
-    file_name="seawater-CRM-144.dat",
+    # file_name="seawater-CRM-144.dat",
+    file_name="0-0  0  (0)calk-3-5.dat",
     file_path="tests/data/",
     analyte_mass=0.1,
     dic=2031.53,
     total_silicate=2.5,
     total_phosphate=0.31,
+    salinity=33.571,
 )
 tt.calibrate(2238.6)
 
@@ -61,7 +63,7 @@ iy = interpolate.pchip_interpolate(
 )
 
 # Model loss of DIC
-k_loss = 3
+k_loss = 2.1
 idic = np.full_like(iy, np.nan)
 idic[0] = ttt.dic_loss.iloc[0]
 idic[0] = ttt.dic.iloc[0] * 1e6
@@ -102,6 +104,7 @@ for i in range(len(fdic) - 1):
 
 # Draw figure
 fig, axs = plt.subplots(dpi=300, nrows=2, figsize=(6, 5))
+
 ax = axs[0]
 ax.plot(ttt.titrant_mass, ttt.dic * 1e6, c="k", label="Dilution only")
 ax.plot("titrant_mass", "dic_loss", data=ttt, label="Calc. from pH")
@@ -122,6 +125,7 @@ ax.plot(fx, fdic, label="Model, projected")
 ax.set_ylabel("DIC / $\mu$mol/kg")
 ax.legend(fontsize=7)
 ax.set_ylim([1450, 2050])
+
 ax = axs[1]
 ax.plot("titrant_mass", "delta_fCO2_loss", data=ttt, label="Calc. from pH")
 ax.plot(ix, iy, label="Model, 'fitted'")
