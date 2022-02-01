@@ -591,6 +591,26 @@ class Titration:
         self.calibrate(alkalinity_certified, **calibrate_kwargs)
         self.solve(**solve_kwargs)
 
+    def __str__(self):
+        return f"Titration {self.file_name}"
+
+    def __repr__(self):
+        rstr = "calkulate.Titration("
+        if hasattr(self, "analyte_mass"):
+            if self.analyte_mass is not None:
+                rstr += f"\n    analyte_mass={self.analyte_mass},"
+        if hasattr(self, "analyte_volume"):
+            if self.analyte_volume is not None:
+                rstr += f"\n    analyte_volume={self.analyte_volume},"
+        if self.file_name != "":
+            rstr += f"\n    file_name='{self.file_name}',"
+        if self.file_path != "":
+            rstr += f"\n    file_path='{self.file_path}',"
+        if self.salinity != 35:
+            rstr += f"\n    salinity={self.salinity},"
+        rstr += "\n    **prepare_kwargs,\n)"
+        return rstr
+
     # Assign plotting functions
     plot_emf = plot.titration.emf
     plot_pH = plot.titration.pH

@@ -2,8 +2,8 @@ import pandas as pd
 import calkulate as calk
 
 tt = calk.Titration(
-    # file_name="seawater-CRM-144.dat",
-    file_name="0-0  0  (0)calk-3-5.dat",
+    file_name="seawater-CRM-144.dat",
+    # file_name="0-0  0  (0)calk-3-5.dat",
     file_path="tests/data/",
     analyte_mass=0.1,
     dic=2031.53,
