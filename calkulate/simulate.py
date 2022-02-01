@@ -2,9 +2,11 @@
 # Copyright (C) 2019--2021  Matthew P. Humphreys  (GNU GPLv3)
 """Simulate solution properties during a titration."""
 
+import copy
 import numpy as np
 import PyCO2SYS as pyco2
-from . import default
+from . import convert, default, io
+from .titration import Titration
 
 
 def alkalinity_components(pH, totals, k_constants, opt_pH_scale=default.opt_pH_scale):
@@ -122,3 +124,176 @@ def alkalinity(pH, totals, k_constants, opt_pH_scale=default.opt_pH_scale):
         pH, totals, k_constants, opt_pH_scale=opt_pH_scale
     )
     return np.sum([v * component_multipliers[k] for k, v in components.items()], axis=0)
+
+
+def _titration(
+    alkalinity,
+    dic=0,
+    emf0=300,
+    file_path="",
+    file_name=None,
+    file_open_mode="x",
+    titrant_amount_fmt=".8f",
+    measurement_fmt=".12f",
+    temperature_fmt=".8f",
+    salinity=35,
+    analyte_mass=0.2,
+    temperature=25,
+    titrant_molinity=0.3,
+    titrant_mass_start=0,
+    titrant_mass_step=0.05e-3,
+    titrant_mass_stop=2.51e-3,
+    **pyco2sys_kwargs,
+):
+    """Simulate a titration and return (titrant_mass, emf, temperature)."""
+    # Reformat inputs
+    titrant_mass = np.arange(
+        titrant_mass_start, titrant_mass_stop, titrant_mass_step
+    )  # kg
+    if np.isscalar(dic):
+        dic = np.array([dic])
+    if np.isscalar(temperature):
+        temperature = np.array([temperature])
+    if np.isscalar(salinity):
+        salinity = np.array([salinity])
+    if "opt_gas_constant" not in pyco2sys_kwargs:
+        pyco2sys_kwargs["opt_gas_constant"] = default.opt_gas_constant
+    if "opt_k_bisulfate" not in pyco2sys_kwargs:
+        pyco2sys_kwargs["opt_k_bisulfate"] = default.opt_k_bisulfate
+    if "opt_k_carbonic" not in pyco2sys_kwargs:
+        pyco2sys_kwargs["opt_k_carbonic"] = default.opt_k_carbonic
+    if "opt_k_fluoride" not in pyco2sys_kwargs:
+        pyco2sys_kwargs["opt_k_fluoride"] = default.opt_k_fluoride
+    if "opt_total_borate" not in pyco2sys_kwargs:
+        pyco2sys_kwargs["opt_total_borate"] = default.opt_total_borate
+    kwargs_core = dict(
+        temperature=temperature,
+        salinity=salinity,
+        opt_pH_scale=3,
+        **pyco2sys_kwargs,
+    )
+    # Calculate initial conditions and dilution through titration
+    co2sys_core = pyco2.sys(**kwargs_core)
+    dilution_factor = analyte_mass / (analyte_mass + titrant_mass)
+    alkalinity_titration = (
+        1e6
+        * (analyte_mass * alkalinity * 1e-6 - titrant_mass * titrant_molinity)
+        / (analyte_mass + titrant_mass)
+    )
+    dic_titration = dic * dilution_factor
+    kwargs_titration = copy.deepcopy(kwargs_core)
+    kwargs_titration.update(
+        total_borate=co2sys_core["total_borate"],
+        total_fluoride=co2sys_core["total_fluoride"],
+        total_sulfate=co2sys_core["total_sulfate"],
+    )
+    for k in [
+        "total_borate",
+        "total_fluoride",
+        "total_sulfate",
+    ]:
+        kwargs_titration[k] = kwargs_titration[k] * dilution_factor
+    # Simulate titration
+    co2sys_titrations = pyco2.sys(
+        alkalinity_titration, dic_titration, 1, 2, **kwargs_titration
+    )
+    pH_titrations = co2sys_titrations["pH_free"]
+    emf = convert.pH_to_emf(pH_titrations, emf0, kwargs_titration["temperature"])
+    if file_name is not None:
+        io.write_dat(
+            file_path + file_name,
+            titrant_mass * 1000,  # g
+            emf,  # mV
+            co2sys_titrations["temperature"],  # °C
+            line0="Titration data simulated by Calkulate",
+            mode=file_open_mode,
+            titrant_amount_fmt=titrant_amount_fmt,
+            measurement_fmt=measurement_fmt,
+            temperature_fmt=temperature_fmt,
+        )
+    return titrant_mass, emf, temperature
+
+
+def titration(
+    alkalinity,
+    dic=0,
+    emf0=300,
+    file_path="",
+    file_name=None,
+    file_open_mode="x",
+    titrant_amount_fmt=".8f",
+    measurement_fmt=".12f",
+    temperature_fmt=".8f",
+    salinity=35,
+    analyte_mass=0.2,
+    temperature=25,
+    titrant_molinity=0.3,
+    titrant_mass_start=0,
+    titrant_mass_step=0.05e-3,
+    titrant_mass_stop=2.51e-3,
+    **pyco2sys_kwargs,
+):
+    """Simulate a titration and return a Titration object."""
+    if file_name is None:
+        file_name = "titration.dat"
+        file_open_mode = "w"
+    _titration(
+        alkalinity,
+        dic=dic,
+        emf0=emf0,
+        file_path=file_path,
+        file_name=file_name,
+        file_open_mode=file_open_mode,
+        titrant_amount_fmt=titrant_amount_fmt,
+        measurement_fmt=measurement_fmt,
+        temperature_fmt=temperature_fmt,
+        salinity=salinity,
+        analyte_mass=analyte_mass,
+        temperature=temperature,
+        titrant_molinity=titrant_molinity,
+        titrant_mass_start=titrant_mass_start,
+        titrant_mass_step=titrant_mass_step,
+        titrant_mass_stop=titrant_mass_stop,
+        **pyco2sys_kwargs,
+    )
+    titration_kwargs = [
+        "total_alpha",
+        "total_beta",
+        "total_ammonia",
+        "total_phosphate",
+        "total_silicate",
+        "total_sulfide",
+        "total_borate",
+        "total_fluoride",
+        "total_sulfate",
+        "k_alpha",
+        "k_ammonia",
+        "k_beta",
+        "k_bisulfate",
+        "k_borate",
+        "k_carbonic_1",
+        "k_carbonic_2",
+        "k_fluoride",
+        "k_phosphoric_1",
+        "k_phosphoric_2",
+        "k_phosphoric_3",
+        "k_silicate",
+        "k_sulfide",
+        "k_water",
+        "opt_k_bisulfate",
+        "opt_k_carbonic",
+        "opt_k_fluoride",
+        "opt_pH_scale",
+        "opt_total_borate",
+    ]
+    prepare_kwargs = {
+        k: pyco2sys_kwargs[k] for k in titration_kwargs if k in pyco2sys_kwargs
+    }
+    return Titration(
+        file_name=file_name,
+        file_path=file_path,
+        salinity=salinity,
+        analyte_mass=analyte_mass,
+        dic=dic,
+        **prepare_kwargs,
+    )

@@ -9,9 +9,12 @@ pH_free = np.array([8.1])
 temperature = 25.0
 salinity = 35.0
 # For the titration
-sample_mass = 0.2  # kg
+analyte_mass = 0.2  # kg
 titrant_molinity = 0.3  # mol/kg
-titrant_mass = np.arange(0, 2.51, 0.05) * 1e-3  # kg
+titrant_mass_start = 0
+titrant_mass_step = 0.05e-3
+titrant_mass_stop = 2.51e-3
+titrant_mass = np.arange(titrant_mass_start, titrant_mass_stop, titrant_mass_step)  # kg
 emf0 = 300  # mV
 # ===============
 
@@ -20,12 +23,15 @@ if np.isscalar(temperature):
     temperature = np.array([temperature])
 if np.isscalar(salinity):
     salinity = np.array([salinity])
+pyco2sys_kwargs = dict(
+    opt_k_carbonic=16,
+    opt_total_borate=1,
+)
 kwargs_core = dict(
     temperature=temperature,
     salinity=salinity,
     opt_pH_scale=3,
-    opt_k_carbonic=16,
-    opt_total_borate=1,
+    **pyco2sys_kwargs,
 )
 
 # Calculate total alkalinity
@@ -33,11 +39,14 @@ co2sys_core = pyco2.sys(dic, pH_free, 2, 3, **kwargs_core)
 alkalinity_core = co2sys_core["alkalinity"]
 
 # Simulate titration(s)
-dilution_factor = sample_mass / (sample_mass + titrant_mass)
+dilution_factor = analyte_mass / (analyte_mass + titrant_mass)
 alkalinity_titration = (
     1e6
-    * (sample_mass * co2sys_core["alkalinity"] * 1e-6 - titrant_mass * titrant_molinity)
-    / (sample_mass + titrant_mass)
+    * (
+        analyte_mass * co2sys_core["alkalinity"] * 1e-6
+        - titrant_mass * titrant_molinity
+    )
+    / (analyte_mass + titrant_mass)
 )
 dic_titration = dic * dilution_factor
 kwargs_titration = copy.deepcopy(kwargs_core)
@@ -69,10 +78,34 @@ calk.write_dat(
     measurement_fmt=".4f",
 )
 
+# Test simulate.titration function
+(
+    titrant_mass__simfunc,
+    emf__simfunc,
+    temperature__simfunc,
+    # totals__simfunc,
+    # k_constants__simfunc,
+) = calk.simulate._titration(
+    alkalinity_core,
+    dic=dic,
+    emf0=emf0,
+    salinity=salinity,
+    analyte_mass=analyte_mass,
+    temperature=temperature,
+    titrant_molinity=titrant_molinity,
+    titrant_mass_start=0,
+    titrant_mass_step=0.05e-3,
+    titrant_mass_stop=2.51e-3,
+    **pyco2sys_kwargs,
+    file_path="tests/data/",
+    file_name="test_calk_simulate_titration.txt",
+    file_open_mode="w",
+)
+
 # Import as a Calkulate Dataset
 ds = pd.DataFrame({"file_name": [file_name]})
 ds["salinity"] = co2sys_core["salinity"]
-ds["analyte_mass"] = sample_mass
+ds["analyte_mass"] = analyte_mass
 ds["titrant_molinity"] = titrant_molinity
 ds["titrant_amount_unit"] = "g"
 ds["opt_total_borate"] = 1
@@ -90,4 +123,11 @@ def test_simulate_then_solve():
     assert np.isclose(co2sys_core["alkalinity_offset"], 0, rtol=0, atol=1e-3)
 
 
+def test_simulate_titration_function():
+    assert np.allclose(titrant_mass, titrant_mass__simfunc)
+    assert np.allclose(emf, emf__simfunc)
+    assert np.allclose(temperature, temperature__simfunc)
+
+
 # test_simulate_then_solve()
+# test_simulate_titration_function()

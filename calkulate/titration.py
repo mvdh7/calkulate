@@ -361,29 +361,17 @@ class Titration:
         analyte_volume=None,
         **prepare_kwargs,
     ):
-        assert analyte_mass is not None or analyte_volume is not None
+        assert (
+            analyte_mass is not None or analyte_volume is not None
+        ), "You must provide either analyte_mass (in kg) or analyte_volume (in ml)!"
         self.file_name = file_name
         self.file_path = file_path
         self.salinity = salinity
         self.prepare_kwargs = prepare_kwargs.copy()
-        self.prepare_kwargs["analyte_volume"] = analyte_volume
-        self.prepare_kwargs["analyte_mass"] = analyte_mass
-        if analyte_volume is not None:
-            self.analyte_volume = analyte_volume
-        (
-            titrant_mass,
-            emf,
-            temperature,
-            self.analyte_mass,
-            totals,
-            k_constants,
-        ) = prepare(
-            file_path + file_name,
-            salinity,
-            analyte_mass=analyte_mass,
-            analyte_volume=analyte_volume,
-            **prepare_kwargs,
-        )
+        self.prepare_kwargs["analyte_mass"] = self.analyte_mass = analyte_mass
+        self.prepare_kwargs["analyte_volume"] = self.analyte_volume = analyte_volume
+        titrant_mass, emf, temperature, totals, k_constants = self._get_from_file()
+        # Now do the processing that's independent of the data source
         self.titration = pd.DataFrame(
             {
                 "titrant_mass": titrant_mass,
@@ -400,6 +388,22 @@ class Titration:
             self.titration[k] = v
         self.calibrated = False
         self.solved = False
+
+    def _get_from_file(self):
+        (
+            titrant_mass,
+            emf,
+            temperature,
+            self.analyte_mass,
+            totals,
+            k_constants,
+        ) = prepare(
+            self.file_path + self.file_name,
+            self.salinity,
+            **self.prepare_kwargs,
+        )
+        self.from_file = True
+        return titrant_mass, emf, temperature, totals, k_constants
 
     def calibrate(self, alkalinity_certified, **calibrate_kwargs):
         self.alkalinity_certified = alkalinity_certified
@@ -592,7 +596,10 @@ class Titration:
         self.solve(**solve_kwargs)
 
     def __str__(self):
-        return f"Titration {self.file_name}"
+        if self.file_name is not None:
+            return f"Titration {self.file_name}"
+        else:
+            return "Titration (simulated)"
 
     def __repr__(self):
         rstr = "calkulate.Titration("
@@ -602,9 +609,9 @@ class Titration:
         if hasattr(self, "analyte_volume"):
             if self.analyte_volume is not None:
                 rstr += f"\n    analyte_volume={self.analyte_volume},"
-        if self.file_name != "":
+        if self.file_name is not None:
             rstr += f"\n    file_name='{self.file_name}',"
-        if self.file_path != "":
+        if self.file_path is not None:
             rstr += f"\n    file_path='{self.file_path}',"
         if self.salinity != 35:
             rstr += f"\n    salinity={self.salinity},"

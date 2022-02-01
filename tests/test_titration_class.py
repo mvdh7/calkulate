@@ -1,17 +1,35 @@
 import pandas as pd
 import calkulate as calk
 
-tt = calk.Titration(
-    file_name="seawater-CRM-144.dat",
-    # file_name="0-0  0  (0)calk-3-5.dat",
-    file_path="tests/data/",
+tt_alkalinity = 2238.6
+tt_kwargs = dict(
     analyte_mass=0.1,
     dic=2031.53,
     total_silicate=2.5,
     total_phosphate=0.31,
     salinity=33.571,
 )
-tt.calibrate(2238.6)
+tt = calk.Titration(
+    file_name="seawater-CRM-144.dat",
+    # file_name="0-0  0  (0)calk-3-5.dat",
+    file_path="tests/data/",
+    **tt_kwargs,
+)
+tt.calibrate(tt_alkalinity)
+
+# Simulate a similar titration
+st = calk.simulate.titration(
+    tt_alkalinity,
+    **tt_kwargs,
+    emf0=tt.emf0,
+    titrant_molinity=tt.titrant_molinity,
+    file_path="tests/data/",
+    # measurement_fmt='.12f',
+    titrant_mass_stop=4.2e-3,
+    titrant_mass_step=0.15e-3,
+)
+st.calibrate(tt_alkalinity)
+# st.plot_alkalinity()
 
 
 def test_class():
@@ -28,6 +46,20 @@ def test_class():
     assert isinstance(tt.titration, pd.DataFrame)
 
 
+def test_class_simulated():
+    """Does the simulated Titration object have the expected attributes?"""
+    assert hasattr(st, "alkalinity")
+    assert hasattr(st, "emf0")
+    assert hasattr(st, "alkalinity_gran")
+    assert hasattr(st, "emf0_gran")
+    assert hasattr(st, "titration")
+    assert isinstance(st.alkalinity, float)
+    assert isinstance(st.emf0, float)
+    assert isinstance(st.alkalinity_gran, float)
+    assert isinstance(st.emf0_gran, float)
+    assert isinstance(st.titration, pd.DataFrame)
+
+
 def test_plots():
     """Do the plots throw no errors?"""
     tt.plot_emf()
@@ -40,6 +72,7 @@ def test_plots():
 
 
 # test_class()
+# test_class_simulated()
 # test_plots()
 
 #%%
@@ -138,5 +171,3 @@ for ax in axs:
     ax.set_xlabel("Titrant mass / kg")
 plt.tight_layout()
 plt.savefig("tests/figures/test_dic_loss.png")
-
-#%%

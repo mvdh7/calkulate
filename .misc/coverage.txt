@@ -13,8 +13,8 @@ calkulate/meta.py                                 6      0   100%
 calkulate/plot/__init__.py                       63     56    11%
 calkulate/plot/misc.py                            3      0   100%
 calkulate/plot/titration.py                     118      0   100%
-calkulate/simulate.py                            70      0   100%
-calkulate/titration.py                          132      8    94%
+calkulate/simulate.py                           113      0   100%
+calkulate/titration.py                          166     26    84%
 tests/__init__.py                                 0      0   100%
 tests/test_convert.py                            21      0   100%
 tests/test_core.py                               42      0   100%
@@ -29,7 +29,7 @@ tests/test_pH_scales_simulated_titration.py      46      0   100%
 tests/test_simulate.py                           22      0   100%
 tests/test_simulate_pH_scales.py                 41      0   100%
 tests/test_simulate_sulfate.py                  103      1    99%
-tests/test_simulate_then_solve.py                46      0   100%
-tests/test_titration_class.py                    23      0   100%
+tests/test_simulate_then_solve.py                55      0   100%
+tests/test_titration_class.py                    95      0   100%
 -----------------------------------------------------------------
-TOTAL                                          1406    110    92%
+TOTAL                                          1564    128    92%
