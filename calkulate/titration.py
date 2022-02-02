@@ -363,14 +363,26 @@ class Titration:
     ):
         assert (
             analyte_mass is not None or analyte_volume is not None
-        ), "You must provide either analyte_mass (in kg) or analyte_volume (in ml)!"
+        ), "You must provide either analyte_mass [kg] or analyte_volume [ml]!"
         self.file_name = file_name
         self.file_path = file_path
         self.salinity = salinity
+        self.analyte_volume = analyte_volume
         self.prepare_kwargs = prepare_kwargs.copy()
-        self.prepare_kwargs["analyte_mass"] = self.analyte_mass = analyte_mass
-        self.prepare_kwargs["analyte_volume"] = self.analyte_volume = analyte_volume
-        titrant_mass, emf, temperature, totals, k_constants = self._get_from_file()
+        (
+            titrant_mass,
+            emf,
+            temperature,
+            self.analyte_mass,
+            totals,
+            k_constants,
+        ) = prepare(
+            self.file_path + self.file_name,
+            self.salinity,
+            analyte_mass=analyte_mass,
+            analyte_volume=self.analyte_volume,
+            **self.prepare_kwargs,
+        )
         # Now do the processing that's independent of the data source
         self.titration = pd.DataFrame(
             {
@@ -382,47 +394,76 @@ class Titration:
         self.titration["dilution_factor"] = convert.get_dilution_factor(
             titrant_mass, self.analyte_mass
         )
+        # Put totals and k_constants into the titration df and get lists of their names
+        self._totals = []
+        self._k_constants = []
         for k, v in totals.items():
             self.titration[k] = v
+            self._totals.append(k)
         for k, v in k_constants.items():
             self.titration[k] = v
+            self._k_constants.append(k)
         self.calibrated = False
         self.solved = False
 
-    def _get_from_file(self):
-        (
-            titrant_mass,
-            emf,
-            temperature,
-            self.analyte_mass,
-            totals,
-            k_constants,
-        ) = prepare(
-            self.file_path + self.file_name,
-            self.salinity,
-            **self.prepare_kwargs,
-        )
-        self.from_file = True
-        return titrant_mass, emf, temperature, totals, k_constants
+    def get_totals(self):
+        return {k: self.titration[k].to_numpy() for k in self._totals}
 
-    def calibrate(self, alkalinity_certified, **calibrate_kwargs):
+    def get_k_constants(self):
+        return {k: self.titration[k].to_numpy() for k in self._k_constants}
+
+    def calibrate(
+        self,
+        alkalinity_certified,
+        analyte_total_sulfate=None,
+        emf0_guess=None,
+        least_squares_kwargs=default.least_squares_kwargs,
+        pH_range=default.pH_range,
+        titrant_molinity_guess=None,
+        titrant=default.titrant,
+    ):
         self.alkalinity_certified = alkalinity_certified
-        self.calibrate_kwargs = calibrate_kwargs.copy()
-        self.titrant_molinity = calibrate(
-            self.file_path + self.file_name,
-            self.salinity,
-            alkalinity_certified,
-            **self.calibrate_kwargs,
-            **self.prepare_kwargs,
-        )[0]
+        self.pH_range = pH_range
+        # Solve for titrant_molinity
+        solver_kwargs = {
+            "pH_range": self.pH_range,
+            "least_squares_kwargs": least_squares_kwargs,
+            "emf0_guess": emf0_guess,
+        }
+        st = self.titration
+        if titrant == "H2SO4":
+            assert analyte_total_sulfate is not None
+            self.titrant_molinity = core.calibrate_H2SO4(
+                self.alkalinity_certified,
+                st.titrant_mass.to_numpy(),
+                st.emf.to_numpy(),
+                st.temperature.to_numpy(),
+                self.analyte_mass,
+                self.analyte_total_sulfate * 1e-6,
+                self.salinity,
+                self.get_totals(),
+                self.get_k_constants(),
+                titrant_molinity_guess=titrant_molinity_guess,
+                least_squares_kwargs=least_squares_kwargs,
+                solver_kwargs=solver_kwargs,
+            )["x"][0]
+        else:
+            self.titrant_molinity = core.calibrate(
+                self.alkalinity_certified,
+                st.titrant_mass.to_numpy(),
+                st.emf.to_numpy(),
+                st.temperature.to_numpy(),
+                self.analyte_mass,
+                self.get_totals(),
+                self.get_k_constants(),
+                titrant_molinity_guess=titrant_molinity_guess,
+                least_squares_kwargs=least_squares_kwargs,
+                solver_kwargs=solver_kwargs,
+            )["x"][0]
+        # Get Gran-plot guesses with solved titrant molinity
         self.gran_guesses()
-        pH_range = (
-            self.calibrate_kwargs["pH_range"]
-            if "pH_range" in self.calibrate_kwargs
-            else default.pH_range
-        )
-        self.titration["G_final"] = (self.titration.pH_gran >= pH_range[0]) & (
-            self.titration.pH_gran <= pH_range[1]
+        self.titration["G_final"] = (self.titration.pH_gran >= self.pH_range[0]) & (
+            self.titration.pH_gran <= self.pH_range[1]
         )
         self.calibrated = True
         self.solve()
