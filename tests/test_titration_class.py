@@ -17,21 +17,31 @@ tt = calk.Titration(
 )
 tt.calkulate(tt_alkalinity)
 
-#%% Simulate a similar titration
+# Simulate a similar titration
 st = calk.Titration(
     analyte_mass=0.1,
     salinity=33.571,
     simulate_alkalinity=tt_alkalinity,
     simulate_kwargs=dict(
-        **tt_kwargs,
         emf0=tt.emf0,
         titrant_molinity=tt.titrant_molinity,
         titrant_mass_stop=4.2e-3,
         titrant_mass_step=0.15e-3,
+        **tt_kwargs,
     ),
 )
 st.calkulate(tt_alkalinity)
-# st.plot_alkalinity()
+
+# Simulate again using the more user-friendly function
+st2 = calk.simulate.titration(
+    tt_alkalinity,
+    analyte_mass=0.1,
+    emf0=tt.emf0,
+    titrant_molinity=tt.titrant_molinity,
+    titrant_mass_stop=4.2e-3,
+    titrant_mass_step=0.15e-3,
+    **tt_kwargs,
+)
 
 
 def test_class():
@@ -48,18 +58,18 @@ def test_class():
     assert isinstance(tt.titration, pd.DataFrame)
 
 
-# def test_class_simulated():
-#     """Does the simulated Titration object have the expected attributes?"""
-#     assert hasattr(st, "alkalinity")
-#     assert hasattr(st, "emf0")
-#     assert hasattr(st, "alkalinity_gran")
-#     assert hasattr(st, "emf0_gran")
-#     assert hasattr(st, "titration")
-#     assert isinstance(st.alkalinity, float)
-#     assert isinstance(st.emf0, float)
-#     assert isinstance(st.alkalinity_gran, float)
-#     assert isinstance(st.emf0_gran, float)
-#     assert isinstance(st.titration, pd.DataFrame)
+def test_class_simulated():
+    """Does the simulated Titration object have the expected attributes?"""
+    assert hasattr(st, "alkalinity")
+    assert hasattr(st, "emf0")
+    assert hasattr(st, "alkalinity_gran")
+    assert hasattr(st, "emf0_gran")
+    assert hasattr(st, "titration")
+    assert isinstance(st.alkalinity, float)
+    assert isinstance(st.emf0, float)
+    assert isinstance(st.alkalinity_gran, float)
+    assert isinstance(st.emf0_gran, float)
+    assert isinstance(st.titration, pd.DataFrame)
 
 
 def test_plots():

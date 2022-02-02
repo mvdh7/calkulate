@@ -86,7 +86,7 @@ calk.write_dat(
     analyte_mass__simfunc,
     totals__simfunc,
     k_constants__simfunc,
-) = calk.simulate.titration(
+) = calk.simulate._titration(
     alkalinity_core,
     dic=dic,
     emf0=emf0,
@@ -98,9 +98,6 @@ calk.write_dat(
     titrant_mass_step=0.05e-3,
     titrant_mass_stop=2.51e-3,
     **pyco2sys_kwargs,
-    file_path="tests/data/",
-    file_name="test_calk_simulate_titration.txt",
-    file_open_mode="w",
 )
 
 # Import as a Calkulate Dataset

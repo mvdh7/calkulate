@@ -399,7 +399,7 @@ class Titration:
                 self.analyte_mass,
                 totals,
                 k_constants,
-            ) = simulate.titration(simulate_alkalinity, **simulate_kwargs)
+            ) = simulate._titration(simulate_alkalinity, **simulate_kwargs)
             if "dic" in simulate_kwargs:
                 self.dic = simulate_kwargs["dic"]
             else:
