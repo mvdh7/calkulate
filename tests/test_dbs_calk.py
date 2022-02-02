@@ -27,6 +27,7 @@ def test_dbs_to_Titration():
         dbs.calkulate(verbose=False)
     ix = 20
     tt = dbs.to_Titration(ix)
+    tt.solve()
     assert tt.solved
     assert not tt.calibrated
     assert np.isclose(tt.alkalinity, dbs.loc[ix, "alkalinity"], rtol=0, atol=1e-12)
@@ -34,7 +35,7 @@ def test_dbs_to_Titration():
     ix_crm = 88  # must be a CRM!
     tt_crm = dbs.to_Titration(ix_crm)
     assert not tt_crm.calibrated
-    tt_crm.calibrate(tt_crm.alkalinity_certified)
+    tt_crm.calkulate(tt_crm.alkalinity_certified)
     assert tt_crm.calibrated
     assert tt_crm.solved
     assert np.isclose(

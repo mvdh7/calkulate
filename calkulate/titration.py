@@ -427,7 +427,7 @@ class Titration:
         self.pH_range = pH_range
         self.titrant = titrant
         # Solve for titrant_molinity
-        solver_kwargs = {
+        self.solver_kwargs = {
             "pH_range": self.pH_range,
             "least_squares_kwargs": least_squares_kwargs,
             "emf0_guess": emf0_guess,
@@ -447,7 +447,7 @@ class Titration:
                 self.get_k_constants(),
                 titrant_molinity_guess=titrant_molinity_guess,
                 least_squares_kwargs=least_squares_kwargs,
-                solver_kwargs=solver_kwargs,
+                solver_kwargs=self.solver_kwargs,
             )["x"][0]
         else:
             self.titrant_molinity = core.calibrate(
@@ -460,18 +460,14 @@ class Titration:
                 self.get_k_constants(),
                 titrant_molinity_guess=titrant_molinity_guess,
                 least_squares_kwargs=least_squares_kwargs,
-                solver_kwargs=solver_kwargs,
+                solver_kwargs=self.solver_kwargs,
             )["x"][0]
         # Get Gran-plot guesses with solved titrant molinity
         self.gran_guesses()
-        self.titration["G_final"] = (self.titration.pH_gran >= self.pH_range[0]) & (
-            self.titration.pH_gran <= self.pH_range[1]
-        )
         self.calibrated = True
 
     def set_titrant_molinity(self, titrant_molinity):
         self.titrant_molinity = titrant_molinity
-        self.gran_guesses()
         self.calibrated = False
 
     @np.errstate(invalid="ignore")
@@ -488,7 +484,7 @@ class Titration:
         )
         # Make first guesses
         (
-            self.alkalinity_gran,
+            alkalinity_gran,
             self.gran_slope,
             self.gran_intercept,
         ) = core.gran_guess_alkalinity(
@@ -503,7 +499,7 @@ class Titration:
             else default.titrant
         )
         if titrant == "H2SO4":
-            self.alkalinity_gran *= 2
+            alkalinity_gran *= 2
         if emf0_guess is None:
             st["emf0_gran"] = core.gran_guesses_emf0(
                 st.titrant_mass,
@@ -511,7 +507,7 @@ class Titration:
                 st.temperature,
                 self.analyte_mass,
                 self.titrant_molinity,
-                alkalinity_guess=self.alkalinity_gran,
+                alkalinity_guess=alkalinity_gran,
                 titrant=titrant,
                 HF=0,
                 HSO4=0,
@@ -520,7 +516,10 @@ class Titration:
         else:
             self.emf0_gran = emf0_guess
         st["pH_gran"] = convert.emf_to_pH(st.emf, self.emf0_gran, st.temperature)
-        self.alkalinity_gran *= 1e6
+        self.alkalinity_gran = alkalinity_gran * 1e6
+        self.titration["G_final"] = (self.titration.pH_gran >= self.pH_range[0]) & (
+            self.titration.pH_gran <= self.pH_range[1]
+        )
 
     def solve(
         self,
@@ -539,11 +538,9 @@ class Titration:
         if pH_range is not None:
             self.pH_range = pH_range
         else:
-            if self.pH_range is None:
+            if not hasattr(self, "pH_range"):
                 self.pH_range = default.pH_range
-        self.titration["G_final"] = (self.titration.pH_gran >= self.pH_range[0]) & (
-            self.titration.pH_gran <= self.pH_range[1]
-        )
+        self.gran_guesses()
         # Solve for total alkalinity and EMF0
         st = self.titration
         if titrant == "H2SO4":
@@ -647,25 +644,39 @@ class Titration:
             * self.titrant_molinity
             / (st.titrant_mass + self.analyte_mass)
         ) / st.dilution_factor
-        dic_loss = pyco2.sys(
-            par1=st.alkalinity_from_acid.to_numpy() * 1e6,
-            par2=st.pH.to_numpy(),
-            par1_type=1,
-            par2_type=3,
-            opt_pH_scale=3,
-            salinity=self.salinity,
-            temperature=st.temperature.to_numpy(),
-            **totals,
-            **k_constants,
-            uncertainty_from={"par1": 2, "par2": 0.01},
-            uncertainty_into=["dic"],
-        )
-        st["dic_loss"] = dic_loss["dic"]
-        st["dic_loss_u"] = dic_loss["u_dic"]
-        st["dic_loss_lo"] = st.dic_loss - st.dic_loss_u
-        st.dic_loss_lo.where(st.dic_loss_lo > 0, other=0, inplace=True)
-        st["dic_loss_hi"] = st.dic_loss + st.dic_loss_u
-        st["fCO2_loss"] = dic_loss["fCO2"]
+        if "dic" in self.prepare_kwargs:
+            if self.prepare_kwargs["dic"] > 0:
+                dic_loss = pyco2.sys(
+                    par1=st.alkalinity_from_acid.to_numpy() * 1e6,
+                    par2=st.pH.to_numpy(),
+                    par1_type=1,
+                    par2_type=3,
+                    opt_pH_scale=3,
+                    salinity=self.salinity,
+                    temperature=st.temperature.to_numpy(),
+                    **totals,
+                    **k_constants,
+                    uncertainty_from={"par1": 2, "par2": 0.01},
+                    uncertainty_into=["dic"],
+                )
+                st["dic_loss"] = dic_loss["dic"]
+                st["dic_loss_u"] = dic_loss["u_dic"]
+                st["dic_loss_lo"] = st.dic_loss - st.dic_loss_u
+                st.dic_loss_lo.where(st.dic_loss_lo > 0, other=0, inplace=True)
+                st["dic_loss_hi"] = st.dic_loss + st.dic_loss_u
+                st["fCO2_loss"] = dic_loss["fCO2"]
+            else:
+                st["dic_loss"] = 0.0
+                st["dic_loss_u"] = 0.0
+                st["dic_loss_lo"] = 0.0
+                st["dic_loss_hi"] = 0.0
+                st["fCO2_loss"] = 0.0
+        else:
+            st["dic_loss"] = 0.0
+            st["dic_loss_u"] = 0.0
+            st["dic_loss_lo"] = 0.0
+            st["dic_loss_hi"] = 0.0
+            st["fCO2_loss"] = 0.0
 
     def calkulate(
         self,
@@ -691,7 +702,6 @@ class Titration:
             emf0_guess=emf0_guess,
             least_squares_kwargs=least_squares_kwargs,
             pH_range=pH_range,
-            titrant_molinity=self.titrant_molinity,
             titrant=titrant,
         )
 
