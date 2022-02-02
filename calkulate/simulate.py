@@ -126,23 +126,23 @@ def alkalinity(pH, totals, k_constants, opt_pH_scale=default.opt_pH_scale):
     return np.sum([v * component_multipliers[k] for k, v in components.items()], axis=0)
 
 
-def _titration(
+def titration(
     alkalinity,
+    analyte_mass=0.2,
     dic=0,
     emf0=300,
-    file_path="",
-    file_name=None,
-    file_open_mode="x",
-    titrant_amount_fmt=".8f",
-    measurement_fmt=".12f",
-    temperature_fmt=".8f",
     salinity=35,
-    analyte_mass=0.2,
     temperature=25,
-    titrant_molinity=0.3,
     titrant_mass_start=0,
     titrant_mass_step=0.05e-3,
     titrant_mass_stop=2.51e-3,
+    titrant_molinity=0.3,
+    file_name=None,
+    file_open_mode="x",
+    file_path="",
+    measurement_fmt=".12f",
+    temperature_fmt=".8f",
+    titrant_amount_fmt=".8f",
     **pyco2sys_kwargs,
 ):
     """Simulate a titration and return arrays of values."""
@@ -150,12 +150,8 @@ def _titration(
     titrant_mass = np.arange(
         titrant_mass_start, titrant_mass_stop, titrant_mass_step
     )  # kg
-    if np.isscalar(dic):
-        dic = np.array([dic])
     if np.isscalar(temperature):
-        temperature = np.array([temperature])
-    if np.isscalar(salinity):
-        salinity = np.array([salinity])
+        temperature = np.full_like(titrant_mass, temperature)
     if "opt_gas_constant" not in pyco2sys_kwargs:
         pyco2sys_kwargs["opt_gas_constant"] = default.opt_gas_constant
     if "opt_k_bisulfate" not in pyco2sys_kwargs:
@@ -219,86 +215,83 @@ def _titration(
     return titrant_mass, emf, temperature, analyte_mass, totals, k_constants
 
 
-def titration(
-    alkalinity,
-    dic=0,
-    emf0=300,
-    file_path="",
-    file_name=None,
-    file_open_mode="x",
-    titrant_amount_fmt=".8f",
-    measurement_fmt=".12f",
-    temperature_fmt=".8f",
-    salinity=35,
-    analyte_mass=0.2,
-    temperature=25,
-    titrant_molinity=0.3,
-    titrant_mass_start=0,
-    titrant_mass_step=0.05e-3,
-    titrant_mass_stop=2.51e-3,
-    **pyco2sys_kwargs,
-):
-    """Simulate a titration and return a Titration object."""
-    if file_name is None:
-        file_name = "titration.dat"
-        file_open_mode = "w"
-    _titration(
-        alkalinity,
-        dic=dic,
-        emf0=emf0,
-        file_path=file_path,
-        file_name=file_name,
-        file_open_mode=file_open_mode,
-        titrant_amount_fmt=titrant_amount_fmt,
-        measurement_fmt=measurement_fmt,
-        temperature_fmt=temperature_fmt,
-        salinity=salinity,
-        analyte_mass=analyte_mass,
-        temperature=temperature,
-        titrant_molinity=titrant_molinity,
-        titrant_mass_start=titrant_mass_start,
-        titrant_mass_step=titrant_mass_step,
-        titrant_mass_stop=titrant_mass_stop,
-        **pyco2sys_kwargs,
-    )
-    titration_kwargs = [
-        "total_alpha",
-        "total_beta",
-        "total_ammonia",
-        "total_phosphate",
-        "total_silicate",
-        "total_sulfide",
-        "total_borate",
-        "total_fluoride",
-        "total_sulfate",
-        "k_alpha",
-        "k_ammonia",
-        "k_beta",
-        "k_bisulfate",
-        "k_borate",
-        "k_carbonic_1",
-        "k_carbonic_2",
-        "k_fluoride",
-        "k_phosphoric_1",
-        "k_phosphoric_2",
-        "k_phosphoric_3",
-        "k_silicate",
-        "k_sulfide",
-        "k_water",
-        "opt_k_bisulfate",
-        "opt_k_carbonic",
-        "opt_k_fluoride",
-        "opt_pH_scale",
-        "opt_total_borate",
-    ]
-    prepare_kwargs = {
-        k: pyco2sys_kwargs[k] for k in titration_kwargs if k in pyco2sys_kwargs
-    }
-    return Titration(
-        file_name=file_name,
-        file_path=file_path,
-        salinity=salinity,
-        analyte_mass=analyte_mass,
-        dic=dic,
-        **prepare_kwargs,
-    )
+# def titration(
+#     alkalinity,
+#     dic=0,
+#     emf0=300,
+#     file_path="",
+#     file_name=None,
+#     file_open_mode="x",
+#     titrant_amount_fmt=".8f",
+#     measurement_fmt=".12f",
+#     temperature_fmt=".8f",
+#     salinity=35,
+#     analyte_mass=0.2,
+#     temperature=25,
+#     titrant_molinity=0.3,
+#     titrant_mass_start=0,
+#     titrant_mass_step=0.05e-3,
+#     titrant_mass_stop=2.51e-3,
+#     **pyco2sys_kwargs,
+# ):
+#     """Simulate a titration and return a Titration object."""
+#     _titration(
+#         alkalinity,
+#         dic=dic,
+#         emf0=emf0,
+#         file_path=file_path,
+#         file_name=file_name,
+#         file_open_mode=file_open_mode,
+#         titrant_amount_fmt=titrant_amount_fmt,
+#         measurement_fmt=measurement_fmt,
+#         temperature_fmt=temperature_fmt,
+#         salinity=salinity,
+#         analyte_mass=analyte_mass,
+#         temperature=temperature,
+#         titrant_molinity=titrant_molinity,
+#         titrant_mass_start=titrant_mass_start,
+#         titrant_mass_step=titrant_mass_step,
+#         titrant_mass_stop=titrant_mass_stop,
+#         **pyco2sys_kwargs,
+#     )
+#     titration_kwargs = [
+#         "total_alpha",
+#         "total_beta",
+#         "total_ammonia",
+#         "total_phosphate",
+#         "total_silicate",
+#         "total_sulfide",
+#         "total_borate",
+#         "total_fluoride",
+#         "total_sulfate",
+#         "k_alpha",
+#         "k_ammonia",
+#         "k_beta",
+#         "k_bisulfate",
+#         "k_borate",
+#         "k_carbonic_1",
+#         "k_carbonic_2",
+#         "k_fluoride",
+#         "k_phosphoric_1",
+#         "k_phosphoric_2",
+#         "k_phosphoric_3",
+#         "k_silicate",
+#         "k_sulfide",
+#         "k_water",
+#         "opt_k_bisulfate",
+#         "opt_k_carbonic",
+#         "opt_k_fluoride",
+#         "opt_pH_scale",
+#         "opt_total_borate",
+#     ]
+#     prepare_kwargs = {
+#         k: pyco2sys_kwargs[k] for k in titration_kwargs if k in pyco2sys_kwargs
+#     }
+#     return Titration(
+#         file_name=file_name,
+#         file_path=file_path,
+#         salinity=salinity,
+#         analyte_mass=analyte_mass,
+#         dic=dic,
+#         **prepare_kwargs,
+#     )

@@ -86,7 +86,7 @@ calk.write_dat(
     analyte_mass__simfunc,
     totals__simfunc,
     k_constants__simfunc,
-) = calk.simulate._titration(
+) = calk.simulate.titration(
     alkalinity_core,
     dic=dic,
     emf0=emf0,

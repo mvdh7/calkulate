@@ -411,11 +411,15 @@ def to_Titration(ds, index):
                 prepare_kwargs[k] = v
         else:
             prepare_kwargs[k] = v
+    analyte_mass = prepare_kwargs.pop("analyte_mass")
+    analyte_volume = prepare_kwargs.pop("analyte_volume")
     tt = titration.Titration(
         file_name=dsr.file_name,
         file_path=dsr.file_path if "file_path" in dsr else "",
         salinity=dsr.salinity,
-        **prepare_kwargs,
+        analyte_mass=analyte_mass,
+        analyte_volume=analyte_volume,
+        file_prepare_kwargs=prepare_kwargs,
     )
     if "alkalinity_certified" in dsr:
         if not pd.isnull(dsr.alkalinity_certified):

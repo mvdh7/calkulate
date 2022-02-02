@@ -5,7 +5,7 @@
 import numpy as np, pandas as pd
 from scipy.stats import linregress
 import PyCO2SYS as pyco2
-from . import convert, core, default, density, interface, io, plot
+from . import convert, core, default, density, interface, io, plot, simulate
 
 
 def get_dat_data(
@@ -354,12 +354,14 @@ def solve(
 class Titration:
     def __init__(
         self,
-        file_name="",
+        file_name=None,
         file_path="",
         salinity=35,
         analyte_mass=None,
         analyte_volume=None,
-        **prepare_kwargs,
+        file_prepare_kwargs={},
+        simulate_alkalinity=None,
+        simulate_kwargs={},
     ):
         assert (
             analyte_mass is not None or analyte_volume is not None
@@ -368,21 +370,40 @@ class Titration:
         self.file_path = file_path
         self.salinity = salinity
         self.analyte_volume = analyte_volume
-        self.prepare_kwargs = prepare_kwargs.copy()
-        (
-            titrant_mass,
-            emf,
-            temperature,
-            self.analyte_mass,
-            totals,
-            k_constants,
-        ) = prepare(
-            self.file_path + self.file_name,
-            self.salinity,
-            analyte_mass=analyte_mass,
-            analyte_volume=self.analyte_volume,
-            **self.prepare_kwargs,
-        )
+        if file_name is not None:
+            self.file_prepare_kwargs = file_prepare_kwargs.copy()
+            (
+                titrant_mass,
+                emf,
+                temperature,
+                self.analyte_mass,
+                totals,
+                k_constants,
+            ) = prepare(
+                self.file_path + self.file_name,
+                self.salinity,
+                analyte_mass=analyte_mass,
+                analyte_volume=self.analyte_volume,
+                **self.file_prepare_kwargs,
+            )
+            if "dic" in file_prepare_kwargs:
+                self.dic = file_prepare_kwargs["dic"]
+            else:
+                self.dic = default.dic
+        else:
+            assert simulate_alkalinity is not None
+            (
+                titrant_mass,
+                emf,
+                temperature,
+                self.analyte_mass,
+                totals,
+                k_constants,
+            ) = simulate.titration(simulate_alkalinity, **simulate_kwargs)
+            if "dic" in simulate_kwargs:
+                self.dic = simulate_kwargs["dic"]
+            else:
+                self.dic = default.dic
         # Now do the processing that's independent of the data source
         self.titration = pd.DataFrame(
             {
@@ -493,12 +514,7 @@ class Titration:
             self.analyte_mass,
             self.titrant_molinity,
         )
-        titrant = (
-            self.prepare_kwargs["titrant"]
-            if "titrant" in self.prepare_kwargs
-            else default.titrant
-        )
-        if titrant == "H2SO4":
+        if self.titrant == "H2SO4":
             alkalinity_gran *= 2
         if emf0_guess is None:
             st["emf0_gran"] = core.gran_guesses_emf0(
@@ -508,7 +524,7 @@ class Titration:
                 self.analyte_mass,
                 self.titrant_molinity,
                 alkalinity_guess=alkalinity_gran,
-                titrant=titrant,
+                titrant=self.titrant,
                 HF=0,
                 HSO4=0,
             )
@@ -543,7 +559,7 @@ class Titration:
         self.gran_guesses()
         # Solve for total alkalinity and EMF0
         st = self.titration
-        if titrant == "H2SO4":
+        if self.titrant == "H2SO4":
             # Update sulfate dilution by titrant and its consequences
             assert self.analyte_total_sulfate is not None
             st["total_sulfate"] = (
@@ -644,33 +660,26 @@ class Titration:
             * self.titrant_molinity
             / (st.titrant_mass + self.analyte_mass)
         ) / st.dilution_factor
-        if "dic" in self.prepare_kwargs:
-            if self.prepare_kwargs["dic"] > 0:
-                dic_loss = pyco2.sys(
-                    par1=st.alkalinity_from_acid.to_numpy() * 1e6,
-                    par2=st.pH.to_numpy(),
-                    par1_type=1,
-                    par2_type=3,
-                    opt_pH_scale=3,
-                    salinity=self.salinity,
-                    temperature=st.temperature.to_numpy(),
-                    **totals,
-                    **k_constants,
-                    uncertainty_from={"par1": 2, "par2": 0.01},
-                    uncertainty_into=["dic"],
-                )
-                st["dic_loss"] = dic_loss["dic"]
-                st["dic_loss_u"] = dic_loss["u_dic"]
-                st["dic_loss_lo"] = st.dic_loss - st.dic_loss_u
-                st.dic_loss_lo.where(st.dic_loss_lo > 0, other=0, inplace=True)
-                st["dic_loss_hi"] = st.dic_loss + st.dic_loss_u
-                st["fCO2_loss"] = dic_loss["fCO2"]
-            else:
-                st["dic_loss"] = 0.0
-                st["dic_loss_u"] = 0.0
-                st["dic_loss_lo"] = 0.0
-                st["dic_loss_hi"] = 0.0
-                st["fCO2_loss"] = 0.0
+        if self.dic > 0:
+            dic_loss = pyco2.sys(
+                par1=st.alkalinity_from_acid.to_numpy() * 1e6,
+                par2=st.pH.to_numpy(),
+                par1_type=1,
+                par2_type=3,
+                opt_pH_scale=3,
+                salinity=self.salinity,
+                temperature=st.temperature.to_numpy(),
+                **totals,
+                **k_constants,
+                uncertainty_from={"par1": 2, "par2": 0.01},
+                uncertainty_into=["dic"],
+            )
+            st["dic_loss"] = dic_loss["dic"]
+            st["dic_loss_u"] = dic_loss["u_dic"]
+            st["dic_loss_lo"] = st.dic_loss - st.dic_loss_u
+            st.dic_loss_lo.where(st.dic_loss_lo > 0, other=0, inplace=True)
+            st["dic_loss_hi"] = st.dic_loss + st.dic_loss_u
+            st["fCO2_loss"] = dic_loss["fCO2"]
         else:
             st["dic_loss"] = 0.0
             st["dic_loss_u"] = 0.0
