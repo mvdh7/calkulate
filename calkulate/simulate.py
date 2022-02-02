@@ -145,7 +145,7 @@ def _titration(
     titrant_mass_stop=2.51e-3,
     **pyco2sys_kwargs,
 ):
-    """Simulate a titration and return (titrant_mass, emf, temperature)."""
+    """Simulate a titration and return arrays of values."""
     # Reformat inputs
     titrant_mass = np.arange(
         titrant_mass_start, titrant_mass_stop, titrant_mass_step
@@ -199,6 +199,11 @@ def _titration(
     )
     pH_titrations = co2sys_titrations["pH_free"]
     emf = convert.pH_to_emf(pH_titrations, emf0, kwargs_titration["temperature"])
+    totals = {
+        k: v * 1e-6 for k, v in co2sys_titrations.items() if k.startswith("total_")
+    }
+    totals["dic"] = co2sys_titrations["dic"] * 1e-6
+    k_constants = {k: v for k, v in co2sys_titrations.items() if k.startswith("k_")}
     if file_name is not None:
         io.write_dat(
             file_path + file_name,
@@ -211,7 +216,7 @@ def _titration(
             measurement_fmt=measurement_fmt,
             temperature_fmt=temperature_fmt,
         )
-    return titrant_mass, emf, temperature
+    return titrant_mass, emf, temperature, analyte_mass, totals, k_constants
 
 
 def titration(

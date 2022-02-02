@@ -78,13 +78,14 @@ calk.write_dat(
     measurement_fmt=".4f",
 )
 
-# Test simulate.titration function
+# Test simulate._titration function
 (
     titrant_mass__simfunc,
     emf__simfunc,
     temperature__simfunc,
-    # totals__simfunc,
-    # k_constants__simfunc,
+    analyte_mass__simfunc,
+    totals__simfunc,
+    k_constants__simfunc,
 ) = calk.simulate._titration(
     alkalinity_core,
     dic=dic,
