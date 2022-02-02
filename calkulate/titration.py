@@ -423,7 +423,9 @@ class Titration:
         titrant=default.titrant,
     ):
         self.alkalinity_certified = alkalinity_certified
+        self.analyte_total_sulfate = analyte_total_sulfate
         self.pH_range = pH_range
+        self.titrant = titrant
         # Solve for titrant_molinity
         solver_kwargs = {
             "pH_range": self.pH_range,
@@ -432,7 +434,7 @@ class Titration:
         }
         st = self.titration
         if titrant == "H2SO4":
-            assert analyte_total_sulfate is not None
+            assert self.analyte_total_sulfate is not None
             self.titrant_molinity = core.calibrate_H2SO4(
                 self.alkalinity_certified,
                 st.titrant_mass.to_numpy(),
@@ -466,7 +468,6 @@ class Titration:
             self.titration.pH_gran <= self.pH_range[1]
         )
         self.calibrated = True
-        self.solve()
 
     def set_titrant_molinity(self, titrant_molinity):
         self.titrant_molinity = titrant_molinity
@@ -521,35 +522,69 @@ class Titration:
         st["pH_gran"] = convert.emf_to_pH(st.emf, self.emf0_gran, st.temperature)
         self.alkalinity_gran *= 1e6
 
-    def solve(self, titrant_molinity=None, **solve_kwargs):
+    def solve(
+        self,
+        analyte_total_sulfate=None,
+        emf0_guess=None,
+        least_squares_kwargs=default.least_squares_kwargs,
+        pH_range=None,
+        titrant_molinity=None,
+        titrant=default.titrant,
+    ):
+        if analyte_total_sulfate is not None:
+            self.analyte_total_sulfate = analyte_total_sulfate
+        self.titrant = titrant
         if titrant_molinity is not None:
             self.set_titrant_molinity(titrant_molinity)
-        self.solve_kwargs = solve_kwargs.copy()
-        pH_range = (
-            self.solve_kwargs["pH_range"]
-            if "pH_range" in self.solve_kwargs
-            else default.pH_range
+        if pH_range is not None:
+            self.pH_range = pH_range
+        else:
+            if self.pH_range is None:
+                self.pH_range = default.pH_range
+        self.titration["G_final"] = (self.titration.pH_gran >= self.pH_range[0]) & (
+            self.titration.pH_gran <= self.pH_range[1]
         )
-        self.titration["G_final"] = (self.titration.pH_gran >= pH_range[0]) & (
-            self.titration.pH_gran <= pH_range[1]
-        )
-        (
-            self.alkalinity,
-            self.emf0,
-            self.pH_initial,
-            self.pH_initial_temperature,
-            self.analyte_mass,
-            self.opt_result,
-        ) = solve(
-            self.file_path + self.file_name,
-            self.salinity,
-            self.titrant_molinity,
-            **self.solve_kwargs,
-            **self.prepare_kwargs,
-        )
-        self.titration["pH"] = convert.emf_to_pH(
-            self.titration.emf, self.emf0, self.titration.temperature
-        )
+        # Solve for total alkalinity and EMF0
+        st = self.titration
+        if titrant == "H2SO4":
+            # Update sulfate dilution by titrant and its consequences
+            assert self.analyte_total_sulfate is not None
+            st["total_sulfate"] = (
+                1e-6 * self.analyte_total_sulfate * self.analyte_mass
+                + st.titrant_molinity * st.titrant_mass
+            ) / (self.analyte_mass + st.titrant_mass)
+            # Solve for alkalinity and EMF0
+            self.opt_result = core.solve_emf_complete_H2SO4(
+                self.titrant_molinity,
+                st.titrant_mass.to_numpy(),
+                st.emf.to_numpy(),
+                st.temperature.to_numpy(),
+                self.analyte_mass,
+                self.get_totals(),
+                self.get_k_constants(),
+                least_squares_kwargs=least_squares_kwargs,
+                pH_range=self.pH_range,
+                emf0_guess=emf0_guess,
+            )
+        else:
+            self.opt_result = core.solve_emf_complete(
+                self.titrant_molinity,
+                st.titrant_mass.to_numpy(),
+                st.emf.to_numpy(),
+                st.temperature.to_numpy(),
+                self.analyte_mass,
+                self.get_totals(),
+                self.get_k_constants(),
+                least_squares_kwargs=least_squares_kwargs,
+                pH_range=self.pH_range,
+                emf0_guess=emf0_guess,
+            )
+        self.alkalinity, self.emf0 = self.opt_result["x"]
+        self.alkalinity *= 1e6
+        # Calculate initial pH
+        st["pH"] = convert.emf_to_pH(st.emf, self.emf0, st.temperature)
+        self.pH_initial = st["pH"].iloc[0]
+        self.pH_initial_temperature = st["temperature"].iloc[0]
         self.get_alkalinity_from_acid()
         self.do_CO2SYS()
         self.solved = True
@@ -584,7 +619,7 @@ class Titration:
             par2_type=3,
             opt_pH_scale=3,
             salinity=self.salinity,
-            temperature=st.temperature,
+            temperature=st.temperature.to_numpy(),
             **totals,
             **k_constants,
         )
@@ -619,7 +654,7 @@ class Titration:
             par2_type=3,
             opt_pH_scale=3,
             salinity=self.salinity,
-            temperature=st.temperature,
+            temperature=st.temperature.to_numpy(),
             **totals,
             **k_constants,
             uncertainty_from={"par1": 2, "par2": 0.01},
@@ -632,9 +667,33 @@ class Titration:
         st["dic_loss_hi"] = st.dic_loss + st.dic_loss_u
         st["fCO2_loss"] = dic_loss["fCO2"]
 
-    def calkulate(self, alkalinity_certified, calibrate_kwargs={}, solve_kwargs={}):
-        self.calibrate(alkalinity_certified, **calibrate_kwargs)
-        self.solve(**solve_kwargs)
+    def calkulate(
+        self,
+        alkalinity_certified,
+        analyte_total_sulfate=None,
+        emf0_guess=None,
+        least_squares_kwargs=default.least_squares_kwargs,
+        pH_range=default.pH_range,
+        titrant_molinity_guess=None,
+        titrant=default.titrant,
+    ):
+        self.calibrate(
+            alkalinity_certified,
+            analyte_total_sulfate=analyte_total_sulfate,
+            emf0_guess=emf0_guess,
+            least_squares_kwargs=least_squares_kwargs,
+            pH_range=pH_range,
+            titrant_molinity_guess=titrant_molinity_guess,
+            titrant=titrant,
+        )
+        self.solve(
+            analyte_total_sulfate=analyte_total_sulfate,
+            emf0_guess=emf0_guess,
+            least_squares_kwargs=least_squares_kwargs,
+            pH_range=pH_range,
+            titrant_molinity=self.titrant_molinity,
+            titrant=titrant,
+        )
 
     def __str__(self):
         if self.file_name is not None:

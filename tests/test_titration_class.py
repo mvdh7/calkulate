@@ -15,7 +15,7 @@ tt = calk.Titration(
     file_path="tests/data/",
     **tt_kwargs,
 )
-tt.calibrate(tt_alkalinity)
+tt.calkulate(tt_alkalinity)
 
 # Simulate a similar titration
 st = calk.simulate.titration(
@@ -28,7 +28,7 @@ st = calk.simulate.titration(
     titrant_mass_stop=4.2e-3,
     titrant_mass_step=0.15e-3,
 )
-st.calibrate(tt_alkalinity)
+st.calkulate(tt_alkalinity)
 # st.plot_alkalinity()
 
 
