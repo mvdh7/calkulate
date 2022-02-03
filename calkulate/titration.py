@@ -672,7 +672,7 @@ class Titration:
                 **totals,
                 **k_constants,
                 uncertainty_from={"par1": 2, "par2": 0.01},
-                uncertainty_into=["dic"],
+                uncertainty_into=["dic", "fCO2"],
             )
             st["dic_loss"] = dic_loss["dic"]
             st["dic_loss_u"] = dic_loss["u_dic"]
@@ -680,12 +680,19 @@ class Titration:
             st.dic_loss_lo.where(st.dic_loss_lo > 0, other=0, inplace=True)
             st["dic_loss_hi"] = st.dic_loss + st.dic_loss_u
             st["fCO2_loss"] = dic_loss["fCO2"]
+            st["fCO2_loss_u"] = dic_loss["u_fCO2"]
+            st["fCO2_loss_lo"] = st.fCO2_loss - st.fCO2_loss_u
+            st.fCO2_loss_lo.where(st.fCO2_loss_lo > 0, other=0, inplace=True)
+            st["fCO2_loss_hi"] = st.fCO2_loss + st.fCO2_loss_u
         else:
             st["dic_loss"] = 0.0
             st["dic_loss_u"] = 0.0
             st["dic_loss_lo"] = 0.0
             st["dic_loss_hi"] = 0.0
             st["fCO2_loss"] = 0.0
+            st["fCO2_loss_u"] = 0.0
+            st["fCO2_loss_lo"] = 0.0
+            st["fCO2_loss_hi"] = 0.0
 
     def calkulate(
         self,

@@ -90,69 +90,212 @@ def test_plots():
 #%%
 from matplotlib import pyplot as plt
 import numpy as np
-from scipy import interpolate
+from scipy import interpolate, optimize
 
-ttt = tt.titration
-fCO2_air = 450
-ttt["delta_fCO2_loss"] = ttt.fCO2_loss - fCO2_air
 
-# Titrant mass as proxy for titration time
-dx = 1e-6
-ix = np.arange(0, 0.0018, dx)
-idic_raw = interpolate.pchip_interpolate(
-    ttt.titrant_mass.values, ttt.dic_loss.values, ix
-)
-# Interpolated delta-fCO2
-iy = interpolate.pchip_interpolate(
-    ttt.titrant_mass.values, ttt.delta_fCO2_loss.values, ix
-)
+def dic_loss_model_fitted(
+    k_dic_loss, i_titrant_mass, i_delta_fCO2, dic_start, analyte_mass, step_tm
+):
+    """Calculate DIC loss for the fitted section of the titration."""
+    i_dic = np.full_like(i_delta_fCO2, np.nan)
+    i_dic[0] = dic_start * 1e6
+    for i in range(len(i_dic) - 1):
+        dilute = calk.convert.get_dilution_factor(
+            step_tm, analyte_mass + i_titrant_mass[i]
+        )
+        i_dic[i + 1] = i_dic[i] * dilute - k_dic_loss * i_delta_fCO2[i] * step_tm
+    return i_dic
 
-# Model loss of DIC
-k_loss = 2.1
-idic = np.full_like(iy, np.nan)
-idic[0] = ttt.dic_loss.iloc[0]
-idic[0] = ttt.dic.iloc[0] * 1e6
-for i in range(1, len(idic)):
-    idilute = calk.convert.get_dilution_factor(dx, tt.analyte_mass + ix[i - 1])
-    idic[i] = idic[i - 1] * idilute - k_loss * iy[i - 1] * dx
 
-# Forecast future DIC loss
-def get_delta_fCO2_from_dic_pH(dic, pH, k0, k1, k2):
+def _lsqfun_dic_loss_model(
+    k_dic_loss,
+    i_titrant_mass,
+    i_delta_fCO2,
+    dic_start,
+    analyte_mass,
+    step_tm,
+    i_dic_loss,
+):
+    return (
+        dic_loss_model_fitted(
+            k_dic_loss, i_titrant_mass, i_delta_fCO2, dic_start, analyte_mass, step_tm
+        )
+        - i_dic_loss
+    )
+
+
+def get_fCO2_from_dic_pH(dic, pH, k0, k1, k2):
+    """Calculate fCO2 from DIC and pH."""
     h = 10 ** -pH
     CO2aq = dic / (1 + k1 / h + k1 * k2 / h ** 2)
     fCO2 = CO2aq / k0
-    return fCO2 - fCO2_air
+    return fCO2
 
 
-fx = np.arange(0.0018, 0.0043, dx)
-fdic = np.full_like(fx, np.nan)
-fdic[0] = idic[-1]
-
-fpH = interpolate.pchip_interpolate(ttt.titrant_mass.values, ttt.pH.values, fx)
-fk0 = interpolate.pchip_interpolate(ttt.titrant_mass.values, ttt.k_CO2.values, fx)
-fk1 = interpolate.pchip_interpolate(
-    ttt.titrant_mass.values, ttt.k_carbonic_1.values, fx
-)
-fk2 = interpolate.pchip_interpolate(
-    ttt.titrant_mass.values, ttt.k_carbonic_2.values, fx
-)
-
-fy = get_delta_fCO2_from_dic_pH(fdic, fpH, fk0, fk1, fk2)
-
-
-for i in range(len(fdic) - 1):
-    idilute = calk.convert.get_dilution_factor(dx, tt.analyte_mass + fx[i - 1])
-    fdic[i + 1] = fdic[i] * idilute - k_loss * fy[i] * dx
-    fy[i + 1] = get_delta_fCO2_from_dic_pH(
-        fdic[i + 1], fpH[i + 1], fk0[i + 1], fk1[i + 1], fk2[i + 1]
+def dic_loss_model_future(
+    k_dic_loss,
+    f_titrant_mass,
+    f_pH,
+    f_k0,
+    f_k1,
+    f_k2,
+    delta_fCO2_start,
+    dic_start,
+    pH_start,
+    k0_start,
+    k1_start,
+    k2_start,
+    analyte_mass,
+    step_tm,
+):
+    """Forecast future DIC loss, starting from the end of the fitted section."""
+    # Prepare empty arrays for model
+    f_delta_fCO2 = np.full_like(f_titrant_mass, np.nan)
+    f_dic = np.full_like(f_titrant_mass, np.nan)
+    # Get first values in the forecast arrays
+    dilute = calk.convert.get_dilution_factor(
+        step_tm, analyte_mass + f_titrant_mass[0] - step_tm
     )
+    f_dic[0] = dic_start * dilute - k_dic_loss * delta_fCO2_start * step_tm
+    f_delta_fCO2[0] = (
+        get_fCO2_from_dic_pH(f_dic[0], pH_start, k0_start, k1_start, k2_start)
+        - fCO2_air
+    )
+    # Forecast future DIC loss
+    for i in range(len(f_dic) - 1):
+        dilute = calk.convert.get_dilution_factor(
+            step_tm, analyte_mass + f_titrant_mass[i]
+        )
+        f_dic[i + 1] = f_dic[i] * dilute - k_dic_loss * f_delta_fCO2[i] * step_tm
+        f_delta_fCO2[i + 1] = (
+            get_fCO2_from_dic_pH(
+                f_dic[i + 1], f_pH[i + 1], f_k0[i + 1], f_k1[i + 1], f_k2[i + 1]
+            )
+            - fCO2_air
+        )
+    return f_dic, f_delta_fCO2
 
-# Draw figure
+
+def get_dic_loss_hires(tt, fCO2_air=450, split_pH=5.5):
+    """Fit and forecast high-resolution DIC loss model."""
+    # Relabel for convenience
+    ttt = tt.titration
+    analyte_mass = tt.analyte_mass
+    titrant_mass = ttt.titrant_mass.to_numpy()
+    dic_loss = ttt.dic_loss.to_numpy()
+    pH = ttt.pH.to_numpy()
+    dic_start = ttt.dic.iloc[0]
+    fCO2_loss = ttt.fCO2_loss.to_numpy()
+    k_CO2 = ttt.k_CO2.to_numpy()
+    k_carbonic_1 = ttt.k_carbonic_1.to_numpy()
+    k_carbonic_2 = ttt.k_carbonic_2.to_numpy()
+    # Get delta-fCO2
+    delta_fCO2_loss = fCO2_loss - fCO2_air
+    # Use titrant_mass as proxy for titration time: generate high-resolution arrays
+    step_tm = 1e-6
+    a_titrant_mass = np.arange(0, np.max(titrant_mass), step_tm)
+    a_pH = interpolate.pchip_interpolate(titrant_mass, pH, a_titrant_mass)
+    i_titrant_mass = a_titrant_mass[a_pH >= split_pH]
+    f_titrant_mass = a_titrant_mass[a_pH < split_pH]
+    # Interpolate other properties to the high-resolution titrant_mass
+    i_dic_loss = interpolate.pchip_interpolate(titrant_mass, dic_loss, i_titrant_mass)
+    i_delta_fCO2 = interpolate.pchip_interpolate(
+        titrant_mass, delta_fCO2_loss, i_titrant_mass
+    )
+    f_pH = interpolate.pchip_interpolate(titrant_mass, pH, f_titrant_mass)
+    f_k0 = interpolate.pchip_interpolate(titrant_mass, k_CO2, f_titrant_mass)
+    f_k1 = interpolate.pchip_interpolate(titrant_mass, k_carbonic_1, f_titrant_mass)
+    f_k2 = interpolate.pchip_interpolate(titrant_mass, k_carbonic_2, f_titrant_mass)
+    # Get mid-way start-points for forecasting
+    pH_start = interpolate.pchip_interpolate(titrant_mass, pH, i_titrant_mass[-1])
+    k0_start = interpolate.pchip_interpolate(titrant_mass, k_CO2, i_titrant_mass[-1])
+    k1_start = interpolate.pchip_interpolate(
+        titrant_mass, k_carbonic_1, i_titrant_mass[-1]
+    )
+    k2_start = interpolate.pchip_interpolate(
+        titrant_mass, k_carbonic_2, i_titrant_mass[-1]
+    )
+    # Find best-fit k_dic_loss
+    k_dic_loss_opt_result = optimize.least_squares(
+        _lsqfun_dic_loss_model,
+        1.0,
+        args=(
+            i_titrant_mass,
+            i_delta_fCO2,
+            dic_start,
+            analyte_mass,
+            step_tm,
+            i_dic_loss,
+        ),
+    )
+    k_dic_loss = k_dic_loss_opt_result["x"]
+    # Calculate DIC from k_dic_loss in the fitted region
+    i_dic = dic_loss_model_fitted(
+        k_dic_loss, i_titrant_mass, i_delta_fCO2, dic_start, analyte_mass, step_tm
+    )
+    # Forecast future DIC loss
+    f_dic, f_delta_fCO2 = dic_loss_model_future(
+        k_dic_loss,
+        f_titrant_mass,
+        f_pH,
+        f_k0,
+        f_k1,
+        f_k2,
+        i_delta_fCO2[-1],
+        i_dic[-1],
+        pH_start,
+        k0_start,
+        k1_start,
+        k2_start,
+        analyte_mass,
+        step_tm,
+    )
+    return k_dic_loss[0], {
+        "titrant_mass": a_titrant_mass,
+        "pH": a_pH,
+        "dic": np.concatenate((i_dic, f_dic)),
+        "delta_fCO2": np.concatenate((i_delta_fCO2, f_delta_fCO2)),
+    }
+
+
+def get_dic_loss(tt, fCO2_air=450, split_pH=5.5):
+    """Get final DIC loss values at the titration points to go in the titration df."""
+    tt.k_dic_loss, loss_hires = get_dic_loss_hires(
+        tt, fCO2_air=fCO2_air, split_pH=split_pH
+    )
+    tt.titration["dic_loss_modelled"] = interpolate.pchip_interpolate(
+        loss_hires["titrant_mass"],
+        loss_hires["dic"],
+        tt.titration.titrant_mass.to_numpy(),
+    )
+    tt.titration["fCO2_loss_modelled"] = (
+        interpolate.pchip_interpolate(
+            loss_hires["titrant_mass"],
+            loss_hires["delta_fCO2"],
+            tt.titration.titrant_mass.to_numpy(),
+        )
+        + fCO2_air
+    )
+    tt.titration["loss_fitted"] = tt.titration.pH >= split_pH
+
+
+# Main function inputs
+fCO2_air = 450
+split_pH = 5.5  # fit DIC-loss model only above this pH, forecast at lower pH
+k_dic_loss, loss_hires = get_dic_loss_hires(tt, fCO2_air=fCO2_air, split_pH=split_pH)
+get_dic_loss(tt, fCO2_air=fCO2_air, split_pH=split_pH)
+
+#%% Draw figure
+loss_hires = pd.DataFrame(loss_hires)
+ttt = tt.titration
 fig, axs = plt.subplots(dpi=300, nrows=2, figsize=(6, 5))
+
 
 ax = axs[0]
 ax.plot(ttt.titrant_mass, ttt.dic * 1e6, c="k", label="Dilution only")
-ax.plot("titrant_mass", "dic_loss", data=ttt, label="Calc. from pH")
+ax.scatter(
+    "titrant_mass", "dic_loss", data=ttt, s=20, label="Calc. from pH", c="xkcd:slate"
+)
 ax.fill_between(
     "titrant_mass",
     "dic_loss_lo",
@@ -161,20 +304,62 @@ ax.fill_between(
     alpha=0.3,
     label="Calc. uncertainty",
     zorder=-1,
+    color="xkcd:slate",
+    edgecolor="none",
 )
-ax.scatter(0, tt.titration.dic.iloc[0] * 1e6)
-ax.plot(ix, idic, label="Model, 'fitted'")
-ax.plot(fx, fdic, label="Model, projected")
-# ax.set_ylim([800, 2500])
-# ax.set_ylim([1850, 2050])
+# ax.scatter(0, tt.dic)
+ax.plot(
+    "titrant_mass",
+    "dic",
+    data=loss_hires[loss_hires.pH >= split_pH],
+    label="Model, 'fitted'",
+    c="xkcd:teal blue",
+)
+ax.plot(
+    "titrant_mass",
+    "dic",
+    data=loss_hires[loss_hires.pH < split_pH],
+    label="Model, projected",
+    c="xkcd:brownish orange",
+)
 ax.set_ylabel("DIC / $\mu$mol/kg")
 ax.legend(fontsize=7)
 ax.set_ylim([1450, 2050])
+ax.set_title("$k$(DIC loss) = {:.2f}".format(tt.k_dic_loss))
 
 ax = axs[1]
-ax.plot("titrant_mass", "delta_fCO2_loss", data=ttt, label="Calc. from pH")
-ax.plot(ix, iy, label="Model, 'fitted'")
-ax.plot(fx, fy, label="Model, projected")
+ax.scatter(
+    ttt.titrant_mass,
+    ttt.fCO2_loss - fCO2_air,
+    label="Calc. from pH",
+    s=20,
+    color="xkcd:slate",
+)
+ax.fill_between(
+    "titrant_mass",
+    "fCO2_loss_lo",
+    y2="fCO2_loss_hi",
+    data=ttt,
+    alpha=0.3,
+    label="Calc. uncertainty",
+    zorder=-1,
+    color="xkcd:slate",
+    edgecolor="none",
+)
+ax.plot(
+    "titrant_mass",
+    "delta_fCO2",
+    data=loss_hires[loss_hires.pH >= split_pH],
+    label="Model, 'fitted'",
+    c="xkcd:teal blue",
+)
+ax.plot(
+    "titrant_mass",
+    "delta_fCO2",
+    data=loss_hires[loss_hires.pH < split_pH],
+    label="Model, projected",
+    c="xkcd:brownish orange",
+)
 ax.set_ylabel("$\Delta f$CO$_2$ / $\mu$atm")
 ax.set_ylim([0, 100000])
 ax.legend(fontsize=7)
@@ -183,3 +368,8 @@ for ax in axs:
     ax.set_xlabel("Titrant mass / kg")
 plt.tight_layout()
 plt.savefig("tests/figures/test_dic_loss.png")
+
+#%%
+# fig, ax = plt.subplots(dpi=300)
+# ttt.plot.scatter('pH', 'dic_loss', ax=ax)
+# ax.set_ylim([1800, 2200])
