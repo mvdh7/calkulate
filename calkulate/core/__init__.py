@@ -6,7 +6,8 @@ import copy
 import numpy as np
 from scipy.stats import linregress
 from scipy.optimize import least_squares
-from . import constants, convert, default, interface, simulate
+from .. import constants, convert, default, interface, simulate
+from . import loss
 
 
 def gran_estimator(mixture_mass, emf, temperature):
