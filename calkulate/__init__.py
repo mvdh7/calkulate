@@ -24,6 +24,7 @@ from . import (
     density,
     interface,
     io,
+    loss,
     meta,
     plot,
     simulate,
