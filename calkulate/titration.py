@@ -1,11 +1,11 @@
 # Calkulate: seawater total alkalinity from titration data
-# Copyright (C) 2019--2021  Matthew P. Humphreys  (GNU GPLv3)
+# Copyright (C) 2019--2022  Matthew P. Humphreys  (GNU GPLv3)
 """Work with titration data in a file."""
 
 import numpy as np, pandas as pd
 from scipy.stats import linregress
 import PyCO2SYS as pyco2
-from . import convert, core, default, density, interface, io, plot
+from . import convert, core, default, density, interface, io, plot, simulate
 
 
 def get_dat_data(
@@ -354,36 +354,57 @@ def solve(
 class Titration:
     def __init__(
         self,
-        file_name="",
+        file_name=None,
         file_path="",
         salinity=35,
         analyte_mass=None,
         analyte_volume=None,
-        **prepare_kwargs,
+        file_prepare_kwargs={},
+        simulate_alkalinity=None,
+        simulate_kwargs={},
     ):
-        assert analyte_mass is not None or analyte_volume is not None
+        assert (
+            analyte_mass is not None or analyte_volume is not None
+        ), "You must provide either analyte_mass [kg] or analyte_volume [ml]!"
         self.file_name = file_name
         self.file_path = file_path
         self.salinity = salinity
-        self.prepare_kwargs = prepare_kwargs.copy()
-        self.prepare_kwargs["analyte_volume"] = analyte_volume
-        self.prepare_kwargs["analyte_mass"] = analyte_mass
-        if analyte_volume is not None:
-            self.analyte_volume = analyte_volume
-        (
-            titrant_mass,
-            emf,
-            temperature,
-            self.analyte_mass,
-            totals,
-            k_constants,
-        ) = prepare(
-            file_path + file_name,
-            salinity,
-            analyte_mass=analyte_mass,
-            analyte_volume=analyte_volume,
-            **prepare_kwargs,
-        )
+        self.analyte_volume = analyte_volume
+        if file_name is not None:
+            self.file_prepare_kwargs = file_prepare_kwargs.copy()
+            (
+                titrant_mass,
+                emf,
+                temperature,
+                self.analyte_mass,
+                totals,
+                k_constants,
+            ) = prepare(
+                self.file_path + self.file_name,
+                self.salinity,
+                analyte_mass=analyte_mass,
+                analyte_volume=self.analyte_volume,
+                **self.file_prepare_kwargs,
+            )
+            if "dic" in file_prepare_kwargs:
+                self.dic = file_prepare_kwargs["dic"]
+            else:
+                self.dic = default.dic
+        else:
+            assert simulate_alkalinity is not None
+            (
+                titrant_mass,
+                emf,
+                temperature,
+                self.analyte_mass,
+                totals,
+                k_constants,
+            ) = simulate._titration(simulate_alkalinity, **simulate_kwargs)
+            if "dic" in simulate_kwargs:
+                self.dic = simulate_kwargs["dic"]
+            else:
+                self.dic = default.dic
+        # Now do the processing that's independent of the data source
         self.titration = pd.DataFrame(
             {
                 "titrant_mass": titrant_mass,
@@ -394,38 +415,80 @@ class Titration:
         self.titration["dilution_factor"] = convert.get_dilution_factor(
             titrant_mass, self.analyte_mass
         )
+        # Put totals and k_constants into the titration df and get lists of their names
+        self._totals = []
+        self._k_constants = []
         for k, v in totals.items():
             self.titration[k] = v
+            self._totals.append(k)
         for k, v in k_constants.items():
             self.titration[k] = v
+            self._k_constants.append(k)
         self.calibrated = False
         self.solved = False
 
-    def calibrate(self, alkalinity_certified, **calibrate_kwargs):
+    def get_totals(self):
+        return {k: self.titration[k].to_numpy() for k in self._totals}
+
+    def get_k_constants(self):
+        return {k: self.titration[k].to_numpy() for k in self._k_constants}
+
+    def calibrate(
+        self,
+        alkalinity_certified,
+        analyte_total_sulfate=None,
+        emf0_guess=None,
+        least_squares_kwargs=default.least_squares_kwargs,
+        pH_range=default.pH_range,
+        titrant_molinity_guess=None,
+        titrant=default.titrant,
+    ):
         self.alkalinity_certified = alkalinity_certified
-        self.calibrate_kwargs = calibrate_kwargs.copy()
-        self.titrant_molinity = calibrate(
-            self.file_path + self.file_name,
-            self.salinity,
-            alkalinity_certified,
-            **self.calibrate_kwargs,
-            **self.prepare_kwargs,
-        )[0]
+        self.analyte_total_sulfate = analyte_total_sulfate
+        self.pH_range = pH_range
+        self.titrant = titrant
+        # Solve for titrant_molinity
+        self.solver_kwargs = {
+            "pH_range": self.pH_range,
+            "least_squares_kwargs": least_squares_kwargs,
+            "emf0_guess": emf0_guess,
+        }
+        st = self.titration
+        if titrant == "H2SO4":
+            assert self.analyte_total_sulfate is not None
+            self.titrant_molinity = core.calibrate_H2SO4(
+                self.alkalinity_certified,
+                st.titrant_mass.to_numpy(),
+                st.emf.to_numpy(),
+                st.temperature.to_numpy(),
+                self.analyte_mass,
+                self.analyte_total_sulfate * 1e-6,
+                self.salinity,
+                self.get_totals(),
+                self.get_k_constants(),
+                titrant_molinity_guess=titrant_molinity_guess,
+                least_squares_kwargs=least_squares_kwargs,
+                solver_kwargs=self.solver_kwargs,
+            )["x"][0]
+        else:
+            self.titrant_molinity = core.calibrate(
+                self.alkalinity_certified,
+                st.titrant_mass.to_numpy(),
+                st.emf.to_numpy(),
+                st.temperature.to_numpy(),
+                self.analyte_mass,
+                self.get_totals(),
+                self.get_k_constants(),
+                titrant_molinity_guess=titrant_molinity_guess,
+                least_squares_kwargs=least_squares_kwargs,
+                solver_kwargs=self.solver_kwargs,
+            )["x"][0]
+        # Get Gran-plot guesses with solved titrant molinity
         self.gran_guesses()
-        pH_range = (
-            self.calibrate_kwargs["pH_range"]
-            if "pH_range" in self.calibrate_kwargs
-            else default.pH_range
-        )
-        self.titration["G_final"] = (self.titration.pH_gran >= pH_range[0]) & (
-            self.titration.pH_gran <= pH_range[1]
-        )
         self.calibrated = True
-        self.solve()
 
     def set_titrant_molinity(self, titrant_molinity):
         self.titrant_molinity = titrant_molinity
-        self.gran_guesses()
         self.calibrated = False
 
     @np.errstate(invalid="ignore")
@@ -442,7 +505,7 @@ class Titration:
         )
         # Make first guesses
         (
-            self.alkalinity_gran,
+            alkalinity_gran,
             self.gran_slope,
             self.gran_intercept,
         ) = core.gran_guess_alkalinity(
@@ -451,13 +514,8 @@ class Titration:
             self.analyte_mass,
             self.titrant_molinity,
         )
-        titrant = (
-            self.prepare_kwargs["titrant"]
-            if "titrant" in self.prepare_kwargs
-            else default.titrant
-        )
-        if titrant == "H2SO4":
-            self.alkalinity_gran *= 2
+        if self.titrant == "H2SO4":
+            alkalinity_gran *= 2
         if emf0_guess is None:
             st["emf0_gran"] = core.gran_guesses_emf0(
                 st.titrant_mass,
@@ -465,8 +523,8 @@ class Titration:
                 st.temperature,
                 self.analyte_mass,
                 self.titrant_molinity,
-                alkalinity_guess=self.alkalinity_gran,
-                titrant=titrant,
+                alkalinity_guess=alkalinity_gran,
+                titrant=self.titrant,
                 HF=0,
                 HSO4=0,
             )
@@ -474,39 +532,81 @@ class Titration:
         else:
             self.emf0_gran = emf0_guess
         st["pH_gran"] = convert.emf_to_pH(st.emf, self.emf0_gran, st.temperature)
-        self.alkalinity_gran *= 1e6
+        self.alkalinity_gran = alkalinity_gran * 1e6
+        self.titration["G_final"] = (self.titration.pH_gran >= self.pH_range[0]) & (
+            self.titration.pH_gran <= self.pH_range[1]
+        )
 
-    def solve(self, titrant_molinity=None, **solve_kwargs):
+    def solve(
+        self,
+        analyte_total_sulfate=None,
+        emf0_guess=None,
+        least_squares_kwargs=default.least_squares_kwargs,
+        pH_range=None,
+        titrant_molinity=None,
+        titrant=default.titrant,
+    ):
+        if analyte_total_sulfate is not None:
+            self.analyte_total_sulfate = analyte_total_sulfate
+        self.titrant = titrant
         if titrant_molinity is not None:
             self.set_titrant_molinity(titrant_molinity)
-        self.solve_kwargs = solve_kwargs.copy()
-        pH_range = (
-            self.solve_kwargs["pH_range"]
-            if "pH_range" in self.solve_kwargs
-            else default.pH_range
-        )
-        self.titration["G_final"] = (self.titration.pH_gran >= pH_range[0]) & (
-            self.titration.pH_gran <= pH_range[1]
-        )
-        (
-            self.alkalinity,
-            self.emf0,
-            self.pH_initial,
-            self.pH_initial_temperature,
-            self.analyte_mass,
-            self.opt_result,
-        ) = solve(
-            self.file_path + self.file_name,
-            self.salinity,
-            self.titrant_molinity,
-            **self.solve_kwargs,
-            **self.prepare_kwargs,
-        )
-        self.titration["pH"] = convert.emf_to_pH(
-            self.titration.emf, self.emf0, self.titration.temperature
-        )
+        if pH_range is not None:
+            self.pH_range = pH_range
+        else:
+            if not hasattr(self, "pH_range"):
+                self.pH_range = default.pH_range
+        self.gran_guesses()
+        # Solve for total alkalinity and EMF0
+        st = self.titration
+        if self.titrant == "H2SO4":
+            # Update sulfate dilution by titrant and its consequences
+            assert self.analyte_total_sulfate is not None
+            st["total_sulfate"] = (
+                1e-6 * self.analyte_total_sulfate * self.analyte_mass
+                + st.titrant_molinity * st.titrant_mass
+            ) / (self.analyte_mass + st.titrant_mass)
+            # Solve for alkalinity and EMF0
+            self.opt_result = core.solve_emf_complete_H2SO4(
+                self.titrant_molinity,
+                st.titrant_mass.to_numpy(),
+                st.emf.to_numpy(),
+                st.temperature.to_numpy(),
+                self.analyte_mass,
+                self.get_totals(),
+                self.get_k_constants(),
+                least_squares_kwargs=least_squares_kwargs,
+                pH_range=self.pH_range,
+                emf0_guess=emf0_guess,
+            )
+        else:
+            self.opt_result = core.solve_emf_complete(
+                self.titrant_molinity,
+                st.titrant_mass.to_numpy(),
+                st.emf.to_numpy(),
+                st.temperature.to_numpy(),
+                self.analyte_mass,
+                self.get_totals(),
+                self.get_k_constants(),
+                least_squares_kwargs=least_squares_kwargs,
+                pH_range=self.pH_range,
+                emf0_guess=emf0_guess,
+            )
+        self.alkalinity, self.emf0 = self.opt_result["x"]
+        self.alkalinity *= 1e6
+        # Calculate initial pH
+        st["pH"] = convert.emf_to_pH(st.emf, self.emf0, st.temperature)
+        self.pH_initial = st["pH"].iloc[0]
+        self.pH_initial_temperature = st["temperature"].iloc[0]
+        self.get_alkalinity_from_acid()
         self.do_CO2SYS()
         self.solved = True
+
+    def get_alkalinity_from_acid(self):
+        self.titration["alkalinity_from_acid"] = (
+            1e-6 * self.alkalinity * self.analyte_mass
+            - self.titration.titrant_mass * self.titrant_molinity
+        ) / (self.analyte_mass + self.titration.titrant_mass)
 
     def do_CO2SYS(self):
         st = self.titration
@@ -532,12 +632,13 @@ class Titration:
             par2_type=3,
             opt_pH_scale=3,
             salinity=self.salinity,
-            temperature=st.temperature,
+            temperature=st.temperature.to_numpy(),
             **totals,
             **k_constants,
         )
+        st["alkalinity_from_pH"] = results["alkalinity"] * 1e-6
+        st["k_CO2"] = results["k_CO2"]
         for co2sysvar in [
-            "alkalinity",
             "HCO3",
             "CO3",
             "BOH4",
@@ -554,20 +655,145 @@ class Titration:
         st["alk_alpha"] = results["alkalinity_alpha"] * 1e-6
         st["alk_beta"] = results["alkalinity_beta"] * 1e-6
         st["alkalinity_estimate"] = (
-            st.alkalinity
+            st.alkalinity_from_pH
             + st.titrant_mass
             * self.titrant_molinity
             / (st.titrant_mass + self.analyte_mass)
         ) / st.dilution_factor
+        if self.dic > 0:
+            dic_loss = pyco2.sys(
+                par1=st.alkalinity_from_acid.to_numpy() * 1e6,
+                par2=st.pH.to_numpy(),
+                par1_type=1,
+                par2_type=3,
+                opt_pH_scale=3,
+                salinity=self.salinity,
+                temperature=st.temperature.to_numpy(),
+                **totals,
+                **k_constants,
+                uncertainty_from={"par1": 2, "par2": 0.01},
+                uncertainty_into=["dic", "fCO2"],
+            )
+            st["dic_loss"] = dic_loss["dic"]
+            st["dic_loss_u"] = dic_loss["u_dic"]
+            st["dic_loss_lo"] = st.dic_loss - st.dic_loss_u
+            st.dic_loss_lo.where(st.dic_loss_lo > 0, other=0, inplace=True)
+            st["dic_loss_hi"] = st.dic_loss + st.dic_loss_u
+            st["fCO2_loss"] = dic_loss["fCO2"]
+            st["fCO2_loss_u"] = dic_loss["u_fCO2"]
+            st["fCO2_loss_lo"] = st.fCO2_loss - st.fCO2_loss_u
+            st.fCO2_loss_lo.where(st.fCO2_loss_lo > 0, other=0, inplace=True)
+            st["fCO2_loss_hi"] = st.fCO2_loss + st.fCO2_loss_u
+        else:
+            st["dic_loss"] = 0.0
+            st["dic_loss_u"] = 0.0
+            st["dic_loss_lo"] = 0.0
+            st["dic_loss_hi"] = 0.0
+            st["fCO2_loss"] = 0.0
+            st["fCO2_loss_u"] = 0.0
+            st["fCO2_loss_lo"] = 0.0
+            st["fCO2_loss_hi"] = 0.0
 
-    def calkulate(self, alkalinity_certified, calibrate_kwargs={}, solve_kwargs={}):
-        self.calibrate(alkalinity_certified, **calibrate_kwargs)
-        self.solve(**solve_kwargs)
+    def calkulate(
+        self,
+        alkalinity_certified,
+        analyte_total_sulfate=None,
+        emf0_guess=None,
+        least_squares_kwargs=default.least_squares_kwargs,
+        pH_range=default.pH_range,
+        titrant_molinity_guess=None,
+        titrant=default.titrant,
+    ):
+        self.calibrate(
+            alkalinity_certified,
+            analyte_total_sulfate=analyte_total_sulfate,
+            emf0_guess=emf0_guess,
+            least_squares_kwargs=least_squares_kwargs,
+            pH_range=pH_range,
+            titrant_molinity_guess=titrant_molinity_guess,
+            titrant=titrant,
+        )
+        self.solve(
+            analyte_total_sulfate=analyte_total_sulfate,
+            emf0_guess=emf0_guess,
+            least_squares_kwargs=least_squares_kwargs,
+            pH_range=pH_range,
+            titrant=titrant,
+        )
 
-    # Plotting functions
+    def _get_dic_loss_hires(self):
+        """Fit and forecast high-resolution DIC loss model."""
+        if not hasattr(self, "fCO2_air"):
+            self.fCO2_air = default.fCO2_air
+        if not hasattr(self, "split_pH"):
+            self.split_pH = default.split_pH
+        k_dic_loss, loss_hires = core.loss.get_dic_loss_hires(
+            self.titration.titrant_mass.to_numpy(),
+            self.titration.pH.to_numpy(),
+            self.titration.dic_loss.to_numpy(),
+            self.titration.fCO2_loss.to_numpy(),
+            self.titration.k_CO2.to_numpy(),
+            self.titration.k_carbonic_1.to_numpy(),
+            self.titration.k_carbonic_2.to_numpy(),
+            self.analyte_mass,
+            self.titration.dic.iloc[0],
+            fCO2_air=self.fCO2_air,
+            split_pH=self.split_pH,
+        )
+        return k_dic_loss, pd.DataFrame(loss_hires)
+
+    def get_dic_loss(self, fCO2_air=default.fCO2_air, split_pH=default.split_pH):
+        """Get final DIC loss values at the titration points to go in the titration df."""
+        self.fCO2_air = fCO2_air
+        self.split_pH = split_pH
+        (
+            self.k_dic_loss,
+            self.titration["dic_loss_modelled"],
+            self.titration["fCO2_loss_modelled"],
+            self.titration["dic_loss_fitted"],
+        ) = core.loss.get_dic_loss(
+            self.titration.titrant_mass.to_numpy(),
+            self.titration.pH.to_numpy(),
+            self.titration.dic_loss.to_numpy(),
+            self.titration.fCO2_loss.to_numpy(),
+            self.titration.k_CO2.to_numpy(),
+            self.titration.k_carbonic_1.to_numpy(),
+            self.titration.k_carbonic_2.to_numpy(),
+            self.analyte_mass,
+            self.titration.dic.iloc[0],
+            fCO2_air=self.fCO2_air,
+            split_pH=self.split_pH,
+        )
+
+    # Assign plotting functions
     plot_emf = plot.titration.emf
     plot_pH = plot.titration.pH
     plot_gran_emf0 = plot.titration.gran_emf0
     plot_gran_alkalinity = plot.titration.gran_alkalinity
     plot_alkalinity = plot.titration.alkalinity
     plot_components = plot.titration.components
+    plot_dic_loss = plot.titration.dic_loss
+    plot_fCO2_loss = plot.titration.fCO2_loss
+
+    def __str__(self):
+        if self.file_name is not None:
+            return f"Titration {self.file_name}"
+        else:
+            return "Titration (simulated)"
+
+    def __repr__(self):
+        rstr = "calkulate.Titration("
+        if hasattr(self, "analyte_mass"):
+            if self.analyte_mass is not None:
+                rstr += f"\n    analyte_mass={self.analyte_mass},"
+        if hasattr(self, "analyte_volume"):
+            if self.analyte_volume is not None:
+                rstr += f"\n    analyte_volume={self.analyte_volume},"
+        if self.file_name is not None:
+            rstr += f"\n    file_name='{self.file_name}',"
+        if self.file_path is not None:
+            rstr += f"\n    file_path='{self.file_path}',"
+        if self.salinity != 35:
+            rstr += f"\n    salinity={self.salinity},"
+        rstr += "\n    **prepare_kwargs,\n)"
+        return rstr

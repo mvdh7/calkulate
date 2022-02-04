@@ -1,17 +1,31 @@
 # Calkulate: seawater total alkalinity from titration data
-# Copyright (C) 2019--2021  Matthew P. Humphreys  (GNU GPLv3)
+# Copyright (C) 2019--2022  Matthew P. Humphreys  (GNU GPLv3)
 """Calibrate and solve titration datasets."""
 
 import copy
 import numpy as np
 from scipy.stats import linregress
 from scipy.optimize import least_squares
-from . import constants, convert, default, interface, simulate
+from .. import constants, convert, default, interface, simulate
+from . import loss
 
 
 def gran_estimator(mixture_mass, emf, temperature):
-    """Simple Gran-plot estimator following DAA03 eq. 10.
-    Uses all provided data points.
+    """Calculate Gran-plot estimator [DAA03 eq. 10] using all provided data.
+
+    Parameters
+    ----------
+    mixture_mass : array_like or float
+        Mass of titrant-analyte mixture [kg].
+    emf : array_like or float
+        EMF measured in titrant-analyte mixture [mV].
+    temperature : array_like or float
+        Temperature of titrant-analyte mixture [°C].
+
+    Returns
+    -------
+    gran_estimates : array_like or float
+        Gran-plot estimator values [DAA03 eq. 10].
     """
     gran_estimates = mixture_mass * np.exp(
         emf
@@ -28,9 +42,31 @@ def gran_guess_alkalinity(
     titrant_molinity,
     titrant=default.titrant,
 ):
-    """Simple Gran-plot first-guess of alkalinity.
-    Uses all provided data points.
+    """Gran-plot first guess of alkalinity using all provided data.
+
+    Parameters
+    ----------
+    titrant_mass : array_like
+        Mass of titrant [kg].
+    gran_estimates : array_like
+        Output from `calkulate.core.gran_estimator()`.
+    analyte_mass : float
+        Mass of analyte [kg].
+    titrant_molinity : float
+        Molinity of titrant [mol/kg].
+    titrant : str, optional
+        Type of titrant, by default `calkulate.default.titrant`.
+
+    Returns
+    -------
+    alkalinity_guess : float
+        Gran-plot estimate of alkalinity [mol/kg].
+    gradient : float
+        Slope of the Gran-plot estimator.
+    intercept_y : float
+        Y-axis intercept of the Gran-plot estimator.
     """
+
     # Do regression through simple Gran-plot estimator
     gradient, intercept_y = linregress(titrant_mass, gran_estimates)[:2]
     # Find alkalinity guess from the x-axis intercept
@@ -50,8 +86,34 @@ def gran_guesses_emf0(
     HF=0,
     HSO4=0,
 ):
-    """Simple Gran-plot first-guess of EMF0 following DAA03 eq. 11.
-    Uses all provided data points.
+    """Gran-plot first guesses of EMF0 [DAA03 eq. 11] using all provided data.
+
+    Parameters
+    ----------
+    titrant_mass : array_like or float
+        Mass of titrant [kg].
+    emf : array_like or float
+        EMF measured in titrant-analyte mixture.
+    temperature : array_like or float
+        Temperature of titrant-analyte mixture [°C].
+    analyte_mass : float
+        Mass of analyte [kg].
+    titrant_molinity : float
+        Molinity of titrant [mol/kg]
+    alkalinity_guess : float, optional
+        Output of `calkulate.core.gran_guess_alkalinity()` if it has already been run,
+        by default None.
+    titrant : str, optional
+        Type of titrant, by default `calkulate.default.titrant`.
+    HF : float, optional
+        Total fluoride in titrant-analyte mixture [mol/kg], by default 0.
+    HSO4 : float, optional
+        Total sulfate in titrant-analyte mixture, by default 0.
+
+    Returns
+    -------
+    emf0_guesses : array_like or float
+        Gran-plot guesses of EMF0 following DAA03 eq. 11 [mV].
     """
     # Get alkalinity_guess if one is not already provided
     mixture_mass = titrant_mass + analyte_mass

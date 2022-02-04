@@ -88,8 +88,8 @@ def pH(tt, ax=None, show_gran=True, **scatter_kwargs):
         **final_styler.scatter(),
     )
     pH_range = (
-        tt.solve_kwargs["pH_range"]
-        if "pH_range" in tt.solve_kwargs
+        tt.solver_kwargs["pH_range"]
+        if "pH_range" in tt.solver_kwargs
         else default.pH_range
     )
     xlim = ax.get_xlim()
@@ -194,6 +194,113 @@ def alkalinity(tt, ax=None):
         )
     )
     ax.legend()
+    misc.add_credit(ax)
+    return ax
+
+
+def dic_loss(tt, ax=None):
+    """Plot DIC loss through a titration."""
+    ttt = tt.titration
+    if ax is None:
+        fig, ax = plt.subplots(dpi=default.dpi)
+    if not hasattr(tt, "k_dic_loss"):
+        tt.get_dic_loss()
+    loss_hires = tt._get_dic_loss_hires()[1]
+    ax.plot(
+        ttt.titrant_mass * 1000,
+        ttt.dic.iloc[0] * 1e6 * ttt.dilution_factor,
+        c="k",
+        label="Dilution only",
+        alpha=0.8,
+    )
+    ax.scatter(
+        ttt.titrant_mass * 1000,
+        ttt.dic_loss,
+        s=25,
+        label="Calc. from pH",
+        c="xkcd:slate",
+        alpha=0.8,
+        edgecolor="none",
+    )
+    ax.fill_between(
+        ttt.titrant_mass * 1000,
+        ttt.dic_loss_lo,
+        y2=ttt.dic_loss_hi,
+        data=ttt,
+        alpha=0.2,
+        label="Calc. uncertainty",
+        zorder=-1,
+        color="xkcd:slate",
+        edgecolor="none",
+    )
+    ax.plot(
+        loss_hires[loss_hires.pH >= tt.split_pH].titrant_mass * 1000,
+        loss_hires[loss_hires.pH >= tt.split_pH].dic,
+        label="Model, 'fitted'",
+        c="xkcd:teal blue",
+        alpha=0.8,
+    )
+    ax.plot(
+        loss_hires[loss_hires.pH < tt.split_pH].titrant_mass * 1000,
+        loss_hires[loss_hires.pH < tt.split_pH].dic,
+        label="Model, projected",
+        c="xkcd:brownish orange",
+        alpha=0.8,
+    )
+    ax.set_ylim([loss_hires.dic.min() * 0.96, loss_hires.dic.max() * 1.04])
+    ax.set_title("$k$(DIC loss) = {:.2f}".format(tt.k_dic_loss))
+    ax.set_xlabel("Titrant mass / g")
+    ax.set_ylabel("DIC / $\mu$mol/kg")
+    ax.legend(fontsize=7, loc="lower left")
+    misc.add_credit(ax)
+    return ax
+
+
+def fCO2_loss(tt, ax=None):
+    """Plot fCO2 change as DIC is lost through a titration."""
+    ttt = tt.titration
+    if ax is None:
+        fig, ax = plt.subplots(dpi=default.dpi)
+    if not hasattr(tt, "k_dic_loss"):
+        tt.get_dic_loss()
+    loss_hires = tt._get_dic_loss_hires()[1]
+    ax.scatter(
+        ttt.titrant_mass * 1000,
+        (ttt.fCO2_loss - tt.fCO2_air) / 1000,
+        label="Calc. from pH",
+        s=25,
+        color="xkcd:slate",
+        alpha=0.8,
+        edgecolor="none",
+    )
+    ax.fill_between(
+        ttt.titrant_mass * 1000,
+        ttt.fCO2_loss_lo / 1000,
+        y2=ttt.fCO2_loss_hi / 1000,
+        alpha=0.2,
+        label="Calc. uncertainty",
+        zorder=-1,
+        color="xkcd:slate",
+        edgecolor="none",
+    )
+    ax.plot(
+        loss_hires[loss_hires.pH >= tt.split_pH].titrant_mass * 1000,
+        loss_hires[loss_hires.pH >= tt.split_pH].delta_fCO2 / 1000,
+        label="Model, 'fitted'",
+        c="xkcd:teal blue",
+        alpha=0.8,
+    )
+    ax.plot(
+        loss_hires[loss_hires.pH < tt.split_pH].titrant_mass * 1000,
+        loss_hires[loss_hires.pH < tt.split_pH].delta_fCO2 / 1000,
+        label="Model, projected",
+        c="xkcd:brownish orange",
+        alpha=0.8,
+    )
+    ax.set_ylim([0, loss_hires.delta_fCO2.max() * 1.5e-3])
+    ax.set_xlabel("Titrant mass / g")
+    ax.set_ylabel("$\Delta f$CO$_2$ / matm")
+    ax.legend(fontsize=7, loc="upper left")
     misc.add_credit(ax)
     return ax
 

@@ -1,5 +1,5 @@
 # Calkulate: seawater total alkalinity from titration data
-# Copyright (C) 2019--2021  Matthew P. Humphreys  (GNU GPLv3)
+# Copyright (C) 2019--2022  Matthew P. Humphreys  (GNU GPLv3)
 """Work with datasets containing multiple titrations."""
 
 import copy
@@ -405,26 +405,28 @@ def to_Titration(ds, index):
     prepare_kwargs = {}
     for k, v in prepare_defaults.items():
         if k in dsr:
-            if ~pd.isnull(dsr[k]):
+            if not pd.isnull(dsr[k]):
                 prepare_kwargs[k] = dsr[k]
             else:
                 prepare_kwargs[k] = v
         else:
             prepare_kwargs[k] = v
+    analyte_mass = prepare_kwargs.pop("analyte_mass")
+    analyte_volume = prepare_kwargs.pop("analyte_volume")
     tt = titration.Titration(
         file_name=dsr.file_name,
         file_path=dsr.file_path if "file_path" in dsr else "",
         salinity=dsr.salinity,
-        **prepare_kwargs,
+        analyte_mass=analyte_mass,
+        analyte_volume=analyte_volume,
+        file_prepare_kwargs=prepare_kwargs,
     )
-    print(dsr)
-    if "titrant_molinity" in dsr:
-        if ~pd.isnull(dsr.titrant_molinity):
-            tt.solve(titrant_molinity=dsr.titrant_molinity)
     if "alkalinity_certified" in dsr:
-        tt.alkalinity_certified = dsr.alkalinity_certified
-        if not tt.solved:
-            tt.calibrate(tt.alkalinity_certified)
+        if not pd.isnull(dsr.alkalinity_certified):
+            tt.alkalinity_certified = dsr.alkalinity_certified
+    if "titrant_molinity" in dsr:
+        if not pd.isnull(dsr.titrant_molinity):
+            tt.set_titrant_molinity(dsr.titrant_molinity)
     return tt
 
 
