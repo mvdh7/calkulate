@@ -176,23 +176,24 @@ def dic_loss_model_future(
     return f_dic, f_delta_fCO2
 
 
-def get_dic_loss_hires(tt, fCO2_air=450, split_pH=5.5):
+def get_dic_loss_hires(
+    titrant_mass,
+    pH,
+    dic_loss,
+    fCO2_loss,
+    k_CO2,
+    k_carbonic_1,
+    k_carbonic_2,
+    analyte_mass,
+    dic_start,
+    fCO2_air=450,
+    split_pH=5.5,
+):
     """Fit and forecast high-resolution DIC loss model."""
-    # Relabel for convenience
-    ttt = tt.titration
-    analyte_mass = tt.analyte_mass
-    titrant_mass = ttt.titrant_mass.to_numpy()
-    dic_loss = ttt.dic_loss.to_numpy()
-    pH = ttt.pH.to_numpy()
-    dic_start = ttt.dic.iloc[0]
-    fCO2_loss = ttt.fCO2_loss.to_numpy()
-    k_CO2 = ttt.k_CO2.to_numpy()
-    k_carbonic_1 = ttt.k_carbonic_1.to_numpy()
-    k_carbonic_2 = ttt.k_carbonic_2.to_numpy()
     # Get delta-fCO2
     delta_fCO2_loss = fCO2_loss - fCO2_air
     # Use titrant_mass as proxy for titration time: generate high-resolution arrays
-    step_tm = 1e-6
+    step_tm = np.median(np.diff(titrant_mass)) / 10
     a_titrant_mass = np.arange(0, np.max(titrant_mass), step_tm)
     a_pH = interpolate.pchip_interpolate(titrant_mass, pH, a_titrant_mass)
     i_titrant_mass = a_titrant_mass[a_pH >= split_pH]
@@ -258,17 +259,39 @@ def get_dic_loss_hires(tt, fCO2_air=450, split_pH=5.5):
     }
 
 
-def get_dic_loss(tt, fCO2_air=450, split_pH=5.5):
+def get_dic_loss(
+    titrant_mass,
+    pH,
+    dic_loss,
+    fCO2_loss,
+    k_CO2,
+    k_carbonic_1,
+    k_carbonic_2,
+    analyte_mass,
+    dic_start,
+    fCO2_air=450,
+    split_pH=5.5,
+):
     """Get final DIC loss values at the titration points to go in the titration df."""
-    tt.k_dic_loss, loss_hires = get_dic_loss_hires(
-        tt, fCO2_air=fCO2_air, split_pH=split_pH
+    k_dic_loss, loss_hires = get_dic_loss_hires(
+        titrant_mass,
+        pH,
+        dic_loss,
+        fCO2_loss,
+        k_CO2,
+        k_carbonic_1,
+        k_carbonic_2,
+        analyte_mass,
+        dic_start,
+        fCO2_air=fCO2_air,
+        split_pH=split_pH,
     )
-    tt.titration["dic_loss_modelled"] = interpolate.pchip_interpolate(
+    dic_loss_modelled = interpolate.pchip_interpolate(
         loss_hires["titrant_mass"],
         loss_hires["dic"],
         tt.titration.titrant_mass.to_numpy(),
     )
-    tt.titration["fCO2_loss_modelled"] = (
+    fCO2_loss_modelled = (
         interpolate.pchip_interpolate(
             loss_hires["titrant_mass"],
             loss_hires["delta_fCO2"],
@@ -276,14 +299,54 @@ def get_dic_loss(tt, fCO2_air=450, split_pH=5.5):
         )
         + fCO2_air
     )
-    tt.titration["loss_fitted"] = tt.titration.pH >= split_pH
+    dic_loss_fitted = pH >= split_pH
+    return k_dic_loss, dic_loss_modelled, fCO2_loss_modelled, dic_loss_fitted
+
+
+def get_dic_loss_hires_tt(tt, fCO2_air=450, split_pH=5.5):
+    """Fit and forecast high-resolution DIC loss model."""
+    return get_dic_loss_hires(
+        tt.titration.titrant_mass.to_numpy(),
+        tt.titration.pH.to_numpy(),
+        tt.titration.dic_loss.to_numpy(),
+        tt.titration.fCO2_loss.to_numpy(),
+        tt.titration.k_CO2.to_numpy(),
+        tt.titration.k_carbonic_1.to_numpy(),
+        tt.titration.k_carbonic_2.to_numpy(),
+        tt.analyte_mass,
+        tt.titration.dic.iloc[0],
+        fCO2_air=fCO2_air,
+        split_pH=split_pH,
+    )
+
+
+def get_dic_loss_tt(tt, fCO2_air=450, split_pH=5.5):
+    """Get final DIC loss values at the titration points to go in the titration df."""
+    (
+        tt.k_dic_loss,
+        tt.titration["dic_loss_modelled"],
+        tt.titration["fCO2_loss_modelled"],
+        tt.titration["dic_loss_fitted"],
+    ) = get_dic_loss(
+        tt.titration.titrant_mass.to_numpy(),
+        tt.titration.pH.to_numpy(),
+        tt.titration.dic_loss.to_numpy(),
+        tt.titration.fCO2_loss.to_numpy(),
+        tt.titration.k_CO2.to_numpy(),
+        tt.titration.k_carbonic_1.to_numpy(),
+        tt.titration.k_carbonic_2.to_numpy(),
+        tt.analyte_mass,
+        tt.titration.dic.iloc[0],
+        fCO2_air=fCO2_air,
+        split_pH=split_pH,
+    )
 
 
 # Main function inputs
 fCO2_air = 450
 split_pH = 5.5  # fit DIC-loss model only above this pH, forecast at lower pH
-k_dic_loss, loss_hires = get_dic_loss_hires(tt, fCO2_air=fCO2_air, split_pH=split_pH)
-get_dic_loss(tt, fCO2_air=fCO2_air, split_pH=split_pH)
+k_dic_loss, loss_hires = get_dic_loss_hires_tt(tt, fCO2_air=fCO2_air, split_pH=split_pH)
+get_dic_loss_tt(tt, fCO2_air=fCO2_air, split_pH=split_pH)
 
 #%% Draw figure
 loss_hires = pd.DataFrame(loss_hires)
