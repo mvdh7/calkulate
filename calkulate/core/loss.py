@@ -4,7 +4,7 @@
 
 import numpy as np
 from scipy import interpolate, optimize
-from .. import convert
+from .. import convert, default
 
 
 def dic_loss_model_fitted(
@@ -198,10 +198,13 @@ def get_dic_loss(
         fCO2_air=fCO2_air,
         split_pH=split_pH,
     )
-    dic_loss_modelled = interpolate.pchip_interpolate(
-        loss_hires["titrant_mass"],
-        loss_hires["dic"],
-        titrant_mass,
+    dic_loss_modelled = (
+        interpolate.pchip_interpolate(
+            loss_hires["titrant_mass"],
+            loss_hires["dic"],
+            titrant_mass,
+        )
+        * 1e-6
     )
     fCO2_loss_modelled = (
         interpolate.pchip_interpolate(

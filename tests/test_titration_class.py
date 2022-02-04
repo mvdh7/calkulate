@@ -88,62 +88,30 @@ def test_plots():
 # test_plots()
 
 #%%
-from matplotlib import pyplot as plt
 
-
-def get_dic_loss_hires_tt(tt, fCO2_air=450, split_pH=5.5):
-    """Fit and forecast high-resolution DIC loss model."""
-    return calk.core.loss.get_dic_loss_hires(
-        tt.titration.titrant_mass.to_numpy(),
-        tt.titration.pH.to_numpy(),
-        tt.titration.dic_loss.to_numpy(),
-        tt.titration.fCO2_loss.to_numpy(),
-        tt.titration.k_CO2.to_numpy(),
-        tt.titration.k_carbonic_1.to_numpy(),
-        tt.titration.k_carbonic_2.to_numpy(),
-        tt.analyte_mass,
-        tt.titration.dic.iloc[0],
-        fCO2_air=fCO2_air,
-        split_pH=split_pH,
-    )
-
-
-def get_dic_loss_tt(tt, fCO2_air=450, split_pH=5.5):
-    """Get final DIC loss values at the titration points to go in the titration df."""
-    (
-        tt.k_dic_loss,
-        tt.titration["dic_loss_modelled"],
-        tt.titration["fCO2_loss_modelled"],
-        tt.titration["dic_loss_fitted"],
-    ) = calk.core.loss.get_dic_loss(
-        tt.titration.titrant_mass.to_numpy(),
-        tt.titration.pH.to_numpy(),
-        tt.titration.dic_loss.to_numpy(),
-        tt.titration.fCO2_loss.to_numpy(),
-        tt.titration.k_CO2.to_numpy(),
-        tt.titration.k_carbonic_1.to_numpy(),
-        tt.titration.k_carbonic_2.to_numpy(),
-        tt.analyte_mass,
-        tt.titration.dic.iloc[0],
-        fCO2_air=fCO2_air,
-        split_pH=split_pH,
-    )
-
-
-# Main function inputs
-fCO2_air = 450
-split_pH = 5.5  # fit DIC-loss model only above this pH, forecast at lower pH
-k_dic_loss, loss_hires = get_dic_loss_hires_tt(tt, fCO2_air=fCO2_air, split_pH=split_pH)
-get_dic_loss_tt(tt, fCO2_air=fCO2_air, split_pH=split_pH)
+# Run the main function
+tt.get_dic_loss()
+tt.titration["dic"] = tt.titration.dic_loss_modelled
+tt.solve()
 
 #%% Draw figure
+k_dic_loss, loss_hires = tt._get_dic_loss_hires()
 loss_hires = pd.DataFrame(loss_hires)
 ttt = tt.titration
+
+
+from matplotlib import pyplot as plt
+
 fig, axs = plt.subplots(dpi=300, nrows=2, figsize=(6, 5))
 
 
 ax = axs[0]
-ax.plot(ttt.titrant_mass, ttt.dic * 1e6, c="k", label="Dilution only")
+ax.plot(
+    ttt.titrant_mass,
+    ttt.dic.iloc[0] * 1e6 * ttt.dilution_factor,
+    c="k",
+    label="Dilution only",
+)
 ax.scatter(
     "titrant_mass", "dic_loss", data=ttt, s=20, label="Calc. from pH", c="xkcd:slate"
 )
@@ -162,14 +130,14 @@ ax.fill_between(
 ax.plot(
     "titrant_mass",
     "dic",
-    data=loss_hires[loss_hires.pH >= split_pH],
+    data=loss_hires[loss_hires.pH >= tt.split_pH],
     label="Model, 'fitted'",
     c="xkcd:teal blue",
 )
 ax.plot(
     "titrant_mass",
     "dic",
-    data=loss_hires[loss_hires.pH < split_pH],
+    data=loss_hires[loss_hires.pH < tt.split_pH],
     label="Model, projected",
     c="xkcd:brownish orange",
 )
@@ -181,7 +149,7 @@ ax.set_title("$k$(DIC loss) = {:.2f}".format(tt.k_dic_loss))
 ax = axs[1]
 ax.scatter(
     ttt.titrant_mass,
-    ttt.fCO2_loss - fCO2_air,
+    ttt.fCO2_loss - tt.fCO2_air,
     label="Calc. from pH",
     s=20,
     color="xkcd:slate",
@@ -200,18 +168,18 @@ ax.fill_between(
 ax.plot(
     "titrant_mass",
     "delta_fCO2",
-    data=loss_hires[loss_hires.pH >= split_pH],
+    data=loss_hires[loss_hires.pH >= tt.split_pH],
     label="Model, 'fitted'",
     c="xkcd:teal blue",
 )
 ax.plot(
     "titrant_mass",
     "delta_fCO2",
-    data=loss_hires[loss_hires.pH < split_pH],
+    data=loss_hires[loss_hires.pH < tt.split_pH],
     label="Model, projected",
     c="xkcd:brownish orange",
 )
-ax.set_ylabel("$\Delta f$CO$_2$ / $\mu$atm")
+ax.set_ylabel("$\Delta f$CO$_2$ / matm")
 ax.set_ylim([0, 100000])
 ax.legend(fontsize=7)
 for ax in axs:

@@ -721,6 +721,57 @@ class Titration:
             titrant=titrant,
         )
 
+    def _get_dic_loss_hires(self):
+        """Fit and forecast high-resolution DIC loss model."""
+        if not hasattr(self, "fCO2_air"):
+            self.fCO2_air = default.fCO2_air
+        if not hasattr(self, "split_pH"):
+            self.split_pH = default.split_pH
+        return core.loss.get_dic_loss_hires(
+            self.titration.titrant_mass.to_numpy(),
+            self.titration.pH.to_numpy(),
+            self.titration.dic_loss.to_numpy(),
+            self.titration.fCO2_loss.to_numpy(),
+            self.titration.k_CO2.to_numpy(),
+            self.titration.k_carbonic_1.to_numpy(),
+            self.titration.k_carbonic_2.to_numpy(),
+            self.analyte_mass,
+            self.titration.dic.iloc[0],
+            fCO2_air=self.fCO2_air,
+            split_pH=self.split_pH,
+        )
+
+    def get_dic_loss(self, fCO2_air=default.fCO2_air, split_pH=default.split_pH):
+        """Get final DIC loss values at the titration points to go in the titration df."""
+        self.fCO2_air = fCO2_air
+        self.split_pH = split_pH
+        (
+            self.k_dic_loss,
+            self.titration["dic_loss_modelled"],
+            self.titration["fCO2_loss_modelled"],
+            self.titration["dic_loss_fitted"],
+        ) = core.loss.get_dic_loss(
+            self.titration.titrant_mass.to_numpy(),
+            self.titration.pH.to_numpy(),
+            self.titration.dic_loss.to_numpy(),
+            self.titration.fCO2_loss.to_numpy(),
+            self.titration.k_CO2.to_numpy(),
+            self.titration.k_carbonic_1.to_numpy(),
+            self.titration.k_carbonic_2.to_numpy(),
+            self.analyte_mass,
+            self.titration.dic.iloc[0],
+            fCO2_air=self.fCO2_air,
+            split_pH=self.split_pH,
+        )
+
+    # Assign plotting functions
+    plot_emf = plot.titration.emf
+    plot_pH = plot.titration.pH
+    plot_gran_emf0 = plot.titration.gran_emf0
+    plot_gran_alkalinity = plot.titration.gran_alkalinity
+    plot_alkalinity = plot.titration.alkalinity
+    plot_components = plot.titration.components
+
     def __str__(self):
         if self.file_name is not None:
             return f"Titration {self.file_name}"
@@ -743,11 +794,3 @@ class Titration:
             rstr += f"\n    salinity={self.salinity},"
         rstr += "\n    **prepare_kwargs,\n)"
         return rstr
-
-    # Assign plotting functions
-    plot_emf = plot.titration.emf
-    plot_pH = plot.titration.pH
-    plot_gran_emf0 = plot.titration.gran_emf0
-    plot_gran_alkalinity = plot.titration.gran_alkalinity
-    plot_alkalinity = plot.titration.alkalinity
-    plot_components = plot.titration.components
