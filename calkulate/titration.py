@@ -727,7 +727,7 @@ class Titration:
             self.fCO2_air = default.fCO2_air
         if not hasattr(self, "split_pH"):
             self.split_pH = default.split_pH
-        return core.loss.get_dic_loss_hires(
+        k_dic_loss, loss_hires = core.loss.get_dic_loss_hires(
             self.titration.titrant_mass.to_numpy(),
             self.titration.pH.to_numpy(),
             self.titration.dic_loss.to_numpy(),
@@ -740,6 +740,7 @@ class Titration:
             fCO2_air=self.fCO2_air,
             split_pH=self.split_pH,
         )
+        return k_dic_loss, pd.DataFrame(loss_hires)
 
     def get_dic_loss(self, fCO2_air=default.fCO2_air, split_pH=default.split_pH):
         """Get final DIC loss values at the titration points to go in the titration df."""
