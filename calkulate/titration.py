@@ -772,6 +772,8 @@ class Titration:
     plot_gran_alkalinity = plot.titration.gran_alkalinity
     plot_alkalinity = plot.titration.alkalinity
     plot_components = plot.titration.components
+    plot_dic_loss = plot.titration.dic_loss
+    plot_fCO2_loss = plot.titration.fCO2_loss
 
     def __str__(self):
         if self.file_name is not None:
