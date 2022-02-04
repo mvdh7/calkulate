@@ -59,7 +59,7 @@ def dic_loss_model_future(
     k2_start,
     analyte_mass,
     step_tm,
-    fCO2_air=450,
+    fCO2_air=default.fCO2_air,
 ):
     """Forecast future DIC loss, starting from the end of the fitted section."""
     # Prepare empty arrays for model
@@ -97,8 +97,8 @@ def get_dic_loss_hires(
     k_carbonic_2,
     analyte_mass,
     dic_start,
-    fCO2_air=450,
-    split_pH=5.5,
+    fCO2_air=default.fCO2_air,
+    split_pH=default.split_pH,
 ):
     """Fit and forecast high-resolution DIC loss model."""
     # Get delta-fCO2
@@ -181,8 +181,8 @@ def get_dic_loss(
     k_carbonic_2,
     analyte_mass,
     dic_start,
-    fCO2_air=450,
-    split_pH=5.5,
+    fCO2_air=default.fCO2_air,
+    split_pH=default.split_pH,
 ):
     """Get final DIC loss values at the titration points to go in the titration df."""
     k_dic_loss, loss_hires = get_dic_loss_hires(
