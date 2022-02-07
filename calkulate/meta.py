@@ -19,7 +19,7 @@ def hello():
 
        doi:10.5281/zenodo.2634304
        
-             Version {}
+              Version {}
 """.format(
             __version__
         )
