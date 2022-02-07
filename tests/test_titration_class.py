@@ -10,8 +10,8 @@ tt_kwargs = dict(
 tt = calk.Titration(
     analyte_mass=0.1,
     salinity=33.571,
-    # file_name="seawater-CRM-144.dat",
-    file_name='0-0  0  (0)calk-3-5.dat',
+    file_name="seawater-CRM-144.dat",
+    # file_name="0-0  0  (0)calk-3-5.dat",
     file_path="tests/data/",
     file_prepare_kwargs=tt_kwargs,
 )
