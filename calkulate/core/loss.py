@@ -104,7 +104,7 @@ def get_dic_loss_hires(
     # Get delta-fCO2
     delta_fCO2_loss = fCO2_loss - fCO2_air
     # Use titrant_mass as proxy for titration time: generate high-resolution arrays
-    step_tm = np.median(np.diff(titrant_mass))  # / 10
+    step_tm = np.median(np.diff(titrant_mass)) / 10
     a_titrant_mass = np.arange(0, np.max(titrant_mass), step_tm)
     a_pH = interpolate.pchip_interpolate(titrant_mass, pH, a_titrant_mass)
     i_titrant_mass = a_titrant_mass[a_pH >= split_pH]
