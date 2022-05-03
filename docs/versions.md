@@ -9,6 +9,7 @@ Calkulate v3 went too far overboard with the OO approach and ended up being very
 !!! info "Changes in v23.3"
 
     * Switched to simpler version numbering scheme (only major and minor, no patch).
+    * Added a test of the SOP 3b example dataset.
 
 ### 23.2
 
