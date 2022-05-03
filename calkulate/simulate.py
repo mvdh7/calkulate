@@ -29,14 +29,14 @@ def alkalinity_components(pH, totals, k_constants, opt_pH_scale=default.opt_pH_s
     ), "opt_pH_scale must be 1 (Total), 2 (Seawater) or 3 (Free)."
     # Build up dict of solution components
     components = {}
-    h = components["H"] = 10.0 ** -pH
+    h = components["H"] = 10.0**-pH
     if "k_water" in k_constants:
         components["OH"] = k_constants["k_water"] / h
     if "dic" in totals:
         TCO2 = totals["dic"]
         K1 = k_constants["k_carbonic_1"]
         K2 = k_constants["k_carbonic_2"]
-        components["CO2"] = TCO2 / (1 + K1 / h + K1 * K2 / h ** 2)
+        components["CO2"] = TCO2 / (1 + K1 / h + K1 * K2 / h**2)
         components["HCO3"] = K1 * components["CO2"] / h
         components["CO3"] = K2 * components["HCO3"] / h
     if "total_borate" in totals:
@@ -48,8 +48,8 @@ def alkalinity_components(pH, totals, k_constants, opt_pH_scale=default.opt_pH_s
         KP1 = k_constants["k_phosphoric_1"]
         KP2 = k_constants["k_phosphoric_2"]
         KP3 = k_constants["k_phosphoric_3"]
-        phosphoric_denom = h ** 3 + KP1 * h ** 2 + KP1 * KP2 * h + KP1 * KP2 * KP3
-        components["H3PO4"] = TPO4 * h ** 3 / phosphoric_denom
+        phosphoric_denom = h**3 + KP1 * h**2 + KP1 * KP2 * h + KP1 * KP2 * KP3
+        components["H3PO4"] = TPO4 * h**3 / phosphoric_denom
         components["HPO4"] = TPO4 * KP1 * KP2 * h / phosphoric_denom
         components["PO4"] = TPO4 * KP1 * KP2 * KP3 / phosphoric_denom
     if "total_silicate" in totals:

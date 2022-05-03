@@ -38,8 +38,8 @@ def _lsqfun_dic_loss_model(
 
 def get_fCO2_from_dic_pH(dic, pH, k0, k1, k2):
     """Calculate fCO2 from DIC and pH."""
-    h = 10 ** -pH
-    CO2aq = dic / (1 + k1 / h + k1 * k2 / h ** 2)
+    h = 10**-pH
+    CO2aq = dic / (1 + k1 / h + k1 * k2 / h**2)
     fCO2 = CO2aq / k0
     return fCO2
 
