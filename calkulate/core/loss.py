@@ -101,6 +101,12 @@ def get_dic_loss_hires(
     split_pH=default.split_pH,
 ):
     """Fit and forecast high-resolution DIC loss model."""
+    # Set NaN dic_loss values to zero
+    dic_loss = dic_loss.copy()
+    dic_loss[np.isnan(dic_loss)] = 0
+    # Set NaN fCO2_loss values to the maximum
+    fCO2_loss = fCO2_loss.copy()
+    fCO2_loss[np.isnan(fCO2_loss)] = np.nanmax(fCO2_loss)
     # Get delta-fCO2
     delta_fCO2_loss = fCO2_loss - fCO2_air
     # Use titrant_mass as proxy for titration time: generate high-resolution arrays

@@ -749,7 +749,7 @@ class Titration:
         return k_dic_loss, pd.DataFrame(loss_hires)
 
     def get_dic_loss(self, fCO2_air=None, split_pH=None):
-        """Get final DIC loss values at the titration points to go in the titration df."""
+        """Get final DIC loss values at the titration points for the titration df."""
         self.check_set_default("fCO2_air", fCO2_air)
         self.check_set_default("split_pH", split_pH)
         (
