@@ -117,7 +117,7 @@ def h_to_emf(h, emf0, temperature):
 
 def pH_to_emf(pH, emf0, temperature):
     """Convert pH to EMF."""
-    h = 10.0 ** -pH
+    h = 10.0**-pH
     return h_to_emf(h, emf0, temperature)
 
 

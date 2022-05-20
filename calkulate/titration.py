@@ -659,7 +659,7 @@ class Titration:
             "OH",
         ]:
             st[co2sysvar] = results[co2sysvar] * 1e-6
-        st["H"] = 10 ** -st.pH
+        st["H"] = 10**-st.pH
         st["alk_alpha"] = results["alkalinity_alpha"] * 1e-6
         st["alk_beta"] = results["alkalinity_beta"] * 1e-6
         st["alkalinity_estimate"] = (
