@@ -19,7 +19,7 @@ pyco2_kwargs = {
     "opt_k_bisulfate": rng.integers(size=npts, low=1, high=2, endpoint=True),
     "opt_k_fluoride": rng.integers(size=npts, low=1, high=2, endpoint=True),
     "opt_gas_constant": 3,
-    "buffers_mode": "none",
+    "opt_buffers_mode": 0,
     "total_alpha": rng.uniform(size=npts, low=0, high=100),
     "k_alpha": rng.uniform(size=npts, low=2, high=12),
     "total_beta": rng.uniform(size=npts, low=0, high=100),
