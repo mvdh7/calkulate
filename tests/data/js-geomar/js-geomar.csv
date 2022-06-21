@@ -1,0 +1,4 @@
+file_name,file_path,salinity,alkalinity_certified,analyte_mass,method
+PC_LIMS_Report-20220518-124748.txt,tests/data/js-geomar/,35,2300,0.05,pclims
+PC_LIMS_Report-20220518-135544.txt,tests/data/js-geomar/,35,,0.05,pclims
+PC_LIMS_Report-20220518-144403.txt,tests/data/js-geomar/,35,,0.05,pclims
