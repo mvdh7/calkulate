@@ -4,12 +4,12 @@
 
 Calkulate v3 went too far overboard with the OO approach and ended up being very slow and overly complex behind the scenes as a result.  Calkulate v23 therefore mashes together the best bits of v2 and v3 for the ultimate alkalinity solving experience.
 
-### 23.3
+### 23.3 (forthcoming)
 
 !!! info "Changes in v23.3"
 
     * Switched to simpler version numbering scheme (only major and minor, no patch).
-    * Added a test of the SOP 3b example dataset.
+    * Added a test of the [DSC07](../references/#d) SOP 3b example dataset.
     * Updated to work with PyCO2SYS v1.8.1.
 
 ### 23.2
