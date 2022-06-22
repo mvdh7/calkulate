@@ -1,10 +1,5 @@
 import calkulate as calk, pandas as pd, numpy as np
 
-# Import dataset and use dataset functions to calibrate and solve
-tf = calk.read_csv("tests/data/js-geomar/js-geomar.csv")
-tf.calkulate()
-tf = pd.DataFrame(tf)
-
 # Use single-titration functions to calibrate and solve
 alkalinity_certified = 2193.07
 tt_kwargs = dict(
@@ -27,6 +22,11 @@ tt_alkalinity = calk.titration.solve(
     **tt_kwargs,
 )[0]
 
+# Import dataset and use dataset functions to calibrate and solve
+tf = calk.read_csv("tests/data/js-geomar/js-geomar.csv")
+tf.calkulate()
+tf = pd.DataFrame(tf)
+
 
 def test_js_titration_calibrate_solve():
     assert isinstance(tt_molinity, float)
@@ -34,4 +34,13 @@ def test_js_titration_calibrate_solve():
     assert np.isclose(tt_alkalinity, alkalinity_certified)
 
 
+def test_js_dataset_calkulate():
+    assert isinstance(tf, pd.DataFrame)
+    assert ~tf.alkalinity.isnull().any()
+    assert ~tf.emf0.isnull().any()
+    crm = ~tf.alkalinity_certified.isnull()
+    assert np.isclose(tf.alkalinity_certified[crm], tf.alkalinity[crm])
+
+
 # test_js_titration_calibrate_solve()
+# test_js_dataset_calkulate()
