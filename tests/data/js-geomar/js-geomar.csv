@@ -1,4 +1,4 @@
-file_name,file_path,salinity,alkalinity_certified,analyte_mass,read_dat_method
-PC_LIMS_Report-20220518-124748.txt,tests/data/js-geomar/,33.425,2193.07,0.05,pclims
-PC_LIMS_Report-20220518-135544.txt,tests/data/js-geomar/,35,,0.05,pclims
-PC_LIMS_Report-20220518-144403.txt,tests/data/js-geomar/,35,,0.05,pclims
+file_name,file_path,salinity,alkalinity_certified,analyte_mass,read_dat_method,dic,total_phosphate,total_silicate
+PC_LIMS_Report-20220518-124748.txt,tests/data/js-geomar/,33.425,2193.07,0.05,pclims,2048.36,0.42,4
+PC_LIMS_Report-20220518-135544.txt,tests/data/js-geomar/,35,,0.05,pclims,0,,
+PC_LIMS_Report-20220518-144403.txt,tests/data/js-geomar/,35,,0.05,pclims,0,,
