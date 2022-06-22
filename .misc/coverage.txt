@@ -4,7 +4,7 @@ calkulate/__init__.py                             7      0   100%
 calkulate/constants.py                            4      0   100%
 calkulate/convert.py                             40      6    85%
 calkulate/core/__init__.py                       94      5    95%
-calkulate/core/loss.py                           57      0   100%
+calkulate/core/loss.py                           61      0   100%
 calkulate/dataset.py                            179     13    93%
 calkulate/default.py                             28      0   100%
 calkulate/density.py                             26      5    81%
@@ -27,6 +27,7 @@ tests/test_dbs_calk.py                           32      0   100%
 tests/test_density.py                            11      0   100%
 tests/test_experiment.py                         13      4    69%
 tests/test_io.py                                 13      0   100%
+tests/test_js_geomar.py                          18      0   100%
 tests/test_loss_simulation.py                    45      1    98%
 tests/test_misc.py                                5      0   100%
 tests/test_pH_scales_simulated_titration.py      46      0   100%
@@ -36,4 +37,4 @@ tests/test_simulate_sulfate.py                  103      1    99%
 tests/test_simulate_then_solve.py                55      0   100%
 tests/test_titration_class.py                    66      0   100%
 -----------------------------------------------------------------
-TOTAL                                          1756    136    92%
+TOTAL                                          1778    136    92%
