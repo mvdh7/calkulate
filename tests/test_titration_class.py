@@ -10,8 +10,8 @@ tt_kwargs = dict(
 tt = calk.Titration(
     analyte_mass=0.1,
     salinity=33.571,
-    # file_name="seawater-CRM-144.dat",
-    file_name='0-0  0  (0)calk-3-5.dat',
+    file_name="seawater-CRM-144.dat",
+    # file_name="0-0  0  (0)calk-3-5.dat",
     file_path="tests/data/",
     file_prepare_kwargs=tt_kwargs,
 )
@@ -43,6 +43,27 @@ st2 = calk.simulate.titration(
     **tt_kwargs,
 )
 st.get_dic_loss()
+
+dt = calk.simulate.titration(
+    tt_alkalinity,
+    analyte_mass=0.1,
+    emf0=tt.emf0,
+    k_dic_loss=2,
+    titrant_molinity=tt.titrant_molinity,
+    titrant_mass_stop=4.2e-3,
+    titrant_mass_step=0.15e-3,
+    **tt_kwargs,
+)
+dt.plot_alkalinity()
+dt.titration["dic"] = dt.dic * dt.titration.dilution_factor * 1e-6
+dt.solve()
+dt.plot_alkalinity()
+dt.update_dic_loss()
+dt.plot_alkalinity()
+dt.update_dic_loss()
+dt.plot_alkalinity()
+dt.update_dic_loss()
+dt.plot_alkalinity()
 
 
 def test_class():

@@ -5,6 +5,9 @@ file_names = [
     "tests/data/PC_LIMS_Report-CRM1-20201211-115353.txt",
     "tests/data/PC_LIMS_Report-BATCH138-20200317-135120.txt",
     "tests/data/PC_LIMS_Report-SEA2-20200317-130328.txt",
+    "tests/data/js-geomar/PC_LIMS_Report-20220518-124748.txt",
+    "tests/data/js-geomar/PC_LIMS_Report-20220518-135544.txt",
+    "tests/data/js-geomar/PC_LIMS_Report-20220518-144403.txt",
 ]
 
 

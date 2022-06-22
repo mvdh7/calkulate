@@ -59,13 +59,13 @@ def get_totals_k_constants(
     temperature,
     analyte_mass,
     salinity,
-    dic=0,
+    dic=default.dic,
     total_alpha=0,
-    total_ammonia=0,
+    total_ammonia=default.total_ammonia,
     total_beta=0,
-    total_phosphate=0,
-    total_silicate=0,
-    total_sulfide=0,
+    total_phosphate=default.total_phosphate,
+    total_silicate=default.total_silicate,
+    total_sulfide=default.total_sulfide,
     total_borate=None,
     total_fluoride=None,
     total_sulfate=None,
@@ -140,13 +140,13 @@ def prepare(
     salinity,
     analyte_mass=None,  # kg
     analyte_volume=None,  # ml
-    dic=0,
+    dic=default.dic,
     total_alpha=0,
     total_beta=0,
-    total_ammonia=0,
-    total_phosphate=0,
-    total_silicate=0,
-    total_sulfide=0,
+    total_ammonia=default.total_ammonia,
+    total_phosphate=default.total_phosphate,
+    total_silicate=default.total_silicate,
+    total_sulfide=default.total_sulfide,
     total_borate=None,
     total_fluoride=None,
     total_sulfate=None,
@@ -356,7 +356,7 @@ class Titration:
         self,
         file_name=None,
         file_path="",
-        salinity=35,
+        salinity=None,
         analyte_mass=None,
         analyte_volume=None,
         file_prepare_kwargs={},
@@ -368,7 +368,7 @@ class Titration:
         ), "You must provide either analyte_mass [kg] or analyte_volume [ml]!"
         self.file_name = file_name
         self.file_path = file_path
-        self.salinity = salinity
+        self.check_set_default("salinity", salinity)
         self.analyte_volume = analyte_volume
         if file_name is not None:
             self.file_prepare_kwargs = file_prepare_kwargs.copy()
@@ -427,6 +427,17 @@ class Titration:
         self.calibrated = False
         self.solved = False
 
+    def check_set_default(self, attr, value):
+        """If value is None, check if attribute already exists.  If it does, do nothing,
+        but if it doesn't, set it to the default.  If value is not None, set attribute
+        to the new value, creating it if necessary.
+        """
+        if value is None:
+            if not hasattr(self, attr):
+                setattr(self, attr, getattr(default, attr))
+        else:
+            setattr(self, attr, value)
+
     def get_totals(self):
         return {k: self.titration[k].to_numpy() for k in self._totals}
 
@@ -438,22 +449,23 @@ class Titration:
         alkalinity_certified,
         analyte_total_sulfate=None,
         emf0_guess=None,
-        least_squares_kwargs=default.least_squares_kwargs,
-        pH_range=default.pH_range,
+        least_squares_kwargs=None,
+        pH_range=None,
         titrant_molinity_guess=None,
-        titrant=default.titrant,
+        titrant=None,
     ):
         self.alkalinity_certified = alkalinity_certified
         self.analyte_total_sulfate = analyte_total_sulfate
-        self.pH_range = pH_range
-        self.titrant = titrant
+        self.check_set_default("least_squares_kwargs", least_squares_kwargs)
+        self.check_set_default("pH_range", pH_range)
+        self.check_set_default("titrant", titrant)
         # Solve for titrant_molinity
-        self.solver_kwargs = {
-            "pH_range": self.pH_range,
-            "least_squares_kwargs": least_squares_kwargs,
-            "emf0_guess": emf0_guess,
-        }
         st = self.titration
+        solver_kwargs = {
+            "emf0_guess": emf0_guess,
+            "least_squares_kwargs": least_squares_kwargs,
+            "pH_range": self.pH_range,
+        }
         if titrant == "H2SO4":
             assert self.analyte_total_sulfate is not None
             self.titrant_molinity = core.calibrate_H2SO4(
@@ -468,7 +480,7 @@ class Titration:
                 self.get_k_constants(),
                 titrant_molinity_guess=titrant_molinity_guess,
                 least_squares_kwargs=least_squares_kwargs,
-                solver_kwargs=self.solver_kwargs,
+                solver_kwargs=solver_kwargs,
             )["x"][0]
         else:
             self.titrant_molinity = core.calibrate(
@@ -481,7 +493,7 @@ class Titration:
                 self.get_k_constants(),
                 titrant_molinity_guess=titrant_molinity_guess,
                 least_squares_kwargs=least_squares_kwargs,
-                solver_kwargs=self.solver_kwargs,
+                solver_kwargs=solver_kwargs,
             )["x"][0]
         # Get Gran-plot guesses with solved titrant molinity
         self.gran_guesses()
@@ -544,18 +556,14 @@ class Titration:
         least_squares_kwargs=default.least_squares_kwargs,
         pH_range=None,
         titrant_molinity=None,
-        titrant=default.titrant,
+        titrant=None,
     ):
         if analyte_total_sulfate is not None:
             self.analyte_total_sulfate = analyte_total_sulfate
-        self.titrant = titrant
         if titrant_molinity is not None:
             self.set_titrant_molinity(titrant_molinity)
-        if pH_range is not None:
-            self.pH_range = pH_range
-        else:
-            if not hasattr(self, "pH_range"):
-                self.pH_range = default.pH_range
+        self.check_set_default("pH_range", pH_range)
+        self.check_set_default("titrant", titrant)
         self.gran_guesses()
         # Solve for total alkalinity and EMF0
         st = self.titration
@@ -651,7 +659,7 @@ class Titration:
             "OH",
         ]:
             st[co2sysvar] = results[co2sysvar] * 1e-6
-        st["H"] = 10 ** -st.pH
+        st["H"] = 10**-st.pH
         st["alk_alpha"] = results["alkalinity_alpha"] * 1e-6
         st["alk_beta"] = results["alkalinity_beta"] * 1e-6
         st["alkalinity_estimate"] = (
@@ -700,9 +708,9 @@ class Titration:
         analyte_total_sulfate=None,
         emf0_guess=None,
         least_squares_kwargs=default.least_squares_kwargs,
-        pH_range=default.pH_range,
+        pH_range=None,
         titrant_molinity_guess=None,
-        titrant=default.titrant,
+        titrant=None,
     ):
         self.calibrate(
             alkalinity_certified,
@@ -721,12 +729,10 @@ class Titration:
             titrant=titrant,
         )
 
-    def _get_dic_loss_hires(self):
+    def _get_dic_loss_hires(self, fCO2_air=None, split_pH=None):
         """Fit and forecast high-resolution DIC loss model."""
-        if not hasattr(self, "fCO2_air"):
-            self.fCO2_air = default.fCO2_air
-        if not hasattr(self, "split_pH"):
-            self.split_pH = default.split_pH
+        self.check_set_default("fCO2_air", fCO2_air)
+        self.check_set_default("split_pH", split_pH)
         k_dic_loss, loss_hires = core.loss.get_dic_loss_hires(
             self.titration.titrant_mass.to_numpy(),
             self.titration.pH.to_numpy(),
@@ -742,10 +748,10 @@ class Titration:
         )
         return k_dic_loss, pd.DataFrame(loss_hires)
 
-    def get_dic_loss(self, fCO2_air=default.fCO2_air, split_pH=default.split_pH):
-        """Get final DIC loss values at the titration points to go in the titration df."""
-        self.fCO2_air = fCO2_air
-        self.split_pH = split_pH
+    def get_dic_loss(self, fCO2_air=None, split_pH=None):
+        """Get final DIC loss values at the titration points for the titration df."""
+        self.check_set_default("fCO2_air", fCO2_air)
+        self.check_set_default("split_pH", split_pH)
         (
             self.k_dic_loss,
             self.titration["dic_loss_modelled"],
@@ -764,6 +770,14 @@ class Titration:
             fCO2_air=self.fCO2_air,
             split_pH=self.split_pH,
         )
+
+    def update_dic_loss(self, fCO2_air=None, split_pH=None):
+        """Model and fit DIC-loss function and then re-solve accounting for DIC loss."""
+        self.check_set_default("fCO2_air", fCO2_air)
+        self.check_set_default("split_pH", split_pH)
+        self.get_dic_loss()
+        self.titration["dic"] = self.titration.dic_loss_modelled
+        self.solve()
 
     # Assign plotting functions
     plot_emf = plot.titration.emf

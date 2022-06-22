@@ -4,7 +4,7 @@
 
 _authorlist = ["Humphreys, Matthew P.", "Matthews, Ruth S."]
 __author__ = " and ".join(_authorlist)
-__version__ = "23.2.2"
+__version__ = "23.3"
 
 
 def hello():
@@ -17,9 +17,9 @@ def hello():
   :   (   ) | |-.' |  | |(   ) | (.-' 
    `--'`-'`-`-'  `-`--`-`-`-'`-`-'`--'
 
+    Humphreys, M.P. & Matthews, R.S.
        doi:10.5281/zenodo.2634304
-       
-             Version {}
+           Version {} (2022)
 """.format(
             __version__
         )

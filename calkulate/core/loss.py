@@ -38,8 +38,8 @@ def _lsqfun_dic_loss_model(
 
 def get_fCO2_from_dic_pH(dic, pH, k0, k1, k2):
     """Calculate fCO2 from DIC and pH."""
-    h = 10 ** -pH
-    CO2aq = dic / (1 + k1 / h + k1 * k2 / h ** 2)
+    h = 10**-pH
+    CO2aq = dic / (1 + k1 / h + k1 * k2 / h**2)
     fCO2 = CO2aq / k0
     return fCO2
 
@@ -101,6 +101,12 @@ def get_dic_loss_hires(
     split_pH=default.split_pH,
 ):
     """Fit and forecast high-resolution DIC loss model."""
+    # Set NaN dic_loss values to zero
+    dic_loss = dic_loss.copy()
+    dic_loss[np.isnan(dic_loss)] = 0
+    # Set NaN fCO2_loss values to the maximum
+    fCO2_loss = fCO2_loss.copy()
+    fCO2_loss[np.isnan(fCO2_loss)] = np.nanmax(fCO2_loss)
     # Get delta-fCO2
     delta_fCO2_loss = fCO2_loss - fCO2_air
     # Use titrant_mass as proxy for titration time: generate high-resolution arrays

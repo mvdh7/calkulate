@@ -4,8 +4,8 @@ calkulate/__init__.py                             7      0   100%
 calkulate/constants.py                            4      0   100%
 calkulate/convert.py                             40      6    85%
 calkulate/core/__init__.py                       94      5    95%
-calkulate/core/loss.py                           57      0   100%
-calkulate/dataset.py                            179     17    91%
+calkulate/core/loss.py                           61      0   100%
+calkulate/dataset.py                            179     13    93%
 calkulate/default.py                             28      0   100%
 calkulate/density.py                             26      5    81%
 calkulate/interface.py                           75      3    96%
@@ -14,9 +14,10 @@ calkulate/meta.py                                 6      0   100%
 calkulate/plot/__init__.py                       63     56    11%
 calkulate/plot/misc.py                            3      0   100%
 calkulate/plot/titration.py                     154      2    99%
-calkulate/simulate.py                            97      0   100%
-calkulate/titration.py                          221     35    84%
+calkulate/simulate.py                           106      0   100%
+calkulate/titration.py                          228     32    86%
 tests/__init__.py                                 0      0   100%
+tests/test_SOP3b.py                              11      0   100%
 tests/test_convert.py                            21      0   100%
 tests/test_core.py                               42      0   100%
 tests/test_dataset_io.py                         13      0   100%
@@ -26,12 +27,14 @@ tests/test_dbs_calk.py                           32      0   100%
 tests/test_density.py                            11      0   100%
 tests/test_experiment.py                         13      4    69%
 tests/test_io.py                                 13      0   100%
+tests/test_js_geomar.py                          18      0   100%
+tests/test_loss_simulation.py                    45      1    98%
 tests/test_misc.py                                5      0   100%
 tests/test_pH_scales_simulated_titration.py      46      0   100%
 tests/test_simulate.py                           22      0   100%
 tests/test_simulate_pH_scales.py                 41      0   100%
 tests/test_simulate_sulfate.py                  103      1    99%
 tests/test_simulate_then_solve.py                55      0   100%
-tests/test_titration_class.py                    55      0   100%
+tests/test_titration_class.py                    66      0   100%
 -----------------------------------------------------------------
-TOTAL                                          1673    142    92%
+TOTAL                                          1778    136    92%

@@ -87,11 +87,7 @@ def pH(tt, ax=None, show_gran=True, **scatter_kwargs):
         label="Final — used",
         **final_styler.scatter(),
     )
-    pH_range = (
-        tt.solver_kwargs["pH_range"]
-        if "pH_range" in tt.solver_kwargs
-        else default.pH_range
-    )
+    pH_range = tt.pH_range if hasattr(tt, "pH_range") else default.pH_range
     xlim = ax.get_xlim()
     ax.fill_between(
         xlim,

@@ -1,0 +1,239 @@
+$S PC/LIMS V1
+$S Devices V1
+$S device 862 C. Titrosampler V1
+P 5.862.0024	S 03120
+$S ADC1
+ADC 3.848.1210	S 47152
+$E
+$S MSB1
+$S 800
+S 70117	
+$E
+$S 802
+S -----	
+$E
+$S 848
+	
+$E
+$E
+$E
+$E
+$S Sample data V1
+		49.8665	g
+$E
+$S MPL V2
+$S Mode 1	07	MET U	V1.0
+1	2.3000	178.7	0.0	0.0	26.2
+2	2.3760	187.9	9.3	45.4	26.2
+3	2.4520	194.9	7.0	90.7	26.2
+4	2.5280	200.5	5.6	136.0	26.2
+5	2.6040	205.1	4.6	181.4	26.2
+6	2.6800	209.0	3.9	226.7	26.2
+7	2.7560	212.4	3.4	272.1	26.2
+8	2.8320	215.5	3.1	317.4	26.2
+9	2.9080	218.2	2.7	362.8	26.2
+10	2.9840	220.7	2.5	408.1	26.2
+11	3.0600	223.0	2.3	453.1	26.2
+12	3.1360	225.0	2.0	491.9	26.2
+13	3.2120	226.9	1.9	532.9	26.2
+14	3.2880	228.7	1.8	566.7	26.2
+15	3.3640	230.3	1.7	603.7	26.2
+$E
+$E
+$S DETERM V1
+$S Props V2
+BERG TA+0	saved	20220518-144403	031201652885043000	2022-05-18 14:44:03	original	Regular without errors		10																												
+$E
+$S Results V1
+$S Result 1C.R1 V1
+		%	-1
+$E
+$S Result 1C.R2 V1
+		%	-1
+$E
+$S Result 1C.R3 V1
+		%	-1
+$E
+$S Result 1C.R4 V1
+		%	-1
+$E
+$S Result 1C.R5 V1
+		%	-1
+$E
+$E
+$S Mode 1	07	MET U	V2.0
+$S EP V1
+$E
+$S Cal V1
+$E
+$S StdAdd V1
+$E
+$E
+$S Eval 1	09	EVAL FIX-EP	V2.0
+$E
+$S Other Variables V1
+$S System V1
+947.0	10	7852	1	10	27	1	10	0
+$E
+$S Mode 1	07	MET U	V2.0
+		3.3640	824.9	2.3000	-38.613	25.5	178.655	26.2	221.1	230.329	26.2	2.3000	0.0000	0.0000	6.809	103.3		15			Stop measured value reached	Pt1000			
+$E
+$S Statistic V2
+$E
+$S ComVar local V1
+$E
+$S Titrant V1
+$E
+$S Sensor V1
+$S Sensor1 V2
+pH electrode	pH			103.3	6.809	17.0	(Pt1000)	2022-05-09 09:06:00	CAL_pH	
+$E
+$E
+$E
+$S Calc Vars V1
+$S Calc1 V1
+$S R1 V1
+
+$E
+$S R2 V1
+
+$E
+$S R3 V1
+
+$E
+$S R4 V1
+
+$E
+$S R5 V1
+
+$E
+$E
+$E
+$S Messages V1
+$E
+$E
+$S Methodproperties V1
+BERG TA+0	saved		2012-04-19 11:51:15		2022-05-09 12:42:40																													
+$E
+$S Method V1
+$S Methodoptions V1.1
+off	3	off	ID1	ID2	on	on	off	1.0	g	off	0	9999999999	off	30 s	on		off	off	Card 1		ID1	on	on	off	on	off	no	**********00**	off	off
+$E
+$S 01	T+	MET U
+off	304131
+$E
+$S 02	MOVE	-1
+on	Sample	1	Show message	20 °/s	+	55 °/s
+$E
+$S 03	LIFT	-3
+on	Work position	20 mm/s
+$E
+$S 04	CTRL	Send remote signal
+	on	*************p	200 ms
+$E
+$S 05	CTRL	2
+	on	off	200 ms
+$E
+$S 06	REQUEST	3
+off	off	off	off	on
+$E
+$S 07	MET U	4
+	2.3 mL	max.	200 s	off	off	5.00 mL/min	off	0 s	1 s	user	0.075 mL	max.	0.1 mV/min	10 s	45 s	25.0 °C	7 mL	230 mV	off	off	off	max.	off	30 mV	all	-1250.0 mV	off	off	off	off	off	off	off	off	1250.0 mV	1250.0 mV	1250.0 mV	1250.0 mV	1250.0 mV	1250.0 mV	1250.0 mV	1250.0 mV	1250.0 mV	30 mV	30 mV	30 mV	30 mV	30 mV	30 mV	30 mV	30 mV	30 mV	first	first	first	first	first	first	first	first	first	0.00000 mL	off	off	off	off	off	off	off	off	9999.99 mL	9999.99 mL	9999.99 mL	9999.99 mL	9999.99 mL	9999.99 mL	9999.99 mL	9999.99 mL	9999.99 mL	30 mV	30 mV	30 mV	30 mV	30 mV	30 mV	30 mV	30 mV	30 mV	first	first	first	first	first	first	first	first	first	on	pH electrode	automatic	on		on	6	on
+$E
+$S 08	BEEP	5
+1
+$E
+$S 09	EVAL FIX-EP	6
+mV	Measured value	off	off	off	off	off	off	off	off	off
+$E
+$S 10	CALC	7
+$S R1
+1			2	%	0	off	off	0	on	off	Round	off	invalid	invalid	Display message		
+$E
+$S R2
+2			2	%	1	off	off	1	on	off	Round	off	invalid	invalid	Display message		
+$E
+$S R3
+3			2	%	2	off	off	2	on	off	Round	off	invalid	invalid	Display message		
+$E
+$S R4
+4			2	%	3	off	off	3	on	off	Round	off	invalid	invalid	Display message		
+$E
+$S R5
+5			2	%	4	off	off	4	on	off	Round	off	invalid	invalid	Display message		
+$E
+$E
+$S 11	T+ Report	8
+off	off	off	off	off
+$E
+$S 12	CTRL	Send remote signal
+	on	*************p	200 ms
+$E
+$S 13	LIFT	-4
+on	Shift position	20 mm/s
+$E
+$S 14	WAIT	DRIP
+5 s	-11	off	on
+$E
+$S 15	MOVE	-2
+on	Special beaker	2	Show message	20 °/s	-	55 °/s
+$E
+$S 16	LIFT	-3
+on	Work position	20 mm/s
+$E
+$S 17	STIR	STIR
+	on	6	on
+$E
+$S 18	WAIT	RINSE
+5 s	-12	off	on
+$E
+$S 19	STIR	Stir
+	on	8	off
+$E
+$S 20	LIFT	-4
+on	Shift position	20 mm/s
+$E
+$S 21	WAIT	DRIP
+5 s	-11	off	on
+$E
+$S 22	MOVE	-2
+on	Special beaker	1	Show message	20 °/s	+	55 °/s
+$E
+$S 23	LIFT	-3
+on	Work position	20 mm/s
+$E
+$S 24	STIR	STIR
+	on	6	on
+$E
+$S 25	WAIT	RINSE
+5 s	-12	off	on
+$E
+$S 26	STIR	Stir
+	on	8	off
+$E
+$S 27	LIFT	-4
+on	Shift position	20 mm/s
+$E
+$S 28	WAIT	DRIP
+5 s	-11	off	on
+$E
+$S 29	SAMPLE	
++	1
+$E
+$S 30	SUBSEQ	Subsequence
+End sequence	1		off
+$S 01	LIFT	-3
+on	Work position	20 mm/s
+$E
+$E
+$S 31	SUBSEQ	Subsequence
+-6	1		off
+$S 01	STIR	Stir
+	on	8	off
+$E
+$S 02	CTRL	Send remote signal
+	on	*********p****	200 ms
+$E
+$E
+$E
+$E

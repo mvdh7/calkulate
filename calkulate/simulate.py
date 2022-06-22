@@ -29,14 +29,14 @@ def alkalinity_components(pH, totals, k_constants, opt_pH_scale=default.opt_pH_s
     ), "opt_pH_scale must be 1 (Total), 2 (Seawater) or 3 (Free)."
     # Build up dict of solution components
     components = {}
-    h = components["H"] = 10.0 ** -pH
+    h = components["H"] = 10.0**-pH
     if "k_water" in k_constants:
         components["OH"] = k_constants["k_water"] / h
     if "dic" in totals:
         TCO2 = totals["dic"]
         K1 = k_constants["k_carbonic_1"]
         K2 = k_constants["k_carbonic_2"]
-        components["CO2"] = TCO2 / (1 + K1 / h + K1 * K2 / h ** 2)
+        components["CO2"] = TCO2 / (1 + K1 / h + K1 * K2 / h**2)
         components["HCO3"] = K1 * components["CO2"] / h
         components["CO3"] = K2 * components["HCO3"] / h
     if "total_borate" in totals:
@@ -48,8 +48,8 @@ def alkalinity_components(pH, totals, k_constants, opt_pH_scale=default.opt_pH_s
         KP1 = k_constants["k_phosphoric_1"]
         KP2 = k_constants["k_phosphoric_2"]
         KP3 = k_constants["k_phosphoric_3"]
-        phosphoric_denom = h ** 3 + KP1 * h ** 2 + KP1 * KP2 * h + KP1 * KP2 * KP3
-        components["H3PO4"] = TPO4 * h ** 3 / phosphoric_denom
+        phosphoric_denom = h**3 + KP1 * h**2 + KP1 * KP2 * h + KP1 * KP2 * KP3
+        components["H3PO4"] = TPO4 * h**3 / phosphoric_denom
         components["HPO4"] = TPO4 * KP1 * KP2 * h / phosphoric_denom
         components["PO4"] = TPO4 * KP1 * KP2 * KP3 / phosphoric_denom
     if "total_silicate" in totals:
@@ -130,6 +130,8 @@ def _titration(
     analyte_mass=0.1,
     dic=0,
     emf0=600,
+    fCO2_air=default.fCO2_air,
+    k_dic_loss=None,
     salinity=35,
     temperature=25,
     titrant_mass_start=0,
@@ -204,13 +206,12 @@ def _titration(
     )
     co2sys_start = pyco2.sys(**kwargs_start)
     # Calculate dilution through the titration, keeping units in µmol/kg
-    dilution_factor = analyte_mass / (analyte_mass + titrant_mass)
+    dilution_factor = convert.get_dilution_factor(titrant_mass, analyte_mass)
     alkalinity_titration = (
         1e6
         * (analyte_mass * alkalinity * 1e-6 - titrant_mass * titrant_molinity)
         / (analyte_mass + titrant_mass)
     )
-    dic_titration = dic * dilution_factor
     kwargs_titration = kwargs_start.copy()
     for k in [
         "total_alpha",
@@ -225,6 +226,32 @@ def _titration(
         "total_sulfide",
     ]:
         kwargs_titration[k] = co2sys_start[k] * dilution_factor
+    # Model DIC loss
+    if k_dic_loss is not None:
+        dic_titration = np.full_like(titrant_mass, np.nan)
+        dic_titration[0] = dic
+        for i in range(len(dic_titration) - 1):
+            kwargs_i = {
+                k: v if np.isscalar(v) else v[i] for k, v in kwargs_titration.items()
+            }
+            fCO2 = pyco2.sys(
+                par1=alkalinity_titration[i],
+                par2=dic_titration[i],
+                par1_type=1,
+                par2_type=2,
+                **kwargs_i,
+            )["fCO2"]
+            delta_fCO2 = fCO2 - fCO2_air
+            dic_loss = k_dic_loss * delta_fCO2 * titrant_mass_step
+            dic_titration[i + 1] = (
+                dic_titration[i]
+                * convert.get_dilution_factor(
+                    titrant_mass_step, analyte_mass + titrant_mass[i]
+                )
+                - dic_loss
+            )
+    else:
+        dic_titration = dic * dilution_factor
     # Simulate the titration pH and convert it to EMF
     co2sys_titration = pyco2.sys(
         alkalinity_titration, dic_titration, 1, 2, **kwargs_titration
@@ -245,6 +272,8 @@ def titration(
     analyte_mass=0.1,
     dic=0,
     emf0=600,
+    fCO2_air=default.fCO2_air,
+    k_dic_loss=None,
     salinity=35,
     temperature=25,
     titrant_mass_start=0,
@@ -298,6 +327,8 @@ def titration(
         simulate_kwargs=dict(
             dic=dic,
             emf0=emf0,
+            fCO2_air=fCO2_air,
+            k_dic_loss=k_dic_loss,
             salinity=salinity,
             temperature=temperature,
             titrant_mass_start=titrant_mass_start,
