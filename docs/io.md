@@ -75,4 +75,4 @@ For example, a file could contain the following:
 
 ### Other formats
 
-Alternatively, you may have files in a different format, for example generated directly by a Metrohm Titrino unit.  These .txt files typically have names beginning with *PC_LIMS_Report_* and the titration data is found in six columns somewhere in the middle of the file.  These files can be imported by Calkulate too: when you run the `calibrate`, `solve` or `calkulate` functions, you just need to include `read_dat_method="pclims"` as a kwarg.
+Alternatively, you may have files in a different format, for example generated directly by a Metrohm Titrino unit.  These .txt files typically have names beginning with *PC_LIMS_Report_* and the titration data is found in six columns somewhere in the middle of the file.  These files can be imported by Calkulate too: when you run the `calibrate`, `solve` or `calkulate` functions, you just need to include `read_dat_method="pclims"` as a kwarg (or if using the dataset approach, add a `read_dat_method` column to your [metadata table](../metadata/#optional-columns)).
