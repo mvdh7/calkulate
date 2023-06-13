@@ -4,13 +4,17 @@
 
 Calkulate v3 went too far overboard with the OO approach and ended up being very slow and overly complex behind the scenes as a result.  Calkulate v23 therefore mashes together the best bits of v2 and v3 for the ultimate alkalinity solving experience.
 
-### 23.3 (22 June 2022)
+### 23.4 (13 June 2023)
 
-Patch version numbers abandoned.
+!!! info "Changes in v23.4"
+
+    * Swapped deprecated pandas `.iteritems` for `.items`.
+    * Improvements to `Titration` class.
+
+### 23.3 (22 June 2022)
 
 !!! info "Changes in v23.3"
 
-    * Switched to simpler version numbering scheme (only major and minor, no patch).
     * Added a test of the [DSC07](../references/#d) SOP 3b example dataset.
     * Updated for compatibility with PyCO2SYS v1.8.1 (but no longer with v1.8.0).
 
