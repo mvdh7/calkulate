@@ -231,7 +231,7 @@ def calibrate(
         read_dat_kwargs=read_dat_kwargs,
         verbose=verbose,
     )
-    for k, v in calibrated_rows.iteritems():
+    for k, v in calibrated_rows.items():
         ds[k] = v
     # Get titrant_molinity averaged by analysis_batch
     if "analysis_batch" not in ds:
@@ -362,7 +362,7 @@ def solve(
         read_dat_kwargs=read_dat_kwargs,
         verbose=verbose,
     )
-    for k, v in solved_rows.iteritems():
+    for k, v in solved_rows.items():
         ds[k] = v
     if "alkalinity_certified" in ds:
         ds["alkalinity_offset"] = ds.alkalinity - ds.alkalinity_certified
