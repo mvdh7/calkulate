@@ -19,7 +19,7 @@ def hello():
 
     Humphreys, M.P. & Matthews, R.S.
        doi:10.5281/zenodo.2634304
-           Version {} (2022)
+           Version {} (2023)
 """.format(
             __version__
         )
