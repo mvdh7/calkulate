@@ -8,8 +8,10 @@ Calkulate v3 went too far overboard with the OO approach and ended up being very
 
 !!! info "Changes in v23.5"
 
+    * Added `to_pandas` method to `Dataset` for a more convenient downgrade to a pandas `DataFrame`.
+    * Improved docstrings for several key functions and classes.
     * Fixed bugs in logicals in various `calk.dataset` functions which had meant that NaN values in the metadata file were not always being ignored.
-    * Fixed bug in the `solve` method such that the `analyte_mass` is now automatically calculated from `analyte_volume`.
+    * Fixed bug in the `Dataset.solve` method such that the `analyte_mass` is now automatically calculated from `analyte_volume`.
     * Switched to using pyproject.toml instead of setup.py for building the package.
     * Renamed module `io` as `read`.
 
