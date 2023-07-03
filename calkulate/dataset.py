@@ -430,7 +430,7 @@ def calkulate(
     inplace=True,
     verbose=default.verbose,
 ):
-    """Calibrate and solve all titrations in a ``Dataset``.
+    """Calibrate and then solve all titrations in a ``Dataset``.
 
     Parameters
     ----------
@@ -475,23 +475,26 @@ def calkulate(
     return ds
 
 
-def to_Titration(ds, index):
-    """Create a ``Titration`` object from one row of a ``Dataset``.
+def to_Titration(ds, index, read_dat_kwargs={}):
+    """Create a ``calk.Titration`` object from one row of a ``Dataset``.
 
     Parameters
     ----------
-    ds : ``calk.Dataset``
-        The ``Dataset`` to make the Titration from.
+    ds : ``pandas.DataFrame`` or ``calk.Dataset``
+        The ``Dataset`` to make the Titration from (not used if running as a method).
     index
         The row index in the ``Dataset`` to use.
+    read_dat_kwargs : ``dict``, optional
+        Any kwargs that need to be passed through in order to correctly read the
+        titration data file (e.g., ``encoding``).
 
     Returns
     -------
     ``calk.Titration``
-        A ``calk.Titration`` object for the specified row of the ``Dataset``.
+        A ``calk.Titration`` for the specified row of the ``Dataset``.
     """
     dsr = ds.loc[index]
-    prepare_kwargs = {}
+    prepare_kwargs = {"read_dat_kwargs": read_dat_kwargs}
     for k, v in prepare_defaults.items():
         if k in dsr:
             if not pd.isnull(dsr[k]):
@@ -516,6 +519,7 @@ def to_Titration(ds, index):
     if "titrant_molinity" in dsr:
         if not pd.isnull(dsr.titrant_molinity):
             tt.set_titrant_molinity(dsr.titrant_molinity)
+            tt.solve()
     return tt
 
 
@@ -523,7 +527,6 @@ class Dataset(pd.DataFrame):
     """
     ``calk.Dataset``
     ================
-
     A ``calk.Dataset`` is pandas ``DataFrame`` with several ``calk.dataset`` functions
     available as methods.
 
