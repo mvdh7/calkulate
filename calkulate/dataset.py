@@ -523,10 +523,10 @@ class Dataset(pd.DataFrame):
     """
     ``calk.Dataset``
     ================
-    
+
     A ``calk.Dataset`` is pandas ``DataFrame`` with several ``calk.dataset`` functions
     available as methods.
-    
+
     Alkalinity solving methods
     --------------------------
     ``calibrate``

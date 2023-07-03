@@ -5,7 +5,7 @@
 import numpy as np, pandas as pd
 from scipy.stats import linregress
 import PyCO2SYS as pyco2
-from . import convert, core, default, density, interface, io, plot, simulate
+from . import convert, core, default, density, interface, read, plot, simulate
 
 
 def get_dat_data(
@@ -22,7 +22,7 @@ def get_dat_data(
 ):
     """Import a dat file and convert titrant units to mass in kg."""
     # Import titration data file
-    titrant_amount, emf, temperature = io.read_dat(
+    titrant_amount, emf, temperature = read.read_dat(
         file_name, method=read_dat_method, **read_dat_kwargs
     )
     if not pd.isnull(temperature_override):

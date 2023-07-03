@@ -23,14 +23,14 @@ from . import (
     default,
     density,
     interface,
-    io,
+    read,
     meta,
     plot,
     simulate,
     titration,
 )
 from .dataset import Dataset, get_batches
-from .io import (
+from .read import (
     read_dat,
     read_clipboard,
     read_csv,

@@ -2,7 +2,7 @@ import calkulate as calk, numpy as np
 
 # Import file
 file_name = "tests/data/seawater-CRM-144.dat"
-titrant_volume, emf, temperature = calk.io.read_dat(file_name)
+titrant_volume, emf, temperature = calk.read.read_dat(file_name)
 titrant_mass = titrant_volume * calk.density.HCl_NaCl_25C_DSC07() * 1e-3
 analyte_mass = 0.1  # kg
 dic = 2121  # micromol/kg-solution

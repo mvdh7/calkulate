@@ -4,7 +4,7 @@
 
 import numpy as np
 import PyCO2SYS as pyco2
-from . import convert, default, io
+from . import convert, default
 from .titration import Titration
 
 
