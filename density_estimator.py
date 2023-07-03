@@ -31,6 +31,7 @@ density = np.array(
     ]
 )
 
+
 # Generate fit
 def density_fitter(coeffs, molality):
     return coeffs[0] + coeffs[1] * molality + coeffs[2] * molality**2
