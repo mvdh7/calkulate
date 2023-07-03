@@ -1,0 +1,15 @@
+file_name,salinity,ignore,analyte_mass,alkalinity_certified,analysis_batch,dic,file_path,total_ammonia,total_phosphate,total_silicate,total_sulfate,total_borate,total_fluoride,total_sulfate,file_good,k_borate,k_carbonic_1,k_carbonic_2,k_fluoride,k_phosphoric_1,k_phosphoric_2,k_phosphoric_3,k_silicate,k_sulfide,k_bisulfate,k_water,molinity_HCl,molinity_NaCl,molinity_H2SO4,opt_k_bisulfate,opt_k_carbonic,opt_k_fluoride,opt_total_borate,read_dat_method,reference_good,temperature_override,titrant,titrant_amount_unit,titrant_density,titrant_molinity
+20210623CRM.1.txt,33.459,,0.13216,2218.31,A21,2033.86,tests/data/irlon/Raw Tiamo/,,0.47,3.5,,,,,TRUE,,,,,,,,,,,,,,,1,15,1,1,genfromtxt,TRUE,,HCl,ml,1.02454,0.100179
+20210623CRM.2.txt,33.459,,0.13052,2218.31,A21,2033.86,tests/data/irlon/Raw Tiamo/,,0.47,3.5,,,,,TRUE,,,,,,,,,,,,,,,1,15,1,1,genfromtxt,TRUE,,HCl,ml,1.02454,0.100179
+20210601SLE-NF.1.txt,24.88,,0.12688,,A21,,tests/data/irlon/Raw Tiamo/,,,,,,,,TRUE,,,,,,,,,,,,,,,1,15,1,1,genfromtxt,TRUE,,HCl,ml,,0.100179
+20210601SLE-NF.2.txt,24.88,,0.12251,,A21,,tests/data/irlon/Raw Tiamo/,,,,,,,,TRUE,,,,,,,,,,,,,,,1,15,1,1,genfromtxt,TRUE,,HCl,ml,,0.100179
+20210601SLE-NF.3.txt,24.88,,0.12641,,A21,,tests/data/irlon/Raw Tiamo/,,,,,,,,TRUE,,,,,,,,,,,,,,,1,15,1,1,genfromtxt,TRUE,,HCl,ml,,0.100179
+20210601SLE-SF2.1.txt,13.85,,0.12462,,A21,,tests/data/irlon/Raw Tiamo/,,,,,,,,TRUE,,,,,,,,,,,,,,,1,15,1,1,genfromtxt,TRUE,,HCl,ml,,0.100179
+20210601SLE-SF2.2.txt,13.85,,0.12566,,A21,,tests/data/irlon/Raw Tiamo/,,,,,,,,TRUE,,,,,,,,,,,,,,,1,15,1,1,genfromtxt,TRUE,,HCl,ml,,0.100179
+20210601SLE-SF2.3.txt,13.85,,0.12975,,A21,,tests/data/irlon/Raw Tiamo/,,,,,,,,TRUE,,,,,,,,,,,,,,,1,15,1,1,genfromtxt,TRUE,,HCl,ml,,0.100179
+20210608IRL-LP.1.txt,36.14980392,,0.1267,,A21,,tests/data/irlon/Raw Tiamo/,,,,,,,,TRUE,,,,,,,,,,,,,,,1,15,1,1,genfromtxt,TRUE,,HCl,ml,,0.100179
+20210608IRL-LP.2.txt,36.14980392,,0.12848,,A21,,tests/data/irlon/Raw Tiamo/,,,,,,,,TRUE,,,,,,,,,,,,,,,1,15,1,1,genfromtxt,TRUE,,HCl,ml,,0.100179
+20210608IRL-LP.3.txt,36.14980392,,0.12264,,A21,,tests/data/irlon/Raw Tiamo/,,,,,,,,TRUE,,,,,,,,,,,,,,,1,15,1,1,genfromtxt,TRUE,,HCl,ml,,0.100179
+20210608IRL-SB.1.txt,35.5,,0.1297,,A21,,tests/data/irlon/Raw Tiamo/,,,,,,,,TRUE,,,,,,,,,,,,,,,1,15,1,1,genfromtxt,TRUE,,HCl,ml,,0.100179
+20210608IRL-SB.2.txt,35.5,,0.1312,,A21,,tests/data/irlon/Raw Tiamo/,,,,,,,,TRUE,,,,,,,,,,,,,,,1,15,1,1,genfromtxt,TRUE,,HCl,ml,,0.100179
+20210608IRL-SB.3.txt,35.5,,0.12459,,A21,,tests/data/irlon/Raw Tiamo/,,,,,,,,TRUE,,,,,,,,,,,,,,,1,15,1,1,genfromtxt,TRUE,,HCl,ml,,0.100179
