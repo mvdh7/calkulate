@@ -284,7 +284,7 @@ def titration(
     pH_range=default.pH_range,
     **pyco2sys_kwargs,
 ):
-    """Simulate a titration and return a calibrated and solved Titration object.
+    """Simulate a titration and return a calibrated and solved ``Titration``.
 
     Parameters
     ----------
