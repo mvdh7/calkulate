@@ -1,0 +1,3 @@
+,file_path,file_name,salinity,analyte_volume,alkalinity_certified,molinity_HCl,titrant_molinity
+1,tests/data/oberlin/content/,Standard2_1_053123.txt,0.0,49.49874838,,0.1,0.1
+2,tests/data/oberlin/content/,Standard1_2_053123.txt,0.0,49.31371847,,0.1,0.1
