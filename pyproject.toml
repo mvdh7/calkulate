@@ -1,0 +1,29 @@
+[build-system]
+requires = [
+    "setuptools",
+    "PyCO2SYS",
+    "matplotlib",
+    "numpy",
+    "openpyxl",
+    "pandas",
+    "scipy",
+
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "Calkulate"
+description = "Calkulate: seawater total alkalinity from titration data"
+readme = "README.md"
+dependencies = [
+    "PyCO2SYS",
+    "matplotlib",
+    "numpy",
+    "openpyxl",
+    "pandas",
+    "scipy",
+]
+dynamic = ["version"]
+
+[tool.setuptools.dynamic]
+version = {attr = "calkulate.meta.__version__"}
