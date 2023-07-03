@@ -8,7 +8,7 @@ Calkulate v3 went too far overboard with the OO approach and ended up being very
 
 !!! info "Changes in v23.5"
 
-    
+    * Fixed bugs in logicals in `calk.dataset` which had meant that NaN values in the metadata file were not always being ignored.
 
 ### 23.4 (13 June 2023)
 

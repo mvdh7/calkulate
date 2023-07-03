@@ -85,10 +85,10 @@ def get_prepare_kwargs(ds_row):
     prepare_kwargs = {}
     for k in prepare_defaults:
         if k in ds_row:
-            if ~pd.isnull(ds_row[k]):
+            if not pd.isnull(ds_row[k]):
                 prepare_kwargs[k] = ds_row[k]
     # Add analyte_mass or analyte_volume as needed
-    if ~pd.isnull(ds_row.analyte_mass):
+    if not pd.isnull(ds_row.analyte_mass):
         prepare_kwargs["analyte_mass"] = ds_row.analyte_mass
     else:
         prepare_kwargs["analyte_volume"] = ds_row.analyte_volume
@@ -117,21 +117,21 @@ def calibrate_row(
             file_name = ds_row.file_name
         titrant_molinity_guess = default.titrant_molinity_guess
         if "titrant_molinity_guess" in ds_row:
-            if ~pd.isnull(ds_row.titrant_molinity_guess):
+            if not pd.isnull(ds_row.titrant_molinity_guess):
                 titrant_molinity_guess = ds_row.titrant_molinity_guess
         emf0_guess = None
         if "emf0_guess" in ds_row:
-            if ~pd.isnull(ds_row.emf0_guess):
+            if not pd.isnull(ds_row.emf0_guess):
                 emf0_guess = ds_row.emf0_guess
         # Deal with H2SO4 titrant special case
         titrant = default.titrant
         analyte_total_sulfate = None
         if "titrant" in ds_row:
-            if ~pd.isnull(ds_row.titrant):
+            if not pd.isnull(ds_row.titrant):
                 titrant = ds_row.titrant
                 if titrant == "H2SO4":
                     assert "total_sulfate" in ds_row
-                    assert ~pd.isnull(ds_row.total_sulfate)
+                    assert not pd.isnull(ds_row.total_sulfate)
                     analyte_total_sulfate = ds_row.total_sulfate
         # Calibrate!
         try:
@@ -268,15 +268,15 @@ def solve_row(
         titrant = default.titrant
         analyte_total_sulfate = None
         if "titrant" in ds_row:
-            if ~pd.isnull(ds_row.titrant):
+            if not pd.isnull(ds_row.titrant):
                 titrant = ds_row.titrant
                 if titrant == "H2SO4":
                     assert "total_sulfate" in ds_row
-                    assert ~pd.isnull(ds_row.total_sulfate)
+                    assert not pd.isnull(ds_row.total_sulfate)
                     analyte_total_sulfate = ds_row.total_sulfate
         emf0_guess = None
         if "emf0_guess" in ds_row:
-            if ~pd.isnull(ds_row.emf0_guess):
+            if not pd.isnull(ds_row.emf0_guess):
                 emf0_guess = ds_row.emf0_guess
         try:
             (
@@ -341,7 +341,29 @@ def solve(
     verbose=default.verbose,
 ):
     """Solve alkalinity, EMF0 and initial pH for all titrations with a
-    titrant_molinity value in a dataset.
+    `titrant_molinity` value in a dataset `ds`.
+
+    Parameters
+    ----------
+    ds : pandas.DataFrame
+        The titration metadataset.
+    least_squares_kwargs : dict, optional
+        kwargs to pass to scipy.optimize.least_squares, by default
+        `calk.default.least_squares_kwargs`.
+    pH_range : list, optional
+        The minimum and maximum pH values to use to solve, by default
+        `calk.default.pH_range`.
+    read_dat_kwargs : dict, optional
+        kwargs to pass to read_dat, by default `{}`.
+    inplace : bool, optional
+        Whether to perform the operation in-place on `ds`, by default `True`
+    verbose : bool, optional
+        Whether to print progress, by default `calk.default.verbose`.
+
+    Returns
+    -------
+    pandas.DataFrame
+        The titration metadataset with additional columns found by the solver.
     """
     print("Calkulate: solving alkalinity...")
     if not inplace:
