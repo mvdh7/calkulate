@@ -406,12 +406,50 @@ class Titration:
 
     Attributes
     ----------
-    ``alkalinity``
+    ``alkalinity`` : ``float``
         The solved alkalinity in micromol/kg-seawater.
-    ``alkalinity_gran``
-        The 
-    ``emf0``
+    ``alkalinity_certified`` : ``float``
+        The certified alkalinity value against which the sample was calibrated,
+        if applicable, in micromol/kg-seawater.
+    ``alkalinity_gran`` : ``float``
+        The Gran-plot initial estimate of alkalinity in micromol/kg-seawater.
+    ``analyte_mass`` : ``float``
+        The mass of the analyte in kg.
+    ``analyte_volume`` : ``float``
+        The volume of the analyte in ml, if provided.
+    ``calibrated`` : ``bool``
+        Whether or not the ``Titration`` has been calibrated.
+    ``dic`` : ``float``
+        The dissolved inorganic carbon in micromol/kg-seawater.
+    ``emf0`` : ``float``
         The solved EMF0 in mV.
+    ``emf0_gran`` : ``float``
+        The Gran-plot initial estimate of EMF0 in mV.
+    ``file_name`` : ``str``
+        The name of the titration data file.
+    ``file_path`` : ``str``
+        The path to the titration data file.
+    ``file_prepare_kwargs`` : ``dict``
+        The kwargs passed to prepare the titration data file for solving.
+    ``opt_result`` : ``scipy.optimize._optimize.OptimizeResult``
+        The raw output from the ``scipy.optimize.least_squares`` solver.
+    ``pH_initial`` : ``float``
+        The pH at the initial titration point on the free pH scale.
+    ``pH_initial_temperature`` : ``float``
+        The temperature at the initial titration point.
+    ``pH_range`` : ``tuple`` or ``list``
+        The (minimum, maximum) pH to use for solving the titration.
+    ``salinity`` : ``float``
+        The practical salinity of the analyte.
+    ``solved`` : ``bool``
+        Whether or not the titration has been solved.
+    ``titrant`` : ``str``
+        The type of titrant used in the titration.
+    ``titrant_molinity`` : ``float``
+        The molinity of the titrant in mol/kg-titrant.
+    ``titration`` : ``pd.DataFrame``
+        A table of everything that changes through the titration (e.g., amount of
+        titrant, EMF, temperature, total salt concentrations and equilibrium constants).
     """
 
     def __init__(
