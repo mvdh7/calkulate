@@ -199,8 +199,31 @@ def calibrate(
     inplace=True,
     verbose=default.verbose,
 ):
-    """Calibrate titrant_molinity for all titrations with an alkalinity_certified
-    value and assign means based on analysis_batch.
+    """Calibrate ``titrant_molinity`` for all titrations with an
+    ``alkalinity_certified`` value and assign means based on ``analysis_batch``.
+
+    Parameters
+    ----------
+    ds : ``pandas.DataFrame`` or ``calk.Dataset``
+        A table containing metadata for each titration (not used if running as a
+        method).
+    least_squares_kwargs : ``dict``, optional
+        kwargs to pass to scipy.optimize.least_squares, by default
+        `calk.default.least_squares_kwargs`.
+    pH_range : ``list``, optional
+        The minimum and maximum pH values to use to solve, by default
+        ``calk.default.pH_range``.
+    read_dat_kwargs : ``dict``, optional
+        kwargs to pass to ``read_dat``, by default ``{}``.
+    inplace : ``bool``, optional
+        Whether to perform the operation in-place on ``ds``, by default ``True``
+    verbose : ``bool``, optional
+        Whether to print progress, by default ``calk.default.verbose``.
+
+    Returns
+    -------
+    ``pandas.DataFrame`` or ``calk.Dataset``
+        The titration metadataset with additional columns found by the solver.
     """
     print("Calkulate: calibrating titrant_molinity...")
     # Get analyte_mass from analyte_volume if required
@@ -341,28 +364,29 @@ def solve(
     verbose=default.verbose,
 ):
     """Solve alkalinity, EMF0 and initial pH for all titrations with a
-    `titrant_molinity` value in a dataset `ds`.
+    ``titrant_molinity`` value in a ``Dataset``.
 
     Parameters
     ----------
-    ds : pandas.DataFrame
-        The titration metadataset.
-    least_squares_kwargs : dict, optional
+    ds : ``pandas.DataFrame`` or ``calk.Dataset``
+        A table containing metadata for each titration (not used if running as a
+        method).
+    least_squares_kwargs : ``dict``, optional
         kwargs to pass to scipy.optimize.least_squares, by default
         `calk.default.least_squares_kwargs`.
-    pH_range : list, optional
+    pH_range : ``list``, optional
         The minimum and maximum pH values to use to solve, by default
-        `calk.default.pH_range`.
-    read_dat_kwargs : dict, optional
-        kwargs to pass to read_dat, by default `{}`.
-    inplace : bool, optional
-        Whether to perform the operation in-place on `ds`, by default `True`
-    verbose : bool, optional
-        Whether to print progress, by default `calk.default.verbose`.
+        ``calk.default.pH_range``.
+    read_dat_kwargs : ``dict``, optional
+        kwargs to pass to ``read_dat``, by default ``{}``.
+    inplace : ``bool``, optional
+        Whether to perform the operation in-place on ``ds``, by default ``True``
+    verbose : ``bool``, optional
+        Whether to print progress, by default ``calk.default.verbose``.
 
     Returns
     -------
-    pandas.DataFrame
+    ``pandas.DataFrame`` or ``calk.Dataset``
         The titration metadataset with additional columns found by the solver.
     """
     print("Calkulate: solving alkalinity...")
@@ -406,7 +430,31 @@ def calkulate(
     inplace=True,
     verbose=default.verbose,
 ):
-    """Calibrate and solve all titrations in a dataset."""
+    """Calibrate and solve all titrations in a ``Dataset``.
+
+    Parameters
+    ----------
+    ds : ``pandas.DataFrame`` or ``calk.Dataset``
+        A table containing metadata for each titration (not used if running as a
+        method).
+    least_squares_kwargs : ``dict``, optional
+        kwargs to pass to scipy.optimize.least_squares, by default
+        `calk.default.least_squares_kwargs`.
+    pH_range : ``list``, optional
+        The minimum and maximum pH values to use to solve, by default
+        ``calk.default.pH_range``.
+    read_dat_kwargs : ``dict``, optional
+        kwargs to pass to ``read_dat``, by default ``{}``.
+    inplace : ``bool``, optional
+        Whether to perform the operation in-place on ``ds``, by default ``True``
+    verbose : ``bool``, optional
+        Whether to print progress, by default ``calk.default.verbose``.
+
+    Returns
+    -------
+    ``pandas.DataFrame`` or ``calk.Dataset``
+        The titration metadataset with additional columns found by the solver.
+    """
     ds = get_total_salts(ds, inplace=inplace)
     ds = calibrate(
         ds,
@@ -428,7 +476,20 @@ def calkulate(
 
 
 def to_Titration(ds, index):
-    """Create a Titration object from one row of a Dataset."""
+    """Create a ``Titration`` object from one row of a ``Dataset``.
+
+    Parameters
+    ----------
+    ds : ``calk.Dataset``
+        The ``Dataset`` to make the Titration from.
+    index
+        The row index in the ``Dataset`` to use.
+
+    Returns
+    -------
+    ``calk.Titration``
+        A ``calk.Titration`` object for the specified row of the ``Dataset``.
+    """
     dsr = ds.loc[index]
     prepare_kwargs = {}
     for k, v in prepare_defaults.items():
@@ -459,7 +520,38 @@ def to_Titration(ds, index):
 
 
 class Dataset(pd.DataFrame):
-    """pandas DataFrame with dataset functions available as methods."""
+    """
+    ``calk.Dataset``
+    ================
+    
+    A ``calk.Dataset`` is pandas ``DataFrame`` with several ``calk.dataset`` functions
+    available as methods.
+    
+    Alkalinity solving methods
+    --------------------------
+    ``calibrate``
+        Find the best-fit ``titrant_molinity`` for each sample that has a value for
+        ``alkalinity_certified``.
+    ``solve``
+        Solve every sample for ``alkalinity`` when ``titrant_molinity`` is known.
+    ``calkulate``
+        Run the ``calibrate`` and ``solve`` steps sequentially.
+
+    Data visualisation methods
+    --------------------------
+    ``plot_titrant_molinity``
+        Plot the ``titrant_molinity`` values determined with ``calibrate`` through time.
+    ``plot_alkalinity_offset``
+        Plot the difference between solved ``alkalinity`` and ``alkalinity_certified``
+        through time.
+
+    Conversion methods
+    ------------------
+    ``to_Titration``
+        Return a ``calk.Titration`` object for one row in the ``Dataset``.
+    ``to_pandas``
+        Return a copy of the ``Dataset`` as a standard pandas ``DataFrame``.
+    """
 
     get_batches = get_batches
     get_total_salts = get_total_salts
@@ -472,3 +564,7 @@ class Dataset(pd.DataFrame):
         titrant_molinity as plot_titrant_molinity,
         alkalinity_offset as plot_alkalinity_offset,
     )
+
+    def to_pandas(self):
+        """Return a copy of the ``Dataset`` as a standard pandas ``DataFrame``."""
+        return pd.DataFrame(self)
