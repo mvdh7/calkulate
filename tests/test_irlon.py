@@ -10,3 +10,5 @@ def test_irlon():
 
 
 # test_irlon()
+
+tt = tf.to_Titration(0, read_dat_kwargs=dict(encoding='unicode_escape'))
