@@ -251,7 +251,9 @@ def calibrate(
     emf0_guess=None,
     **prepare_kwargs,
 ):
-    """Calibrate titrant_molinity for a titration file given alkalinity_certified."""
+    """Calibrate ``titrant_molinity`` for a titration file given
+    ``alkalinity_certified``.
+    """
     titrant_mass, emf, temperature, analyte_mass, totals, k_constants = prepare(
         file_name, salinity, titrant=titrant, **prepare_kwargs
     )
@@ -303,9 +305,10 @@ def solve(
     emf0_guess=None,
     **prepare_kwargs,
 ):
-    """Solve alkalinity, EMF0 and initial pH for a titration file given titrant_molinity.
+    """Solve alkalinity, EMF0 and initial pH for a titration file given the
+    ``titrant_molinity``.
 
-    Results in micromol/kg-solution, mV, and on the Free scale.
+    Results in micromol/kg-solution, mV, and on the Free pH scale.
     """
     titrant_mass, emf, temperature, analyte_mass, totals, k_constants = prepare(
         file_name, salinity, titrant=titrant, **prepare_kwargs
@@ -352,6 +355,65 @@ def solve(
 
 
 class Titration:
+    """
+    ``calk.Titration``
+    ==================
+    A structure containing all the information about one titration with methods for
+    calibrating and solving and then visualising the results.
+
+    Creating a ``Titration``
+    ------------------------
+    There are two ways to create a ``Titration``:
+
+    (1) From a row in ``calk.Dataset`` using the ``to_Titration`` method (or
+    equivalently from a ``pandas.DataFrame`` using the ``calk.dataset.to_Titration``
+    function):
+
+      >>> tt = ds.to_Titration(index)
+      >>> tt = calk.dataset.to_Titration(ds, index)
+
+    (2) By initalising a ``calk.Titration`` directly with a ``file_name`` for a
+    titration data file.
+
+      >>> tt = calk.Titration(file_name="path/to/file.dat", **kwargs)
+
+    Alkalinity solving methods
+    --------------------------
+    ``calibrate``
+        Find the best-fit ``titrant_molinity`` for a given ``alkalinity_certified``.
+    ``set_titrant_molinity``
+        Set the ``titrant_molinity`` if it is known independently.
+    ``solve``
+        Solve for ``alkalinity`` when ``titrant_molinity`` is known.
+    ``calkulate``
+        Run the ``calibrate`` and ``solve`` steps sequentially.
+
+    Data visualisation methods
+    --------------------------
+    ``plot_emf``
+        EMF throughout the titration.
+    ``plot_pH``
+        pH throughout the titration.
+    ``plot_gran_emf0``
+        The Gran-plot initial estimate of EMF0.
+    ``plot_gran_alkalinity``
+        The Gran-plot initial estimate of alkalinity.
+    ``plot_alkalinity``
+        The final alkalinity estimates across the titration.
+    ``plot_components``
+        Show how all equilibrating components of the solution change throughout the
+        titration.
+
+    Attributes
+    ----------
+    ``alkalinity``
+        The solved alkalinity in micromol/kg-seawater.
+    ``alkalinity_gran``
+        The 
+    ``emf0``
+        The solved EMF0 in mV.
+    """
+
     def __init__(
         self,
         file_name=None,
