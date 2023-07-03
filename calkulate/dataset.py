@@ -368,6 +368,12 @@ def solve(
     print("Calkulate: solving alkalinity...")
     if not inplace:
         ds = copy.deepcopy(ds)
+    # Get analyte_mass from analyte_volume if required
+    if "analyte_mass" not in ds:
+        assert (
+            "analyte_volume" in ds
+        ), "ds must contain either 'analyte_mass' or 'analyte_volume'!"
+        ds["analyte_mass"] = np.nan
     if "file_good" not in ds:
         ds["file_good"] = True
     if "titrant_amount_unit" in ds:
