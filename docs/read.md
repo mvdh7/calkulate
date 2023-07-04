@@ -50,7 +50,7 @@ You don't need to manually import titration data files, but you should check tha
 Each titration file is a text file containing the measurements of the solution carried out during a titration.  The file should contain data in columns, where each row represents a measurement after a separate titrant addition.  There must be at least three columns:
 
   1. The amount of titrant added to the analyte in ml or g.
-  2. The EMF measured across the titrant-analyte mixture in mV, or its pH.
+  2. The EMF measured across the titrant-analyte mixture in mV.
   3. The temperature of the titrant-analyte mixture in °C.
 
 ### Their default format
