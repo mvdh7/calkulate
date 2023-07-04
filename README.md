@@ -24,13 +24,11 @@ data = calk.read_csv("path/to/metadata_file.csv").calkulate()
 data.alkalinity  # <== here are your alkalinity results
 ```
 
-For more detail, see [the online documentation](https://calkulate.readthedocs.io/en/latest/).
+For more detail, see [the online documentation](https://mvdh.xyz/calkulate/).
 
 ## About
 
-Calkulate is being developed primarily by [Dr Matthew P. Humphreys](https://mvdh.xyz) at the Royal Netherlands Institute for Sea Research ([NIOZ, Texel, the Netherlands](https://www.nioz.nl/en)).
-
-While its results should be reliable, the package is still a work-in-progress intended primarily for the developers' own use, and not everything is documented.  You are therefore strongly encouraged to get in touch if you're using it.  Contributions are welcome!
+Calkulate is being developed primarily by [Dr Matthew P. Humphreys](https://www.nioz.nl/en/about/organisation/staff/matthew-humphreys) at the Royal Netherlands Institute for Sea Research ([NIOZ, Texel](https://www.nioz.nl/en)).
 
 ## Citation
 
