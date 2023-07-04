@@ -2,7 +2,7 @@
 
 A Calkulate Dataset is just a [pandas DataFrame](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html) with [some extra methods added](../methods).
 
-You can make a Dataset [from an existing DataFrame](../io/#convert-from-a-dataframe) or by [importing a spreadsheet from various formats](../io/#import-from-excel-csv-or-dbs).
+You can make a Dataset [from an existing DataFrame](../read/#convert-from-a-dataframe) or by [importing a spreadsheet from various formats](../read/#import-from-excel-csv-or-dbs).
 
 There are some example Dataset spreadsheets in various formats to look at [on GitHub](https://github.com/mvdh7/calkulate/tree/main/tests/data).
 

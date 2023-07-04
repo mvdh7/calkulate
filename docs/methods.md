@@ -1,6 +1,6 @@
 # Dataset methods
 
-Once you have [imported your Dataset](../io/#titration-metadata-dataset) (as `ds` in the example code below) and made sure it has [the necessary columns, named correctly](../metadata/#dataset-column-names), you can use a series of different functions or methods to calibrate the titrant and solve the samples for alkalinity.
+Once you have [imported your Dataset](../read/#titration-metadata-dataset) (as `ds` in the example code below) and made sure it has [the necessary columns, named correctly](../metadata/#dataset-column-names), you can use a series of different functions or methods to calibrate the titrant and solve the samples for alkalinity.
 
 !!! question "Methods or functions?"
 
