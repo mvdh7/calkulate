@@ -9,7 +9,7 @@ repo_url: https://github.com/mvdh7/calkulate
 
 nav:
   - Overview: index.md
-  - Import data: io.md
+  - Import data: read.md
   - Metadata contents and format: metadata.md
   - Dataset methods: methods.md
   - Visualisation: plot.md

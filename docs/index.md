@@ -1,6 +1,6 @@
 # Calkulate
 
-Calkulate is a Python package for finding total alkalinity from titration data using [PyCO2SYS](https://pyco2sys.rtfd.io).
+Calkulate is a Python package for finding total alkalinity [[D91](references/#d)] from titration data using [PyCO2SYS](https://pyco2sys.rtfd.io) [[HLSP22](references/#h), [HSS22](references/#h)].
 
 [![pypi badge](https://img.shields.io/pypi/v/calkulate.svg?style=popout)](https://pypi.org/project/calkulate/) [![DOI](https://zenodo.org/badge/85561246.svg)](https://zenodo.org/badge/latestdoi/85561246)
 
@@ -20,17 +20,9 @@ data.alkalinity  # <== here are your alkalinity results
 
 `data` is then a pandas DataFrame based on the metadata file you provided but with some extra columns added such as `data.alkalinity`, which contains the fully calibrated total alkalinity for each sample.
 
-Other read-in functions are also available (e.g. for [Excel spreadsheets and VINDTA .dbs files](io/#import-from-excel-csv-or-dbs)).
+Other read-in functions are also available (e.g., for [Excel spreadsheets and VINDTA .dbs files](io/#import-from-excel-csv-or-dbs)).
 
 See [Dataset methods](methods) for more information on what `calkulate` does.
-
-## Coming soon
-
-Calkulate is in active development and new features that should be added soon include:
-
-  * Different alkalinity-solving algorithms.
-  * Visualisation functions.
-  * Better documentation of the lower-level controls for fine-tuning your analysis.
 
 ## About
 

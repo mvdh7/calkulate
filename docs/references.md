@@ -18,8 +18,11 @@ Click on each reference to see the full citation.
 ??? info "H15: Humphreys (2015) *PhD thesis*"
     Humphreys, M. P. (2015).  "Calculating seawater total alkalinity from open-cell titration data using a modified Gran plot technique," in *Measurements and Concepts in Marine Carbonate Chemistry* (PhD Thesis, Ocean and Earth Science, University of Southampton, UK), 25–44.
 
-??? info "HGP20: Humphreys et al. (2020) *Zenodo*"
-    Humphreys, M. P., Gregor, L., Pierrot, D., van Heuven, S. M. A. C., Lewis, E. R., and Wallace, D. W. R. (2020). PyCO2SYS: marine carbonate system calculations in Python. Version 1.4.0. *Zenodo.* [doi:10.5281/zenodo.3744275](https://doi.org/10.5281/zenodo.3744275).
+??? info "HLSP22: Humphreys et al. (2022) *Geosci. Model Dev.*"
+    Humphreys, M. P., Lewis, E. R., Sharp, J. D., and Pierrot, D. (2021).  PyCO2SYS v1.8: marine carbonate system calculations in Python.  *Geoscientific Model Development* 15, 15–43.  [doi:10.5194/gmd-15-15-2022](https://doi.org/10.5194/gmd-15-15-2022).
+
+??? info "HSS22: Humphreys et al. (2022) *"PyCO2SYS: marine carbonate..."*"
+    Humphreys, M. P., Schiller, A. J., Sandborn, D. E., Gregor, L., Pierrot, D., van Heuven, S. M. A. C., Lewis, E. R., and Wallace, D. W. R. (2022). PyCO2SYS: marine carbonate system calculations in Python.  *Zenodo.* [doi:10.5281/zenodo.3744275](https://doi.org/10.5281/zenodo.3744275).
 
 ### M
 

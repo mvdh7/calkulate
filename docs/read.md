@@ -76,3 +76,5 @@ For example, a file could contain the following:
 ### Other formats
 
 Alternatively, you may have files in a different format, for example generated directly by a Metrohm Titrino unit.  These .txt files typically have names beginning with *PC_LIMS_Report_* and the titration data is found in six columns somewhere in the middle of the file.  These files can be imported by Calkulate too: when you run the `calibrate`, `solve` or `calkulate` functions, you just need to include `read_dat_method="pclims"` as a kwarg (or if using the dataset approach, add a `read_dat_method` column to your [metadata table](../metadata/#optional-columns)).
+
+If your titration data files arrive in some other format, it's quite straightforward to add a new `read_dat_method` option that will allow them to be imported directly.  If this applies to you, please just [create an Issue on the GitHub repo](https://github.com/mvdh7/calkulate/issues/new), attaching an example of the file you need to import.
