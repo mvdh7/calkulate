@@ -1,10 +1,11 @@
 # Calkulate: seawater total alkalinity from titration data
-# Copyright (C) 2019--2023  Matthew P. Humphreys  (GNU GPLv3)
+# Copyright (C) 2019--2024  Matthew P. Humphreys  (GNU GPLv3)
 """Package metadata."""
 
 _authorlist = ["Humphreys, Matthew P.", "Matthews, Ruth S."]
 __author__ = " and ".join(_authorlist)
 __version__ = "23.5"
+__year__ = 2024
 
 
 def hello():
@@ -19,8 +20,8 @@ def hello():
 
     Humphreys, M.P. & Matthews, R.S.
        doi:10.5281/zenodo.2634304
-           Version {} (2023)
+           Version {} ({})
 """.format(
-            __version__
+            __version__, __year__
         )
     )
