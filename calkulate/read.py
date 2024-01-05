@@ -61,7 +61,40 @@ def read_dat_pclims(
     return titrant_amount, measurement, temperature
 
 
-methods = {"genfromtxt": read_dat_genfromtxt, "pclims": read_dat_pclims}
+def read_dat_orgalk_excel(file_name):
+    """Import a titration dataset from an Excel file formatted for the NIOZ organic
+    alkalinity project.
+
+    Parameters
+    ----------
+    file_name : str
+        The file name (and path).
+
+    Returns
+    -------
+    acid_amount : array-like
+        The amount of acid added at each titration step (should be in ml).
+    base_amount : array-like
+        The amount of base added at each titration step (should be in ml).
+    emf : array-like
+        The EMF at each titration step (should be in mV).
+    temperature : array-like
+        The temperature at each titration step (should be in °C).
+    """
+    data = pd.read_excel(file_name, skiprows=1)
+    return (
+        data.acid.to_numpy(),
+        data.base.to_numpy(),
+        data.emf.to_numpy(),
+        data.temperature.to_numpy(),
+    )
+
+
+methods = {
+    "genfromtxt": read_dat_genfromtxt,
+    "pclims": read_dat_pclims,
+    "orgalk_excel": read_dat_orgalk_excel,
+}
 
 
 def read_dat(file_name, method=default.read_dat_method, **kwargs):
@@ -69,8 +102,8 @@ def read_dat(file_name, method=default.read_dat_method, **kwargs):
     if method not in methods:
         method = "genfromtxt"
         print("method '{}' not recognised, using 'genfromtxt'.".format(method))
-    titrant_amount, measurement, temperature = methods[method](file_name, **kwargs)
-    return titrant_amount, measurement, temperature
+    dat_data = methods[method](file_name, **kwargs)
+    return dat_data
 
 
 def write_dat(
