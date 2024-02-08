@@ -8,7 +8,7 @@ Calkulate v3 went too far overboard with the OO approach and ended up being very
 
 !!! info "Changes in v23.6"
 
-    * TBC
+    * Added missing components to titration table in a Titration.
 
 ### 23.5 (4 July 2023)
 

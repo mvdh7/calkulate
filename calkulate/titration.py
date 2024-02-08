@@ -336,6 +336,7 @@ def solve(
             emf0_guess=emf0_guess,
         )
     else:
+        print(totals)
         opt_result = core.solve_emf_complete(
             titrant_molinity,
             titrant_mass,
@@ -756,6 +757,8 @@ class Titration:
             "HSO4",
             "HF",
             "H3SiO4",
+            "NH3",
+            "HS",
             "OH",
         ]:
             st[co2sysvar] = results[co2sysvar] * 1e-6

@@ -471,3 +471,63 @@ def calibrate_H2SO4(
         ),
         **least_squares_kwargs,
     )
+
+
+def get_phase(acid_mass, base_mass):
+    """Determine phase (whether we are currently adding acid, base, degassing, etc.).
+
+    In general, phase numbers should be
+      - 0 for the initial measurement (before any titrant has been added),
+      - 1 for the first acid titration,
+      - 2 for the degassing step,
+      - 3 for the base titration,
+      - 4 for the second acid titration (if present).
+
+    Parameters
+    ----------
+    acid_mass : array-like
+        The amount of acid added at each titration step in kg.
+    base_mass : array-like
+        The amount of base added at each titration step in kg.
+
+    Returns
+    -------
+    phase : array-like
+        Which phase of the titration we are currently in.
+    acid_added : array-like
+        Was acid added to get to the current titration step?
+    base_added : array-like
+        Was base added to get to the current titration step?
+    """
+    assert np.shape(acid_mass) == np.shape(
+        base_mass
+    ), "`acid_mass` and `base_mass` have different shapes!"
+    acid_diff = np.array([0, *np.diff(acid_mass)])
+    base_diff = np.array([0, *np.diff(base_mass)])
+    assert np.all(
+        acid_diff >= 0
+    ), "Amount of acid is not always constant or increasing!"
+    assert np.all(
+        base_diff >= 0
+    ), "Amount of base is not always constant or increasing!"
+    phase = np.full(np.shape(acid_mass), np.nan)
+    acid_added = np.full(np.shape(acid_mass), False)  # was acid added in this step?
+    base_added = np.full(np.shape(acid_mass), False)  # was base added in this step?
+    iphase = 0
+    phase[0] = iphase
+    for i in range(1, len(phase)):
+        acid_added[i] = acid_diff[i] > 0
+        base_added[i] = base_diff[i] > 0
+        if acid_added[i] and not acid_added[i - 1]:
+            iphase += 1  # acid added when it wasn't in the previous step
+        if base_added[i] and not base_added[i - 1]:
+            iphase += 1  # base added when it wasn't in the previous step
+        if not acid_added[i] and acid_added[i - 1] and not base_added[i]:
+            iphase += 1  # stopped adding acid without adding base
+        if not base_added[i] and base_added[i - 1] and not acid_added[i]:
+            iphase += 1  # stopped adding base without adding acid
+        phase[i] = iphase
+    assert np.all(
+        np.isin(phase, range(5))
+    ), "Too many phases of titrant addition detected!"
+    return phase, acid_added, base_added
