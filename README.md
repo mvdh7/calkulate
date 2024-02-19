@@ -34,7 +34,7 @@ Calkulate is being developed primarily by [Dr Matthew P. Humphreys](https://www.
 
 If you use Calkulate in your work, please cite it as:
 
-> Humphreys, M. P. and Matthews, R. S. (2023).  Calkulate: total alkalinity from titration data in Python.  *Zenodo.*  [doi:10.5281/zenodo.2634304](https://doi.org/10.5281/zenodo.2634304).
+> Humphreys, M. P. and Matthews, R. S. (2024).  Calkulate: total alkalinity from titration data in Python.  *Zenodo.*  [doi:10.5281/zenodo.2634304](https://doi.org/10.5281/zenodo.2634304).
 
 Please report which version you are using.  To find this out:
 
