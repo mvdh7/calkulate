@@ -1,5 +1,5 @@
 # Calkulate: seawater total alkalinity from titration data
-# Copyright (C) 2019--2023  Matthew P. Humphreys  (GNU GPLv3)
+# Copyright (C) 2019--2024  Matthew P. Humphreys  (GNU GPLv3)
 """Work with datasets containing multiple titrations."""
 
 import copy
@@ -503,6 +503,7 @@ def to_Titration(ds, index, read_dat_kwargs={}):
                 prepare_kwargs[k] = v
         else:
             prepare_kwargs[k] = v
+    print(prepare_kwargs)
     analyte_mass = prepare_kwargs.pop("analyte_mass")
     analyte_volume = prepare_kwargs.pop("analyte_volume")
     tt = titration.Titration(

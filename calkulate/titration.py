@@ -1,5 +1,5 @@
 # Calkulate: seawater total alkalinity from titration data
-# Copyright (C) 2019--2023  Matthew P. Humphreys  (GNU GPLv3)
+# Copyright (C) 2019--2024  Matthew P. Humphreys  (GNU GPLv3)
 """Work with titration data in a file."""
 
 import numpy as np, pandas as pd
@@ -336,6 +336,7 @@ def solve(
             emf0_guess=emf0_guess,
         )
     else:
+        print(totals)
         opt_result = core.solve_emf_complete(
             titrant_molinity,
             titrant_mass,
@@ -756,6 +757,8 @@ class Titration:
             "HSO4",
             "HF",
             "H3SiO4",
+            "NH3",
+            "HS",
             "OH",
         ]:
             st[co2sysvar] = results[co2sysvar] * 1e-6

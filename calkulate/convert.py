@@ -1,5 +1,5 @@
 # Calkulate: seawater total alkalinity from titration data
-# Copyright (C) 2019--2023  Matthew P. Humphreys  (GNU GPLv3)
+# Copyright (C) 2019--2024  Matthew P. Humphreys  (GNU GPLv3)
 """Convert between various properties."""
 
 import numpy as np
