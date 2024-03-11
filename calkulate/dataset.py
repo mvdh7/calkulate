@@ -503,7 +503,6 @@ def to_Titration(ds, index, read_dat_kwargs={}):
                 prepare_kwargs[k] = v
         else:
             prepare_kwargs[k] = v
-    print(prepare_kwargs)
     analyte_mass = prepare_kwargs.pop("analyte_mass")
     analyte_volume = prepare_kwargs.pop("analyte_volume")
     tt = titration.Titration(
