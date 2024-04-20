@@ -336,7 +336,6 @@ def solve(
             emf0_guess=emf0_guess,
         )
     else:
-        print(totals)
         opt_result = core.solve_emf_complete(
             titrant_molinity,
             titrant_mass,

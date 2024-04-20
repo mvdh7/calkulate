@@ -25,21 +25,23 @@ def dilute_totals_pyco2(totals_pyco2, titrant_mass, analyte_mass):
     """Apply the dilution factor to the appropriate elements of totals_pyco2."""
     dilution_factor = get_dilution_factor(titrant_mass, analyte_mass)
     return {
-        k: v * dilution_factor
-        if k
-        in (
-            "TB",
-            "TF",
-            "TSO4",
-            "TCa",
-            "alpha",
-            "beta",
-            "TPO4",
-            "TSi",
-            "TNH3",
-            "TH2S",
+        k: (
+            v * dilution_factor
+            if k
+            in (
+                "TB",
+                "TF",
+                "TSO4",
+                "TCa",
+                "alpha",
+                "beta",
+                "TPO4",
+                "TSi",
+                "TNH3",
+                "TH2S",
+            )
+            else v
         )
-        else v
         for k, v in totals_pyco2.items()
     }
 
@@ -58,10 +60,12 @@ def dilute_totals_H2SO4(totals, titrant_molinity, titrant_mass, analyte_mass):
     """Apply the dilution factor to all elements of totals when the titrant is H2SO4."""
     dilution_factor = get_dilution_factor(titrant_mass, analyte_mass)
     totals = {
-        k: v * dilution_factor
-        if k != "total_sulfate"
-        else (v * analyte_mass + titrant_molinity * titrant_mass)
-        / (analyte_mass + titrant_mass)
+        k: (
+            v * dilution_factor
+            if k != "total_sulfate"
+            else (v * analyte_mass + titrant_molinity * titrant_mass)
+            / (analyte_mass + titrant_mass)
+        )
         for k, v in totals.items()
     }
     return totals
@@ -75,20 +79,22 @@ def dilute_totals_pyco2_H2SO4(
     """
     dilution_factor = get_dilution_factor(titrant_mass, analyte_mass)
     totals_pyco2 = {
-        k: v * dilution_factor
-        if k
-        in (
-            "TB",
-            "TF",
-            "TCa",
-            "alpha",
-            "beta",
-            "TPO4",
-            "TSi",
-            "TNH3",
-            "TH2S",
+        k: (
+            v * dilution_factor
+            if k
+            in (
+                "TB",
+                "TF",
+                "TCa",
+                "alpha",
+                "beta",
+                "TPO4",
+                "TSi",
+                "TNH3",
+                "TH2S",
+            )
+            else v
         )
-        else v
         for k, v in totals_pyco2.items()
     }
     totals_pyco2["TSO4"] = (
