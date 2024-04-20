@@ -4,12 +4,6 @@
 
 Calkulate v3 went too far overboard with the OO approach and ended up being very slow and overly complex behind the scenes as a result.  Calkulate v23 therefore mashes together the best bits of v2 and v3 for the ultimate alkalinity solving experience.
 
-### 23.7 (forthcoming)
-
-!!! info "Changes in v23.7"
-
-    * Fixed bug with printing debug messages.
-
 ### 23.6 (19 February 2024)
 
 !!! info "Changes in v23.6"
