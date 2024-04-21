@@ -10,6 +10,11 @@ Calkulate v3 went too far overboard with the OO approach and ended up being very
 
     * Added missing components to titration table in a `Titration`.
 
+    ***Bug fixes 23.6.1 (20 April 2024)***
+
+    * Removed excessive `print` statements from debugging.
+
+
 ### 23.5 (4 July 2023)
 
 !!! info "Changes in v23.5"
