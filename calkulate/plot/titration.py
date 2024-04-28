@@ -246,7 +246,7 @@ def dic_loss(tt, ax=None):
     ax.set_ylim([loss_hires.dic.min() * 0.96, loss_hires.dic.max() * 1.04])
     ax.set_title("$k$(DIC loss) = {:.2f}".format(tt.k_dic_loss))
     ax.set_xlabel("Titrant mass / g")
-    ax.set_ylabel("DIC / $\mu$mol/kg")
+    ax.set_ylabel(r"DIC / $\mu$mol/kg")
     ax.legend(fontsize=7, loc="lower left")
     misc.add_credit(ax)
     return ax
@@ -295,7 +295,7 @@ def fCO2_loss(tt, ax=None):
     )
     ax.set_ylim([0, loss_hires.delta_fCO2.max() * 1.5e-3])
     ax.set_xlabel("Titrant mass / g")
-    ax.set_ylabel("$\Delta f$CO$_2$ / matm")
+    ax.set_ylabel(r"$\Delta f$CO$_2$ / matm")
     ax.legend(fontsize=7, loc="upper left")
     misc.add_credit(ax)
     return ax
