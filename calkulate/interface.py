@@ -17,6 +17,7 @@ calk_to_pyco2__totals = {
     "total_sulfate": "TSO4",
     "total_alpha": "total_alpha",
     "total_beta": "total_beta",
+    "total_calcium": "total_calcium",
 }
 calk_to_pyco2__k_constants = {
     "k_alpha": "k_alpha",
