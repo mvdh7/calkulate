@@ -75,7 +75,7 @@ def get_total_salts(ds, inplace=True):
     for salt in salts:
         if salt not in ds:
             ds[salt] = np.nan
-        ds[salt].where(~pd.isnull(ds[salt]), other=results[salt], inplace=True)
+        ds[salt] = ds[salt].where(~pd.isnull(ds[salt]), other=results[salt])
     return ds
 
 

@@ -14,6 +14,9 @@ Calkulate v3 went too far overboard with the OO approach and ended up being very
 
     * Removed excessive `print` statements from debugging.
 
+    ***v23.6.2 bug fixes (forthcoming)***
+
+    * Fix `FutureWarning` in `calk.dataset.get_total_salts`.
 
 ### 23.5 (4 July 2023)
 

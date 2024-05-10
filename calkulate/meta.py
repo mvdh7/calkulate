@@ -4,7 +4,7 @@
 
 _authorlist = ["Humphreys, Matthew P.", "Matthews, Ruth S."]
 __author__ = " and ".join(_authorlist)
-__version__ = "23.6.1"
+__version__ = "23.6.2"
 __year__ = 2024
 
 
