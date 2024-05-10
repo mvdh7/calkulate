@@ -68,6 +68,4 @@ def H2SO4_25C_EAIM(titrant_molinity):
     """
     if (titrant_molinity < 0.05) or (titrant_molinity > 3):
         print("Warning: titrant_molinity out of parameterisation range!")
-    return (
-        0.99750018 + 0.06181819 * titrant_molinity - 0.00285491 * titrant_molinity**2
-    )
+    return 0.99750018 + 0.06181819 * titrant_molinity - 0.00285491 * titrant_molinity**2
