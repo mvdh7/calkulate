@@ -2,6 +2,7 @@
 
 ![Tests](https://github.com/mvdh7/calkulate/workflows/Tests/badge.svg)
 [![PyPI version](https://img.shields.io/pypi/v/calkulate.svg?style=popout)](https://pypi.org/project/calkulate/)
+[![Conda Version](https://img.shields.io/conda/vn/conda-forge/calkulate.svg)](https://anaconda.org/conda-forge/calkulate)
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.2634304-informational)](https://doi.org/10.5281/zenodo.2634304)
 [![Docs](https://readthedocs.org/projects/calkulate/badge/?version=latest&style=flat)](https://calkulate.readthedocs.io/en/latest/)
 [![Coverage](https://github.com/mvdh7/calkulate/blob/main/.misc/coverage.svg)](https://github.com/mvdh7/calkulate/blob/main/.misc/coverage.txt)
