@@ -1,6 +1,7 @@
 import numpy as np
-from scipy.interpolate import pchip_interpolate
 from matplotlib import pyplot as plt
+from scipy.interpolate import pchip_interpolate
+
 from .. import default, simulate
 from . import misc
 
@@ -39,7 +40,9 @@ gran_styler = Styler(alpha=0.8, color="xkcd:azure", marker="s")
 final_styler = Styler(alpha=0.6, color="k", marker="o")
 
 
-def scatter_both(ax, x, y, G, styler, label_used="Used", label_unused="Unused"):
+def scatter_both(
+    ax, x, y, G, styler, label_used="Used", label_unused="Unused"
+):
     ax.scatter(x[~G], y[~G], **styler.scatter(False), label=label_unused)
     ax.scatter(x[G], y[G], **styler.scatter(), label=label_used)
     return ax
@@ -148,15 +151,23 @@ def gran_alkalinity(tt, ax=None):
         **gran_styler.scatter(),
     )
     ax.axhline(0, c="k", lw=0.8, zorder=-1)
-    x_line = np.array([-tt.gran_intercept / tt.gran_slope, ttt.titrant_mass.max()])
+    x_line = np.array(
+        [-tt.gran_intercept / tt.gran_slope, ttt.titrant_mass.max()]
+    )
     y_line = x_line * tt.gran_slope + tt.gran_intercept
     ax.plot(x_line * 1e3, y_line, **gran_styler.plot(), label="Fit")
     ax.axvline(
-        x_line[0] * 1e3, **gran_styler.plot(), lw=1, dashes=[3, 3], label="Intercept"
+        x_line[0] * 1e3,
+        **gran_styler.plot(),
+        lw=1,
+        dashes=[3, 3],
+        label="Intercept",
     )
     ax.set_xlabel("Titrant mass / g")
     ax.set_ylabel("Gran function")
-    ax.set_title("Gran alkalinity = {:.1f} μmol/kg-sw".format(tt.alkalinity_gran))
+    ax.set_title(
+        "Gran alkalinity = {:.1f} μmol/kg-sw".format(tt.alkalinity_gran)
+    )
     ax.legend()
     misc.add_credit(ax)
     return ax
@@ -179,7 +190,9 @@ def alkalinity(tt, ax=None):
         label="Used",
         **final_styler.scatter(),
     )
-    ax.axhline(tt.alkalinity, **final_styler.plot(), label="Final value", zorder=-1)
+    ax.axhline(
+        tt.alkalinity, **final_styler.plot(), label="Final value", zorder=-1
+    )
     ax.set_xlabel("Titrant mass / g")
     ax.set_ylabel("Alkalinity / μmol/kg-sw")
     ax.set_title(
@@ -345,7 +358,9 @@ def components(tt, ax=None, log_scale=True):
     ttt = tt.titration
     if ax is None:
         fig, ax = plt.subplots(dpi=default.dpi, figsize=(6, 6))
-    x_line = np.linspace(ttt.titrant_mass.min(), ttt.titrant_mass.max(), num=500)
+    x_line = np.linspace(
+        ttt.titrant_mass.min(), ttt.titrant_mass.max(), num=500
+    )
     for var, styler in component_stylers.items():
         if var in ttt:
             if (ttt[var] > 0).all():
@@ -363,7 +378,9 @@ def components(tt, ax=None, log_scale=True):
                         x_line,
                     ),
                     **styler.plot(),
-                    label=component_labels[var] if var in component_labels else var,
+                    label=component_labels[var]
+                    if var in component_labels
+                    else var,
                 )
                 scatter_both(
                     ax,

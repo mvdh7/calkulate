@@ -4,8 +4,9 @@
 
 import numpy as np
 from matplotlib import pyplot as plt
-from .. import meta, dataset
-from . import titration, misc
+
+from .. import dataset
+from . import misc
 
 
 def titrant_molinity(
@@ -117,7 +118,9 @@ def alkalinity_offset(
     ax.axhline(0, c="k", lw=0.8)
     misc.add_credit(ax)
     ax.set_xlabel(xlabel)
-    ax.set_ylabel(r"$\Delta$ Alkalinity (measured $-$ certified) / mol$\cdot$kg$^{-1}$")
+    ax.set_ylabel(
+        r"$\Delta$ Alkalinity (measured $-$ certified) / mol$\cdot$kg$^{-1}$"
+    )
     plt.tight_layout()
     if figure_fname is not None:
         plt.savefig(figure_fname)

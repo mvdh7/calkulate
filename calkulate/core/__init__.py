@@ -3,11 +3,12 @@
 """Calibrate and solve titration datasets."""
 
 import copy
+
 import numpy as np
-from scipy.stats import linregress
 from scipy.optimize import least_squares
+from scipy.stats import linregress
+
 from .. import constants, convert, default, interface, simulate
-from . import loss
 
 
 def gran_estimator(mixture_mass, emf, temperature):
@@ -246,7 +247,9 @@ def solve_emf_complete(
     # Set which data points to use in the final solver
     G = (pH_guesses >= pH_range[0]) & (pH_guesses <= pH_range[1])
     totals_G = {k: v[G] if np.size(v) > 1 else v for k, v in totals.items()}
-    k_constants_G = {k: v[G] if np.size(v) > 1 else v for k, v in k_constants.items()}
+    k_constants_G = {
+        k: v[G] if np.size(v) > 1 else v for k, v in k_constants.items()
+    }
     # Solve for alkalinity and EMF0
     opt_result = least_squares(
         _lsqfun_solve_emf_complete,
@@ -319,7 +322,9 @@ def solve_emf_complete_H2SO4(
     # Set which data points to use in the final solver
     G = (pH_guesses >= pH_range[0]) & (pH_guesses <= pH_range[1])
     totals_G = {k: v[G] if np.size(v) > 1 else v for k, v in totals.items()}
-    k_constants_G = {k: v[G] if np.size(v) > 1 else v for k, v in k_constants.items()}
+    k_constants_G = {
+        k: v[G] if np.size(v) > 1 else v for k, v in k_constants.items()
+    }
     # Solve for alkalinity and EMF0
     opt_result = least_squares(
         _lsqfun_solve_emf_complete_H2SO4,
@@ -499,20 +504,24 @@ def get_phase(acid_mass, base_mass):
     base_added : array-like
         Was base added to get to the current titration step?
     """
-    assert np.shape(acid_mass) == np.shape(
-        base_mass
-    ), "`acid_mass` and `base_mass` have different shapes!"
+    assert np.shape(acid_mass) == np.shape(base_mass), (
+        "`acid_mass` and `base_mass` have different shapes!"
+    )
     acid_diff = np.array([0, *np.diff(acid_mass)])
     base_diff = np.array([0, *np.diff(base_mass)])
-    assert np.all(
-        acid_diff >= 0
-    ), "Amount of acid is not always constant or increasing!"
-    assert np.all(
-        base_diff >= 0
-    ), "Amount of base is not always constant or increasing!"
+    assert np.all(acid_diff >= 0), (
+        "Amount of acid is not always constant or increasing!"
+    )
+    assert np.all(base_diff >= 0), (
+        "Amount of base is not always constant or increasing!"
+    )
     phase = np.full(np.shape(acid_mass), np.nan)
-    acid_added = np.full(np.shape(acid_mass), False)  # was acid added in this step?
-    base_added = np.full(np.shape(acid_mass), False)  # was base added in this step?
+    acid_added = np.full(
+        np.shape(acid_mass), False
+    )  # was acid added in this step?
+    base_added = np.full(
+        np.shape(acid_mass), False
+    )  # was base added in this step?
     iphase = 0
     phase[0] = iphase
     for i in range(1, len(phase)):
@@ -527,7 +536,7 @@ def get_phase(acid_mass, base_mass):
         if not base_added[i] and base_added[i - 1] and not acid_added[i]:
             iphase += 1  # stopped adding base without adding acid
         phase[i] = iphase
-    assert np.all(
-        np.isin(phase, range(5))
-    ), "Too many phases of titrant addition detected!"
+    assert np.all(np.isin(phase, range(5))), (
+        "Too many phases of titrant addition detected!"
+    )
     return phase, acid_added, base_added

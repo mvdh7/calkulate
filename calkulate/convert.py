@@ -3,7 +3,9 @@
 """Convert between various properties."""
 
 import numpy as np
-from . import constants, default, interface
+
+from . import constants, interface
+
 
 # For convenience
 F = constants.faraday

@@ -3,6 +3,7 @@
 """Calculate the density of various solutions."""
 
 import numpy as np
+
 from . import default
 
 
@@ -57,7 +58,9 @@ def HCl_NaCl_25C_DSC07(
     phi_mix = (mHCl * phiHCl + mNaCl * phiNaCl) / (mHCl + mNaCl)
     # DSC07 eq. 13:
     rho25 = (
-        rhow25 * (1e3 + mT * (mHCl + mNaCl)) / (1e3 + phi_mix * (mHCl + mNaCl) * rhow25)
+        rhow25
+        * (1e3 + mT * (mHCl + mNaCl))
+        / (1e3 + phi_mix * (mHCl + mNaCl) * rhow25)
     )
     return rho25
 
@@ -68,4 +71,8 @@ def H2SO4_25C_EAIM(titrant_molinity):
     """
     if (titrant_molinity < 0.05) or (titrant_molinity > 3):
         print("Warning: titrant_molinity out of parameterisation range!")
-    return 0.99750018 + 0.06181819 * titrant_molinity - 0.00285491 * titrant_molinity**2
+    return (
+        0.99750018
+        + 0.06181819 * titrant_molinity
+        - 0.00285491 * titrant_molinity**2
+    )

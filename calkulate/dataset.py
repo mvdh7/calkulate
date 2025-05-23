@@ -3,8 +3,11 @@
 """Work with datasets containing multiple titrations."""
 
 import copy
-import numpy as np, pandas as pd
+
+import numpy as np
+import pandas as pd
 import PyCO2SYS as pyco2
+
 from . import default, titration
 
 
@@ -152,7 +155,9 @@ def calibrate_row(
             titrant_molinity_here = np.nan
             analyte_mass = ds_row.analyte_mass
         except:
-            print("Calkulate: ERROR calibrating '{}'!".format(ds_row.file_name))
+            print(
+                "Calkulate: ERROR calibrating '{}'!".format(ds_row.file_name)
+            )
             titrant_molinity_here = np.nan
             analyte_mass = ds_row.analyte_mass
     else:
@@ -228,13 +233,15 @@ def calibrate(
     print("Calkulate: calibrating titrant_molinity...")
     # Get analyte_mass from analyte_volume if required
     if "analyte_mass" not in ds:
-        assert (
-            "analyte_volume" in ds
-        ), "ds must contain either 'analyte_mass' or 'analyte_volume'!"
+        assert "analyte_volume" in ds, (
+            "ds must contain either 'analyte_mass' or 'analyte_volume'!"
+        )
         ds["analyte_mass"] = np.nan
     # Check essential columns are present
     for must_have in ["alkalinity_certified", "analyte_mass", "salinity"]:
-        assert must_have in ds, "ds must contain a '{}' column!".format(must_have)
+        assert must_have in ds, "ds must contain a '{}' column!".format(
+            must_have
+        )
     if not inplace:
         ds = copy.deepcopy(ds)
     if "titrant_amount_unit" in ds:
@@ -394,9 +401,9 @@ def solve(
         ds = copy.deepcopy(ds)
     # Get analyte_mass from analyte_volume if required
     if "analyte_mass" not in ds:
-        assert (
-            "analyte_volume" in ds
-        ), "ds must contain either 'analyte_mass' or 'analyte_volume'!"
+        assert "analyte_volume" in ds, (
+            "ds must contain either 'analyte_mass' or 'analyte_volume'!"
+        )
         ds["analyte_mass"] = np.nan
     if "file_good" not in ds:
         ds["file_good"] = True
@@ -564,8 +571,8 @@ class Dataset(pd.DataFrame):
     to_Titration = to_Titration
 
     from .plot import (
-        titrant_molinity as plot_titrant_molinity,
         alkalinity_offset as plot_alkalinity_offset,
+        titrant_molinity as plot_titrant_molinity,
     )
 
     def to_pandas(self):

@@ -23,25 +23,26 @@ from . import (
     default,
     density,
     interface,
-    read,
     meta,
     plot,
+    read,
     simulate,
     titration,
 )
 from .dataset import Dataset, get_batches
+from .meta import __author__, __version__, hello
 from .read import (
-    read_dat,
     read_clipboard,
     read_csv,
+    read_dat,
+    read_dbs,
     read_excel,
     read_fwf,
     read_table,
-    read_dbs,
     write_dat,
 )
-from .meta import __author__, __version__, hello
 from .titration import Titration
+
 
 # For backwards-compatibility
 say_hello = hello

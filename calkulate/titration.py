@@ -2,10 +2,11 @@
 # Copyright (C) 2019--2025  Matthew P. Humphreys  (GNU GPLv3)
 """Work with titration data in a file."""
 
-import numpy as np, pandas as pd
-from scipy.stats import linregress
+import numpy as np
+import pandas as pd
 import PyCO2SYS as pyco2
-from . import convert, core, default, density, interface, read, plot, simulate
+
+from . import convert, core, default, density, interface, plot, read, simulate
 
 
 def get_dat_data(
@@ -34,7 +35,9 @@ def get_dat_data(
         else:
             if titrant == "H2SO4":
                 titrant_mass = (
-                    titrant_amount * density.H2SO4_25C_EAIM(molinity_H2SO4) * 1e-3
+                    titrant_amount
+                    * density.H2SO4_25C_EAIM(molinity_H2SO4)
+                    * 1e-3
                 )
             else:
                 titrant_mass = (
@@ -107,7 +110,9 @@ def get_totals_k_constants(
     )
     # Dilute totals with titrant
     totals = convert.dilute_totals(totals, titrant_mass, analyte_mass)
-    totals_pyco2 = convert.dilute_totals_pyco2(totals_pyco2, titrant_mass, analyte_mass)
+    totals_pyco2 = convert.dilute_totals_pyco2(
+        totals_pyco2, titrant_mass, analyte_mass
+    )
     # Get k_constants from PyCO2SYS
     k_constants = interface.get_k_constants(
         totals_pyco2,
@@ -254,8 +259,8 @@ def calibrate(
     """Calibrate ``titrant_molinity`` for a titration file given
     ``alkalinity_certified``.
     """
-    titrant_mass, emf, temperature, analyte_mass, totals, k_constants = prepare(
-        file_name, salinity, titrant=titrant, **prepare_kwargs
+    titrant_mass, emf, temperature, analyte_mass, totals, k_constants = (
+        prepare(file_name, salinity, titrant=titrant, **prepare_kwargs)
     )
     solver_kwargs = {
         "pH_range": pH_range,
@@ -310,8 +315,8 @@ def solve(
 
     Results in micromol/kg-solution, mV, and on the Free pH scale.
     """
-    titrant_mass, emf, temperature, analyte_mass, totals, k_constants = prepare(
-        file_name, salinity, titrant=titrant, **prepare_kwargs
+    titrant_mass, emf, temperature, analyte_mass, totals, k_constants = (
+        prepare(file_name, salinity, titrant=titrant, **prepare_kwargs)
     )
     if titrant == "H2SO4":
         # Update sulfate dilution by titrant and its consequences
@@ -351,7 +356,14 @@ def solve(
     alkalinity, emf0 = opt_result["x"]
     # Calculate initial pH
     pH_initial = convert.emf_to_pH(emf[0], emf0, temperature[0])
-    return alkalinity * 1e6, emf0, pH_initial, temperature[0], analyte_mass, opt_result
+    return (
+        alkalinity * 1e6,
+        emf0,
+        pH_initial,
+        temperature[0],
+        analyte_mass,
+        opt_result,
+    )
 
 
 class Titration:
@@ -463,9 +475,9 @@ class Titration:
         simulate_alkalinity=None,
         simulate_kwargs={},
     ):
-        assert (
-            analyte_mass is not None or analyte_volume is not None
-        ), "You must provide either analyte_mass [kg] or analyte_volume [ml]!"
+        assert analyte_mass is not None or analyte_volume is not None, (
+            "You must provide either analyte_mass [kg] or analyte_volume [ml]!"
+        )
         self.file_name = file_name
         self.file_path = file_path
         self.check_set_default("salinity", salinity)
@@ -612,9 +624,9 @@ class Titration:
             st.mixture_mass, st.emf, st.temperature
         )
         # Select which data points to use for first guesses
-        st["G_gran"] = (st.gran_estimates >= 0.1 * np.max(st.gran_estimates)) & (
-            st.gran_estimates <= 0.9 * np.max(st.gran_estimates)
-        )
+        st["G_gran"] = (
+            st.gran_estimates >= 0.1 * np.max(st.gran_estimates)
+        ) & (st.gran_estimates <= 0.9 * np.max(st.gran_estimates))
         # Make first guesses
         (
             alkalinity_gran,
@@ -643,11 +655,13 @@ class Titration:
             self.emf0_gran = np.mean(st.emf0_gran[st.G_gran])
         else:
             self.emf0_gran = emf0_guess
-        st["pH_gran"] = convert.emf_to_pH(st.emf, self.emf0_gran, st.temperature)
-        self.alkalinity_gran = alkalinity_gran * 1e6
-        self.titration["G_final"] = (self.titration.pH_gran >= self.pH_range[0]) & (
-            self.titration.pH_gran <= self.pH_range[1]
+        st["pH_gran"] = convert.emf_to_pH(
+            st.emf, self.emf0_gran, st.temperature
         )
+        self.alkalinity_gran = alkalinity_gran * 1e6
+        self.titration["G_final"] = (
+            self.titration.pH_gran >= self.pH_range[0]
+        ) & (self.titration.pH_gran <= self.pH_range[1])
 
     def solve(
         self,
@@ -732,7 +746,9 @@ class Titration:
                 "total_beta",
             ]
         }
-        k_constants = {k: st[k].to_numpy() for k in st.columns if k.startswith("k_")}
+        k_constants = {
+            k: st[k].to_numpy() for k in st.columns if k.startswith("k_")
+        }
         results = pyco2.sys(
             par1=st.dic.to_numpy() * 1e6,
             par2=st.pH.to_numpy(),

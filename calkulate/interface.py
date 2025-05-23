@@ -4,6 +4,7 @@
 
 import pandas as pd
 import PyCO2SYS as pyco2
+
 from . import default
 
 
@@ -36,7 +37,9 @@ calk_to_pyco2__k_constants = {
     "k_water": "KW",
 }
 pyco2_to_calk__totals = {v: k for k, v in calk_to_pyco2__totals.items()}
-pyco2_to_calk__k_constants = {v: k for k, v in calk_to_pyco2__k_constants.items()}
+pyco2_to_calk__k_constants = {
+    v: k for k, v in calk_to_pyco2__k_constants.items()
+}
 
 
 def get_totals(
@@ -174,6 +177,10 @@ def get_k_constants(
     }
     # Convert k_fluoride to the Total scale if needed
     if (opt_pH_scale == 1) and "TSO4" in totals_pyco2:
-        pH_free_to_total = 1 + totals_pyco2["TSO4"] / k_constants["k_bisulfate"]
-        k_constants["k_fluoride"] = k_constants["k_fluoride"] * pH_free_to_total
+        pH_free_to_total = (
+            1 + totals_pyco2["TSO4"] / k_constants["k_bisulfate"]
+        )
+        k_constants["k_fluoride"] = (
+            k_constants["k_fluoride"] * pH_free_to_total
+        )
     return k_constants
