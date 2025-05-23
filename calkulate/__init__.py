@@ -23,6 +23,7 @@ from . import (
     default,
     density,
     interface,
+    loss,
     meta,
     plot,
     read,

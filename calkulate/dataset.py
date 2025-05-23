@@ -151,13 +151,11 @@ def calibrate_row(
                 **prepare_kwargs,
             )
         except FileNotFoundError:
-            print("Calkulate: file not found: '{}'".format(ds_row.file_name))
+            print(f"Calkulate: file not found: '{ds_row.file_name}'")
             titrant_molinity_here = np.nan
             analyte_mass = ds_row.analyte_mass
-        except:
-            print(
-                "Calkulate: ERROR calibrating '{}'!".format(ds_row.file_name)
-            )
+        except Exception as e:
+            print(f"Calkulate: ERROR calibrating '{ds_row.file_name}'!  {e}")
             titrant_molinity_here = np.nan
             analyte_mass = ds_row.analyte_mass
     else:
@@ -329,9 +327,9 @@ def solve_row(
             )
             solved = True
         except FileNotFoundError:
-            print("Calkulate: file not found: '{}'".format(ds_row.file_name))
-        except:
-            print("Calkulate: ERROR solving '{}'!".format(ds_row.file_name))
+            print(f"Calkulate: file not found: '{ds_row.file_name}'")
+        except Exception as e:
+            print(f"Calkulate: ERROR solving '{ds_row.file_name}'!  {e}")
     if solved:
         return pd.Series(
             {
@@ -570,10 +568,10 @@ class Dataset(pd.DataFrame):
     calkulate = calkulate
     to_Titration = to_Titration
 
-    from .plot import (
-        alkalinity_offset as plot_alkalinity_offset,
-        titrant_molinity as plot_titrant_molinity,
-    )
+    # from .plot import (
+    #     alkalinity_offset as plot_alkalinity_offset,
+    #     titrant_molinity as plot_titrant_molinity,
+    # )
 
     def to_pandas(self):
         """Return a copy of the ``Dataset`` as a standard pandas ``DataFrame``."""

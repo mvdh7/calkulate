@@ -5,7 +5,7 @@
 import numpy as np
 from scipy import interpolate, optimize
 
-from .. import convert, default
+from . import convert, default
 
 
 def dic_loss_model_fitted(

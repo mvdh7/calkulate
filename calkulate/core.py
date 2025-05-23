@@ -8,7 +8,7 @@ import numpy as np
 from scipy.optimize import least_squares
 from scipy.stats import linregress
 
-from .. import constants, convert, default, interface, simulate
+from . import constants, convert, default, interface, simulate
 
 
 def gran_estimator(mixture_mass, emf, temperature):
@@ -102,8 +102,8 @@ def gran_guesses_emf0(
     titrant_molinity : float
         Molinity of titrant [mol/kg]
     alkalinity_guess : float, optional
-        Output of `calkulate.core.gran_guess_alkalinity()` if it has already been run,
-        by default None.
+        Output of `calkulate.core.gran_guess_alkalinity()` if it has already
+        been run, by default None.
     titrant : str, optional
         Type of titrant, by default `calkulate.default.titrant`.
     HF : float, optional
@@ -270,6 +270,58 @@ def solve_emf_complete(
     opt_result["data_used"] = G
     opt_result["alkalinity_gran"] = alkalinity_guess * 1e6
     opt_result["emf0_gran"] = emf0_guess
+    return opt_result
+
+
+def solve_emf_pH_adjust(
+    titrant_molinity,
+    titrant_mass,
+    pH,
+    temperature,
+    analyte_mass,
+    totals,
+    k_constants,
+    least_squares_kwargs=default.least_squares_kwargs,
+    pH_range=default.pH_range,
+):
+    """Solve for alkalinity and ∆EMF0 when pH is known but may be adjusted."""
+    # Set which data points to use in the final solver
+    G = (pH >= pH_range[0]) & (pH <= pH_range[1])
+    totals_G = {k: v[G] if np.size(v) > 1 else v for k, v in totals.items()}
+    k_constants_G = {
+        k: v[G] if np.size(v) > 1 else v for k, v in k_constants.items()
+    }
+    alkalinity_guess = (
+        (
+            simulate.alkalinity(pH[G], totals_G, k_constants_G)
+            + titrant_mass[G]
+            * titrant_molinity
+            / (titrant_mass[G] + analyte_mass)
+        )
+        / convert.get_dilution_factor(titrant_mass[G], analyte_mass)
+    ).mean()
+    # Solve for alkalinity and EMF0
+    opt_result = least_squares(
+        _lsqfun_solve_emf_complete,
+        [alkalinity_guess, 0],
+        args=(
+            titrant_molinity,
+            titrant_mass[G],
+            convert.pH_to_emf(pH, 0, temperature)[G],
+            temperature[G],
+            analyte_mass,
+            totals_G,
+            k_constants_G,
+        ),
+        x_scale=[1e-6, 1],
+        **least_squares_kwargs,
+    )
+    # Add which data points were used and initial guesses to the output
+    opt_result["data_used"] = G
+    # TODO these below are not really Gran guesses, so rename them
+    # (but needs to be consistent with other solvers, probably)
+    opt_result["alkalinity_gran"] = alkalinity_guess * 1e6
+    opt_result["emf0_gran"] = 0
     return opt_result
 
 
@@ -479,7 +531,8 @@ def calibrate_H2SO4(
 
 
 def get_phase(acid_mass, base_mass):
-    """Determine phase (whether we are currently adding acid, base, degassing, etc.).
+    """Determine phase (whether we are currently adding acid, base, degassing,
+    etc.).
 
     In general, phase numbers should be
       - 0 for the initial measurement (before any titrant has been added),
