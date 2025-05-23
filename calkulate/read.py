@@ -3,9 +3,17 @@
 """Import data for Calkulate and export its results."""
 
 import re
-import numpy as np, pandas as pd
+from collections import namedtuple
+from warnings import warn
+
+import numpy as np
+import pandas as pd
 from matplotlib import dates as mdates
+
 from . import dataset, default
+
+
+TiamoData = namedtuple("TiamoData", ("volume", "pH", "temperature"))
 
 
 def read_dat_genfromtxt(
@@ -15,7 +23,7 @@ def read_dat_genfromtxt(
     temperature_col=2,
     delimiter="\t",
     skip_header=2,
-    **kwargs
+    **kwargs,
 ):
     """Import a titration dataset from a .dat file with numpy.genfromtxt."""
     data = np.genfromtxt(
@@ -90,10 +98,65 @@ def read_dat_orgalk_excel(file_name):
     )
 
 
+def read_tiamo_de_df(file_name, encoding="unicode_escape"):
+    with open(file_name, "r", encoding=encoding) as f:
+        data = f.read().splitlines()
+    gran_line = data.index("Gran.1")
+    volume_start = float(data[gran_line - 3].split(";")[2])
+    data = pd.read_csv(
+        file_name,
+        skiprows=gran_line + 1,
+        encoding=encoding,
+        sep=";",
+    ).rename(
+        columns={
+            "Volumen [mL]": "volume",
+            "Messwert": "pH",
+            "dMW [pH]": "dpH",
+            "Zeit [s]": "time",
+            "Temperatur [°C]": "temperature",
+            "Berechnet 1": "b1",
+            "Berechnet 2": "b2",
+            "Berechnet 3": "b3",
+        }
+    )
+    data["volume"] += volume_start
+    return data
+
+
+def read_tiamo_de(file_name, encoding="unicode_escape"):
+    """Read volume, pH and temperature from a German Tiamo data file
+    (as received from T. Steinhoff, GEOMAR).
+
+    Parameters
+    ----------
+    file_name : str
+        The file name (and path).
+    encoding : str, optional
+        The file encoding, by default "unicode_escape"
+
+    Returns
+    -------
+    TiamoData
+        A named tuple containing the fields
+            volume : float
+                Volume of titrant added in ml.
+            pH : float
+                pH measured by the electrode.
+            temperature : float
+                Temperature in °C.
+    """
+    data = read_tiamo_de_df(file_name, encoding=encoding)
+    return TiamoData(
+        data.volume.values, data.pH.values, data.temperature.values
+    )
+
+
 methods = {
     "genfromtxt": read_dat_genfromtxt,
     "pclims": read_dat_pclims,
     "orgalk_excel": read_dat_orgalk_excel,
+    "tiamo_de": read_tiamo_de,
 }
 
 
@@ -101,7 +164,7 @@ def read_dat(file_name, method=default.read_dat_method, **kwargs):
     """Import a titration dataset from a .dat file."""
     if method not in methods:
         method = "genfromtxt"
-        print("method '{}' not recognised, using 'genfromtxt'.".format(method))
+        warn(f"method '{method}' not recognised, trying 'genfromtxt'.")
     dat_data = methods[method](file_name, **kwargs)
     return dat_data
 
@@ -117,7 +180,7 @@ def write_dat(
     titrant_amount_fmt=".3f",
     measurement_fmt=".3f",
     temperature_fmt=".3f",
-    **open_kwargs
+    **open_kwargs,
 ):
     """Write titration data to a text file."""
     with open(filepath, mode=mode, **open_kwargs) as f:
@@ -164,7 +227,9 @@ def read_fwf(filepath_or_buffer, **read_fwf_kwargs):
 
 def read_table(filepath_or_buffer, **read_csv_kwargs):
     """Import a metadata table from a general delimited file."""
-    return dataset.Dataset(pd.read_table(filepath_or_buffer, **read_csv_kwargs))
+    return dataset.Dataset(
+        pd.read_table(filepath_or_buffer, **read_csv_kwargs)
+    )
 
 
 def add_func_cols(df, func, *args, **kwargs):
@@ -177,7 +242,9 @@ def dbs_datetime(dbs_row):
     try:
         dspl = dbs_row["date"].split("/")
         analysis_datetime = np.datetime64(
-            "-".join(("20" + dspl[2], dspl[0], dspl[1])) + "T" + dbs_row["time"]
+            "-".join(("20" + dspl[2], dspl[0], dspl[1]))
+            + "T"
+            + dbs_row["time"]
         )
     except AttributeError:
         analysis_datetime = np.datetime64("NaT")
