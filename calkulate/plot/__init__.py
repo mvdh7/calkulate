@@ -1,5 +1,5 @@
 # Calkulate: seawater total alkalinity from titration data
-# Copyright (C) 2019--2024  Matthew P. Humphreys  (GNU GPLv3)
+# Copyright (C) 2019--2025  Matthew P. Humphreys  (GNU GPLv3)
 """Visualise the results."""
 
 import numpy as np
