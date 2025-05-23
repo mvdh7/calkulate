@@ -4,19 +4,26 @@
 
 Calkulate v3 went too far overboard with the OO approach and ended up being very slow and overly complex behind the scenes as a result.  Calkulate v23 therefore mashes together the best bits of v2 and v3 for the ultimate alkalinity solving experience.
 
+### 23.7 (forthcoming)
+
+ !!! info "Changes in v23.7"
+
+    * Added support for Tiamo titration files.
+    * Added support for VINDTA titration files where the CRM button was used for running reference materials.
+
 ### 23.6 (19 February 2024)
 
 !!! info "Changes in v23.6"
 
     * Added missing components to titration table in a `Titration`.
 
-    ***v23.6.1 bug fixes (20 April 2024)***
-
-    * Removed excessive `print` statements from debugging.
-
-    ***v23.6.2 bug fixes (forthcoming)***
+    ***v23.6.2 changes (29 October 2024)***
 
     * Fix `FutureWarning` in `calk.dataset.get_total_salts`.
+
+    ***v23.6.1 changes (20 April 2024)***
+
+    * Removed excessive `print` statements from debugging.
 
 ### 23.5 (4 July 2023)
 
