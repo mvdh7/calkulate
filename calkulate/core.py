@@ -3,6 +3,7 @@
 """Calibrate and solve titration datasets."""
 
 import copy
+from collections import namedtuple
 
 import numpy as np
 from scipy.optimize import least_squares
@@ -11,29 +12,38 @@ from scipy.stats import linregress
 from . import constants, convert, default, interface, simulate
 
 
+GranGuessAlkResult = namedtuple(
+    "GranGuessAlkResult",
+    (
+        "alkalinity_guess",
+        "slope",
+        "intercept_y",
+    ),
+)
+
+
 def gran_estimator(mixture_mass, emf, temperature):
-    """Calculate Gran-plot estimator [DAA03 eq. 10] using all provided data.
+    """Calculate Gran-plot estimator (DAA03 eq. 10) using all provided data.
 
     Parameters
     ----------
-    mixture_mass : array_like or float
-        Mass of titrant-analyte mixture [kg].
-    emf : array_like or float
-        EMF measured in titrant-analyte mixture [mV].
-    temperature : array_like or float
-        Temperature of titrant-analyte mixture [°C].
+    mixture_mass : float
+        Mass of titrant-analyte mixture in kg.
+    emf : float
+        EMF measured in titrant-analyte mixture in mV.
+    temperature : float
+        Temperature of titrant-analyte mixture in °C.
 
     Returns
     -------
-    gran_estimates : array_like or float
-        Gran-plot estimator values [DAA03 eq. 10].
+    float
+        Gran-plot estimator values (DAA03 eq. 10).
     """
-    gran_estimates = mixture_mass * np.exp(
+    return mixture_mass * np.exp(
         emf
         * constants.faraday
         / (constants.ideal_gas * (temperature + constants.absolute_zero))
     )
-    return gran_estimates
 
 
 def gran_guess_alkalinity(
@@ -41,39 +51,43 @@ def gran_guess_alkalinity(
     gran_estimates,
     analyte_mass,
     titrant_molinity,
-    titrant=default.titrant,
+    titrant="HCl",
 ):
     """Gran-plot first guess of alkalinity using all provided data.
 
     Parameters
     ----------
-    titrant_mass : array_like
+    titrant_mass : array-like
         Mass of titrant [kg].
-    gran_estimates : array_like
-        Output from `calkulate.core.gran_estimator()`.
+    gran_estimates : array-like
+        Gran-plot estimator, output from `calkulate.core.gran_estimator`.
     analyte_mass : float
-        Mass of analyte [kg].
+        Mass of analyte in kg.
     titrant_molinity : float
-        Molinity of titrant [mol/kg].
+        Molinity of titrant in mol/kg-solution.
     titrant : str, optional
-        Type of titrant, by default `calkulate.default.titrant`.
+        Type of titrant, "HCl" (default) or "H2SO4".
 
     Returns
     -------
-    alkalinity_guess : float
-        Gran-plot estimate of alkalinity [mol/kg].
-    gradient : float
-        Slope of the Gran-plot estimator.
-    intercept_y : float
-        Y-axis intercept of the Gran-plot estimator.
+    GranGuessAlkResult
+        A `namedtuple` with the fields
+            alkalinity_guess : float
+                Gran-plot estimate of alkalinity in mol/kg.
+            gradient : float
+                Slope of the Gran-plot estimator.
+            intercept_y : float
+                Y-axis intercept of the Gran-plot estimator.
     """
 
     # Do regression through simple Gran-plot estimator
-    gradient, intercept_y = linregress(titrant_mass, gran_estimates)[:2]
+    lr = linregress(titrant_mass, gran_estimates)[:2]
     # Find alkalinity guess from the x-axis intercept
-    intercept_x = -intercept_y / gradient
+    intercept_x = -lr.intercept / lr.slope
     alkalinity_guess = intercept_x * titrant_molinity / analyte_mass
-    return alkalinity_guess, gradient, intercept_y
+    if titrant.upper() == "H2SO4":
+        alkalinity_guess *= 2
+    return GranGuessAlkResult(alkalinity_guess, lr.slope, lr.intercept)
 
 
 def gran_guesses_emf0(
@@ -83,7 +97,7 @@ def gran_guesses_emf0(
     analyte_mass,
     titrant_molinity,
     alkalinity_guess=None,
-    titrant=default.titrant,
+    titrant="HCl",
     HF=0,
     HSO4=0,
 ):
@@ -91,11 +105,11 @@ def gran_guesses_emf0(
 
     Parameters
     ----------
-    titrant_mass : array_like or float
+    titrant_mass : array-like or float
         Mass of titrant [kg].
-    emf : array_like or float
+    emf : array-like or float
         EMF measured in titrant-analyte mixture.
-    temperature : array_like or float
+    temperature : array-like or float
         Temperature of titrant-analyte mixture [°C].
     analyte_mass : float
         Mass of analyte [kg].
@@ -105,7 +119,7 @@ def gran_guesses_emf0(
         Output of `calkulate.core.gran_guess_alkalinity()` if it has already
         been run, by default None.
     titrant : str, optional
-        Type of titrant, by default `calkulate.default.titrant`.
+        Type of titrant, by default "HCl".
     HF : float, optional
         Total fluoride in titrant-analyte mixture [mol/kg], by default 0.
     HSO4 : float, optional
@@ -113,7 +127,7 @@ def gran_guesses_emf0(
 
     Returns
     -------
-    emf0_guesses : array_like or float
+    emf0_guesses : array-like or float
         Gran-plot guesses of EMF0 following DAA03 eq. 11 [mV].
     """
     # Get alkalinity_guess if one is not already provided
@@ -125,10 +139,9 @@ def gran_guesses_emf0(
             gran_estimates,
             analyte_mass,
             titrant_molinity,
+            titrant=titrant,
         )[0]
-        if titrant == "H2SO4":
-            alkalinity_guess *= 2
-    if titrant == "H2SO4":
+    if titrant.upper() == "H2SO4":
         titrant_normality = 2
     else:
         titrant_normality = 1
@@ -155,7 +168,7 @@ def gran_guesses(
     temperature,
     analyte_mass,
     titrant_molinity,
-    titrant=default.titrant,
+    titrant="HCl",
     HF=0,
     HSO4=0,
     emf0_guess=None,
@@ -176,9 +189,8 @@ def gran_guesses(
         gran_estimates[G],
         analyte_mass,
         titrant_molinity,
+        titrant=titrant,
     )[0]
-    if titrant == "H2SO4":
-        alkalinity_guess *= 2
     if np.size(temperature) == 1:
         temperature = np.full(np.size(titrant_mass), temperature)
     if emf0_guess is None:
@@ -480,7 +492,8 @@ def _lsqfun_calibrate_pH_adjust(
         k_constants,
         **solver_kwargs,
     )["x"][0]
-    return alkalinity * 1e6 - alkalinity_certified
+    residual = alkalinity * 1e6 - alkalinity_certified
+    return residual
 
 
 def calibrate_pH_adjust(

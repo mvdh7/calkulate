@@ -20,7 +20,6 @@ pressure = 0  # in-water pressure in dbar
 read_dat_method = "genfromtxt"
 salinity = 35.0  # practical (dimensionless)
 split_pH = 5.5  # for DIC loss modelling
-titrant = "HCl"
 titrant_amount_unit = "ml"
 titrant_molinity_guess = 0.1  # mol / kg-solution
 total_ammonia = 0  # µmol/kg-sw

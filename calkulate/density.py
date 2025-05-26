@@ -41,10 +41,25 @@ def seawater_1atm_MP81(temperature=25, salinity=35):
     ) * 1e-3
 
 
-def HCl_NaCl_25C_DSC07(
-    molinity_HCl=default.molinity_HCl, molinity_NaCl=default.molinity_NaCl
-):
-    """Density of a mixture of HCl and NaCl at 25 °C and 1 atm following DSC07."""
+def HCl_NaCl_25C_DSC07(molinity_HCl=None, molinity_NaCl=None):
+    """Density of a mixture of HCl and NaCl at 25 °C and 1 atm following DSC07.
+
+    Parameters
+    ----------
+    molinity_HCl : float
+        Substance content of HCl in mol / kg-solution.
+    molinity_NaCl : float
+        Substance content of NaCl in mol / kg-solution.
+
+    Returns
+    -------
+    float
+        Density of the HCl-NaCl mixture in g / ml.
+    """
+    if molinity_HCl is None:
+        molinity_HCl = default.molinity_HCl
+    if molinity_NaCl is None:
+        molinity_NaCl = default.molinity_NaCl
     rhow25 = 0.99704  # g / cm**3
     # For convenience:
     mHCl = molinity_HCl

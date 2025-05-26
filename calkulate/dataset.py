@@ -102,16 +102,18 @@ def calibrate_row(
     ds_row,
     pH_range=default.pH_range,
     least_squares_kwargs=default.least_squares_kwargs,
-    read_dat_kwargs={},
+    read_dat_method=default.read_dat_method,
+    read_dat_kwargs=None,
     verbose=default.verbose,
 ):
-    """Calibrate titrant_molinity for all titrations with an alkalinity_certified
-    value and assign means based on analysis_batch.
+    """Calibrate `titrant_molinity` for all titrations with an
+    `alkalinity_certified` value and assign means based on `analysis_batch`.
     """
     if ~np.isnan(ds_row.alkalinity_certified) & ds_row.file_good:
         if verbose:
             print("Calkulate: calibrating {}...".format(ds_row.file_name))
         prepare_kwargs = get_prepare_kwargs(ds_row)
+        prepare_kwargs["read_dat_method"] = read_dat_method
         prepare_kwargs["read_dat_kwargs"] = read_dat_kwargs
         # Calibrate titrant molinity
         if "file_path" in ds_row:
@@ -127,14 +129,14 @@ def calibrate_row(
             if not pd.isnull(ds_row.emf0_guess):
                 emf0_guess = ds_row.emf0_guess
         # Deal with H2SO4 titrant special case
-        titrant = default.titrant
+        titrant = "HCl"
         analyte_total_sulfate = None
         if "titrant" in ds_row:
             if not pd.isnull(ds_row.titrant):
                 titrant = ds_row.titrant
-                if titrant == "H2SO4":
+                if titrant.upper() == "H2SO4":
                     assert "total_sulfate" in ds_row
-                    assert not pd.isnull(ds_row.total_sulfate)
+                    assert pd.notnull(ds_row.total_sulfate)
                     analyte_total_sulfate = ds_row.total_sulfate
         # Calibrate!
         try:
@@ -155,7 +157,7 @@ def calibrate_row(
             titrant_molinity_here = np.nan
             analyte_mass = ds_row.analyte_mass
         except Exception as e:
-            print(f"Calkulate: ERROR calibrating '{ds_row.file_name}'!  {e}")
+            print(f"Calkulate ERROR calibrating '{ds_row.file_name}': {e}")
             titrant_molinity_here = np.nan
             analyte_mass = ds_row.analyte_mass
     else:
@@ -198,34 +200,34 @@ def calibrate(
     ds,
     least_squares_kwargs=default.least_squares_kwargs,
     pH_range=default.pH_range,
-    read_dat_kwargs={},
+    read_dat_kwargs=None,
     inplace=True,
     verbose=default.verbose,
 ):
-    """Calibrate ``titrant_molinity`` for all titrations with an
-    ``alkalinity_certified`` value and assign means based on ``analysis_batch``.
+    """Calibrate `titrant_molinity` for all titrations with an
+    `alkalinity_certified` value and assign means based on `analysis_batch`.
 
     Parameters
     ----------
-    ds : ``pandas.DataFrame`` or ``calk.Dataset``
-        A table containing metadata for each titration (not used if running as a
-        method).
-    least_squares_kwargs : ``dict``, optional
-        kwargs to pass to scipy.optimize.least_squares, by default
+    ds : pandas.DataFrame or calk.Dataset
+        A table containing metadata for each titration (not used if running as
+        a method).
+    least_squares_kwargs : dict, optional
+        kwargs to pass to `scipy.optimize.least_squares`, by default
         `calk.default.least_squares_kwargs`.
-    pH_range : ``list``, optional
+    pH_range : list, optional
         The minimum and maximum pH values to use to solve, by default
-        ``calk.default.pH_range``.
-    read_dat_kwargs : ``dict``, optional
-        kwargs to pass to ``read_dat``, by default ``{}``.
-    inplace : ``bool``, optional
-        Whether to perform the operation in-place on ``ds``, by default ``True``
-    verbose : ``bool``, optional
-        Whether to print progress, by default ``calk.default.verbose``.
+        `calk.default.pH_range`.
+    read_dat_kwargs : dict, optional
+        kwargs to pass to `read_dat`, by default `None`.
+    inplace : bool, optional
+        Whether to perform the operation in-place on `ds`, by default `True`.
+    verbose : bool, optional
+        Whether to print progress, by default `calk.default.verbose`.
 
     Returns
     -------
-    ``pandas.DataFrame`` or ``calk.Dataset``
+    pandas.DataFrame or calk.Dataset
         The titration metadataset with additional columns found by the solver.
     """
     print("Calkulate: calibrating titrant_molinity...")
@@ -237,9 +239,7 @@ def calibrate(
         ds["analyte_mass"] = np.nan
     # Check essential columns are present
     for must_have in ["alkalinity_certified", "analyte_mass", "salinity"]:
-        assert must_have in ds, "ds must contain a '{}' column!".format(
-            must_have
-        )
+        assert must_have in ds, f'ds must contain a "{must_have}" column!'
     if not inplace:
         ds = copy.deepcopy(ds)
     if "titrant_amount_unit" in ds:
@@ -293,7 +293,7 @@ def solve_row(
             file_name = ds_row.file_path + ds_row.file_name
         else:
             file_name = ds_row.file_name
-        titrant = default.titrant
+        titrant = "HCl"
         analyte_total_sulfate = None
         if "titrant" in ds_row:
             if not pd.isnull(ds_row.titrant):

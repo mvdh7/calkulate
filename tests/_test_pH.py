@@ -1,9 +1,13 @@
 # %%
+import os
+
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import PyCO2SYS as pyco2
 from scipy.optimize import least_squares
 
+import calkulate as calk
 from calkulate.convert import emf_to_pH, get_dilution_factor, pH_to_emf
 from calkulate.core import (
     _lsqfun_solve_emf_complete,
@@ -11,10 +15,52 @@ from calkulate.core import (
     solve_emf_pH_adjust,
 )
 from calkulate.read import read_tiamo_de
-from calkulate.titration import get_totals_k_constants
+from calkulate.titration import (
+    calibrate,
+    get_totals_k_constants,
+    prepare,
+    solve,
+)
 
 
-volume, pH, temperature = read_tiamo_de("tests/data/ts-tiamo/CRM-210-0033.old")
+# Create metadata df based on all *.old files from a given path
+file_path = "tests/data/ts-tiamo/"
+file_name = [f for f in os.listdir(file_path) if f.endswith(".old")]
+ds = pd.DataFrame({"file_name": file_name, "file_path": file_path})
+
+# Add extra info about samples
+ds["analyte_volume"] = 25  # ml
+ds["salinity"] = 33.231
+ds["alkalinity_certified"] = 2220.62  # should be NaN if not a CRM
+
+# Calibrate
+ds["file_good"] = True
+ds["analyte_mass"] = np.nan
+ds_row = ds.iloc[0]
+prepare_kwargs = {
+    "analyte_volume": 25,
+    "read_dat_method": "tiamo_de",
+}
+titrant_molinity_here, analyte_mass = calk.titration.calibrate(
+    file_path + file_name[0],
+    ds_row.salinity,
+    ds_row.alkalinity_certified,
+    # analyte_total_sulfate=analyte_total_sulfate,
+    # titrant=titrant,
+    # titrant_molinity_guess=titrant_molinity_guess,
+    # pH_range=pH_range,
+    # least_squares_kwargs=least_squares_kwargs,
+    # emf0_guess=emf0_guess,
+    measurement_type="pH",
+    **prepare_kwargs,
+)
+
+row = calk.dataset.calibrate_row(ds.iloc[0], read_dat_method="tiamo_de")
+# calk.dataset.calibrate(ds, read_dat_kwargs={"method": "tiamo_de"})
+
+# %%
+filename = "tests/data/ts-tiamo/CRM-210-0033.old"
+volume, pH, temperature = read_tiamo_de(filename)
 emf0_offset = -9.830345
 emf = pH_to_emf(pH, 0, temperature)
 pH = emf_to_pH(emf, emf0_offset, temperature)
@@ -26,6 +72,32 @@ alkalinity_certified = 2220.62
 analyte_volume = 25
 dilfac = get_dilution_factor(volume, analyte_volume)
 
+pr = prepare(
+    filename,
+    salinity,
+    analyte_volume=analyte_volume,
+    dic=0,
+    read_dat_method="tiamo_de",
+)
+cr = calibrate(
+    filename,
+    salinity,
+    alkalinity_certified,
+    measurement_type="pH",
+    read_dat_method="tiamo_de",
+    analyte_volume=analyte_volume,
+    titrant_molinity_guess=0.01,
+)
+sr = solve(
+    filename,
+    salinity,
+    cr.titrant_molinity,
+    analyte_volume=analyte_volume,
+    measurement_type="pH",
+    read_dat_method="tiamo_de",
+)
+
+# %%
 alkalinity = pyco2.sys(
     par1=pH,
     par1_type=3,
@@ -53,7 +125,7 @@ totals, k_constants = get_totals_k_constants(
     salinity,
     dic=0,
 )
-cal = calibrate_pH_adjust(
+calcore = calibrate_pH_adjust(
     alkalinity_certified,
     volume,
     pH,
