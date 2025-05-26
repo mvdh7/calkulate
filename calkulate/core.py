@@ -1,6 +1,11 @@
 # Calkulate: seawater total alkalinity from titration data
 # Copyright (C) 2019--2025  Matthew P. Humphreys  (GNU GPLv3)
-"""Calibrate and solve titration datasets."""
+"""Calibrate and solve titration datasets.
+
+This is the lowest level of the three layers of processing functions.
+Titration data need to be imported and converted into separate NumPy arrays in
+order to work with the functions here.
+"""
 
 from collections import namedtuple
 
@@ -176,7 +181,7 @@ def gran_guesses(
     titrant_molinity : float
         Molinity of titrant in mol/kg-solution.
     emf0_guess : float, optional
-        Gran-plot guess of EMF0 in mV, by default None, in which case it is
+        Gran-plot guess of EMF0 in mV, by default `None`, in which case it is
         determined using `gran_guesses_emf0`.
     titrant_normality : float, optional
         Titrant normality, by default 1 (e.g., for HCl).
@@ -273,7 +278,50 @@ def solve_emf_complete(
     pH_max=4,
 ):
     """Solve for alkalinity and EMF0 using the complete-calculation method,
-    assuming a titrant normality of 1 (e.g., HCl)."""
+    assuming a titrant normality of 1 (e.g., HCl).
+
+    Parameters
+    ----------
+    titrant_molinity : float
+        Molinity of titrant in mol/kg-solution.
+    titrant_mass : array-like
+        Mass of titrant in kg.
+    emf : array-like
+        EMF measured across the titrant-analyte mixture in mV.
+    temperature : array-like
+        Temperature of titrant-analyte mixture in °C.
+    analyte_mass : float
+        Mass of analyte in kg.
+    totals : dict
+        Total salt contents through the titration, created with
+        `interface.get_totals` and diluted with `convert.dilute_totals.`
+    k_constants : dict
+        Equilibrium constants through the titration, create with
+        `interface.get_k_constants`.
+    emf0_guess : float, optional
+        Gran-plot guess of EMF0 in mV, by default `None`, in which case it is
+        determined using `gran_guesses_emf0`.
+    pH_min : float, optional
+        Minimum pH to use from the titration data, by default 3.
+    pH_max : float, optional
+        Maximum pH to use from the titration data, by default 4.
+
+    Returns
+    -------
+    opt_result : dict
+        The output from `scipy.optimize.least_squares`, where solved values
+        are `alkalinity, emf0 = opt_result["x"]`, plus plus some additional
+        entries:
+            data_used : bool
+                Logical for which titration data points were used (i.e., in
+                the range from `pH_min` to `pH_max`).
+            alkalinity_guess : float
+                First-guess alkalinity value in µmol/kg-solution.
+            emf0_guess : float
+                First-guess EMF0 value in µmol/kg-solution.
+            emf0_offset : float
+                Not used here (contains `np.nan`).
+    """
     # Get initial guesses
     ggr = gran_guesses(
         titrant_mass,
@@ -326,7 +374,50 @@ def solve_emf_pH_adjust(
     pH_max=4,
 ):
     """Solve for alkalinity and ∆EMF0 when pH is known but may be adjusted,
-    assuming a titrant normality of 1 (e.g., HCl)."""
+    assuming a titrant normality of 1 (e.g., HCl).
+
+    Parameters
+    ----------
+    titrant_molinity : float
+        Molinity of titrant in mol/kg-solution.
+    titrant_mass : array-like
+        Mass of titrant in kg.
+    pH : array-like
+        pH in the titrant-analyte mixture through the titration.
+    temperature : array-like
+        Temperature of titrant-analyte mixture in °C.
+    analyte_mass : float
+        Mass of analyte in kg.
+    totals : dict
+        Total salt contents through the titration, created with
+        `interface.get_totals` and diluted with `convert.dilute_totals.`
+    k_constants : dict
+        Equilibrium constants through the titration, create with
+        `interface.get_k_constants`.
+    emf0_guess : float, optional
+        Gran-plot guess of EMF0 in mV, by default `None`, in which case it is
+        determined using `gran_guesses_emf0`.
+    pH_min : float, optional
+        Minimum pH to use from the titration data, by default 3.
+    pH_max : float, optional
+        Maximum pH to use from the titration data, by default 4.
+
+    Returns
+    -------
+    opt_result : dict
+        The output from `scipy.optimize.least_squares`, where solved values
+        are `alkalinity, emf0_offset = opt_result["x"]`, plus plus some
+        additional entries:
+            data_used : bool
+                Logical for which titration data points were used (i.e., in
+                the range from `pH_min` to `pH_max`).
+            alkalinity_guess : float
+                First-guess alkalinity value in µmol/kg-solution.
+            emf0_guess : float
+                Not used here (contains `np.nan`).
+            emf0_offset : float
+                Adjustment applied to EMF0 in mV.
+    """
     # Set which data points to use in the final solver
     assert pH_min < pH_max
     G = (pH >= pH_min) & (pH <= pH_max)
@@ -403,7 +494,51 @@ def solve_emf_complete_H2SO4(
     pH_max=4,
 ):
     """Solve for alkalinity and EMF0 using the complete-calculation method
-    for an H2SO4 titrant."""
+    for an H2SO4 titrant.
+
+
+    Parameters
+    ----------
+    titrant_molinity : float
+        Molinity of titrant in mol/kg-solution.
+    titrant_mass : array-like
+        Mass of titrant in kg.
+    emf : array-like
+        EMF measured across the titrant-analyte mixture in mV.
+    temperature : array-like
+        Temperature of titrant-analyte mixture in °C.
+    analyte_mass : float
+        Mass of analyte in kg.
+    totals : dict
+        Total salt contents through the titration, created with
+        `interface.get_totals` and diluted with `convert.dilute_totals.`
+    k_constants : dict
+        Equilibrium constants through the titration, create with
+        `interface.get_k_constants`.
+    emf0_guess : float, optional
+        Gran-plot guess of EMF0 in mV, by default `None`, in which case it is
+        determined using `gran_guesses_emf0`.
+    pH_min : float, optional
+        Minimum pH to use from the titration data, by default 3.
+    pH_max : float, optional
+        Maximum pH to use from the titration data, by default 4.
+
+    Returns
+    -------
+    opt_result : dict
+        The output from `scipy.optimize.least_squares`, where solved values
+        are `alkalinity, emf0 = opt_result["x"]`, plus plus some additional
+        entries:
+            data_used : bool
+                Logical for which titration data points were used (i.e., in
+                the range from `pH_min` to `pH_max`).
+            alkalinity_guess : float
+                First-guess alkalinity value in µmol/kg-solution.
+            emf0_guess : float
+                First-guess EMF0 value in µmol/kg-solution.
+            emf0_offset : float
+                Not used here (contains `np.nan`).
+    """
     # Get initial guesses
     ggr = gran_guesses(
         titrant_mass,
@@ -484,11 +619,47 @@ def calibrate(
     pH_min=3,
     pH_max=4,
     solve_func=solve_emf_complete,
-    titrant_molinity_guess=None,
+    titrant_molinity_guess=0.1,
 ):
-    """Solve for `titrant_molinity` given `alkalinity_certified`."""
-    if titrant_molinity_guess is None:
-        titrant_molinity_guess = 0.1
+    """Solve for `titrant_molinity` given `alkalinity_certified`.
+
+
+    Parameters
+    ----------
+    alkalinity_certified : float
+        The target total alkalinity in µmol/kg-solution.
+    titrant_mass : array-like
+        Mass of titrant in kg.
+    measurement : array-like
+        Depending on what is required by `solve_func`, either EMF measured
+        across the titrant-analyte mixture in mV, or its pH.
+    temperature : array-like
+        Temperature of titrant-analyte mixture in °C.
+    analyte_mass : float
+        Mass of analyte in kg.
+    totals : dict
+        Total salt contents through the titration, created with
+        `interface.get_totals` and diluted with `convert.dilute_totals.`
+    k_constants : dict
+        Equilibrium constants through the titration, create with
+        `interface.get_k_constants`.
+    pH_min : float, optional
+        Minimum pH to use from the titration data, by default 3.
+    pH_max : float, optional
+        Maximum pH to use from the titration data, by default 4.
+    solve_func : func, optional
+        Which function to use to solve for alkalinity, by default
+        `solve_emf_complete`.
+    titrant_molinity_guess : float, optional
+        First guess for the molinity of titrant in mol/kg-solution, by default
+        0.1.
+
+    Returns
+    -------
+    opt_result : dict
+        The output from `scipy.optimize.least_squares`, where solved values
+        are `titrant_molinity = opt_result["x"][0]`.
+    """
     return least_squares(
         _lsqfun_calibrate,
         [titrant_molinity_guess],
