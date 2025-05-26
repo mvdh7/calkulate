@@ -1,4 +1,8 @@
-import calkulate as calk, numpy as np
+# %%
+import numpy as np
+
+import calkulate as calk
+
 
 # Import file
 file_name = "tests/data/seawater-CRM-144.dat"
@@ -18,17 +22,10 @@ nutrients = {
 k_alpha = 1e-5
 k_beta = 1e-6
 
-
-def test_imported_file():
-    """Was the titration file imported successfully?"""
-    assert isinstance(titrant_volume, np.ndarray)
-    assert isinstance(emf, np.ndarray)
-    assert isinstance(temperature, np.ndarray)
-    assert np.shape(titrant_volume) == np.shape(emf) == np.shape(temperature)
-
-
 # Get totals and k_constants
-totals, totals_pyco2 = calk.interface.get_totals(salinity, dic=dic, **nutrients)
+totals, totals_pyco2 = calk.interface.get_totals(
+    salinity, dic=dic, **nutrients
+)
 totals = calk.convert.dilute_totals(totals, titrant_mass, analyte_mass)
 totals_pyco2 = calk.convert.dilute_totals_pyco2(
     totals_pyco2, titrant_mass, analyte_mass
@@ -42,7 +39,14 @@ k_constants = calk.interface.get_k_constants(
 
 # Solve for titrant_molinity
 alkalinity_certified = 2345  # micromol/kg-solution
-solver_args = (titrant_mass, emf, temperature, analyte_mass, totals, k_constants)
+solver_args = (
+    titrant_mass,
+    emf,
+    temperature,
+    analyte_mass,
+    totals,
+    k_constants,
+)
 res_titrant_molinity = calk.core.calibrate(
     alkalinity_certified,
     titrant_mass,
@@ -67,7 +71,7 @@ opt_result = calk.core.solve_emf_complete(
 alkalinity, emf0 = opt_result["x"]
 alkalinity *= 1e6
 
-# Solve for alkalinity with self-calibrated titrant_molinity and user's EMF0 guess
+# Solve for alkalinity with self-calibrated titrant_molinity and EMF0 guess
 opt_result__emf0_user = calk.core.solve_emf_complete(
     titrant_molinity,
     titrant_mass,
@@ -82,6 +86,14 @@ alkalinity__emf0_user, emf0__emf0_user = opt_result["x"]
 alkalinity__emf0_user *= 1e6
 
 
+def test_imported_file():
+    """Was the titration file imported successfully?"""
+    assert isinstance(titrant_volume, np.ndarray)
+    assert isinstance(emf, np.ndarray)
+    assert isinstance(temperature, np.ndarray)
+    assert np.shape(titrant_volume) == np.shape(emf) == np.shape(temperature)
+
+
 def test_self_calibration():
     """Does the self-calibrated sample have the certified alkalinity value?"""
     assert np.isclose(alkalinity, alkalinity_certified, rtol=0, atol=1e-6)
@@ -94,30 +106,32 @@ def test_user_emf0():
     assert np.isclose(emf0, emf0__emf0_user, rtol=0, atol=1e-6)
 
 
-# Compare with calk.titration functions
-ctf_kwargs = dict(
-    analyte_mass=analyte_mass,
-    dic=dic,
-    **nutrients,
-    k_alpha=k_alpha,
-    k_beta=k_beta,
-)
-titrant_molinity__ctf, analyte_mass__ctf = calk.titration.calibrate(
-    file_name, salinity, alkalinity_certified, **ctf_kwargs
-)
-(
-    alkalinity__ctf,
-    emf0__ctf,
-    pH__ctf,
-    temperature0__ctf,
-    analyte_mass__ctf,
-    opt_result__ctf,
-) = calk.titration.solve(file_name, salinity, titrant_molinity__ctf, **ctf_kwargs)
-
-
 def test_calibrate_titration():
     """Do the calk.titration functions give consistent results?"""
-    assert np.isclose(titrant_molinity, titrant_molinity__ctf, rtol=0, atol=1e-12)
+    # Compare with calk.titration functions
+    ctf_kwargs = dict(
+        analyte_mass=analyte_mass,
+        dic=dic,
+        **nutrients,
+        k_alpha=k_alpha,
+        k_beta=k_beta,
+    )
+    titrant_molinity__ctf, analyte_mass__ctf = calk.titration.calibrate(
+        file_name, salinity, alkalinity_certified, **ctf_kwargs
+    )
+    (
+        alkalinity__ctf,
+        emf0__ctf,
+        pH__ctf,
+        temperature0__ctf,
+        analyte_mass__ctf,
+        opt_result__ctf,
+    ) = calk.titration.solve(
+        file_name, salinity, titrant_molinity__ctf, **ctf_kwargs
+    )
+    assert np.isclose(
+        titrant_molinity, titrant_molinity__ctf, rtol=0, atol=1e-12
+    )
     assert np.isclose(alkalinity, alkalinity__ctf, rtol=0, atol=1e-12)
     assert np.isclose(emf0, emf0__ctf, rtol=0, atol=1e-12)
 

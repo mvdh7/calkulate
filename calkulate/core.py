@@ -2,23 +2,18 @@
 # Copyright (C) 2019--2025  Matthew P. Humphreys  (GNU GPLv3)
 """Calibrate and solve titration datasets."""
 
-import copy
 from collections import namedtuple
 
 import numpy as np
 from scipy.optimize import least_squares
 from scipy.stats import linregress
 
-from . import constants, convert, default, interface, simulate
+from . import constants, convert, simulate
+from .settings import least_squares_kwargs
 
 
-GranGuessAlkResult = namedtuple(
-    "GranGuessAlkResult",
-    (
-        "alkalinity_guess",
-        "slope",
-        "intercept_y",
-    ),
+GranGuessesResult = namedtuple(
+    "GranGuessesResult", ("alkalinity", "emf0", "pH", "G")
 )
 
 
@@ -37,7 +32,7 @@ def gran_estimator(mixture_mass, emf, temperature):
     Returns
     -------
     float
-        Gran-plot estimator values (DAA03 eq. 10).
+        Gran-plot estimator (DAA03 eq. 10).
     """
     return mixture_mass * np.exp(
         emf
@@ -51,43 +46,37 @@ def gran_guess_alkalinity(
     gran_estimates,
     analyte_mass,
     titrant_molinity,
-    titrant="HCl",
+    titrant_normality=1,
 ):
     """Gran-plot first guess of alkalinity using all provided data.
 
     Parameters
     ----------
     titrant_mass : array-like
-        Mass of titrant [kg].
+        Mass of titrant in kg.
     gran_estimates : array-like
         Gran-plot estimator, output from `calkulate.core.gran_estimator`.
     analyte_mass : float
         Mass of analyte in kg.
     titrant_molinity : float
         Molinity of titrant in mol/kg-solution.
-    titrant : str, optional
-        Type of titrant, "HCl" (default) or "H2SO4".
+    titrant_normality : float, optional
+        Titrant normality, by default 1 (e.g., for HCl).
 
     Returns
     -------
-    GranGuessAlkResult
-        A `namedtuple` with the fields
-            alkalinity_guess : float
-                Gran-plot estimate of alkalinity in mol/kg.
-            gradient : float
-                Slope of the Gran-plot estimator.
-            intercept_y : float
-                Y-axis intercept of the Gran-plot estimator.
+    alkalinity_guess : float
+        Gran-plot estimate of alkalinity in mol/kg-solution.
     """
 
     # Do regression through simple Gran-plot estimator
-    lr = linregress(titrant_mass, gran_estimates)[:2]
+    lr = linregress(titrant_mass, gran_estimates)
     # Find alkalinity guess from the x-axis intercept
     intercept_x = -lr.intercept / lr.slope
-    alkalinity_guess = intercept_x * titrant_molinity / analyte_mass
-    if titrant.upper() == "H2SO4":
-        alkalinity_guess *= 2
-    return GranGuessAlkResult(alkalinity_guess, lr.slope, lr.intercept)
+    alkalinity_guess = (
+        intercept_x * titrant_molinity * titrant_normality / analyte_mass
+    )
+    return alkalinity_guess
 
 
 def gran_guesses_emf0(
@@ -97,38 +86,40 @@ def gran_guesses_emf0(
     analyte_mass,
     titrant_molinity,
     alkalinity_guess=None,
-    titrant="HCl",
-    HF=0,
-    HSO4=0,
+    titrant_normality=1,
+    total_fluoride=0,
+    total_sulfate=0,
 ):
-    """Gran-plot first guesses of EMF0 [DAA03 eq. 11] using all provided data.
+    """Gran-plot first guesses of EMF0 (DAA03 eq. 11) using all provided data.
 
     Parameters
     ----------
-    titrant_mass : array-like or float
-        Mass of titrant [kg].
-    emf : array-like or float
-        EMF measured in titrant-analyte mixture.
-    temperature : array-like or float
-        Temperature of titrant-analyte mixture [°C].
+    titrant_mass : array-like
+        Mass of titrant in kg.
+    emf : array-like
+        EMF measured across the titrant-analyte mixture in mV.
+    temperature : array-like
+        Temperature of titrant-analyte mixture in °C.
     analyte_mass : float
-        Mass of analyte [kg].
+        Mass of analyte in kg.
     titrant_molinity : float
-        Molinity of titrant [mol/kg]
+        Molinity of titrant in mol/kg-solution.
     alkalinity_guess : float, optional
-        Output of `calkulate.core.gran_guess_alkalinity()` if it has already
-        been run, by default None.
-    titrant : str, optional
-        Type of titrant, by default "HCl".
-    HF : float, optional
-        Total fluoride in titrant-analyte mixture [mol/kg], by default 0.
-    HSO4 : float, optional
-        Total sulfate in titrant-analyte mixture, by default 0.
+        First-guess value for total alkalinity in mol/kg-solution, by default
+        `None`, in which case `gran_guess_alkalinity` is used.
+    titrant_normality : float, optional
+        Titrant normality, by default 1 (e.g., for HCl).
+    total_fluoride : float, optional
+        Total fluoride in titrant-analyte mixture in mol/kg-solution, by
+        default 0.
+    total_sulfate : float, optional
+        Total sulfate in titrant-analyte mixture in mol/kg-solution, by
+        default 0.
 
     Returns
     -------
     emf0_guesses : array-like or float
-        Gran-plot guesses of EMF0 following DAA03 eq. 11 [mV].
+        Gran-plot guesses of EMF0 in mV following DAA03 eq. 11.
     """
     # Get alkalinity_guess if one is not already provided
     mixture_mass = titrant_mass + analyte_mass
@@ -139,12 +130,8 @@ def gran_guesses_emf0(
             gran_estimates,
             analyte_mass,
             titrant_molinity,
-            titrant=titrant,
-        )[0]
-    if titrant.upper() == "H2SO4":
-        titrant_normality = 2
-    else:
-        titrant_normality = 1
+            titrant_normality=titrant_normality,
+        )
     # Calculate first-guesses of EMF0
     temperature_K = temperature + constants.absolute_zero
     emf0_guesses = emf - (
@@ -155,7 +142,7 @@ def gran_guesses_emf0(
                 titrant_mass * titrant_molinity * titrant_normality
                 - analyte_mass * alkalinity_guess
             )
-            - analyte_mass * (HF + HSO4)
+            - analyte_mass * (total_fluoride + total_sulfate)
         )
         / mixture_mass
     )
@@ -168,13 +155,51 @@ def gran_guesses(
     temperature,
     analyte_mass,
     titrant_molinity,
-    titrant="HCl",
-    HF=0,
-    HSO4=0,
     emf0_guess=None,
+    titrant_normality=1,
+    total_fluoride=0,
+    total_sulfate=0,
 ):
-    """Simple Gran-plot first guesses for alkalinity, EMF0 and pH.
-    Uses a subset of the provided data points.
+    """Calculate Gran-plot first guesses for alkalinity, EMF0 and pH, using a
+    subset of the provided data points.
+
+    Parameters
+    ----------
+    titrant_mass : array-like
+        Mass of titrant in kg.
+    emf : array-like
+        EMF measured across the titrant-analyte mixture in mV.
+    temperature : array-like
+        Temperature of titrant-analyte mixture in °C.
+    analyte_mass : float
+        Mass of analyte in kg.
+    titrant_molinity : float
+        Molinity of titrant in mol/kg-solution.
+    emf0_guess : float, optional
+        Gran-plot guess of EMF0 in mV, by default None, in which case it is
+        determined using `gran_guesses_emf0`.
+    titrant_normality : float, optional
+        Titrant normality, by default 1 (e.g., for HCl).
+    total_fluoride : float, optional
+        Total fluoride in titrant-analyte mixture in mol/kg-solution, by
+        default 0.
+    total_sulfate : float, optional
+        Total sulfate in titrant-analyte mixture in mol/kg-solution, by
+        default 0.
+
+    Returns
+    -------
+    GranGuessesResult
+        A namedtuple containing the fields
+            alkalinity : float
+                Gran-plot estimate of alkalinity in mol/kg-solution.
+            emf0 : float
+                Gran-plot estimate of EMF0 in mV following DAA03 eq. 11.
+            pH : array-like (float)
+                pH through the titration based on estimated EMF0.
+            G : array-like (bool)
+                Which titration data points were used to estimate alkalinity
+                and EMF0.
     """
     # Get simple Gran-plot estimator
     mixture_mass = titrant_mass + analyte_mass
@@ -189,8 +214,8 @@ def gran_guesses(
         gran_estimates[G],
         analyte_mass,
         titrant_molinity,
-        titrant=titrant,
-    )[0]
+        titrant_normality=titrant_normality,
+    )
     if np.size(temperature) == 1:
         temperature = np.full(np.size(titrant_mass), temperature)
     if emf0_guess is None:
@@ -202,13 +227,13 @@ def gran_guesses(
                 analyte_mass,
                 titrant_molinity,
                 alkalinity_guess=alkalinity_guess,
-                titrant=titrant,
-                HF=HF,
-                HSO4=HSO4,
+                titrant_normality=titrant_normality,
+                total_fluoride=total_fluoride,
+                total_sulfate=total_sulfate,
             )
         )
     pH_guesses = convert.emf_to_pH(emf, emf0_guess, temperature)
-    return alkalinity_guess, emf0_guess, pH_guesses, G
+    return GranGuessesResult(alkalinity_guess, emf0_guess, pH_guesses, G)
 
 
 def _lsqfun_solve_emf_complete(
@@ -221,17 +246,18 @@ def _lsqfun_solve_emf_complete(
     totals,
     k_constants,
 ):
-    """Calculate residuals for the complete-calculation solver."""
+    """Calculate residuals for the solvers `solve_emf_complete` and
+    `solve_emf_pH_adjust`.
+    """
     alkalinity, emf0 = alkalinity_emf0
     pH = convert.emf_to_pH(emf, emf0, temperature)
     mixture_mass = titrant_mass + analyte_mass
     dilution_factor = convert.get_dilution_factor(titrant_mass, analyte_mass)
-    residual = (
+    return (
         simulate.alkalinity(pH, totals, k_constants)
         - alkalinity * dilution_factor
         + titrant_mass * titrant_molinity / mixture_mass
     )
-    return residual
 
 
 def solve_emf_complete(
@@ -242,22 +268,24 @@ def solve_emf_complete(
     analyte_mass,
     totals,
     k_constants,
-    least_squares_kwargs=default.least_squares_kwargs,
-    pH_range=default.pH_range,
     emf0_guess=None,
+    pH_min=3,
+    pH_max=4,
 ):
-    """Solve for alkalinity and EMF0 using the complete-calculation method."""
+    """Solve for alkalinity and EMF0 using the complete-calculation method,
+    assuming a titrant normality of 1 (e.g., HCl)."""
     # Get initial guesses
-    alkalinity_guess, emf0_guess, pH_guesses = gran_guesses(
+    ggr = gran_guesses(
         titrant_mass,
         emf,
         temperature,
         analyte_mass,
         titrant_molinity,
         emf0_guess=emf0_guess,
-    )[:-1]
+    )
     # Set which data points to use in the final solver
-    G = (pH_guesses >= pH_range[0]) & (pH_guesses <= pH_range[1])
+    assert pH_min < pH_max
+    G = (ggr.pH >= pH_min) & (ggr.pH <= pH_max)
     totals_G = {k: v[G] if np.size(v) > 1 else v for k, v in totals.items()}
     k_constants_G = {
         k: v[G] if np.size(v) > 1 else v for k, v in k_constants.items()
@@ -265,7 +293,7 @@ def solve_emf_complete(
     # Solve for alkalinity and EMF0
     opt_result = least_squares(
         _lsqfun_solve_emf_complete,
-        [alkalinity_guess, emf0_guess],
+        [ggr.alkalinity, ggr.emf0],
         args=(
             titrant_molinity,
             titrant_mass[G],
@@ -278,10 +306,11 @@ def solve_emf_complete(
         x_scale=[1e-6, 1],
         **least_squares_kwargs,
     )
-    # Add which data points were used and initial guesses to the output
+    # Append which data points were used and initial guesses to the output
     opt_result["data_used"] = G
-    opt_result["alkalinity_gran"] = alkalinity_guess * 1e6
-    opt_result["emf0_gran"] = emf0_guess
+    opt_result["alkalinity_guess"] = ggr.alkalinity * 1e6
+    opt_result["emf0_guess"] = ggr.emf0
+    opt_result["emf0_offset"] = np.nan
     return opt_result
 
 
@@ -293,12 +322,14 @@ def solve_emf_pH_adjust(
     analyte_mass,
     totals,
     k_constants,
-    least_squares_kwargs=default.least_squares_kwargs,
-    pH_range=default.pH_range,
+    pH_min=3,
+    pH_max=4,
 ):
-    """Solve for alkalinity and ∆EMF0 when pH is known but may be adjusted."""
+    """Solve for alkalinity and ∆EMF0 when pH is known but may be adjusted,
+    assuming a titrant normality of 1 (e.g., HCl)."""
     # Set which data points to use in the final solver
-    G = (pH >= pH_range[0]) & (pH <= pH_range[1])
+    assert pH_min < pH_max
+    G = (pH >= pH_min) & (pH <= pH_max)
     totals_G = {k: v[G] if np.size(v) > 1 else v for k, v in totals.items()}
     k_constants_G = {
         k: v[G] if np.size(v) > 1 else v for k, v in k_constants.items()
@@ -330,10 +361,9 @@ def solve_emf_pH_adjust(
     )
     # Add which data points were used and initial guesses to the output
     opt_result["data_used"] = G
-    # TODO these below are not really Gran guesses, so rename them
-    # (but needs to be consistent with other solvers, probably)
-    opt_result["alkalinity_gran"] = alkalinity_guess * 1e6
-    opt_result["emf0_gran"] = 0
+    opt_result["alkalinity_guess"] = alkalinity_guess * 1e6
+    opt_result["emf0_guess"] = np.nan
+    opt_result["emf0_offset"] = 0
     return opt_result
 
 
@@ -347,7 +377,7 @@ def _lsqfun_solve_emf_complete_H2SO4(
     totals,
     k_constants,
 ):
-    """Calculate residuals for the complete-calculation solver."""
+    """Calculate residuals for `solve_emf_complete_H2SO4`."""
     alkalinity, emf0 = alkalinity_emf0
     pH = convert.emf_to_pH(emf, emf0, temperature)
     mixture_mass = titrant_mass + analyte_mass
@@ -368,23 +398,25 @@ def solve_emf_complete_H2SO4(
     analyte_mass,
     totals,
     k_constants,
-    least_squares_kwargs=default.least_squares_kwargs,
-    pH_range=default.pH_range,
     emf0_guess=None,
+    pH_min=3,
+    pH_max=4,
 ):
-    """Solve for alkalinity and EMF0 using the complete-calculation method."""
+    """Solve for alkalinity and EMF0 using the complete-calculation method
+    for an H2SO4 titrant."""
     # Get initial guesses
-    alkalinity_guess, emf0_guess, pH_guesses = gran_guesses(
+    ggr = gran_guesses(
         titrant_mass,
         emf,
         temperature,
         analyte_mass,
         titrant_molinity,
-        titrant="H2SO4",
         emf0_guess=emf0_guess,
+        titrant_normality=2,
     )[:-1]
     # Set which data points to use in the final solver
-    G = (pH_guesses >= pH_range[0]) & (pH_guesses <= pH_range[1])
+    assert pH_min < pH_max
+    G = (ggr.pH >= pH_min) & (ggr.pH <= pH_max)
     totals_G = {k: v[G] if np.size(v) > 1 else v for k, v in totals.items()}
     k_constants_G = {
         k: v[G] if np.size(v) > 1 else v for k, v in k_constants.items()
@@ -392,7 +424,7 @@ def solve_emf_complete_H2SO4(
     # Solve for alkalinity and EMF0
     opt_result = least_squares(
         _lsqfun_solve_emf_complete_H2SO4,
-        [alkalinity_guess, emf0_guess],
+        [ggr.alkalinity, ggr.emf0],
         args=(
             titrant_molinity,
             titrant_mass[G],
@@ -407,8 +439,9 @@ def solve_emf_complete_H2SO4(
     )
     # Add which data points were used to the output
     opt_result["data_used"] = G
-    opt_result["alkalinity_gran"] = alkalinity_guess * 1e6
-    opt_result["emf0_gran"] = emf0_guess
+    opt_result["alkalinity_guess"] = ggr.alkalinity * 1e6
+    opt_result["emf0_guess"] = ggr.emf0
+    opt_result["emf0_offset"] = np.nan
     return opt_result
 
 
@@ -416,23 +449,26 @@ def _lsqfun_calibrate(
     titrant_molinity,
     alkalinity_certified,
     titrant_mass,
-    emf,
+    measurement,
     temperature,
     analyte_mass,
     totals,
     k_constants,
-    solver_kwargs,
+    pH_min,
+    pH_max,
+    solve_func,
 ):
     """Calculate residuals for the calibrator."""
-    alkalinity = solve_emf_complete(
+    alkalinity = solve_func(
         titrant_molinity[0],
         titrant_mass,
-        emf,
+        measurement,
         temperature,
         analyte_mass,
         totals,
         k_constants,
-        **solver_kwargs,
+        pH_min=pH_min,
+        pH_max=pH_max,
     )["x"][0]
     return alkalinity * 1e6 - alkalinity_certified
 
@@ -440,231 +476,33 @@ def _lsqfun_calibrate(
 def calibrate(
     alkalinity_certified,
     titrant_mass,
-    emf,
+    measurement,
     temperature,
     analyte_mass,
     totals,
     k_constants,
+    pH_min=3,
+    pH_max=4,
+    solve_func=solve_emf_complete,
     titrant_molinity_guess=None,
-    least_squares_kwargs=default.least_squares_kwargs,
-    solver_kwargs={},
 ):
-    """Solve for titrant_molinity given alkalinity_certified."""
+    """Solve for `titrant_molinity` given `alkalinity_certified`."""
     if titrant_molinity_guess is None:
-        titrant_molinity_guess = copy.deepcopy(default.titrant_molinity_guess)
-    solver_kwargs["least_squares_kwargs"] = least_squares_kwargs
+        titrant_molinity_guess = 0.1
     return least_squares(
         _lsqfun_calibrate,
         [titrant_molinity_guess],
         args=(
             alkalinity_certified,
             titrant_mass,
-            emf,
+            measurement,
             temperature,
             analyte_mass,
             totals,
             k_constants,
-            solver_kwargs,
+            pH_min,
+            pH_max,
+            solve_func,
         ),
         **least_squares_kwargs,
     )
-
-
-def _lsqfun_calibrate_pH_adjust(
-    titrant_molinity,
-    alkalinity_certified,
-    titrant_mass,
-    pH,
-    temperature,
-    analyte_mass,
-    totals,
-    k_constants,
-    solver_kwargs,
-):
-    """Calculate residuals for the calibrator."""
-    alkalinity = solve_emf_pH_adjust(
-        titrant_molinity[0],
-        titrant_mass,
-        pH,
-        temperature,
-        analyte_mass,
-        totals,
-        k_constants,
-        **solver_kwargs,
-    )["x"][0]
-    residual = alkalinity * 1e6 - alkalinity_certified
-    return residual
-
-
-def calibrate_pH_adjust(
-    alkalinity_certified,
-    titrant_mass,
-    pH,
-    temperature,
-    analyte_mass,
-    totals,
-    k_constants,
-    titrant_molinity_guess=None,
-    least_squares_kwargs=None,
-    solver_kwargs=None,
-):
-    """Solve for titrant_molinity given alkalinity_certified."""
-    if titrant_molinity_guess is None:
-        titrant_molinity_guess = copy.deepcopy(default.titrant_molinity_guess)
-    if solver_kwargs is None:
-        solver_kwargs = {}
-    if least_squares_kwargs is None:
-        least_squares_kwargs = default.least_squares_kwargs
-    solver_kwargs["least_squares_kwargs"] = least_squares_kwargs
-    return least_squares(
-        _lsqfun_calibrate_pH_adjust,
-        [titrant_molinity_guess],
-        args=(
-            alkalinity_certified,
-            titrant_mass,
-            pH,
-            temperature,
-            analyte_mass,
-            totals,
-            k_constants,
-            solver_kwargs,
-        ),
-        **least_squares_kwargs,
-    )
-
-
-def _lsqfun_calibrate_H2SO4(
-    titrant_molinity,
-    alkalinity_certified,
-    titrant_mass,
-    emf,
-    temperature,
-    analyte_mass,
-    analyte_total_sulfate,
-    analyte_salinity,
-    totals,
-    k_constants,
-    solver_kwargs,
-):
-    """Calculate residuals for the calibrator."""
-    # Update sulfate dilution by titrant and its consequences
-    totals["total_sulfate"] = (
-        analyte_total_sulfate * analyte_mass + titrant_molinity * titrant_mass
-    ) / (analyte_mass + titrant_mass)
-    totals_pyco2 = convert.totals_to_pyco2(totals, analyte_salinity)
-    k_constants = interface.get_k_constants(totals_pyco2, temperature)
-    # Solve for alkalinity
-    alkalinity = solve_emf_complete_H2SO4(
-        titrant_molinity[0],
-        titrant_mass,
-        emf,
-        temperature,
-        analyte_mass,
-        totals,
-        k_constants,
-        **solver_kwargs,
-    )["x"][0]
-    # Return residual
-    return alkalinity * 1e6 - alkalinity_certified
-
-
-def calibrate_H2SO4(
-    alkalinity_certified,
-    titrant_mass,
-    emf,
-    temperature,
-    analyte_mass,
-    analyte_total_sulfate,
-    analyte_salinity,
-    totals,
-    k_constants,
-    titrant_molinity_guess=None,
-    least_squares_kwargs=default.least_squares_kwargs,
-    solver_kwargs={},
-):
-    """Solve for titrant_molinity given alkalinity_certified."""
-    if titrant_molinity_guess is None:
-        titrant_molinity_guess = copy.deepcopy(default.titrant_molinity_guess)
-    solver_kwargs["least_squares_kwargs"] = least_squares_kwargs
-    return least_squares(
-        _lsqfun_calibrate_H2SO4,
-        [titrant_molinity_guess],
-        args=(
-            alkalinity_certified,
-            titrant_mass,
-            emf,
-            temperature,
-            analyte_mass,
-            analyte_total_sulfate,
-            analyte_salinity,
-            totals.copy(),
-            k_constants,
-            solver_kwargs,
-        ),
-        **least_squares_kwargs,
-    )
-
-
-def get_phase(acid_mass, base_mass):
-    """Determine phase (whether we are currently adding acid, base, degassing,
-    etc.).
-
-    In general, phase numbers should be
-      - 0 for the initial measurement (before any titrant has been added),
-      - 1 for the first acid titration,
-      - 2 for the degassing step,
-      - 3 for the base titration,
-      - 4 for the second acid titration (if present).
-
-    Parameters
-    ----------
-    acid_mass : array-like
-        The amount of acid added at each titration step in kg.
-    base_mass : array-like
-        The amount of base added at each titration step in kg.
-
-    Returns
-    -------
-    phase : array-like
-        Which phase of the titration we are currently in.
-    acid_added : array-like
-        Was acid added to get to the current titration step?
-    base_added : array-like
-        Was base added to get to the current titration step?
-    """
-    assert np.shape(acid_mass) == np.shape(base_mass), (
-        "`acid_mass` and `base_mass` have different shapes!"
-    )
-    acid_diff = np.array([0, *np.diff(acid_mass)])
-    base_diff = np.array([0, *np.diff(base_mass)])
-    assert np.all(acid_diff >= 0), (
-        "Amount of acid is not always constant or increasing!"
-    )
-    assert np.all(base_diff >= 0), (
-        "Amount of base is not always constant or increasing!"
-    )
-    phase = np.full(np.shape(acid_mass), np.nan)
-    acid_added = np.full(
-        np.shape(acid_mass), False
-    )  # was acid added in this step?
-    base_added = np.full(
-        np.shape(acid_mass), False
-    )  # was base added in this step?
-    iphase = 0
-    phase[0] = iphase
-    for i in range(1, len(phase)):
-        acid_added[i] = acid_diff[i] > 0
-        base_added[i] = base_diff[i] > 0
-        if acid_added[i] and not acid_added[i - 1]:
-            iphase += 1  # acid added when it wasn't in the previous step
-        if base_added[i] and not base_added[i - 1]:
-            iphase += 1  # base added when it wasn't in the previous step
-        if not acid_added[i] and acid_added[i - 1] and not base_added[i]:
-            iphase += 1  # stopped adding acid without adding base
-        if not base_added[i] and base_added[i - 1] and not acid_added[i]:
-            iphase += 1  # stopped adding base without adding acid
-        phase[i] = iphase
-    assert np.all(np.isin(phase, range(5))), (
-        "Too many phases of titrant addition detected!"
-    )
-    return phase, acid_added, base_added
