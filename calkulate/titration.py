@@ -40,7 +40,7 @@ SolveResult = namedtuple(
         "alkalinity",
         "emf0",
         "pH_initial",
-        "temperature",
+        "temperature_initial",
         "analyte_mass",
         "opt_result",
     ),
@@ -403,7 +403,7 @@ def solve(
             The electrode EMF0 in mV.
         pH_initial : float
             pH at the first measurement point on the free scale.
-        temperature : float
+        temperature_initial : float
             Temperature at the first measurement point in °C.
         analyte_mass : float
             Mass of the analyte in kg.
