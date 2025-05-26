@@ -5,6 +5,23 @@
 This is the lowest level of the three layers of processing functions.
 Titration data need to be imported and converted into separate NumPy arrays in
 order to work with the functions here.
+
+First-guess functions
+---------------------
+gran_estimator
+gran_guess_alkalinity
+gran_guesses_emf0
+gran_guesses
+
+Solver functions
+----------------
+solve_emf_complete
+solve_emf_complete_H2SO4
+solve_emf_pH_adjust
+
+Calibration functions
+---------------------
+calibrate
 """
 
 from collections import namedtuple
