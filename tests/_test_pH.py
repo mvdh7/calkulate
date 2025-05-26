@@ -61,7 +61,7 @@ cal = calibrate_pH_adjust(
     analyte_volume,
     totals,
     k_constants,
-    titrant_molinity_guess=0.01 * 1e6,
+    titrant_molinity_guess=0.01,
 )
 
 test = solve_emf_pH_adjust(
