@@ -5,7 +5,11 @@ import PyCO2SYS as pyco2
 from scipy.optimize import least_squares
 
 from calkulate.convert import emf_to_pH, get_dilution_factor, pH_to_emf
-from calkulate.core import _lsqfun_solve_emf_complete, solve_emf_pH_adjust
+from calkulate.core import (
+    _lsqfun_solve_emf_complete,
+    calibrate_pH_adjust,
+    solve_emf_pH_adjust,
+)
 from calkulate.read import read_tiamo_de
 from calkulate.titration import get_totals_k_constants
 
@@ -49,6 +53,17 @@ totals, k_constants = get_totals_k_constants(
     salinity,
     dic=0,
 )
+cal = calibrate_pH_adjust(
+    alkalinity_certified,
+    volume,
+    pH,
+    temperature,
+    analyte_volume,
+    totals,
+    k_constants,
+    titrant_molinity_guess=0.01 * 1e6,
+)
+
 test = solve_emf_pH_adjust(
     titrant_molinity,
     volume * 1e-6,

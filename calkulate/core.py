@@ -458,6 +458,68 @@ def calibrate(
     )
 
 
+def _lsqfun_calibrate_pH_adjust(
+    titrant_molinity,
+    alkalinity_certified,
+    titrant_mass,
+    pH,
+    temperature,
+    analyte_mass,
+    totals,
+    k_constants,
+    solver_kwargs,
+):
+    """Calculate residuals for the calibrator."""
+    alkalinity = solve_emf_pH_adjust(
+        titrant_molinity[0],
+        titrant_mass,
+        pH,
+        temperature,
+        analyte_mass,
+        totals,
+        k_constants,
+        **solver_kwargs,
+    )["x"][0]
+    return alkalinity * 1e6 - alkalinity_certified
+
+
+def calibrate_pH_adjust(
+    alkalinity_certified,
+    titrant_mass,
+    pH,
+    temperature,
+    analyte_mass,
+    totals,
+    k_constants,
+    titrant_molinity_guess=None,
+    least_squares_kwargs=None,
+    solver_kwargs=None,
+):
+    """Solve for titrant_molinity given alkalinity_certified."""
+    if titrant_molinity_guess is None:
+        titrant_molinity_guess = copy.deepcopy(default.titrant_molinity_guess)
+    if solver_kwargs is None:
+        solver_kwargs = {}
+    if least_squares_kwargs is None:
+        least_squares_kwargs = default.least_squares_kwargs
+    solver_kwargs["least_squares_kwargs"] = least_squares_kwargs
+    return least_squares(
+        _lsqfun_calibrate_pH_adjust,
+        [titrant_molinity_guess],
+        args=(
+            alkalinity_certified,
+            titrant_mass,
+            pH,
+            temperature,
+            analyte_mass,
+            totals,
+            k_constants,
+            solver_kwargs,
+        ),
+        **least_squares_kwargs,
+    )
+
+
 def _lsqfun_calibrate_H2SO4(
     titrant_molinity,
     alkalinity_certified,
