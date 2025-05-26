@@ -1,6 +1,11 @@
 # Calkulate: seawater total alkalinity from titration data
 # Copyright (C) 2019--2025  Matthew P. Humphreys  (GNU GPLv3)
-"""Work with titration data in a file."""
+"""Work with titration data in a file.
+
+This is the middle level of the three layers of processing functions.
+It includes convenience functions for importing data files and reformatting
+them to use with the `core` functions, one file at a time.
+"""
 
 from collections import namedtuple
 
