@@ -387,6 +387,7 @@ def solve_emf_pH_adjust(
     analyte_mass,
     totals,
     k_constants,
+    emf0_guess=None,
     pH_min=3,
     pH_max=4,
 ):
@@ -412,8 +413,7 @@ def solve_emf_pH_adjust(
         Equilibrium constants through the titration, created with
         `titration.get_totals_k_constants`.
     emf0_guess : float, optional
-        Gran-plot guess of EMF0 in mV, by default `None`, in which case it is
-        determined using `gran_guesses_emf0`.
+        Not used here.
     pH_min : float, optional
         Minimum pH to use from the titration data, by default 3.
     pH_max : float, optional

@@ -27,15 +27,6 @@ PrepareResult = namedtuple(
         "measurement",
         "temperature",
         "analyte_mass",
-        "totals",
-        "k_constants",
-    ),
-)
-CalibrateResult = namedtuple(
-    "CalibrateResult",
-    (
-        "titrant_molinity",
-        "analyte_mass",
     ),
 )
 SolveResult = namedtuple(
@@ -234,7 +225,6 @@ def prepare(
     analyte_mass=None,
     analyte_volume=None,
     kwargs_dat_data=None,
-    kwargs_totals_ks=None,
 ):
     """Prepare a titration data file for calibration and/or solving.
 
@@ -252,8 +242,6 @@ def prepare(
         is seawater. Either this or `analyte_mass` must be provided.
     kwargs_dat_data : dict, optional
         Additional kwargs to pass to `get_dat_data`.
-    kwargs_totals_ks : dict, optional
-        Additional kwargs to pass to `get_totals_k_constants`.
 
     Returns
     -------
@@ -280,287 +268,267 @@ def prepare(
             )
             * 1e-3
         )
-    if kwargs_totals_ks is None:
-        kwargs_totals_ks = {}
-    totals, k_constants = get_totals_k_constants(
-        titrant_mass,
-        temperature,
-        analyte_mass,
-        salinity,
-        **kwargs_totals_ks,
-    )
     return PrepareResult(
         titrant_mass,
         measurement,
         temperature,
         analyte_mass,
-        totals,
-        k_constants,
     )
 
 
-def calibrate(
-    file_name,
-    salinity,
-    alkalinity_certified,
-    analyte_total_sulfate=None,
-    measurement_type="emf",
-    titrant="HCl",
-    titrant_molinity_guess=None,
-    pH_range=default.pH_range,
-    least_squares_kwargs=default.least_squares_kwargs,
-    emf0_guess=None,
-    **prepare_kwargs,
-):
-    """Calibrate ``titrant_molinity`` for a titration file given
-    ``alkalinity_certified``.
-    """
-    (
-        titrant_mass,
-        measurement,
-        temperature,
-        analyte_mass,
-        totals,
-        k_constants,
-    ) = prepare(file_name, salinity, titrant=titrant, **prepare_kwargs)
-    solver_kwargs = {
-        "pH_range": pH_range,
-        "least_squares_kwargs": least_squares_kwargs,
-    }
-    if titrant == "H2SO4":
-        assert analyte_total_sulfate is not None
-        solver_kwargs["emf0_guess"] = emf0_guess
-        titrant_molinity = core.calibrate_H2SO4(
-            alkalinity_certified,
-            titrant_mass,
-            measurement,
-            temperature,
-            analyte_mass,
-            analyte_total_sulfate * 1e-6,
-            salinity,
-            totals,
-            k_constants,
-            titrant_molinity_guess=titrant_molinity_guess,
-            least_squares_kwargs=least_squares_kwargs,
-            solver_kwargs=solver_kwargs,
-        )["x"][0]
+def _get_solve_func(titrant, measurement_type):
+    if titrant.upper() == "H2SO4":
+        solve_func = core.solve_emf_complete_H2SO4
     else:
         if measurement_type.lower() == "emf":
-            solver_kwargs["emf0_guess"] = emf0_guess
-            titrant_molinity = core.calibrate(
-                alkalinity_certified,
-                titrant_mass,
-                measurement,
-                temperature,
-                analyte_mass,
-                totals,
-                k_constants,
-                titrant_molinity_guess=titrant_molinity_guess,
-                least_squares_kwargs=least_squares_kwargs,
-                solver_kwargs=solver_kwargs,
-            )["x"][0]
-        elif measurement_type.lower() == "ph":
-            titrant_molinity = core.calibrate_pH_adjust(
-                alkalinity_certified,
-                titrant_mass,
-                measurement,
-                temperature,
-                analyte_mass,
-                totals,
-                k_constants,
-                titrant_molinity_guess=titrant_molinity_guess,
-                least_squares_kwargs=least_squares_kwargs,
-                solver_kwargs=solver_kwargs,
-            )["x"][0]
-    return CalibrateResult(titrant_molinity, analyte_mass)
+            solve_func = core.solve_emf_complete
+        else:
+            solve_func = core.solve_emf_pH_adjust
+    return solve_func
+
+
+def calibrate(
+    alkalinity_certified,
+    prepped,
+    totals,
+    k_constants,
+    emf0_guess=None,
+    measurement_type="emf",
+    pH_min=3,
+    pH_max=4,
+    titrant_molinity_guess=0.1,
+    titrant="HCl",
+):
+    """Solve for `titrant_molinity` given `alkalinity_certified`.
+
+    Parameters
+    ----------
+    alkalinity_certified : float
+        The target total alkalinity in µmol/kg-solution.
+    prepped : PrepareResult
+        The output from `prepare`.
+    totals : dict
+        The total salt contents through the titration, including dilution
+        by the titrant, assuming the titrant is not one of the totals (e.g.,
+        it is not H2SO4).  Generated with `get_totals_k_constants`.
+    k_constants : dict
+        The equilibrium constants through the titration, including dilution
+        by the titrant (affects pH scale conversions only) and temperature
+        variations.  Generated with `get_totals_k_constants`.
+    emf0_guess : float, optional
+        A first-guess value for EMF0 in mV.
+    measurement_type : str, optional
+        The type of measurement in the data file, "emf" (default) or "pH".
+    pH_min : float, optional
+        Minimum pH to use from the titration data, by default 3.
+    pH_max : float, optional
+        Maximum pH to use from the titration data, by default 4.
+    titrant_molinity_guess : float, optional
+        First guess for the molinity of titrant in mol/kg-solution, by default
+        0.1.
+    titrant : str, optional
+        What the titrant was, "HCl" (default) or "H2SO4".
+
+    Returns
+    -------
+    float
+        The least-squares best fitting `titrant_molinity`.
+    """
+    titrant_molinity = core.calibrate(
+        alkalinity_certified,
+        prepped.titrant_mass,
+        prepped.measurement,
+        prepped.temperature,
+        prepped.analyte_mass,
+        totals,
+        k_constants,
+        pH_min=pH_min,
+        pH_max=pH_max,
+        solve_func=_get_solve_func(titrant, measurement_type),
+        titrant_molinity_guess=titrant_molinity_guess,
+    )["x"][0]
+    return titrant_molinity
 
 
 def solve(
-    file_name,
-    salinity,
     titrant_molinity,
-    analyte_total_sulfate=None,
-    measurement_type="emf",
-    titrant="HCl",
-    pH_range=default.pH_range,
-    least_squares_kwargs=default.least_squares_kwargs,
+    prepped,
+    totals,
+    k_constants,
     emf0_guess=None,
-    **prepare_kwargs,
+    measurement_type="emf",
+    pH_min=3,
+    pH_max=4,
+    titrant="HCl",
 ):
     """Solve alkalinity, EMF0 and initial pH for a titration file given the
-    ``titrant_molinity``.
+    `titrant_molinity`.
 
-    Results in micromol/kg-solution, mV, and on the Free pH scale.
+    Parameters
+    ----------
+    titrant_molinity : float
+        The titrant molinity in mol/kg-solution.
+    prepped : PrepareResult
+        The output from `prepare`.
+    totals : dict
+        The total salt contents through the titration, including dilution
+        by the titrant, assuming the titrant is not one of the totals (e.g.,
+        it is not H2SO4).  Generated with `get_totals_k_constants`.
+    k_constants : dict
+        The equilibrium constants through the titration, including dilution
+        by the titrant (affects pH scale conversions only) and temperature
+        variations.  Generated with `get_totals_k_constants`.
+    emf0_guess : float, optional
+        A first-guess value for EMF0 in mV.
+    measurement_type : str, optional
+        The type of measurement in the data file, "emf" (default) or "pH".
+    pH_min : float, optional
+        Minimum pH to use from the titration data, by default 3.
+    pH_max : float, optional
+        Maximum pH to use from the titration data, by default 4.
+    titrant : str, optional
+        What the titrant was, "HCl" (default) or "H2SO4".
+
+    Returns
+    -------
+    SolveResult - a named tuple containing the fields
+        alkalinity : float
+            Total alkalinity in µmol/kg-solution.
+        emf0 : float
+            The electrode EMF0 in mV.
+        pH_initial : float
+            pH at the first measurement point on the free scale.
+        temperature : float
+            Temperature at the first measurement point in °C.
+        analyte_mass : float
+            Mass of the analyte in kg.
+        opt_result : dict
+            The alkalinity-EMF0 solver output (see docstring for the
+            appropriate solver in `core`).
     """
-    (
-        titrant_mass,
-        measurement,
-        temperature,
-        analyte_mass,
+    solve_func = _get_solve_func(titrant, measurement_type)
+    opt_result = solve_func(
+        titrant_molinity,
+        prepped.titrant_mass,
+        prepped.measurement,
+        prepped.temperature,
+        prepped.analyte_mass,
         totals,
         k_constants,
-    ) = prepare(file_name, salinity, titrant=titrant, **prepare_kwargs)
-    if titrant == "H2SO4":
-        # Update sulfate dilution by titrant and its consequences
-        assert analyte_total_sulfate is not None
-        totals["total_sulfate"] = (
-            1e-6 * analyte_total_sulfate * analyte_mass
-            + titrant_molinity * titrant_mass
-        ) / (analyte_mass + titrant_mass)
-        totals_pyco2 = convert.totals_to_pyco2(totals, salinity)
-        k_constants = interface.get_k_constants(totals_pyco2, temperature)
-        # Solve for alkalinity and EMF0
-        opt_result = core.solve_emf_complete_H2SO4(
-            titrant_molinity,
-            titrant_mass,
-            measurement,
-            temperature,
-            analyte_mass,
-            totals,
-            k_constants,
-            least_squares_kwargs=least_squares_kwargs,
-            pH_range=pH_range,
-            emf0_guess=emf0_guess,
-        )
-    else:
-        if measurement_type.lower() == "emf":
-            opt_result = core.solve_emf_complete(
-                titrant_molinity,
-                titrant_mass,
-                measurement,
-                temperature,
-                analyte_mass,
-                totals,
-                k_constants,
-                least_squares_kwargs=least_squares_kwargs,
-                pH_range=pH_range,
-                emf0_guess=emf0_guess,
-            )
-            alkalinity, emf0 = opt_result["x"]
-            # Calculate initial pH
-            pH_initial = convert.emf_to_pH(
-                measurement[0], emf0, temperature[0]
-            )
-        elif measurement_type.lower() == "ph":
-            opt_result = core.solve_emf_pH_adjust(
-                titrant_molinity,
-                titrant_mass,
-                measurement,
-                temperature,
-                analyte_mass,
-                totals,
-                k_constants,
-                least_squares_kwargs=least_squares_kwargs,
-                pH_range=pH_range,
-            )
-            alkalinity, emf0 = opt_result["x"]
-            # Calculate initial pH
-            pH_initial = convert.pH_to_emf(measurement[0], 0, temperature[0])
-            pH_initial = convert.emf_to_pH(pH_initial, emf0, temperature[0])
+        emf0_guess=emf0_guess,
+        pH_min=pH_min,
+        pH_max=pH_max,
+    )
+    alkalinity, emf0 = opt_result["x"]
+    # Calculate initial pH
+    pH_initial = convert.pH_to_emf(
+        prepped.measurement[0], 0, prepped.temperature[0]
+    )
+    pH_initial = convert.emf_to_pH(pH_initial, emf0, prepped.temperature[0])
     return SolveResult(
         alkalinity * 1e6,
         emf0,
         pH_initial,
-        temperature[0],
-        analyte_mass,
+        prepped.temperature[0],
+        prepped.analyte_mass,
         opt_result,
     )
 
 
 class Titration:
     """
-    ``calk.Titration``
-    ==================
+    `calk.Titration`
+    ================
     A structure containing all the information about one titration with methods for
     calibrating and solving and then visualising the results.
 
-    Creating a ``Titration``
-    ------------------------
-    There are two ways to create a ``Titration``:
+    Creating a `Titration`
+    ----------------------
+    There are two ways to create a `Titration`:
 
-    (1) From a row in ``calk.Dataset`` using the ``to_Titration`` method (or
-    equivalently from a ``pandas.DataFrame`` using the ``calk.dataset.to_Titration``
+    (1) From a row in `calk.Dataset` using the `to_Titration` method (or
+    equivalently from a `pandas.DataFrame` using the `calk.dataset.to_Titration`
     function):
 
       >>> tt = ds.to_Titration(index)
       >>> tt = calk.dataset.to_Titration(ds, index)
 
-    (2) By initalising a ``calk.Titration`` directly with a ``file_name`` for a
+    (2) By initalising a `calk.Titration` directly with a `file_name` for a
     titration data file.
 
       >>> tt = calk.Titration(file_name="path/to/file.dat", **kwargs)
 
     Alkalinity solving methods
     --------------------------
-    ``calibrate``
-        Find the best-fit ``titrant_molinity`` for a given ``alkalinity_certified``.
-    ``set_titrant_molinity``
-        Set the ``titrant_molinity`` if it is known independently.
-    ``solve``
-        Solve for ``alkalinity`` when ``titrant_molinity`` is known.
-    ``calkulate``
-        Run the ``calibrate`` and ``solve`` steps sequentially.
+    `calibrate`
+        Find the best-fit `titrant_molinity` for a given `alkalinity_certified`.
+    `set_titrant_molinity`
+        Set the `titrant_molinity` if it is known independently.
+    `solve`
+        Solve for `alkalinity` when `titrant_molinity` is known.
+    `calkulate`
+        Run the `calibrate` and `solve` steps sequentially.
 
     Data visualisation methods
     --------------------------
-    ``plot_emf``
+    `plot_emf`
         EMF throughout the titration.
-    ``plot_pH``
+    `plot_pH`
         pH throughout the titration.
-    ``plot_gran_emf0``
+    `plot_gran_emf0`
         The Gran-plot initial estimate of EMF0.
-    ``plot_gran_alkalinity``
+    `plot_gran_alkalinity`
         The Gran-plot initial estimate of alkalinity.
-    ``plot_alkalinity``
+    `plot_alkalinity`
         The final alkalinity estimates across the titration.
-    ``plot_components``
+    `plot_components`
         Show how all equilibrating components of the solution change throughout the
         titration.
 
     Attributes
     ----------
-    ``alkalinity`` : ``float``
+    `alkalinity` : `float`
         The solved alkalinity in micromol/kg-seawater.
-    ``alkalinity_certified`` : ``float``
+    `alkalinity_certified` : `float`
         The certified alkalinity value against which the sample was calibrated,
         if applicable, in micromol/kg-seawater.
-    ``alkalinity_gran`` : ``float``
+    `alkalinity_gran` : `float`
         The Gran-plot initial estimate of alkalinity in micromol/kg-seawater.
-    ``analyte_mass`` : ``float``
+    `analyte_mass` : `float`
         The mass of the analyte in kg.
-    ``analyte_volume`` : ``float``
+    `analyte_volume` : `float`
         The volume of the analyte in ml, if provided.
-    ``calibrated`` : ``bool``
-        Whether or not the ``Titration`` has been calibrated.
-    ``dic`` : ``float``
+    `calibrated` : `bool`
+        Whether or not the `Titration` has been calibrated.
+    `dic` : `float`
         The dissolved inorganic carbon in micromol/kg-seawater.
-    ``emf0`` : ``float``
+    `emf0` : `float`
         The solved EMF0 in mV.
-    ``emf0_gran`` : ``float``
+    `emf0_gran` : `float`
         The Gran-plot initial estimate of EMF0 in mV.
-    ``file_name`` : ``str``
+    `file_name` : `str`
         The name of the titration data file.
-    ``file_path`` : ``str``
+    `file_path` : `str`
         The path to the titration data file.
-    ``file_prepare_kwargs`` : ``dict``
+    `file_prepare_kwargs` : `dict`
         The kwargs passed to prepare the titration data file for solving.
-    ``opt_result`` : ``scipy.optimize._optimize.OptimizeResult``
-        The raw output from the ``scipy.optimize.least_squares`` solver.
-    ``pH_initial`` : ``float``
+    `opt_result` : `scipy.optimize._optimize.OptimizeResult`
+        The raw output from the `scipy.optimize.least_squares` solver.
+    `pH_initial` : `float`
         The pH at the initial titration point on the free pH scale.
-    ``pH_initial_temperature`` : ``float``
+    `pH_initial_temperature` : `float`
         The temperature at the initial titration point.
-    ``pH_range`` : ``tuple`` or ``list``
+    `pH_range` : `tuple` or `list`
         The (minimum, maximum) pH to use for solving the titration.
-    ``salinity`` : ``float``
+    `salinity` : `float`
         The practical salinity of the analyte.
-    ``solved`` : ``bool``
+    `solved` : `bool`
         Whether or not the titration has been solved.
-    ``titrant`` : ``str``
+    `titrant` : `str`
         The type of titrant used in the titration.
-    ``titrant_molinity`` : ``float``
+    `titrant_molinity` : `float`
         The molinity of the titrant in mol/kg-titrant.
-    ``titration`` : ``pd.DataFrame``
+    `titration` : `pd.DataFrame`
         A table of everything that changes through the titration (e.g., amount of
         titrant, EMF, temperature, total salt concentrations and equilibrium constants).
     """

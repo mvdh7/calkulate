@@ -1,6 +1,8 @@
 # %%
 from os import listdir
 
+import numpy as np
+
 import calkulate as calk
 
 
@@ -33,7 +35,7 @@ def test_prepare():
     for filename in filenames:
         pr = calk.titration.prepare(
             filepath + filename,
-            35,
+            33.231,
             analyte_volume=25,
             kwargs_dat_data={"kwargs_read_dat": {"method": "tiamo_de"}},
         )
@@ -48,6 +50,43 @@ def test_prepare():
         assert isinstance(pr.k_constants, dict)
 
 
+def test_tt_calibrate_solve():
+    alkalinity_certified = 2220.62
+    for filename in filenames:
+        pr = calk.titration.prepare(
+            filepath + filename,
+            33.231,
+            analyte_volume=25,
+            kwargs_dat_data={"kwargs_read_dat": {"method": "tiamo_de"}},
+        )
+        totals, k_constants = calk.titration.get_totals_k_constants(
+            pr.titrant_mass,
+            pr.temperature,
+            pr.analyte_mass,
+            33.231,
+        )
+        titrant_molinity = calk.titration.calibrate(
+            alkalinity_certified,
+            pr,
+            totals,
+            k_constants,
+            measurement_type="pH",
+            titrant_molinity_guess=0.01,
+        )
+        assert isinstance(titrant_molinity, float)
+        assert 0.0095 < titrant_molinity < 0.0100
+        sr = calk.titration.solve(
+            titrant_molinity,
+            pr,
+            totals,
+            k_constants,
+            measurement_type="pH",
+        )
+        assert np.isclose(sr.alkalinity, alkalinity_certified)
+        assert np.abs(sr.emf0) < 3
+
+
 # test_read_dat()
 # test_get_dat_data()
 # test_prepare()
+# test_tt_calibrate_solve()
