@@ -311,10 +311,10 @@ def solve_emf_complete(
         Mass of analyte in kg.
     totals : dict
         Total salt contents through the titration, created with
-        `interface.get_totals` and diluted with `convert.dilute_totals.`
+        `titration.get_totals_k_constants`.
     k_constants : dict
-        Equilibrium constants through the titration, create with
-        `interface.get_k_constants`.
+        Equilibrium constants through the titration, created with
+        `titration.get_totals_k_constants`.
     emf0_guess : float, optional
         Gran-plot guess of EMF0 in mV, by default `None`, in which case it is
         determined using `gran_guesses_emf0`.
@@ -407,10 +407,10 @@ def solve_emf_pH_adjust(
         Mass of analyte in kg.
     totals : dict
         Total salt contents through the titration, created with
-        `interface.get_totals` and diluted with `convert.dilute_totals.`
+        `titration.get_totals_k_constants`.
     k_constants : dict
-        Equilibrium constants through the titration, create with
-        `interface.get_k_constants`.
+        Equilibrium constants through the titration, created with
+        `titration.get_totals_k_constants`.
     emf0_guess : float, optional
         Gran-plot guess of EMF0 in mV, by default `None`, in which case it is
         determined using `gran_guesses_emf0`.
@@ -528,10 +528,10 @@ def solve_emf_complete_H2SO4(
         Mass of analyte in kg.
     totals : dict
         Total salt contents through the titration, created with
-        `interface.get_totals` and diluted with `convert.dilute_totals.`
+        `titration.get_totals_k_constants`.
     k_constants : dict
-        Equilibrium constants through the titration, create with
-        `interface.get_k_constants`.
+        Equilibrium constants through the titration, created with
+        `titration.get_totals_k_constants`.
     emf0_guess : float, optional
         Gran-plot guess of EMF0 in mV, by default `None`, in which case it is
         determined using `gran_guesses_emf0`.
@@ -656,10 +656,10 @@ def calibrate(
         Mass of analyte in kg.
     totals : dict
         Total salt contents through the titration, created with
-        `interface.get_totals` and diluted with `convert.dilute_totals.`
+        `titration.get_totals_k_constants`.
     k_constants : dict
-        Equilibrium constants through the titration, create with
-        `interface.get_k_constants`.
+        Equilibrium constants through the titration, created with
+        `titration.get_totals_k_constants`.
     pH_min : float, optional
         Minimum pH to use from the titration data, by default 3.
     pH_max : float, optional

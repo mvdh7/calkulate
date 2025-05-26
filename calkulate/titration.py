@@ -8,9 +8,18 @@ import numpy as np
 import pandas as pd
 import PyCO2SYS as pyco2
 
-from . import convert, core, default, density, interface, plot, read, simulate
+from . import convert, core, default, density, interface, plot, simulate
+from .read import read_dat
 
 
+DatData = namedtuple(
+    "DatData",
+    (
+        "titrant_mass",
+        "measurement",
+        "temperature",
+    ),
+)
 PrepareResult = namedtuple(
     "PrepareResult",
     (
@@ -44,31 +53,68 @@ SolveResult = namedtuple(
 
 def get_dat_data(
     file_name,
-    molinity_HCl=None,
-    molinity_NaCl=None,
-    molinity_H2SO4=default.molinity_H2SO4,
+    molinity_HCl=0.1,
+    molinity_NaCl=0.6,
+    molinity_H2SO4=0.1,
     temperature_override=None,
     titrant="HCl",
-    titrant_amount_unit=default.titrant_amount_unit,
+    titrant_amount_unit="ml",
     titrant_density=None,
-    read_dat_method=default.read_dat_method,
-    read_dat_kwargs=None,
+    kwargs_read_dat=None,
 ):
-    """Import a dat file and convert titrant units to mass in kg."""
+    """Import a dat file and convert titrant units to mass in kg.
+
+    Parameters
+    ----------
+    file_name : str
+        The file (path and) name.
+    molinity_HCl : float, optional
+        Molinity of the HCl titrant for density calculation, by default 0.1.
+    molinity_NaCl : float, optional
+        Molinity of the NaCl in the titrant where it is an HCl-NaCl mixture,
+        for density calculation, by default 0.6.
+    molinity_H2SO4 : float, optional
+        Molinity of the H2SO4 titrant for density calculation, by default 0.1.
+    temperature_override : float, optional
+        A temperature in °C to use instead of the temperature data in the
+        titration file, by default None.
+    titrant : str, optional
+        Which titrant was used, "HCl" (default) or "H2SO4".
+    titrant_amount_unit : str, optional
+        What units the titrant amount is in in the file, one of "ml" (default),
+        "g" or "kg".
+    titrant_density : float, optional
+        Density of the titrant, by default None, in which case it is calculated
+        from the molinities provided.
+    kwargs_read_dat : dict, optional
+        Keyword arguments to be passed onto read.read_dat, by default None.
+
+    Returns
+    -------
+    DatData
+        A namedtuple containing the fields
+            titrant_mass : array-like
+                Titrant mass through the titration in kg.
+            measurement : array-like
+                EMF through the titration in mV, or pH.
+            temperature : array-like
+                Temperature through the titration in °C.
+    """
     # Import titration data file
-    if read_dat_kwargs is None:
-        read_dat_kwargs = {}
-    titrant_amount, emf, temperature = read.read_dat(
-        file_name, method=read_dat_method, **read_dat_kwargs
+    if kwargs_read_dat is None:
+        kwargs_read_dat = {}
+    titrant_amount, measurement, temperature = read_dat(
+        file_name, **kwargs_read_dat
     )
-    if not pd.isnull(temperature_override):
-        temperature = np.full_like(titrant_amount, temperature_override)
+    # Overwrite temperature, if requested
+    if temperature_override is not None:
+        temperature = np.full_like(temperature, temperature_override)
     # Get titrant mass
-    if titrant_amount_unit == "ml":
-        if not pd.isnull(titrant_density):
-            titrant_mass = titrant_amount * titrant_density * 1e-3
-        else:
-            if titrant == "H2SO4":
+    assert titrant_amount_unit.lower() in ["ml", "g", "kg"]
+    if titrant_amount_unit.lower() == "ml":
+        if titrant_density is None:
+            assert titrant.upper() in ["H2SO4", "HCL"]
+            if titrant.upper() == "H2SO4":
                 titrant_mass = (
                     titrant_amount
                     * density.H2SO4_25C_EAIM(molinity_H2SO4)
@@ -83,13 +129,13 @@ def get_dat_data(
                     )
                     * 1e-3
                 )
-    elif titrant_amount_unit == "g":
+        else:
+            titrant_mass = titrant_amount * titrant_density * 1e-3
+    elif titrant_amount_unit.lower() == "g":
         titrant_mass = titrant_amount * 1e-3
-    elif titrant_amount_unit == "kg":
+    elif titrant_amount_unit.lower() == "kg":
         titrant_mass = titrant_amount
-    else:
-        print("titrant_amount_unit not recognised.")
-    return titrant_mass, emf, temperature
+    return DatData(titrant_mass, measurement, temperature)
 
 
 def get_totals_k_constants(
@@ -97,80 +143,87 @@ def get_totals_k_constants(
     temperature,
     analyte_mass,
     salinity,
-    dic=default.dic,
-    total_alpha=0,
-    total_ammonia=default.total_ammonia,
-    total_beta=0,
-    total_phosphate=default.total_phosphate,
-    total_silicate=default.total_silicate,
-    total_sulfide=default.total_sulfide,
-    total_borate=None,
-    total_fluoride=None,
-    total_sulfate=None,
-    k_alpha=None,
-    k_beta=None,
-    k_ammonia=None,
-    k_bisulfate=None,
-    k_borate=None,
-    k_carbonic_1=None,
-    k_carbonic_2=None,
-    k_fluoride=None,
-    k_phosphoric_1=None,
-    k_phosphoric_2=None,
-    k_phosphoric_3=None,
-    k_silicate=None,
-    k_sulfide=None,
-    k_water=None,
-    opt_k_bisulfate=default.opt_k_bisulfate,
-    opt_k_carbonic=default.opt_k_carbonic,
-    opt_k_fluoride=default.opt_k_fluoride,
-    opt_pH_scale=default.opt_pH_scale,
-    opt_total_borate=default.opt_total_borate,
+    **kwargs,
 ):
+    """Get total salt contents and equilibrium constants through a titration.
+
+    Parameters
+    ----------
+    titrant_mass : array-like
+        Titrant mass through the titration in kg.
+    temperature : array-like
+        Temperature through the titration in °C.
+    analyte_mass : float
+        Mass of analyte at the start of the titration in kg.
+    salinity : float
+        Practical salinity of the analyte at the start of the titration.
+
+    Returns
+    -------
+    totals : dict
+        The total salt contents through the titration, including dilution
+        by the titrant, assuming the titrant is not one of the totals (e.g.,
+        it is not H2SO4).
+    k_constants : dict
+        The equilibrium constants through the titration, including dilution
+        by the titrant (affects pH scale conversions only) and temperature
+        variations.
+    """
     # Get totals from PyCO2SYS
-    totals, totals_pyco2 = interface.get_totals(
-        salinity,
-        dic=dic,
-        total_alpha=total_alpha,
-        total_beta=total_beta,
-        total_ammonia=total_ammonia,
-        total_phosphate=total_phosphate,
-        total_silicate=total_silicate,
-        total_sulfide=total_sulfide,
-        total_borate=total_borate,
-        total_fluoride=total_fluoride,
-        total_sulfate=total_sulfate,
-        opt_k_carbonic=opt_k_carbonic,
-        opt_total_borate=opt_total_borate,
-    )
+    kwargs_totals = {
+        k: v
+        for k, v in kwargs.items()
+        if k
+        in [
+            "dic",
+            "total_alpha",
+            "total_beta",
+            "total_ammonia",
+            "total_phosphate",
+            "total_silicate",
+            "total_sulfide",
+            "total_borate",
+            "total_fluoride",
+            "total_sulfate",
+            "opt_k_carbonic",
+            "opt_total_borate",
+        ]
+    }
+    totals, totals_pyco2 = interface.get_totals(salinity, **kwargs_totals)
     # Dilute totals with titrant
     totals = convert.dilute_totals(totals, titrant_mass, analyte_mass)
     totals_pyco2 = convert.dilute_totals_pyco2(
         totals_pyco2, titrant_mass, analyte_mass
     )
     # Get k_constants from PyCO2SYS
+    kwargs_k_constants = {
+        k: v
+        for k, v in kwargs.items()
+        if k
+        in [
+            "k_alpha",
+            "k_ammonia",
+            "k_beta",
+            "k_bisulfate",
+            "k_borate",
+            "k_carbonic_1",
+            "k_carbonic_2",
+            "k_fluoride",
+            "k_phosphoric_1",
+            "k_phosphoric_2",
+            "k_phosphoric_3",
+            "k_silicate",
+            "k_sulfide",
+            "k_water",
+            "opt_k_bisulfate",
+            "opt_k_carbonic",
+            "opt_k_fluoride",
+            "opt_pH_scale",
+            "opt_total_borate",
+        ]
+    }
     k_constants = interface.get_k_constants(
-        totals_pyco2,
-        temperature,
-        k_alpha=k_alpha,
-        k_ammonia=k_ammonia,
-        k_beta=k_beta,
-        k_bisulfate=k_bisulfate,
-        k_borate=k_borate,
-        k_carbonic_1=k_carbonic_1,
-        k_carbonic_2=k_carbonic_2,
-        k_fluoride=k_fluoride,
-        k_phosphoric_1=k_phosphoric_1,
-        k_phosphoric_2=k_phosphoric_2,
-        k_phosphoric_3=k_phosphoric_3,
-        k_silicate=k_silicate,
-        k_sulfide=k_sulfide,
-        k_water=k_water,
-        opt_k_bisulfate=opt_k_bisulfate,
-        opt_k_carbonic=opt_k_carbonic,
-        opt_k_fluoride=opt_k_fluoride,
-        opt_pH_scale=opt_pH_scale,
-        opt_total_borate=opt_total_borate,
+        totals_pyco2, temperature, **kwargs_k_constants
     )
     return totals, k_constants
 
@@ -178,59 +231,45 @@ def get_totals_k_constants(
 def prepare(
     file_name,
     salinity,
-    analyte_mass=None,  # kg
-    analyte_volume=None,  # ml
-    dic=default.dic,
-    total_alpha=0,
-    total_beta=0,
-    total_ammonia=default.total_ammonia,
-    total_phosphate=default.total_phosphate,
-    total_silicate=default.total_silicate,
-    total_sulfide=default.total_sulfide,
-    total_borate=None,
-    total_fluoride=None,
-    total_sulfate=None,
-    k_alpha=None,
-    k_ammonia=None,
-    k_beta=None,
-    k_bisulfate=None,
-    k_borate=None,
-    k_carbonic_1=None,
-    k_carbonic_2=None,
-    k_fluoride=None,
-    k_phosphoric_1=None,
-    k_phosphoric_2=None,
-    k_phosphoric_3=None,
-    k_silicate=None,
-    k_sulfide=None,
-    k_water=None,
-    molinity_HCl=None,
-    molinity_NaCl=None,
-    molinity_H2SO4=default.molinity_H2SO4,
-    temperature_override=None,
-    titrant="HCl",
-    titrant_amount_unit=default.titrant_amount_unit,
-    titrant_density=None,
-    opt_k_bisulfate=default.opt_k_bisulfate,
-    opt_k_carbonic=default.opt_k_carbonic,
-    opt_k_fluoride=default.opt_k_fluoride,
-    opt_pH_scale=default.opt_pH_scale,
-    opt_total_borate=default.opt_total_borate,
-    read_dat_kwargs=None,
-    read_dat_method=default.read_dat_method,
+    analyte_mass=None,
+    analyte_volume=None,
+    kwargs_dat_data=None,
+    kwargs_totals_ks=None,
 ):
-    """Prepare a titration data file for calibration and/or solving."""
-    titrant_mass, emf, temperature = get_dat_data(
-        file_name,
-        molinity_HCl=molinity_HCl,
-        molinity_NaCl=molinity_NaCl,
-        molinity_H2SO4=molinity_H2SO4,
-        temperature_override=temperature_override,
-        titrant=titrant,
-        titrant_density=titrant_density,
-        titrant_amount_unit=titrant_amount_unit,
-        read_dat_method=read_dat_method,
-        read_dat_kwargs=read_dat_kwargs,
+    """Prepare a titration data file for calibration and/or solving.
+
+    Parameters
+    ----------
+    file_name : str
+        The file (path and) name.
+    salinity : float
+        Practical salinity of the analyte at the start of the titration.
+    analyte_mass : _type_, optional
+        Mass of analyte in kg.  Either this or `analyte_volume` must be
+        provided.
+    analyte_volume : _type_, optional
+        Volume of analyte in ml, which is converted to kg assuming the analyte
+        is seawater. Either this or `analyte_mass` must be provided.
+    kwargs_dat_data : dict, optional
+        Additional kwargs to pass to `get_dat_data`.
+    kwargs_totals_ks : dict, optional
+        Additional kwargs to pass to `get_totals_k_constants`.
+
+    Returns
+    -------
+    PrepareResult
+        A namedtuple containing the fields
+            titrant_mass, measurement, temperature
+                See docstring for `get_dat_data`.
+            analyte_mass : float
+                Mass of the analyte in kg.
+            totals, k_constants
+                See docstring for `get_totals_k_constants`.
+    """
+    if kwargs_dat_data is None:
+        kwargs_dat_data = {}
+    titrant_mass, measurement, temperature = get_dat_data(
+        file_name, **kwargs_dat_data
     )
     if pd.isnull(analyte_mass):
         analyte_mass = (
@@ -241,43 +280,22 @@ def prepare(
             )
             * 1e-3
         )
+    if kwargs_totals_ks is None:
+        kwargs_totals_ks = {}
     totals, k_constants = get_totals_k_constants(
         titrant_mass,
         temperature,
         analyte_mass,
         salinity,
-        dic=dic,
-        total_alpha=total_alpha,
-        total_ammonia=total_ammonia,
-        total_beta=total_beta,
-        total_phosphate=total_phosphate,
-        total_silicate=total_silicate,
-        total_sulfide=total_sulfide,
-        total_borate=total_borate,
-        total_fluoride=total_fluoride,
-        total_sulfate=total_sulfate,
-        k_alpha=k_alpha,
-        k_beta=k_beta,
-        k_ammonia=k_ammonia,
-        k_bisulfate=k_bisulfate,
-        k_borate=k_borate,
-        k_carbonic_1=k_carbonic_1,
-        k_carbonic_2=k_carbonic_2,
-        k_fluoride=k_fluoride,
-        k_phosphoric_1=k_phosphoric_1,
-        k_phosphoric_2=k_phosphoric_2,
-        k_phosphoric_3=k_phosphoric_3,
-        k_silicate=k_silicate,
-        k_sulfide=k_sulfide,
-        k_water=k_water,
-        opt_k_bisulfate=opt_k_bisulfate,
-        opt_k_carbonic=opt_k_carbonic,
-        opt_k_fluoride=opt_k_fluoride,
-        opt_pH_scale=opt_pH_scale,
-        opt_total_borate=opt_total_borate,
+        **kwargs_totals_ks,
     )
     return PrepareResult(
-        titrant_mass, emf, temperature, analyte_mass, totals, k_constants
+        titrant_mass,
+        measurement,
+        temperature,
+        analyte_mass,
+        totals,
+        k_constants,
     )
 
 

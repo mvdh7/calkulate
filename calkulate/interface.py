@@ -54,8 +54,8 @@ def get_totals(
     total_borate=None,
     total_fluoride=None,
     total_sulfate=None,
-    opt_k_carbonic=default.opt_k_carbonic,
-    opt_total_borate=default.opt_total_borate,
+    opt_k_carbonic=10,
+    opt_total_borate=1,
 ):
     """Get dict of total substance contents (undiluted) from inputs and PyCO2SYS.
 
@@ -121,11 +121,11 @@ def get_k_constants(
     k_silicate=None,
     k_sulfide=None,
     k_water=None,
-    opt_k_bisulfate=default.opt_k_bisulfate,
-    opt_k_carbonic=default.opt_k_carbonic,
-    opt_k_fluoride=default.opt_k_fluoride,
-    opt_pH_scale=default.opt_pH_scale,
-    opt_total_borate=default.opt_total_borate,
+    opt_k_bisulfate=1,
+    opt_k_carbonic=10,
+    opt_k_fluoride=1,
+    opt_pH_scale=3,
+    opt_total_borate=1,
 ):
     """Get dict of equilibrium constants from inputs and PyCO2SYS."""
     # Create raw k_constants dict using PyCO2SYS
