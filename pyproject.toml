@@ -10,7 +10,7 @@ description = "Calkulate: seawater total alkalinity from titration data"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "PyCO2SYS",
+    "PyCO2SYS >= 1.8, < 2",
     "matplotlib",
     "numpy",
     "openpyxl",

@@ -2,29 +2,41 @@
 # Copyright (C) 2019--2025  Matthew P. Humphreys  (GNU GPLv3)
 """Work with datasets containing multiple titrations."""
 
-from collections import namedtuple
+import os
 
 import numpy as np
 import pandas as pd
 import PyCO2SYS as pyco2
 
-from . import default, titration
+# from . import default, titration
+from .read.titrations import keys_read_dat, read_dat
+from .titration import (
+    calibrate as t_calibrate,
+    convert_amount_units,
+    get_totals_k_constants,
+    keys_calibrate,
+    keys_cau,
+    keys_solve,
+    keys_totals_ks,
+    solve as t_solve,
+)
 
 
 def get_total_salts(ds):
     """Estimate total salt contents from salinity using PyCO2SYS without
     overwriting existing values.  Operates in-place.
     """
-    assert "salinity" in ds, "ds must contain a 'salinity' column!"
+    assert "salinity" in ds, 'Dataset must contain a "salinity" column.'
+    # Use opt_total_borate = 1 where it's not provided
     if "opt_total_borate" in ds:
-        opt_total_borate = ds.opt_total_borate.where(
-            ds.opt_total_borate.notnull(), default.opt_total_borate
-        ).to_numpy()
+        ds["opt_total_borate"] = ds.opt_total_borate.where(
+            ds.opt_total_borate.notnull(), 1
+        )
     else:
-        opt_total_borate = 1
+        ds["opt_total_borate"] = 1
     results = pyco2.sys(
-        salinity=ds.salinity.to_numpy(),
-        opt_total_borate=opt_total_borate,
+        salinity=ds.salinity.values,
+        opt_total_borate=ds.opt_total_borate.values,
     )
     salts = ["total_sulfate", "total_borate", "total_fluoride"]
     for salt in salts:
@@ -34,131 +46,106 @@ def get_total_salts(ds):
     return ds
 
 
-RowArgs = namedtuple(
-    "RowArgs",
-    ("file_name",),
-)
-
-# These are the kwargs that can be passed to `titration.get_totals_k_constants`
-keys_totals_ks = {
-    "dic",
-    "k_alpha",
-    "k_ammonia",
-    "k_beta",
-    "k_bisulfate",
-    "k_borate",
-    "k_carbonic_1",
-    "k_carbonic_2",
-    "k_fluoride",
-    "k_phosphoric_1",
-    "k_phosphoric_2",
-    "k_phosphoric_3",
-    "k_silicate",
-    "k_sulfide",
-    "k_water",
-    "opt_k_bisulfate",
-    "opt_k_carbonic",
-    "opt_k_fluoride",
-    "opt_pH_scale",
-    "opt_total_borate",
-    "total_alpha",
-    "total_ammonia",
-    "total_beta",
-    "total_borate",
-    "total_fluoride",
-    "total_phosphate",
-    "total_silicate",
-    "total_sulfate",
-    "total_sulfide",
-}
+def _backcompat(row, kwargs):
+    """Deal with old-style kwargs for backwards compatibility."""
+    prevdicts = ["read_dat_kwargs"]
+    for prevdict in prevdicts:
+        if prevdict in kwargs:
+            for k, v in kwargs[prevdict].items():
+                kwargs[k] = v
+    if "pH_range" in kwargs:
+        kwargs["pH_min"], kwargs["pH_max"] = kwargs["pH_range"]
+    old2new = {"read_dat_method": "file_type"}
+    for old, new in old2new.items():
+        if old in kwargs:
+            kwargs[new] = kwargs[old]
+        if "read_dat_method" in row:
+            kwargs[new] = row[old]
+    return row, kwargs
 
 
-def calibrate_row(row, kwargs_dat_data=None, verbose=False):
+def _get_kwargs_for(keys, kwargs, row):
+    # Start by getting any kwargs that are in the keys
+    kwargs_for = {k: v for k, v in kwargs.items() if k in keys}
+    # Overwrite any that have values in the row
+    for k in keys:
+        if k in row and pd.notnull(row[k]):
+            kwargs_for[k] = row[k]
+    return kwargs_for
+
+
+def calibrate_row(row, verbose=False, **kwargs):
     """Calibrate `titrant_molinity` for a single row of (i.e., a single
-    titration in) a dataset."""
-    if pd.notnull(row.alkalinity_certified) & row.file_good:
+    titration in) a dataset.  Also returns analyte mass.
+    """
+    row, kwargs = _backcompat(row, kwargs)
+    # Initialise output
+    calibrated = pd.Series(
+        {
+            "titrant_molinity_here": np.nan,
+            "analyte_mass": row.analyte_mass,
+        }
+    )
+    if pd.notnull(row.alkalinity_certified) and row.file_good:
         if verbose:
             print(f"Calkulate: calibrating {row.file_name}...")
+        # STEP 1: IMPORT TITRATION DATA
         # Append file_name to file_path if present
         if "file_path" in row:
-            file_name = row.file_path + row.file_name
+            file_name = os.path.join(row.file_path, row.file_name)
         else:
             file_name = row.file_name
+        # Get kwargs for read_dat
+        kwargs_read_dat = _get_kwargs_for(keys_read_dat, kwargs, row)
+        # Import the file
+        try:
+            dat_data = read_dat(file_name, **kwargs_read_dat)
+        except FileNotFoundError:
+            print(f'File not found: "{file_name}"')
+            return calibrated
+        # STEP 2: CONVERT AMOUNT UNITS
+        # Get kwargs for convert_amount_units
+        kwargs_cau = _get_kwargs_for(keys_cau, kwargs, row)
         # If there is analyte_mass, use it, otherwise use analyte_volume
-        analyte_amount = {}
-        if "analyte_mass" in row and pd.notnull(row.analyte_mass):
-            analyte_amount["analyte_mass"] = row.analyte_mass
-        else:
-            analyte_amount["analyte_volume"] = row.analyte_volume
-        # Get row kwargs for get_dat_data
-        if kwargs_dat_data is None:
-            kwargs_dat_data = {}
-        if "temperature_override" in row and pd.notnull(
-            row.temperature_override
-        ):
-            kwargs_dat_data["temperature_override"] = row.temperature_override
+        if "analyte_volume" in kwargs_cau and "analyte_mass" in kwargs_cau:
+            kwargs_cau["analyte_volume"] = None
         # Prepare titration file, totals and k_constants
         try:
-            prepped = titration.prepare(
-                file_name,
-                row.salinity,
-                **analyte_amount,
-                kwargs_dat_data=kwargs_dat_data,
+            converted = convert_amount_units(
+                dat_data, row.salinity, **kwargs_cau
             )
-            analyte_mass = prepped.analyte_mass
-        except FileNotFoundError:
-            print(f'Calkulate - file not found: "{row.file_name}"')
-            return pd.Series(
-                {
-                    "titrant_molinity_here": np.nan,
-                    "analyte_mass": row.analyte_mass,
-                }
-            )
-        kwargs_totals_ks = {}
-        for k in keys_totals_ks:
-            if k in row and pd.notnull(row[k]):
-                kwargs_totals_ks[k] = row[k]
-        totals, k_constants = titration.get_totals_k_constants(
-            prepped.titrant_mass,
-            prepped.temperature,
-            prepped.analyte_mass,
-            row.salinity,
-            **kwargs_totals_ks,
-        )
-        # Do the calibration
-        kwargs_calibrate = {}
-        for k in [
-            "emf0_guess",
-            "measurement_type",
-            "pH_min",
-            "pH_max",
-            "titrant_molinity_guess",
-            "titrant",
-        ]:
-            if k in row and pd.notnull(row[k]):
-                kwargs_calibrate[k] = row[k]
+            calibrated["analyte_mass"] = converted.analyte_mass
+        except Exception as e:
+            print(f'Error converting units for "{file_name}":')
+            print(f"{e}")
+            return calibrated
+        # STEP 3: GET TOTAL SALTS AND EQUILIBRIUM CONSTANTS
+        kwargs_totals_ks = _get_kwargs_for(keys_totals_ks, kwargs, row)
         try:
-            titrant_molinity_here = titration.calibrate(
+            totals, k_constants = get_totals_k_constants(
+                converted,
+                row.salinity,
+                **kwargs_totals_ks,
+            )
+        except Exception as e:
+            print(f'Error getting salts and constants for "{file_name}":')
+            print(f"{e}")
+            return calibrated
+        # STEP 4: DO THE CALIBRATION
+        kwargs_calibrate = _get_kwargs_for(keys_calibrate, kwargs, row)
+        try:
+            calibrated["titrant_molinity_here"] = t_calibrate(
                 row.alkalinity_certified,
-                prepped,
+                converted,
                 totals,
                 k_constants,
                 **kwargs_calibrate,
             )
         except Exception as e:
-            print(f"Calkulate ERROR calibrating '{row.file_name}': {e}")
-            titrant_molinity_here = np.nan
-            analyte_mass = row.analyte_mass
-    else:
-        # If alkalinity_certified not provided for this row
-        titrant_molinity_here = np.nan
-        analyte_mass = row.analyte_mass
-    return pd.Series(
-        {
-            "titrant_molinity_here": titrant_molinity_here,
-            "analyte_mass": analyte_mass,
-        }
-    )
+            print(f'Error calibrating "{file_name}":')
+            print(f"{e}")
+            return calibrated
+    return calibrated
 
 
 def get_group_calibration(ds_group):
@@ -185,23 +172,21 @@ def get_batches(ds):
     return batches
 
 
-def calibrate(ds, kwargs_dat_data=None, verbose=False):
+def calibrate(ds, verbose=False, **kwargs):
     """Calibrate `titrant_molinity` for all titrations with an
     `alkalinity_certified` value and assign means based on `analysis_batch`.
 
     Parameters
     ----------
-    ds : pandas.DataFrame or calk.Dataset
+    ds : pandas.DataFrame
         A table containing metadata for each titration (not used if running as
         a method).
-    kwargs_dat_data : dict, optional
-        kwargs to pass to `get_dat_data`, by default `None`.
     verbose : bool, optional
         Whether to print progress, by default `calk.default.verbose`.
 
     Returns
     -------
-    pandas.DataFrame or calk.Dataset
+    pandas.DataFrame
         The titration metadataset with additional columns found by the solver.
     """
     print("Calkulate: calibrating titrant_molinity...")
@@ -217,17 +202,14 @@ def calibrate(ds, kwargs_dat_data=None, verbose=False):
     if "titrant_amount_unit" in ds:
         ds["titrant_amount_unit"] = np.where(
             pd.isnull(ds.titrant_amount_unit),
-            default.titrant_amount_unit,
+            "ml",
             ds.titrant_amount_unit,
         )
     # Calibrate titrant_molinity_here for each row with an alkalinity_certified
     if "file_good" not in ds:
         ds["file_good"] = True
     calibrated_rows = ds.apply(
-        calibrate_row,
-        axis=1,
-        kwargs_dat_data=kwargs_dat_data,
-        verbose=verbose,
+        calibrate_row, axis=1, verbose=verbose, **kwargs
     )
     for k, v in calibrated_rows.items():
         ds[k] = v
@@ -244,133 +226,111 @@ def calibrate(ds, kwargs_dat_data=None, verbose=False):
     return ds
 
 
-def solve_row(row, kwargs_dat_data=None, verbose=False):
+def solve_row(row, verbose=False, **kwargs):
     """Solve alkalinity, EMF0 and initial pH for one titration in a dataset."""
-    if verbose:
-        print("Calkulate: solving {}...".format(row.file_name))
-    solved = False
-    if pd.notnull(row.titrant_molinity) & row.file_good:
+    row, kwargs = _backcompat(row, kwargs)
+    # Define blank output
+    solved = pd.Series(
+        {
+            "alkalinity_guess": np.nan,
+            "emf0_guess": np.nan,
+            "alkalinity": np.nan,
+            "alkalinity_std": np.nan,
+            "alkalinity_npts": 0,
+            "emf0": np.nan,
+            "pH_initial": np.nan,
+            "temperature_initial": np.nan,
+            "analyte_mass": row.analyte_mass,
+        }
+    )
+    if pd.notnull(row.titrant_molinity) and row.file_good:
+        if verbose:
+            print(f"Calkulate: solving {row.file_name}...")
+        # STEP 1: IMPORT TITRATION DATA
         # Append file_name to file_path if present
         if "file_path" in row:
-            file_name = row.file_path + row.file_name
+            file_name = os.path.join(row.file_path, row.file_name)
         else:
             file_name = row.file_name
+        # Get kwargs for read_dat
+        kwargs_read_dat = _get_kwargs_for(keys_read_dat, kwargs, row)
+        # Import the file
+        try:
+            dat_data = read_dat(file_name, **kwargs_read_dat)
+        except FileNotFoundError:
+            print(f'File not found: "{file_name}"')
+            return solved
+        except Exception as e:
+            print(f'Error importing "{file_name}":')
+            print(f"{e}")
+            return solved
+        # STEP 2: CONVERT AMOUNT UNITS
+        # Get kwargs for convert_amount_units
+        kwargs_cau = _get_kwargs_for(keys_cau, kwargs, row)
         # If there is analyte_mass, use it, otherwise use analyte_volume
-        analyte_amount = {}
-        if "analyte_mass" in row and pd.notnull(row.analyte_mass):
-            analyte_amount["analyte_mass"] = row.analyte_mass
-        else:
-            analyte_amount["analyte_volume"] = row.analyte_volume
-        # Get row kwargs for get_dat_data
-        if kwargs_dat_data is None:
-            kwargs_dat_data = {}
-        if "temperature_override" in row and pd.notnull(
-            row.temperature_override
-        ):
-            kwargs_dat_data["temperature_override"] = row.temperature_override
+        if "analyte_volume" in kwargs_cau and "analyte_mass" in kwargs_cau:
+            kwargs_cau["analyte_volume"] = None
         # Prepare titration file, totals and k_constants
         try:
-            prepped = titration.prepare(
-                file_name,
-                row.salinity,
-                **analyte_amount,
-                kwargs_dat_data=kwargs_dat_data,
+            converted = convert_amount_units(
+                dat_data, row.salinity, **kwargs_cau
             )
-        except FileNotFoundError:
-            print(f'Calkulate - file not found: "{row.file_name}"')
-            return pd.Series(
-                {
-                    "alkalinity_guess": np.nan,
-                    "emf0_guess": np.nan,
-                    "alkalinity": np.nan,
-                    "alkalinity_std": np.nan,
-                    "alkalinity_npts": 0,
-                    "emf0": np.nan,
-                    "pH_initial": np.nan,
-                    "temperature_initial": np.nan,
-                    "analyte_mass": row.analyte_mass,
-                }
-            )
-        kwargs_totals_ks = {}
-        for k in keys_totals_ks:
-            if k in row and pd.notnull(row[k]):
-                kwargs_totals_ks[k] = row[k]
-        totals, k_constants = titration.get_totals_k_constants(
-            prepped.titrant_mass,
-            prepped.temperature,
-            prepped.analyte_mass,
-            row.salinity,
-            **kwargs_totals_ks,
-        )
-        # TODO up to here was similar to `calibrate_row`; make a separate
-        # subfunction for both?
-        kwargs_solve = {}
-        for k in [
-            "emf0_guess",
-            "measurement_type",
-            "pH_min",
-            "pH_max",
-            "titrant",
-        ]:
-            if k in row and pd.notnull(row[k]):
-                kwargs_solve[k] = row[k]
+            solved["analyte_mass"] = converted.analyte_mass
+        except Exception as e:
+            print(f'Error converting units for "{file_name}":')
+            print(f"{e}")
+            return solved
+        # STEP 3: GET TOTAL SALTS AND EQUILIBRIUM CONSTANTS
+        kwargs_totals_ks = _get_kwargs_for(keys_totals_ks, kwargs, row)
         try:
-            solved = titration.solve(
+            totals, k_constants = get_totals_k_constants(
+                converted,
+                row.salinity,
+                **kwargs_totals_ks,
+            )
+        except Exception as e:
+            print(f'Error getting salts and constants for "{file_name}":')
+            print(f"{e}")
+            return solved
+        # STEP 4: SOLVE THE TITRATION
+        kwargs_solve = _get_kwargs_for(keys_solve, kwargs, row)
+        try:
+            sr = t_solve(
                 row.titrant_molinity,
-                prepped,
+                converted,
                 totals,
                 k_constants,
                 **kwargs_solve,
             )
+            solved["alkalinity_guess"] = sr.opt_result["alkalinity_guess"]
+            solved["emf0_guess"] = sr.opt_result["emf0_guess"]
+            solved["alkalinity"] = sr.alkalinity
+            solved["alkalinity_std"] = np.std(sr.opt_result["fun"]) * 1e6
+            solved["alkalinity_npts"] = sum(sr.opt_result["data_used"])
+            solved["emf0"] = sr.emf0
+            solved["pH_initial"] = sr.pH_initial
+            solved["temperature_initial"] = sr.temperature_initial
         except Exception as e:
-            print(f'Calkulate ERROR solving "{row.file_name}":  {e}')
-    if solved:
-        return pd.Series(
-            {
-                "alkalinity_guess": solved.opt_result["alkalinity_guess"],
-                "emf0_guess": solved.opt_result["emf0_guess"],
-                "alkalinity": solved.alkalinity,
-                "alkalinity_std": np.std(solved.opt_result["fun"]) * 1e6,
-                "alkalinity_npts": sum(solved.opt_result["data_used"]),
-                "emf0": solved.emf0,
-                "pH_initial": solved.pH_initial,
-                "temperature_initial": solved.temperature_initial,
-                "analyte_mass": solved.analyte_mass,
-            }
-        )
-    else:
-        return pd.Series(
-            {
-                "alkalinity_guess": np.nan,
-                "emf0_guess": np.nan,
-                "alkalinity": np.nan,
-                "alkalinity_std": np.nan,
-                "alkalinity_npts": 0,
-                "emf0": np.nan,
-                "pH_initial": np.nan,
-                "temperature_initial": np.nan,
-                "analyte_mass": row.analyte_mass,
-            }
-        )
+            print(f'Error calibrating "{file_name}":')
+            print(f"{e}")
+            return solved
+    return solved
 
 
-def solve(ds, kwargs_dat_data=None, verbose=False):
+def solve(ds, verbose=False, **kwargs):
     """Solve alkalinity, EMF0 and initial pH for all titrations with a
     `titrant_molinity` value in a `Dataset`.
 
     Parameters
     ----------
-    ds : `pandas.DataFrame` or `calk.Dataset`
-        A table containing metadata for each titration (not used if running as
-        a method).
-    kwargs_dat_data : dict, optional
-        kwargs to pass to `get_dat_data`, by default `None`.
+    ds : pandas.DataFrame
+        A table containing metadata for each titration.
     verbose : `bool`, optional
-        Whether to print progress, by default `calk.default.verbose`.
+        Whether to print progress, by default False.
 
     Returns
     -------
-    pandas.DataFrame or calk.Dataset
+    pandas.DataFrame
         The titration metadataset with additional columns found by the solver.
     """
     print("Calkulate: solving alkalinity...")
@@ -385,15 +345,10 @@ def solve(ds, kwargs_dat_data=None, verbose=False):
     if "titrant_amount_unit" in ds:
         ds["titrant_amount_unit"] = np.where(
             pd.isnull(ds.titrant_amount_unit),
-            default.titrant_amount_unit,
+            "ml",
             ds.titrant_amount_unit,
         )
-    solved_rows = ds.apply(
-        solve_row,
-        axis=1,
-        kwargs_dat_data=kwargs_dat_data,
-        verbose=verbose,
-    )
+    solved_rows = ds.apply(solve_row, axis=1, verbose=verbose, **kwargs)
     for k, v in solved_rows.items():
         ds[k] = v
     if "alkalinity_certified" in ds:
@@ -402,27 +357,25 @@ def solve(ds, kwargs_dat_data=None, verbose=False):
     return ds
 
 
-def calkulate(ds, kwargs_dat_data=None, verbose=default.verbose):
+def calkulate(ds, verbose=False, **kwargs):
     """Calibrate and then solve all titrations in a `Dataset`.
 
     Parameters
     ----------
-    ds : `pandas.DataFrame` or `calk.Dataset`
+    ds : pd.DataFrame
         A table containing metadata for each titration (not used if running as a
         method).
-    kwargs_dat_data : dict, optional
-        kwargs to pass to `get_dat_data`, by default `None`.
     verbose : `bool`, optional
         Whether to print progress, by default `calk.default.verbose`.
 
     Returns
     -------
-    `pandas.DataFrame` or `calk.Dataset`
+    pd.DataFrame
         The titration metadataset with additional columns found by the solver.
     """
     get_total_salts(ds)
-    calibrate(ds, kwargs_dat_data=kwargs_dat_data, verbose=verbose)
-    solve(ds, kwargs_dat_data=kwargs_dat_data, verbose=verbose)
+    calibrate(ds, verbose=verbose, **kwargs)
+    solve(ds, verbose=verbose, **kwargs)
     return ds
 
 
@@ -472,53 +425,3 @@ def to_Titration(ds, index, read_dat_kwargs={}):
             tt.set_titrant_molinity(dsr.titrant_molinity)
             tt.solve()
     return tt
-
-
-class Dataset(pd.DataFrame):
-    """
-    `calk.Dataset`
-    ================
-    A `calk.Dataset` is pandas `DataFrame` with several `calk.dataset` functions
-    available as methods.
-
-    Alkalinity solving methods
-    --------------------------
-    `calibrate`
-        Find the best-fit `titrant_molinity` for each sample that has a value for
-        `alkalinity_certified`.
-    `solve`
-        Solve every sample for `alkalinity` when `titrant_molinity` is known.
-    `calkulate`
-        Run the `calibrate` and `solve` steps sequentially.
-
-    Data visualisation methods
-    --------------------------
-    `plot_titrant_molinity`
-        Plot the `titrant_molinity` values determined with `calibrate` through time.
-    `plot_alkalinity_offset`
-        Plot the difference between solved `alkalinity` and `alkalinity_certified`
-        through time.
-
-    Conversion methods
-    ------------------
-    `to_Titration`
-        Return a `calk.Titration` object for one row in the `Dataset`.
-    `to_pandas`
-        Return a copy of the `Dataset` as a standard pandas `DataFrame`.
-    """
-
-    get_batches = get_batches
-    get_total_salts = get_total_salts
-    calibrate = calibrate
-    solve = solve
-    calkulate = calkulate
-    to_Titration = to_Titration
-
-    # from .plot import (
-    #     alkalinity_offset as plot_alkalinity_offset,
-    #     titrant_molinity as plot_titrant_molinity,
-    # )
-
-    def to_pandas(self):
-        """Return a copy of the `Dataset` as a standard pandas `DataFrame`."""
-        return pd.DataFrame(self)

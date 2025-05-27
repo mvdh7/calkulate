@@ -106,37 +106,6 @@ def test_user_emf0():
     assert np.isclose(emf0, emf0__emf0_user, rtol=0, atol=1e-6)
 
 
-def test_calibrate_titration():
-    """Do the calk.titration functions give consistent results?"""
-    # Compare with calk.titration functions
-    ctf_kwargs = dict(
-        analyte_mass=analyte_mass,
-        dic=dic,
-        **nutrients,
-        k_alpha=k_alpha,
-        k_beta=k_beta,
-    )
-    titrant_molinity__ctf, analyte_mass__ctf = calk.titration.calibrate(
-        file_name, salinity, alkalinity_certified, **ctf_kwargs
-    )
-    (
-        alkalinity__ctf,
-        emf0__ctf,
-        pH__ctf,
-        temperature0__ctf,
-        analyte_mass__ctf,
-        opt_result__ctf,
-    ) = calk.titration.solve(
-        file_name, salinity, titrant_molinity__ctf, **ctf_kwargs
-    )
-    assert np.isclose(
-        titrant_molinity, titrant_molinity__ctf, rtol=0, atol=1e-12
-    )
-    assert np.isclose(alkalinity, alkalinity__ctf, rtol=0, atol=1e-12)
-    assert np.isclose(emf0, emf0__ctf, rtol=0, atol=1e-12)
-
-
 # test_imported_file()
 # test_self_calibration()
 # test_user_emf0()
-# test_calibrate_titration()

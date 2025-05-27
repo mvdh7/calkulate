@@ -1,3 +1,4 @@
+# %%
 import calkulate as calk
 
 
@@ -6,7 +7,7 @@ tf.calkulate(read_dat_kwargs={"encoding": "unicode_escape"}, verbose=True)
 
 
 def test_irlon():
-    assert not tf.alkalinity.isnull().any()
+    assert tf.alkalinity.notnull().all()
 
 
 # test_irlon()

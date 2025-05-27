@@ -1,5 +1,8 @@
+# %%
 import numpy as np
+
 import calkulate as calk
+
 
 file_names = [
     "tests/data/PC_LIMS_Report-CRM1-20201211-115353.txt",
@@ -15,7 +18,7 @@ def test_pclims_io():
     """Can PC LIMS Report files be imported correctly?"""
     for file_name in file_names:
         titrant_amount, measurement, temperature = calk.read_dat(
-            file_name, method="pclims"
+            file_name, file_type="pclims"
         )
         assert isinstance(titrant_amount, np.ndarray)
         assert isinstance(titrant_amount[0], float)
@@ -24,7 +27,9 @@ def test_pclims_io():
         assert isinstance(temperature, np.ndarray)
         assert isinstance(temperature[0], float)
         assert (
-            np.shape(titrant_amount) == np.shape(measurement) == np.shape(temperature)
+            np.shape(titrant_amount)
+            == np.shape(measurement)
+            == np.shape(temperature)
         )
 
 

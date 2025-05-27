@@ -1,6 +1,11 @@
+# %%
 import copy
-import numpy as np, pandas as pd
-import PyCO2SYS as pyco2, calkulate as calk
+
+import numpy as np
+import pandas as pd
+import PyCO2SYS as pyco2
+
+import calkulate as calk
 
 
 # Function inputs
@@ -14,7 +19,9 @@ titrant_molinity = 0.3  # mol/kg
 titrant_mass_start = 0
 titrant_mass_step = 0.05e-3
 titrant_mass_stop = 2.51e-3
-titrant_mass = np.arange(titrant_mass_start, titrant_mass_stop, titrant_mass_step)  # kg
+titrant_mass = np.arange(
+    titrant_mass_start, titrant_mass_stop, titrant_mass_step
+)  # kg
 emf0 = 300  # mV
 # ===============
 
@@ -67,7 +74,9 @@ co2sys_titrations = pyco2.sys(
 pH_titrations = co2sys_titrations["pH_free"]
 
 # Export .dat file(s) for Calkulate
-emf = calk.convert.pH_to_emf(pH_titrations, emf0, kwargs_titration["temperature"])
+emf = calk.convert.pH_to_emf(
+    pH_titrations, emf0, kwargs_titration["temperature"]
+)
 file_name = "tests/data/test_simulate_then_solve.dat"
 calk.write_dat(
     file_name,
@@ -111,9 +120,13 @@ ds["opt_k_carbonic"] = 16
 ds["dic"] = co2sys_core["dic"]
 ds = calk.Dataset(ds)
 ds.solve()
-co2sys_core["alkalinity_titration"] = alkalinity_solved = ds.alkalinity.to_numpy()[0]
+co2sys_core["alkalinity_titration"] = alkalinity_solved = (
+    ds.alkalinity.to_numpy()[0]
+)
 co2sys_core["emf0"] = ds.emf0.to_numpy()
-co2sys_core["alkalinity_offset"] = co2sys_core["alkalinity_titration"] - alkalinity_core
+co2sys_core["alkalinity_offset"] = (
+    co2sys_core["alkalinity_titration"] - alkalinity_core
+)
 
 
 def test_simulate_then_solve():

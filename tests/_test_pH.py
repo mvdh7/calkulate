@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 
 import calkulate as calk
+from calkulate.dataset import calibrate, calkulate, solve, solve_row
 
 
 # Create metadata df based on all *.old files from a given path
@@ -30,12 +31,11 @@ prepare_kwargs = {
     "read_dat_method": "tiamo_de",
 }
 
+ds = calk.Dataset(ds)
+ds.calkulate(file_type="tiamo_de")
 
-calk.dataset.calibrate(
-    ds,
-    kwargs_dat_data={"kwargs_read_dat": {"method": "tiamo_de"}},
-)
-# ds["titrant_molinity"] = ds.titrant_molinity_here.copy()
-calk.dataset.solve(
-    ds, kwargs_dat_data={"kwargs_read_dat": {"method": "tiamo_de"}}
-)
+# row = calibrate_row(ds.iloc[0], file_type="tiamo_de")
+# calibrate(ds, file_type="tiamo_de")
+# row = solve_row(ds.iloc[0], file_type="tiamo_de")
+# solve(ds, file_type="tiamo_de")
+# calkulate(ds, file_type="tiamo_de")

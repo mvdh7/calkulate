@@ -1,4 +1,9 @@
-import calkulate as calk, PyCO2SYS as pyco2, numpy as np
+# %%
+import numpy as np
+import PyCO2SYS as pyco2
+
+import calkulate as calk
+
 
 # Set up random number generator for repeatability
 rng = np.random.default_rng(7)
@@ -43,7 +48,9 @@ results_for_calk = {
 components_calk = calk.simulate.alkalinity_components(
     pH, results_for_calk, results_for_calk
 )
-alkalinity_calk = calk.simulate.alkalinity(pH, results_for_calk, results_for_calk) * 1e6
+alkalinity_calk = (
+    calk.simulate.alkalinity(pH, results_for_calk, results_for_calk) * 1e6
+)
 
 # Compare individual components
 results_pyco2["H"] = results_pyco2["Hfree"]
@@ -64,7 +71,9 @@ def test_components():
 
 def test_alkalinity_from_pH():
     """Does Calkulate's total alkalinity simulator agree with PyCO2SYS?"""
-    assert np.all(np.isclose(alkalinity_calk, alkalinity_pyco2, rtol=0, atol=1e-10))
+    assert np.all(
+        np.isclose(alkalinity_calk, alkalinity_pyco2, rtol=0, atol=1e-10)
+    )
 
 
 # test_components()

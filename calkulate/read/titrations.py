@@ -8,19 +8,18 @@ from warnings import warn
 
 import numpy as np
 import pandas as pd
-from matplotlib import dates as mdates
-
-from . import dataset, default
 
 
-TiamoData = namedtuple("TiamoData", ("volume", "pH", "temperature"))
+DatData = namedtuple(
+    "DatData", ("titrant_amount", "measurement", "temperature")
+)
 
 
 def read_dat_genfromtxt(
     file_name,
-    titrant_amount_col=0,
-    measurement_col=1,
-    temperature_col=2,
+    col_titrant_amount=0,
+    col_measurement=1,
+    col_temperature=2,
     delimiter="\t",
     skip_header=2,
     **kwargs,
@@ -29,17 +28,17 @@ def read_dat_genfromtxt(
     data = np.genfromtxt(
         file_name, delimiter=delimiter, skip_header=skip_header, **kwargs
     )
-    titrant_amount = data[:, titrant_amount_col]
-    measurement = data[:, measurement_col]
-    temperature = data[:, temperature_col]
-    return titrant_amount, measurement, temperature
+    titrant_amount = data[:, col_titrant_amount]
+    measurement = data[:, col_measurement]
+    temperature = data[:, col_temperature]
+    return DatData(titrant_amount, measurement, temperature)
 
 
 def read_dat_pclims(
     file_name,
-    titrant_amount_col=1,
-    measurement_col=2,
-    temperature_col=5,
+    col_titrant_amount=1,
+    col_measurement=2,
+    col_temperature=5,
     n_cols=6,
 ):
     """Import a titration dataset from a PC LIMS Report."""
@@ -63,15 +62,15 @@ def read_dat_pclims(
         i += 1
     # Convert data to float arrays
     data = np.array(data, dtype="float64")
-    titrant_amount = data[:, titrant_amount_col]
-    measurement = data[:, measurement_col]
-    temperature = data[:, temperature_col]
-    return titrant_amount, measurement, temperature
+    titrant_amount = data[:, col_titrant_amount]
+    measurement = data[:, col_measurement]
+    temperature = data[:, col_temperature]
+    return DatData(titrant_amount, measurement, temperature)
 
 
 def read_dat_orgalk_excel(file_name):
-    """Import a titration dataset from an Excel file formatted for the NIOZ organic
-    alkalinity project.
+    """Import a titration dataset from an Excel file formatted for the NIOZ
+    organic alkalinity project.
 
     Parameters
     ----------
@@ -98,7 +97,7 @@ def read_dat_orgalk_excel(file_name):
     )
 
 
-def read_tiamo_de_df(file_name, encoding="unicode_escape"):
+def _read_tiamo_de_df(file_name, encoding="unicode_escape"):
     with open(file_name, "r", encoding=encoding) as f:
         data = f.read().splitlines()
     gran_line = data.index("Gran.1")
@@ -146,26 +145,35 @@ def read_tiamo_de(file_name, encoding="unicode_escape"):
             temperature : float
                 Temperature in °C.
     """
-    data = read_tiamo_de_df(file_name, encoding=encoding)
-    return TiamoData(
-        data.volume.values, data.pH.values, data.temperature.values
-    )
+    data = _read_tiamo_de_df(file_name, encoding=encoding)
+    return DatData(data.volume.values, data.pH.values, data.temperature.values)
 
 
-methods = {
+file_types = {
     "genfromtxt": read_dat_genfromtxt,
-    "pclims": read_dat_pclims,
+    "vindta": read_dat_genfromtxt,
     "orgalk_excel": read_dat_orgalk_excel,
+    "pclims": read_dat_pclims,
     "tiamo_de": read_tiamo_de,
 }
+keys_read_dat = [
+    "col_measurement",
+    "col_temperature",
+    "col_titrant_amount",
+    "delimiter",
+    "encoding",
+    "file_type",
+    "n_cols",
+    "skip_header",
+]
 
 
-def read_dat(file_name, method=default.read_dat_method, **kwargs):
+def read_dat(file_name, file_type="genfromtxt", **kwargs):
     """Import a titration dataset from a .dat file."""
-    if method not in methods:
-        method = "genfromtxt"
-        warn(f"method '{method}' not recognised, trying 'genfromtxt'.")
-    dat_data = methods[method](file_name, **kwargs)
+    if file_type not in file_types:
+        file_type = "genfromtxt"
+        warn(f"method '{file_type}' not recognised, trying 'genfromtxt'.")
+    dat_data = file_types[file_type](file_name, **kwargs)
     return dat_data
 
 
@@ -203,82 +211,3 @@ def write_dat(
                     temperature_i,
                 )
             )
-
-
-def read_clipboard(**read_clipboard_kwargs):
-    """Import a metadata table from clipboard and pass to read_csv."""
-    return dataset.Dataset(pd.read_clipboard(**read_clipboard_kwargs))
-
-
-def read_csv(filepath_or_buffer, **read_csv_kwargs):
-    """Import a metadata table from a CSV file."""
-    return dataset.Dataset(pd.read_csv(filepath_or_buffer, **read_csv_kwargs))
-
-
-def read_excel(io, **read_excel_kwargs):
-    """Import a metadata table from an Excel file."""
-    return dataset.Dataset(pd.read_excel(io, **read_excel_kwargs))
-
-
-def read_fwf(filepath_or_buffer, **read_fwf_kwargs):
-    """Import a metadata table from fixed-width formatted lines."""
-    return dataset.Dataset(pd.read_fwf(filepath_or_buffer, **read_fwf_kwargs))
-
-
-def read_table(filepath_or_buffer, **read_csv_kwargs):
-    """Import a metadata table from a general delimited file."""
-    return dataset.Dataset(
-        pd.read_table(filepath_or_buffer, **read_csv_kwargs)
-    )
-
-
-def add_func_cols(df, func, *args, **kwargs):
-    """Add results of df.apply(func) to df as new columns."""
-    return df.join(df.apply(lambda x: func(x, *args, **kwargs), axis=1))
-
-
-def dbs_datetime(dbs_row):
-    """Convert date and time from .dbs file into datetime."""
-    try:
-        dspl = dbs_row["date"].split("/")
-        analysis_datetime = np.datetime64(
-            "-".join(("20" + dspl[2], dspl[0], dspl[1]))
-            + "T"
-            + dbs_row["time"]
-        )
-    except AttributeError:
-        analysis_datetime = np.datetime64("NaT")
-    return pd.Series(
-        {
-            "analysis_datetime": analysis_datetime,
-        }
-    )
-
-
-def get_VINDTA_filenames(dbs):
-    """Determine VINDTA filenames, assuming defaults were used, based on the dbs."""
-    dbs["file_name"] = dbs.apply(
-        lambda x: "{}-{}  {}  ({}){}.dat".format(
-            int(x.station), int(x.cast), int(x.niskin), x.depth, x.bottle
-        ),
-        axis=1,
-    )
-    return dbs
-
-
-def read_dbs(fname, analyte_volume=100.0, analyte_mass=None, file_path=None):
-    """Import one .dbs file from a VINDTA as single DataFrame."""
-    headers = np.genfromtxt(fname, delimiter="\t", dtype=str, max_rows=1)
-    dbs = pd.read_table(fname, header=0, names=headers, usecols=headers)
-    dbs["dbs_fname"] = fname
-    dbs = add_func_cols(dbs, dbs_datetime)
-    dbs["analysis_datenum"] = mdates.date2num(dbs.analysis_datetime)
-    dbs = get_VINDTA_filenames(dbs)
-    if analyte_mass is None:
-        dbs["analyte_volume"] = analyte_volume
-    else:
-        dbs["analyte_mass"] = analyte_mass
-    if file_path is not None:
-        assert isinstance(file_path, str), "file_path must be a string."
-        dbs["file_path"] = file_path
-    return dataset.Dataset(dbs)

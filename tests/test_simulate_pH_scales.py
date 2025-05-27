@@ -1,6 +1,9 @@
+# %%
 import numpy as np
 import PyCO2SYS as pyco2
+
 import calkulate as calk
+
 
 # Set conditions
 salinity = 35
@@ -47,7 +50,8 @@ for i in pH.keys():
         pH[i], totals, k_constants[i], opt_pH_scale=i
     )
     alkalinity[i] = (
-        calk.simulate.alkalinity(pH[i], totals, k_constants[i], opt_pH_scale=i) * 1e6
+        calk.simulate.alkalinity(pH[i], totals, k_constants[i], opt_pH_scale=i)
+        * 1e6
     )
     all_H[i] = components[i]["H"]
     if "HSO4" in components[i]:

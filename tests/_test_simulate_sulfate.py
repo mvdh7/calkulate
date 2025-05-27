@@ -1,6 +1,10 @@
+# %%
 import copy
+
 import numpy as np
-import PyCO2SYS as pyco2, calkulate as calk
+import PyCO2SYS as pyco2
+
+import calkulate as calk
 
 
 # Function inputs
@@ -69,7 +73,9 @@ co2sys_titrations = pyco2.sys(
 pH_titrations = co2sys_titrations["pH_free"]
 
 # Export .dat file(s) for Calkulate
-emf = calk.convert.pH_to_emf(pH_titrations, emf0, kwargs_titration["temperature"])
+emf = calk.convert.pH_to_emf(
+    pH_titrations, emf0, kwargs_titration["temperature"]
+)
 file_name = "tests/data/test_simulate_sulfate.dat"
 calk.write_dat(
     file_name,
@@ -214,18 +220,30 @@ def test_calibrate_H2SO4():
     """Do the H2SO4 calibrators find the correct titrant_molinity for a simulated
     titration?
     """
-    assert np.isclose(titrant_molinity, titrant_molinity_calibrated, rtol=0, atol=1e-12)
+    assert np.isclose(
+        titrant_molinity, titrant_molinity_calibrated, rtol=0, atol=1e-12
+    )
     # These are negligibly worse due to rounding errors when data are saved to file:
-    assert np.isclose(titrant_molinity, titrant_molinity_tcal, rtol=0, atol=1e-6)
-    assert np.isclose(titrant_molinity, titrant_molinity_tcal_v, rtol=0, atol=1e-6)
-    assert np.isclose(titrant_molinity, ds.titrant_molinity_here, rtol=0, atol=1e-6)
-    assert np.isclose(titrant_molinity, ds_v.titrant_molinity_here, rtol=0, atol=1e-6)
+    assert np.isclose(
+        titrant_molinity, titrant_molinity_tcal, rtol=0, atol=1e-6
+    )
+    assert np.isclose(
+        titrant_molinity, titrant_molinity_tcal_v, rtol=0, atol=1e-6
+    )
+    assert np.isclose(
+        titrant_molinity, ds.titrant_molinity_here, rtol=0, atol=1e-6
+    )
+    assert np.isclose(
+        titrant_molinity, ds_v.titrant_molinity_here, rtol=0, atol=1e-6
+    )
 
 
 def test_solve_H2SO4():
     """Do the H2SO4 solvers correctly solve a simulated titration?"""
     assert np.isclose(alkalinity_core, alkalinity_solved, rtol=0, atol=1e-12)
-    assert np.isclose(alkalinity_core, alkalinity_cal_solved, rtol=0, atol=1e-12)
+    assert np.isclose(
+        alkalinity_core, alkalinity_cal_solved, rtol=0, atol=1e-12
+    )
     assert np.isclose(alkalinity_core, alkalinity_tcal, rtol=0, atol=1e-10)
     assert np.isclose(alkalinity_core, alkalinity_tcal_v, rtol=0, atol=1e-10)
     assert np.isclose(alkalinity_core, ds.alkalinity, rtol=0, atol=1e-10)

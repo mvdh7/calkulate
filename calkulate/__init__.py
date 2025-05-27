@@ -15,35 +15,66 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """Determine (sea)water total alkalinity from titration data."""
 
-from . import (
-    constants,
-    convert,
-    core,
-    dataset,
-    default,
-    density,
-    interface,
-    loss,
-    meta,
-    plot,
-    read,
-    simulate,
-    titration,
-)
-from .dataset import Dataset, get_batches
+from .classes import Dataset
+from .dataset import calibrate, solve
 from .meta import __author__, __version__, hello
-from .read import (
+from .read.metadata import (
     read_clipboard,
     read_csv,
-    read_dat,
     read_dbs,
     read_excel,
     read_fwf,
     read_table,
-    write_dat,
 )
-from .titration import Titration
+from .read.titrations import read_dat, write_dat
+
+
+# from . import (
+#     constants,
+#     convert,
+#     core,
+#     dataset,
+#     default,
+#     density,
+#     interface,
+#     loss,
+#     meta,
+#     plot,
+#     read,
+#     simulate,
+#     titration,
+# )
+# from .dataset import Dataset, get_batches
+# from .meta import __author__, __version__, hello
+# from .read import (
+#     read_clipboard,
+#     read_csv,
+#     read_dat,
+#     read_dbs,
+#     read_excel,
+#     read_fwf,
+#     read_table,
+#     write_dat,
+# )
+# from .titration import Titration
 
 
 # For backwards-compatibility
 say_hello = hello
+__all__ = [
+    "__author__",
+    "__version__",
+    "hello",
+    "say_hello",
+    "Dataset",
+    "calibrate",
+    "solve",
+    "read_dat",
+    "read_clipboard",
+    "read_csv",
+    "read_dbs",
+    "read_excel",
+    "read_fwf",
+    "read_table",
+    "write_dat",
+]

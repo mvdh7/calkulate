@@ -12,62 +12,41 @@ filenames = [f for f in listdir(filepath) if f.endswith(".old")]
 
 def test_read_dat():
     for filename in filenames:
-        td = calk.read.read_tiamo_de(filepath + filename)
-        assert isinstance(td, calk.read.TiamoData)
-        assert all(td[0] == td.volume)
-        assert all(td[1] == td.pH)
-        assert all(td[2] == td.temperature)
-        assert td.volume[0] > 0
+        dd = calk.read.titrations.read_tiamo_de(filepath + filename)
+        assert all(dd[0] == dd.titrant_amount)
+        assert all(dd[1] == dd.measurement)
+        assert all(dd[2] == dd.temperature)
+        assert dd.titrant_amount[0] > 0
 
 
 def test_get_dat_data():
     for filename in filenames:
-        td = calk.titration.get_dat_data(
-            filepath + filename, read_dat_kwargs={"method": "tiamo_de"}
-        )
-        assert isinstance(td, calk.titration.DatData)
-        assert all(td[0] == td.titrant_mass)
-        assert all(td[1] == td.measurement)
-        assert all(td[2] == td.temperature)
+        dd = calk.read_dat(filepath + filename, file_type="tiamo_de")
+        assert all(dd[0] == dd.titrant_amount)
+        assert all(dd[1] == dd.measurement)
+        assert all(dd[2] == dd.temperature)
 
 
-def test_prepare():
+def test_cau():
     for filename in filenames:
-        pr = calk.titration.prepare(
-            filepath + filename,
-            33.231,
-            analyte_volume=25,
-            kwargs_dat_data={"kwargs_read_dat": {"method": "tiamo_de"}},
-        )
-        assert isinstance(pr, calk.titration.PrepareResult)
-        assert all(pr[0] == pr.titrant_mass)
-        assert all(pr[1] == pr.measurement)
-        assert all(pr[2] == pr.temperature)
-        assert pr[3] == pr.analyte_mass
-        assert pr[4] == pr.totals
-        assert pr[5] == pr.k_constants
-        assert isinstance(pr.totals, dict)
-        assert isinstance(pr.k_constants, dict)
+        dd = calk.read_dat(filepath + filename, file_type="tiamo_de")
+        cv = calk.titration.convert_amount_units(dd, 33.231, analyte_volume=25)
+        assert isinstance(cv, calk.titration.Converted)
+        assert all(cv[0] == cv.titrant_mass)
+        assert all(cv[1] == cv.measurement)
+        assert all(cv[2] == cv.temperature)
+        assert cv[3] == cv.analyte_mass
 
 
 def test_tt_calibrate_solve():
     alkalinity_certified = 2220.62
     for filename in filenames:
-        pr = calk.titration.prepare(
-            filepath + filename,
-            33.231,
-            analyte_volume=25,
-            kwargs_dat_data={"kwargs_read_dat": {"method": "tiamo_de"}},
-        )
-        totals, k_constants = calk.titration.get_totals_k_constants(
-            pr.titrant_mass,
-            pr.temperature,
-            pr.analyte_mass,
-            33.231,
-        )
+        dd = calk.read_dat(filepath + filename, file_type="tiamo_de")
+        cv = calk.titration.convert_amount_units(dd, 33.231, analyte_volume=25)
+        totals, k_constants = calk.titration.get_totals_k_constants(cv, 33.231)
         titrant_molinity = calk.titration.calibrate(
             alkalinity_certified,
-            pr,
+            cv,
             totals,
             k_constants,
             measurement_type="pH",
@@ -77,7 +56,7 @@ def test_tt_calibrate_solve():
         assert 0.0095 < titrant_molinity < 0.0100
         sr = calk.titration.solve(
             titrant_molinity,
-            pr,
+            cv,
             totals,
             k_constants,
             measurement_type="pH",
@@ -88,5 +67,5 @@ def test_tt_calibrate_solve():
 
 # test_read_dat()
 # test_get_dat_data()
-# test_prepare()
+# test_cau()
 # test_tt_calibrate_solve()
