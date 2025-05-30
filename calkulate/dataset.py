@@ -61,7 +61,7 @@ def _backcompat(row, kwargs):
             kwargs[new] = kwargs[old]
         if "read_dat_method" in row:
             kwargs[new] = row[old]
-    return row, kwargs
+    return kwargs
 
 
 def _get_kwargs_for(keys, kwargs, row):
@@ -78,7 +78,7 @@ def calibrate_row(row, verbose=False, **kwargs):
     """Calibrate `titrant_molinity` for a single row of (i.e., a single
     titration in) a dataset.  Also returns analyte mass.
     """
-    row, kwargs = _backcompat(row, kwargs)
+    kwargs = _backcompat(row, kwargs)
     # Initialise output
     calibrated = pd.Series(
         {
@@ -228,7 +228,7 @@ def calibrate(ds, verbose=False, **kwargs):
 
 def solve_row(row, verbose=False, **kwargs):
     """Solve alkalinity, EMF0 and initial pH for one titration in a dataset."""
-    row, kwargs = _backcompat(row, kwargs)
+    kwargs = _backcompat(row, kwargs)
     # Define blank output
     solved = pd.Series(
         {
@@ -379,49 +379,49 @@ def calkulate(ds, verbose=False, **kwargs):
     return ds
 
 
-def to_Titration(ds, index, read_dat_kwargs={}):
-    """Create a `calk.Titration` object from one row of a `Dataset`.
+# def to_Titration(ds, index, read_dat_kwargs={}):
+#     """Create a `calk.Titration` object from one row of a `Dataset`.
 
-    Parameters
-    ----------
-    ds : `pandas.DataFrame` or `calk.Dataset`
-        The `Dataset` to make the Titration from (not used if running as a method).
-    index
-        The row index in the `Dataset` to use.
-    read_dat_kwargs : `dict`, optional
-        Any kwargs that need to be passed through in order to correctly read the
-        titration data file (e.g., `encoding`).
+#     Parameters
+#     ----------
+#     ds : `pandas.DataFrame` or `calk.Dataset`
+#         The `Dataset` to make the Titration from (not used if running as a method).
+#     index
+#         The row index in the `Dataset` to use.
+#     read_dat_kwargs : `dict`, optional
+#         Any kwargs that need to be passed through in order to correctly read the
+#         titration data file (e.g., `encoding`).
 
-    Returns
-    -------
-    `calk.Titration`
-        A `calk.Titration` for the specified row of the `Dataset`.
-    """
-    dsr = ds.loc[index]
-    prepare_kwargs = {"read_dat_kwargs": read_dat_kwargs}
-    for k, v in prepare_defaults.items():
-        if k in dsr:
-            if not pd.isnull(dsr[k]):
-                prepare_kwargs[k] = dsr[k]
-            else:
-                prepare_kwargs[k] = v
-        else:
-            prepare_kwargs[k] = v
-    analyte_mass = prepare_kwargs.pop("analyte_mass")
-    analyte_volume = prepare_kwargs.pop("analyte_volume")
-    tt = titration.Titration(
-        file_name=dsr.file_name,
-        file_path=dsr.file_path if "file_path" in dsr else "",
-        salinity=dsr.salinity,
-        analyte_mass=analyte_mass,
-        analyte_volume=analyte_volume,
-        file_prepare_kwargs=prepare_kwargs,
-    )
-    if "alkalinity_certified" in dsr:
-        if not pd.isnull(dsr.alkalinity_certified):
-            tt.alkalinity_certified = dsr.alkalinity_certified
-    if "titrant_molinity" in dsr:
-        if not pd.isnull(dsr.titrant_molinity):
-            tt.set_titrant_molinity(dsr.titrant_molinity)
-            tt.solve()
-    return tt
+#     Returns
+#     -------
+#     `calk.Titration`
+#         A `calk.Titration` for the specified row of the `Dataset`.
+#     """
+#     dsr = ds.loc[index]
+#     prepare_kwargs = {"read_dat_kwargs": read_dat_kwargs}
+#     for k, v in prepare_defaults.items():
+#         if k in dsr:
+#             if not pd.isnull(dsr[k]):
+#                 prepare_kwargs[k] = dsr[k]
+#             else:
+#                 prepare_kwargs[k] = v
+#         else:
+#             prepare_kwargs[k] = v
+#     analyte_mass = prepare_kwargs.pop("analyte_mass")
+#     analyte_volume = prepare_kwargs.pop("analyte_volume")
+#     tt = titration.Titration(
+#         file_name=dsr.file_name,
+#         file_path=dsr.file_path if "file_path" in dsr else "",
+#         salinity=dsr.salinity,
+#         analyte_mass=analyte_mass,
+#         analyte_volume=analyte_volume,
+#         file_prepare_kwargs=prepare_kwargs,
+#     )
+#     if "alkalinity_certified" in dsr:
+#         if not pd.isnull(dsr.alkalinity_certified):
+#             tt.alkalinity_certified = dsr.alkalinity_certified
+#     if "titrant_molinity" in dsr:
+#         if not pd.isnull(dsr.titrant_molinity):
+#             tt.set_titrant_molinity(dsr.titrant_molinity)
+#             tt.solve()
+#     return tt
