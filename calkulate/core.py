@@ -376,6 +376,8 @@ def solve_emf_complete(
     opt_result["alkalinity_guess"] = ggr.alkalinity * 1e6
     opt_result["emf0_guess"] = ggr.emf0
     opt_result["emf0_offset"] = np.nan
+    opt_result["pH_guess"] = ggr.pH
+    opt_result["data_used_guess"] = ggr.G
     return opt_result
 
 

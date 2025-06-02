@@ -226,9 +226,8 @@ def calibrate(ds, verbose=False, **kwargs):
     return ds
 
 
-def solve_row(row, verbose=False, **kwargs):
+def _solve_row(row, verbose=False, **kwargs):
     """Solve alkalinity, EMF0 and initial pH for one titration in a dataset."""
-    kwargs = _backcompat(row, kwargs)
     # Define blank output
     solved = pd.Series(
         {
@@ -243,6 +242,7 @@ def solve_row(row, verbose=False, **kwargs):
             "analyte_mass": row.analyte_mass,
         }
     )
+    kwargs = _backcompat(row, kwargs)
     if pd.notnull(row.titrant_molinity) and row.file_good:
         if verbose:
             print(f"Calkulate: solving {row.file_name}...")
@@ -263,7 +263,7 @@ def solve_row(row, verbose=False, **kwargs):
         except Exception as e:
             print(f'Error importing "{file_name}":')
             print(f"{e}")
-            return solved
+            return solved, None
         # STEP 2: CONVERT AMOUNT UNITS
         # Get kwargs for convert_amount_units
         kwargs_cau = _get_kwargs_for(keys_cau, kwargs, row)
@@ -279,7 +279,7 @@ def solve_row(row, verbose=False, **kwargs):
         except Exception as e:
             print(f'Error converting units for "{file_name}":')
             print(f"{e}")
-            return solved
+            return solved, None
         # STEP 3: GET TOTAL SALTS AND EQUILIBRIUM CONSTANTS
         kwargs_totals_ks = _get_kwargs_for(keys_totals_ks, kwargs, row)
         try:
@@ -291,7 +291,7 @@ def solve_row(row, verbose=False, **kwargs):
         except Exception as e:
             print(f'Error getting salts and constants for "{file_name}":')
             print(f"{e}")
-            return solved
+            return solved, None
         # STEP 4: SOLVE THE TITRATION
         kwargs_solve = _get_kwargs_for(keys_solve, kwargs, row)
         try:
@@ -313,8 +313,12 @@ def solve_row(row, verbose=False, **kwargs):
         except Exception as e:
             print(f'Error calibrating "{file_name}":')
             print(f"{e}")
-            return solved
-    return solved
+            return solved, None
+    return solved, sr
+
+
+def solve_row(row, verbose=False, **kwargs):
+    return _solve_row(row, verbose=verbose, **kwargs)[0]
 
 
 def solve(ds, verbose=False, **kwargs):
