@@ -159,7 +159,7 @@ titrant_molinity_tcal = calk.titration.calibrate(
     alkalinity_core,
     **prepare_kwargs,
 )[0]
-alkalinity_tcal, emf0_tcal, pH_initial_tcal = calk.titration.solve(
+alkalinity_tcal, emf0_tcal, pH_init_tcal = calk.titration.solve(
     file_name,
     salinity,
     titrant_molinity_tcal,
@@ -181,7 +181,7 @@ titrant_molinity_tcal_v = calk.titration.calibrate(
     alkalinity_core,
     **prepare_kwargs_v,
 )[0]
-alkalinity_tcal_v, emf0_tcal_v, pH_initial_tcal_v = calk.titration.solve(
+alkalinity_tcal_v, emf0_tcal_v, pH_init_tcal_v = calk.titration.solve(
     file_name_v,
     salinity,
     titrant_molinity_tcal_v,
@@ -255,10 +255,10 @@ def test_solve_H2SO4():
     assert np.isclose(emf0, emf0_tcal_v, rtol=0, atol=1e-4)
     assert np.isclose(emf0, ds.emf0, rtol=0, atol=1e-4)
     assert np.isclose(emf0, ds_v.emf0, rtol=0, atol=1e-4)
-    assert np.isclose(pH_free[0], pH_initial_tcal, rtol=0, atol=1e-6)
-    assert np.isclose(pH_free[0], pH_initial_tcal_v, rtol=0, atol=1e-6)
-    assert np.isclose(pH_free[0], ds.pH_initial, rtol=0, atol=1e-6)
-    assert np.isclose(pH_free[0], ds_v.pH_initial, rtol=0, atol=1e-6)
+    assert np.isclose(pH_free[0], pH_init_tcal, rtol=0, atol=1e-6)
+    assert np.isclose(pH_free[0], pH_init_tcal_v, rtol=0, atol=1e-6)
+    assert np.isclose(pH_free[0], ds.pH_init, rtol=0, atol=1e-6)
+    assert np.isclose(pH_free[0], ds_v.pH_init, rtol=0, atol=1e-6)
     assert np.isclose(0, ds.alkalinity_offset, rtol=0, atol=1e-10)
     assert np.isclose(0, ds_v.alkalinity_offset, rtol=0, atol=1e-10)
 

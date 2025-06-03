@@ -31,7 +31,7 @@ if np.isscalar(temperature):
 if np.isscalar(salinity):
     salinity = np.array([salinity])
 pyco2sys_kwargs = dict(
-    opt_k_carbonic=16,
+    opt_k_carbonic=10,
     opt_total_borate=1,
 )
 kwargs_core = dict(
@@ -116,7 +116,7 @@ ds["analyte_mass"] = analyte_mass
 ds["titrant_molinity"] = titrant_molinity
 ds["titrant_amount_unit"] = "g"
 ds["opt_total_borate"] = 1
-ds["opt_k_carbonic"] = 16
+ds["opt_k_carbonic"] = 10
 ds["dic"] = co2sys_core["dic"]
 ds = calk.Dataset(ds)
 ds.solve()
@@ -140,5 +140,5 @@ def test_simulate_titration_function():
     assert np.allclose(temperature, temperature__simfunc)
 
 
-# test_simulate_then_solve()
+test_simulate_then_solve()
 # test_simulate_titration_function()

@@ -156,7 +156,7 @@ file_types = {
     "pclims": read_dat_pclims,
     "tiamo_de": read_tiamo_de,
 }
-keys_read_dat = [
+keys_read_dat = {
     "col_measurement",
     "col_temperature",
     "col_titrant_amount",
@@ -165,7 +165,7 @@ keys_read_dat = [
     "file_type",
     "n_cols",
     "skip_header",
-]
+}
 
 
 def read_dat(file_name, file_type="genfromtxt", **kwargs):

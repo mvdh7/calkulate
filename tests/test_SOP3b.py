@@ -1,4 +1,6 @@
 # %%
+import os
+
 import numpy as np
 
 import calkulate as calk
@@ -8,7 +10,7 @@ def test_SOP3b():
     """Does Calkulate return values close to those reported in the SOP?
 
     Not exactly, but:
-      * the alkalinity is very close (great), but the EMF0 is a bit worse (who cares?);
+      * the alkalinity is very close (great), but the EMF0 is a bit worse;
       * the value of the alkalinity can be shifted around by about ±0.5 μmol/kg by
         switching to different PyCO2SYS options for K-bisulfate and K-fluoride, and it's
         not clear which of these were used in the SOP calculation.
@@ -17,7 +19,7 @@ def test_SOP3b():
     therefore consider the agreement here to be good enough.
     """
     file_path = "tests/data/SOP3b/"
-    ds = calk.read_csv(file_path + "metadata_DicksonSOP3b.csv")
+    ds = calk.read_csv(os.path.join(file_path, "metadata_DicksonSOP3b.csv"))
     ds["file_path"] = file_path
     ds["total_borate"] = 0
     ds["opt_k_bisulfate"] = 1

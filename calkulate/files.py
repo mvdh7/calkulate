@@ -11,186 +11,235 @@ The processing steps are
   2.  `convert.amount_units`: convert amount units to kg (titrant and analyte).
   3.  `core.totals_ks`: calculate total salt contents and equilibrium
       constants.
-  4a. `calibrate`: find best fitting titrant molinity given a certified
+  4a. `core.calibrate_*`: find best fitting titrant molinity given a certified
       alkalinity value.
-  4b. `solve`: find best fitting alkalinity and EMF0 given titrant molinity.
+  4b. `core.solve_*`: find best fitting alkalinity and EMF0 given titrant
+      molinity.
 """
 
-from collections import namedtuple
+import os
 
-from . import convert, core
-from .meta import _get_kwarg_keys
+from . import core
+from .convert import amount_units, keys_cau, pH_to_emf
+from .core import (
+    add_titrant_totals,
+    keys_calibrate_emf,
+    keys_calibrate_pH,
+    keys_solve_emf,
+    keys_solve_pH,
+    keys_titrant_totals,
+    keys_totals_ks,
+    totals_ks,
+)
+from .meta import _get_kwargs_for
+from .read.titrations import keys_read_dat, read_dat
 
 
-SolveResult = namedtuple(
-    "SolveResult",
-    (
-        "alkalinity",
-        "emf0",
-        "pH_initial",
-        "temperature_initial",
-        "analyte_mass",
-        "opt_result",
-    ),
+keys_calibrate = (
+    keys_read_dat
+    | keys_cau
+    | keys_totals_ks
+    | keys_calibrate_emf
+    | keys_calibrate_pH
+    | {"solve_mode"}
+)
+keys_solve = (
+    keys_read_dat
+    | keys_cau
+    | keys_totals_ks
+    | keys_titrant_totals
+    | keys_solve_emf
+    | keys_solve_pH
+    | {"solve_mode"}
 )
 
 
-def _get_solve_func(titrant, measurement_type):
-    if titrant.upper() == "H2SO4":
-        solve_func = core.solve_emf_complete_H2SO4
-    else:
-        if measurement_type.lower() == "emf":
-            solve_func = core.solve_emf_complete
-        else:
-            solve_func = core.solve_emf_pH_adjust
-    return solve_func
-
-
 def calibrate(
+    file_name,
     alkalinity_certified,
-    converted,
-    totals,
-    k_constants,
-    emf0_guess=None,
-    measurement_type="emf",
-    pH_min=3,
-    pH_max=4,
-    titrant_molinity_guess=0.1,
-    titrant="HCl",
+    salinity,
+    solve_mode="emf",
+    **kwargs,
 ):
     """Solve for `titrant_molinity` given `alkalinity_certified`.
 
     Parameters
     ----------
+    file_name : str
+        The name (and path to) the titration data file.
     alkalinity_certified : float
         The target total alkalinity in µmol/kg-sol.
-    converted : Converted
-        The output from `convert.amount_units`.
-    totals : dict
-        The total salt contents through the titration, including dilution
-        by the titrant, assuming the titrant is not one of the totals (e.g.,
-        it is not H2SO4).  Generated with `totals_ks`.
-    k_constants : dict
-        The equilibrium constants through the titration, including dilution
-        by the titrant (affects pH scale conversions only) and temperature
-        variations.  Generated with `totals_ks`.
-    emf0_guess : float, optional
-        A first-guess value for EMF0 in mV.
-    measurement_type : str, optional
-        The type of measurement in the data file, "emf" (default) or "pH".
-    pH_min : float, optional
-        Minimum pH to use from the titration data, by default 3.
-    pH_max : float, optional
-        Maximum pH to use from the titration data, by default 4.
-    titrant_molinity_guess : float, optional
-        First guess for the molinity of titrant in mol/kg-sol, by default 0.1.
-    titrant : str, optional
-        What the titrant was, "HCl" (default) or "H2SO4".
+    salinity : float
+        Practical salinity of the analyte.
+    solve_mode : str, optional, case-insensitive
+        How to solve for alkalinity, one of
+            "emf" (default) - measurements are EMF in mV
+            "pH_adjust" - measurements are pH but their EMF0 can be adjusted
+            "pH" - measurements are pH and cannot be adjusted
+    kwargs
+        Any keyword arguments that need passing to lower-level functions
+        (`read_dat`, `amount_units`, `totals_ks` and `calibrate_*`).
 
     Returns
     -------
-    float
-        The least-squares best fitting `titrant_molinity`.
+    opt_result : scipy.optimize.OptimizeResult
+        Output from `scipy.optimize.least_squares`, where the solved value is
+        `titrant_molinity = opt_result["x"][0]`.
     """
-    cv = converted
-    titrant_molinity = core.calibrate(
-        alkalinity_certified,
-        cv.titrant_mass,
-        cv.measurement,
-        cv.temperature,
-        cv.analyte_mass,
-        totals,
-        k_constants,
-        pH_min=pH_min,
-        pH_max=pH_max,
-        titrant_molinity_guess=titrant_molinity_guess,
-    )["x"][0]
-    return titrant_molinity
+    # Import the titration data file
+    if "file_path" in kwargs:
+        file_name = os.path.join(kwargs["file_path"], file_name)
+    kwargs_read_dat = _get_kwargs_for(keys_read_dat, kwargs)
+    dd = read_dat(file_name, **kwargs_read_dat)
+    # Convert amount units
+    kwargs_cau = _get_kwargs_for(keys_cau, kwargs)
+    cv = amount_units(dd, salinity, **kwargs_cau)
+    # Get total salts and equilibrium constants
+    kwargs_totals_ks = _get_kwargs_for(keys_totals_ks, kwargs)
+    totals, k_constants = totals_ks(cv, **kwargs_totals_ks)
+    # Calibrate!
+    if solve_mode.lower() == "emf":
+        # Titration data are EMFs
+        kwargs_calibrate_emf = _get_kwargs_for(keys_calibrate_emf, kwargs)
+        cal = core.calibrate_emf(
+            alkalinity_certified,
+            cv.titrant_mass,
+            cv.measurement,
+            cv.temperature,
+            cv.analyte_mass,
+            totals,
+            k_constants,
+            **kwargs_calibrate_emf,
+        )
+    elif solve_mode.lower() == "ph_adjust":
+        # Titration data are pHs but we want to allow the EMF0 to be adjusted
+        kwargs_calibrate_emf = _get_kwargs_for(keys_calibrate_emf, kwargs)
+        emf0_init = 0
+        kwargs_calibrate_emf["emf0_init"] = emf0_init
+        emf = pH_to_emf(cv.measurement, emf0_init, cv.temperature)
+        cal = core.calibrate_emf(
+            alkalinity_certified,
+            cv.titrant_mass,
+            emf,
+            cv.temperature,
+            cv.analyte_mass,
+            totals,
+            k_constants,
+            **kwargs_calibrate_emf,
+        )
+    elif solve_mode.lower() == "ph":
+        # Titration data are pHs and cannot be adjusted
+        kwargs_calibrate_pH = _get_kwargs_for(keys_calibrate_pH, kwargs)
+        cal = core.calibrate_pH(
+            alkalinity_certified,
+            cv.titrant_mass,
+            cv.measurement,
+            cv.temperature,
+            cv.analyte_mass,
+            totals,
+            k_constants,
+            **kwargs_calibrate_pH,
+        )
+    else:
+        raise Exception("`solve_mode` not valid")
+    return cal
 
 
 def solve(
+    file_name,
     titrant_molinity,
-    converted,
-    totals,
-    k_constants,
-    emf0_guess=None,
-    measurement_type="emf",
-    pH_min=3,
-    pH_max=4,
-    titrant="HCl",
+    salinity,
+    solve_mode="emf",
+    **kwargs,
 ):
-    """Solve alkalinity, EMF0 and initial pH for a titration file given the
-    `titrant_molinity`.
+    """Solve for `alkalinity` etc. given `titrant_molinity`.
 
     Parameters
     ----------
+    file_name : str
+        The name (and path to) the titration data file.
     titrant_molinity : float
         The titrant molinity in mol/kg-sol.
-    converted : Converted
-        The output from `convert.amount_units`.
-    totals : dict
-        The total salt contents through the titration, including dilution
-        by the titrant, assuming the titrant is not one of the totals (e.g.,
-        it is not H2SO4).  Generated with `totals_ks`.
-    k_constants : dict
-        The equilibrium constants through the titration, including dilution
-        by the titrant (affects pH scale conversions only) and temperature
-        variations.  Generated with `totals_ks`.
-    emf0_guess : float, optional
-        A first-guess value for EMF0 in mV.
-    measurement_type : str, optional
-        The type of measurement in the data file, "emf" (default) or "pH".
-    pH_min : float, optional
-        Minimum pH to use from the titration data, by default 3.
-    pH_max : float, optional
-        Maximum pH to use from the titration data, by default 4.
-    titrant : str, optional
-        What the titrant was, "HCl" (default) or "H2SO4".
+    salinity : float
+        Practical salinity of the analyte.
+    solve_mode : str, optional, case-insensitive
+        How to solve for alkalinity, one of
+            "emf" (default) - measurements are EMF in mV
+            "pH_adjust" - measurements are pH but their EMF0 can be adjusted
+            "pH" - measurements are pH and cannot be adjusted
+    kwargs
+        Any keyword arguments that need passing to lower-level functions
+        (`read_dat`, `amount_units`, `totals_ks`, `add_titrant_totals` and
+        `solve_*`).
 
     Returns
     -------
-    SolveResult - a named tuple containing the fields
-        alkalinity : float
-            Total alkalinity in µmol/kg-sol.
-        emf0 : float
-            The electrode EMF0 in mV.
-        pH_initial : float
-            pH at the first measurement point on the free scale.
-        temperature_initial : float
-            Temperature at the first measurement point in °C.
-        analyte_mass : float
-            Mass of the analyte in kg.
-        opt_result : dict
-            The alkalinity-EMF0 solver output (see docstring for the
-            appropriate solver in `core`).
+    Depends on solve_mode:
+
     """
-    cv = converted
-    solve_func = _get_solve_func(titrant, measurement_type)
-    opt_result = solve_func(
-        titrant_molinity,
-        cv.titrant_mass,
-        cv.measurement,
-        cv.temperature,
-        cv.analyte_mass,
+    # Import the titration data file
+    if "file_path" in kwargs:
+        file_name = os.path.join(kwargs["file_path"], file_name)
+    kwargs_read_dat = _get_kwargs_for(keys_read_dat, kwargs)
+    dd = read_dat(file_name, **kwargs_read_dat)
+    # Convert amount units
+    kwargs_cau = _get_kwargs_for(keys_cau, kwargs)
+    cv = amount_units(dd, salinity, **kwargs_cau)
+    # Get total salts and equilibrium constants
+    kwargs_totals_ks = _get_kwargs_for(keys_totals_ks, kwargs)
+    totals, k_constants = totals_ks(cv, **kwargs_totals_ks)
+    kwargs_titrant_totals = _get_kwargs_for(keys_titrant_totals, kwargs)
+    totals = add_titrant_totals(
         totals,
-        k_constants,
-        emf0_guess=emf0_guess,
-        pH_min=pH_min,
-        pH_max=pH_max,
-    )
-    alkalinity, emf0 = opt_result["x"]
-    # Calculate initial pH
-    pH_initial = convert.pH_to_emf(cv.measurement[0], 0, cv.temperature[0])
-    pH_initial = convert.emf_to_pH(pH_initial, emf0, cv.temperature[0])
-    return SolveResult(
-        alkalinity * 1e6,
-        emf0,
-        pH_initial,
-        cv.temperature[0],
+        cv.titrant_mass,
         cv.analyte_mass,
-        opt_result,
+        titrant_molinity,
+        titrant_molinity_prev=0,
+        **kwargs_titrant_totals,
     )
-
-
-keys_calibrate = _get_kwarg_keys(calibrate)
-keys_solve = _get_kwarg_keys(solve)
+    # Calibrate!
+    if solve_mode.lower() == "emf":
+        # Titration data are EMFs
+        kwargs_solve_emf = _get_kwargs_for(keys_solve_emf, kwargs)
+        sr = core.solve_emf(
+            titrant_molinity,
+            cv.titrant_mass,
+            cv.measurement,
+            cv.temperature,
+            cv.analyte_mass,
+            totals,
+            k_constants,
+            **kwargs_solve_emf,
+        )
+    elif solve_mode.lower() == "ph_adjust":
+        # Titration data are pHs but we want to allow the EMF0 to be adjusted
+        kwargs_solve_emf = _get_kwargs_for(keys_solve_emf, kwargs)
+        emf0_init = 0
+        kwargs_solve_emf["emf0_init"] = emf0_init
+        emf = pH_to_emf(cv.measurement, emf0_init, cv.temperature)
+        sr = core.solve_emf(
+            titrant_molinity,
+            cv.titrant_mass,
+            emf,
+            cv.temperature,
+            cv.analyte_mass,
+            totals,
+            k_constants,
+            **kwargs_solve_emf,
+        )
+    elif solve_mode.lower() == "ph":
+        # Titration data are pHs and cannot be adjusted
+        kwargs_solve_pH = _get_kwargs_for(keys_solve_pH, kwargs)
+        sr = core.solve_pH(
+            titrant_molinity,
+            cv.titrant_mass,
+            cv.measurement,
+            cv.temperature,
+            cv.analyte_mass,
+            totals,
+            k_constants,
+            **kwargs_solve_pH,
+        )
+    else:
+        raise Exception("`solve_mode` not valid")
+    return sr

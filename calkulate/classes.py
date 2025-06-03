@@ -7,7 +7,7 @@ import PyCO2SYS as pyco2
 from . import core
 from .convert import amount_units, emf_to_pH, get_dilution_factor, keys_cau
 from .core import keys_totals_ks, totals_ks
-from .dataset import _backcompat, _get_kwargs_for, _solve_row, calibrate_row
+from .dataset import _backcompat, _get_kwargs_for, calibrate_row
 from .read.titrations import keys_read_dat, read_dat
 
 
@@ -134,11 +134,11 @@ class Titration:
         The path to the titration data file.
     opt_result : scipy.optimize._optimize.OptimizeResult
         The raw output from the `scipy.optimize.least_squares` solver.
-    pH_initial : float
+    pH_init : float
         The pH at the initial titration point on the free pH scale.
     salinity : float
         The practical salinity of the analyte.
-    temperature_initial : float
+    temperature_init : float
         The temperature at the initial titration point.
     titrant_molinity : float
         The molinity of the titrant in mol/kg-titrant.

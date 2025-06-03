@@ -9,7 +9,7 @@ import calkulate as calk
 salinity = 35
 temperature = 25
 dic = 2100
-alkalinity_initial = -500
+alkalinity_init = -500
 
 # Create empty dicts
 pH = {}
@@ -20,7 +20,7 @@ all_H = {}
 
 # Get pH on all scales
 res = pyco2.sys(
-    par1=alkalinity_initial,
+    par1=alkalinity_init,
     par1_type=1,
     par2=dic,
     par2_type=2,
@@ -81,7 +81,7 @@ def test_alkalinity():
     """Is the alkalinity consistent across the different pH scales?"""
     tol = dict(atol=0, rtol=0.005)
     for i in [1, 2, 3]:
-        assert np.isclose(alkalinity[i], alkalinity_initial, **tol)
+        assert np.isclose(alkalinity[i], alkalinity_init, **tol)
 
 
 # test_nonH_components()

@@ -65,8 +65,8 @@ def test_calibrate_solve_emf():
             cv.analyte_mass,
             totals,
             k_constants,
-            emf0_initial=0,
-            titrant_molinity_initial=0.01,
+            emf0_init=0,
+            titrant_molinity_init=0.01,
         )
         titrant_molinity = cal["x"][0]
         assert isinstance(titrant_molinity, float)
@@ -79,7 +79,7 @@ def test_calibrate_solve_emf():
             cv.analyte_mass,
             totals,
             k_constants,
-            emf0_initial=0,
+            emf0_init=0,
         )
         assert np.abs(sr.emf0) < 3
         assert np.isclose(sr.alkalinity, alkalinity_certified)
@@ -105,7 +105,7 @@ def test_calibrate_solve_pH():
             k_constants,
             pH_min=3,
             pH_max=4,
-            titrant_molinity_initial=0.1,
+            titrant_molinity_init=0.1,
             titrant_normality=1,
         )
         titrant_molinity = cal["x"][0]

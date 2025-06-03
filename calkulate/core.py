@@ -38,9 +38,16 @@ from scipy.optimize import least_squares
 from scipy.stats import linregress
 
 from . import constants, convert, interface, simulate
+from .meta import _get_kwarg_keys
 from .settings import kwargs_least_squares
 
 
+# NOTE: The first 7 arguments of calibrate_emf and calibrate_pH must be the
+#       same as each other, as well as solve_emf and solve_pH.
+# NOTE: Internally, Gran alkalinities are in mol/kg while all other alkalinity
+#       values are in µmol/kg.
+
+# Set up namedtuples for results
 gar_vars = ("alkalinity", "gfunc", "used", "intercept_x", "lr")
 GranAlkalinityResult = namedtuple("GranAlkalinityResult", gar_vars)
 GranGuessesResult = namedtuple(
@@ -57,6 +64,13 @@ SolveEmfResult = namedtuple(
         "alkalinity_all",
         "opt_result",
         "ggr",
+        "titrant_molinity",
+        "titrant_mass",
+        "emf",
+        "temperature",
+        "analyte_mass",
+        "totals",
+        "k_constants",
     ),
 )
 SolvePhResult = namedtuple(
@@ -66,6 +80,13 @@ SolvePhResult = namedtuple(
         "used",
         "alkalinity_std",
         "alkalinity_all",
+        "titrant_molinity",
+        "titrant_mass",
+        "pH",
+        "temperature",
+        "analyte_mass",
+        "totals",
+        "k_constants",
     ),
 )
 # These are the kwargs that can be passed to `totals_ks`
@@ -385,9 +406,13 @@ def totals_ks(converted, **kwargs):
     totals, totals_pyco2 = interface.get_totals(cv.salinity, **kwargs_totals)
     # Dilute totals with titrant
     totals = convert.dilute_totals(totals, cv.titrant_mass, cv.analyte_mass)
-    totals_pyco2 = convert.dilute_totals_pyco2(
-        totals_pyco2, cv.titrant_mass, cv.analyte_mass
-    )
+    # # ... but DON'T dilute totals for calculating k_constants - they should
+    # # vary with temperature only.  NOTE below was commented out for v23.7;
+    # # numerical differences with previous versions are small (~0.1 µmol/kg),
+    # # and they will mostly cancel themselves out during calibration.
+    # totals_pyco2 = convert.dilute_totals_pyco2(
+    #     totals_pyco2, cv.titrant_mass, cv.analyte_mass
+    # )
     # Get k_constants from PyCO2SYS
     kwargs_k_constants = {
         k: v
@@ -504,9 +529,9 @@ def solve_emf(
     analyte_mass,
     totals,
     k_constants,
-    alkalinity_initial=None,
+    alkalinity_init=None,
     double=True,
-    emf0_initial=None,
+    emf0_init=None,
     pH_min=3,
     pH_max=4,
     titrant_normality=1,
@@ -531,13 +556,13 @@ def solve_emf(
         with any additions from the titrant included with `add_titrant_totals`.
     k_constants : dict of array-like floats
         Equilibrium constants through the titration, created with `totals_ks`.
-    alkalinity_initial : float, optional
+    alkalinity_init : float, optional
         An alkalinity value in µmol/kg-sol to use to initialise the
         solver.  By default None, in which case this is estimated using the
         Gran approach (see `gran_guesses`).
     double : bool, optional
         Whether to solve twice, by default True.
-    emf0_initial : float, optional
+    emf0_init : float, optional
         An EMF0 value to use to calculate the initial pH estimates from EMF,
         which are used with pH_min and pH_max to find the data points to use
         for solving.  By default None, in which case this is estimated using
@@ -578,17 +603,17 @@ def solve_emf(
         titrant_molinity,
         titrant_normality=titrant_normality,
     )
-    if alkalinity_initial is None:
+    if alkalinity_init is None:
         alkalinity = ggr.alkalinity
     else:
-        alkalinity = alkalinity_initial * 1e-6
+        alkalinity = alkalinity_init * 1e-6
     # Set which data points to use in the final solver
     assert pH_min < pH_max
-    if emf0_initial is None:
+    if emf0_init is None:
         emf0 = ggr.emf0
         pH = ggr.pH
     else:
-        emf0 = emf0_initial
+        emf0 = emf0_init
         pH = convert.emf_to_pH(emf, emf0, temperature)
     used = (pH >= pH_min) & (pH <= pH_max)
     totals_used = {
@@ -636,6 +661,13 @@ def solve_emf(
         alkalinity_all,
         opt_result,
         ggr,
+        titrant_molinity,
+        titrant_mass,
+        emf,
+        temperature,
+        analyte_mass,
+        totals,
+        k_constants,
     )
     if double:
         # Solve again, but this time starting from the previously solved-for
@@ -649,9 +681,9 @@ def solve_emf(
             analyte_mass,
             totals,
             k_constants,
-            alkalinity_initial=sr.alkalinity,
+            alkalinity_init=sr.alkalinity,
             double=False,  # if True this becomes an infinite loop, so don't
-            emf0_initial=sr.emf0,
+            emf0_init=sr.emf0,
             pH_min=pH_min,
             pH_max=pH_max,
             titrant_normality=titrant_normality,
@@ -724,7 +756,19 @@ def solve_pH(
     )
     alkalinity = np.mean(alkalinity_all[used])
     alkalinity_std = np.std(alkalinity_all[used])
-    return SolvePhResult(alkalinity, used, alkalinity_std, alkalinity_all)
+    return SolvePhResult(
+        alkalinity,
+        used,
+        alkalinity_std,
+        alkalinity_all,
+        titrant_molinity,
+        titrant_mass,
+        pH,
+        temperature,
+        analyte_mass,
+        totals,
+        k_constants,
+    )
 
 
 def _lsqfun_calibrate_emf(
@@ -736,9 +780,9 @@ def _lsqfun_calibrate_emf(
     analyte_mass,
     totals,
     k_constants,
-    alkalinity_initial,
+    alkalinity_init,
     double,
-    emf0_initial,
+    emf0_init,
     pH_min,
     pH_max,
     titrant_normality,
@@ -763,9 +807,9 @@ def _lsqfun_calibrate_emf(
         analyte_mass,
         totals,
         k_constants,
-        alkalinity_initial=alkalinity_initial,
+        alkalinity_init=alkalinity_init,
         double=double,
-        emf0_initial=emf0_initial,
+        emf0_init=emf0_init,
         pH_min=pH_min,
         pH_max=pH_max,
         titrant_normality=titrant_normality,
@@ -790,12 +834,12 @@ def calibrate_emf(
     analyte_mass,
     totals,
     k_constants,
-    alkalinity_initial=None,
-    emf0_initial=None,
+    alkalinity_init=None,
+    emf0_init=None,
     double=True,
     pH_min=3,
     pH_max=4,
-    titrant_molinity_initial=0.1,
+    titrant_molinity_init=0.1,
     titrant_normality=1,
     **titrant_totals,
 ):
@@ -820,13 +864,13 @@ def calibrate_emf(
     k_constants : dict
         Equilibrium constants through the titration, created with
         `totals_ks`.
-    alkalinity_initial : float, optional
+    alkalinity_init : float, optional
         An alkalinity value in µmol/kg-sol to use to initialise the
         solver.  By default None, in which case this is estimated using the
         Gran approach (see `gran_guesses`).
     double : bool, optional
         Whether to solve twice, by default True.
-    emf0_initial : float, optional
+    emf0_init : float, optional
         An EMF0 value to use to calculate the initial pH estimates from EMF,
         which are used with pH_min and pH_max to find the data points to use
         for solving.  By default None, in which case this is estimated using
@@ -835,7 +879,7 @@ def calibrate_emf(
         Minimum pH to use from the titration data, by default 3.
     pH_max : float, optional
         Maximum pH to use from the titration data, by default 4.
-    titrant_molinity_initial : float, optional
+    titrant_molinity_init : float, optional
         First guess for the molinity of titrant in mol/kg-sol, by default
         0.1.
     titrant_normality : float, optional
@@ -849,7 +893,7 @@ def calibrate_emf(
     """
     return least_squares(
         _lsqfun_calibrate_emf,
-        [titrant_molinity_initial],
+        [titrant_molinity_init],
         args=(
             alkalinity_certified,
             titrant_mass,
@@ -858,9 +902,9 @@ def calibrate_emf(
             analyte_mass,
             totals,
             k_constants,
-            alkalinity_initial,
+            alkalinity_init,
             double,
-            emf0_initial,
+            emf0_init,
             pH_min,
             pH_max,
             titrant_normality,
@@ -929,7 +973,7 @@ def calibrate_pH(
     k_constants,
     pH_min=3,
     pH_max=4,
-    titrant_molinity_initial=0.1,
+    titrant_molinity_init=0.1,
     titrant_normality=1,
     **titrant_totals,
 ):
@@ -958,7 +1002,7 @@ def calibrate_pH(
         Minimum pH to use from the titration data, by default 3.
     pH_max : float, optional
         Maximum pH to use from the titration data, by default 4.
-    titrant_molinity_initial : float, optional
+    titrant_molinity_init : float, optional
         First guess for the molinity of titrant in mol/kg-sol, by default
         0.1.
     titrant_normality : float, optional
@@ -972,7 +1016,7 @@ def calibrate_pH(
     """
     return least_squares(
         _lsqfun_calibrate_pH,
-        [titrant_molinity_initial],
+        [titrant_molinity_init],
         args=(
             alkalinity_certified,
             titrant_mass,
@@ -988,3 +1032,15 @@ def calibrate_pH(
         kwargs=titrant_totals,
         **kwargs_least_squares,
     )
+
+
+# Get kwarg key sets
+keys_solve_emf = _get_kwarg_keys(solve_emf)
+keys_solve_pH = _get_kwarg_keys(solve_pH)
+keys_titrant_totals = {
+    f"titrant_total_{k}" for k in ["sulfate", "phosphate", "fluoride"]
+}
+keys_calibrate_emf = _get_kwarg_keys(calibrate_emf)
+keys_calibrate_emf.update(keys_titrant_totals)
+keys_calibrate_pH = _get_kwarg_keys(calibrate_pH)
+keys_calibrate_pH.update(keys_titrant_totals)

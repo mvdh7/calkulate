@@ -4,6 +4,8 @@
 
 import inspect
 
+import pandas as pd
+
 
 _authorlist = ["Humphreys, Matthew P.", "Matthews, Ruth S."]
 __author__ = " and ".join(_authorlist)
@@ -31,3 +33,14 @@ def hello():
 def _get_kwarg_keys(func):
     params = inspect.signature(func).parameters
     return {p for p in params if params[p].default != inspect.Parameter.empty}
+
+
+def _get_kwargs_for(keys, kwargs, row=None):
+    # Start by getting any kwargs that are in the keys
+    kwargs_for = {k: v for k, v in kwargs.items() if k in keys}
+    # Overwrite / append any that (also) have values in the row
+    if row is not None:
+        for k in keys:
+            if k in row and pd.notnull(row[k]):
+                kwargs_for[k] = row[k]
+    return kwargs_for
