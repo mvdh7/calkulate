@@ -427,11 +427,40 @@ def add_titrant_totals(
     analyte_mass,
     titrant_molinity,
     titrant_molinity_prev=0,
-    inplace=False,
     **titrant_totals,
 ):
-    if not inplace:
-        totals = totals.copy()
+    """If the titrant contains an equilibrating species (e.g. H2SO4), then this
+    adds that to the totals.  This should be done explicitly AFTER calibrating
+    but BEFORE solving, thus NOT before calibrating, because the titrant
+    molinity is used in the calculation here.
+
+    This function does not need to be used if the titrant was HCl.
+
+    Operates in-place on `totals`.
+
+    Parameters
+    ----------
+    totals : dict of array-like floats
+        Total salt contents through the titration, created with `totals_ks`
+    titrant_mass : array-like float
+        Mass of titrant in kg.
+    analyte_mass : float
+        Mass of analyte in kg.
+    titrant_molinity : float
+        Molinity of titrant in mol/kg-sol.
+    titrant_molinity_prev : float, optional
+        Previously used molinity of titrant to remove in mol/kg-sol.
+    **titrant_totals : array-likes of float
+        Multipliers for how much of each total is added by the titrant.  The
+        keys are the same as in `totals` but with `"titrant_"` as a prefix.
+        For example, for H2SO4 titrant (which adds 1:1 to `total_sulfate`) use
+        `titrant_total_sulfate=1`.
+
+    Returns
+    -------
+    totals dict of array-like floats
+        The input totals with contributions from the titrant added.
+    """
     for t_total, factor in titrant_totals.items():
         assert t_total.startswith("titrant_total_")
         total = t_total[8:]
@@ -441,8 +470,7 @@ def add_titrant_totals(
             * factor
             / (titrant_mass + analyte_mass)
         )
-    if not inplace:
-        return totals
+    return totals
 
 
 def _lsqfun_solve_emf(
