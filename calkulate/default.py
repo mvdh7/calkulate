@@ -2,7 +2,7 @@
 # Copyright (C) 2019--2025  Matthew P. Humphreys  (GNU GPLv3)
 """Set default values."""
 
-dic = 0  # micromol / kg-solution
+dic = 0  # µmol / kg-solution
 dpi = 300  # resolution of figures
 fCO2_air = 450  # for DIC loss modelling, µatm
 least_squares_kwargs = dict(method="lm", gtol=1e-12, xtol=1e-12)

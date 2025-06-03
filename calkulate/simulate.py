@@ -13,7 +13,7 @@ def alkalinity_components(
 ):
     """Calculate chemical speciation from pH.
 
-    totals should include dilution correction and be in mol/kg-solution.
+    totals should include dilution correction and be in mol/kg-sol.
 
     k_constants should be on the scale specified by opt_pH_scale, with:
         1 = Total                pH = -log10([H+] + [HSO4-])
@@ -22,7 +22,7 @@ def alkalinity_components(
     Note that when using the Total scale, k_fluoride must also be on the Total scale
     (this does not happen by default in PyCO2SYS!).
 
-    Outputs are substance contents in mol/kg-solution.
+    Outputs are substance contents in mol/kg-sol.
     """
     # Check opt_pH_scale is valid
     opt_pH_scales = [1, 2, 3]
@@ -120,7 +120,7 @@ component_multipliers = {
 
 
 def alkalinity(pH, totals, k_constants, opt_pH_scale=default.opt_pH_scale):
-    """Estimate total alkalinity from pH and total salts in mol/kg-solution."""
+    """Estimate total alkalinity from pH and total salts in mol/kg-sol."""
     components = alkalinity_components(
         pH, totals, k_constants, opt_pH_scale=opt_pH_scale
     )

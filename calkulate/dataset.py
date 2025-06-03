@@ -8,16 +8,13 @@ import numpy as np
 import pandas as pd
 import PyCO2SYS as pyco2
 
-# from . import default, titration
+from .convert import amount_units, keys_cau
+from .core import keys_totals_ks, totals_ks
 from .read.titrations import keys_read_dat, read_dat
 from .titration import (
     calibrate as t_calibrate,
-    convert_amount_units,
-    get_totals_k_constants,
     keys_calibrate,
-    keys_cau,
     keys_solve,
-    keys_totals_ks,
     solve as t_solve,
 )
 
@@ -104,16 +101,14 @@ def calibrate_row(row, verbose=False, **kwargs):
             print(f'File not found: "{file_name}"')
             return calibrated
         # STEP 2: CONVERT AMOUNT UNITS
-        # Get kwargs for convert_amount_units
+        # Get kwargs for convert.amount_units
         kwargs_cau = _get_kwargs_for(keys_cau, kwargs, row)
         # If there is analyte_mass, use it, otherwise use analyte_volume
         if "analyte_volume" in kwargs_cau and "analyte_mass" in kwargs_cau:
             kwargs_cau["analyte_volume"] = None
         # Prepare titration file, totals and k_constants
         try:
-            converted = convert_amount_units(
-                dat_data, row.salinity, **kwargs_cau
-            )
+            converted = amount_units(dat_data, row.salinity, **kwargs_cau)
             calibrated["analyte_mass"] = converted.analyte_mass
         except Exception as e:
             print(f'Error converting units for "{file_name}":')
@@ -122,7 +117,7 @@ def calibrate_row(row, verbose=False, **kwargs):
         # STEP 3: GET TOTAL SALTS AND EQUILIBRIUM CONSTANTS
         kwargs_totals_ks = _get_kwargs_for(keys_totals_ks, kwargs, row)
         try:
-            totals, k_constants = get_totals_k_constants(
+            totals, k_constants = totals_ks(
                 converted,
                 row.salinity,
                 **kwargs_totals_ks,
@@ -265,16 +260,14 @@ def _solve_row(row, verbose=False, **kwargs):
             print(f"{e}")
             return solved, None
         # STEP 2: CONVERT AMOUNT UNITS
-        # Get kwargs for convert_amount_units
+        # Get kwargs for convert.amount_units
         kwargs_cau = _get_kwargs_for(keys_cau, kwargs, row)
         # If there is analyte_mass, use it, otherwise use analyte_volume
         if "analyte_volume" in kwargs_cau and "analyte_mass" in kwargs_cau:
             kwargs_cau["analyte_volume"] = None
         # Prepare titration file, totals and k_constants
         try:
-            converted = convert_amount_units(
-                dat_data, row.salinity, **kwargs_cau
-            )
+            converted = amount_units(dat_data, row.salinity, **kwargs_cau)
             solved["analyte_mass"] = converted.analyte_mass
         except Exception as e:
             print(f'Error converting units for "{file_name}":')
@@ -283,7 +276,7 @@ def _solve_row(row, verbose=False, **kwargs):
         # STEP 3: GET TOTAL SALTS AND EQUILIBRIUM CONSTANTS
         kwargs_totals_ks = _get_kwargs_for(keys_totals_ks, kwargs, row)
         try:
-            totals, k_constants = get_totals_k_constants(
+            totals, k_constants = totals_ks(
                 converted,
                 row.salinity,
                 **kwargs_totals_ks,

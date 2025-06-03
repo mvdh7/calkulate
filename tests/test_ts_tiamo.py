@@ -1,5 +1,5 @@
 # %%
-from os import listdir
+import os
 
 import numpy as np
 
@@ -7,12 +7,14 @@ import calkulate as calk
 
 
 filepath = "tests/data/ts-tiamo/"
-filenames = [f for f in listdir(filepath) if f.endswith(".old")]
+filenames = [f for f in os.listdir(filepath) if f.endswith(".old")]
 
 
 def test_read_dat():
     for filename in filenames:
-        dd = calk.read.titrations.read_tiamo_de(filepath + filename)
+        dd = calk.read.titrations.read_tiamo_de(
+            os.path.join(filepath, filename)
+        )
         assert all(dd[0] == dd.titrant_amount)
         assert all(dd[1] == dd.measurement)
         assert all(dd[2] == dd.temperature)
@@ -21,7 +23,10 @@ def test_read_dat():
 
 def test_get_dat_data():
     for filename in filenames:
-        dd = calk.read_dat(filepath + filename, file_type="tiamo_de")
+        dd = calk.read_dat(
+            os.path.join(filepath, filename),
+            file_type="tiamo_de",
+        )
         assert all(dd[0] == dd.titrant_amount)
         assert all(dd[1] == dd.measurement)
         assert all(dd[2] == dd.temperature)
@@ -29,43 +34,100 @@ def test_get_dat_data():
 
 def test_cau():
     for filename in filenames:
-        dd = calk.read_dat(filepath + filename, file_type="tiamo_de")
-        cv = calk.titration.convert_amount_units(dd, 33.231, analyte_volume=25)
-        assert isinstance(cv, calk.titration.Converted)
+        dd = calk.read_dat(
+            os.path.join(filepath, filename),
+            file_type="tiamo_de",
+        )
+        cv = calk.convert.amount_units(dd, 33.231, analyte_volume=25)
+        assert isinstance(cv, calk.convert.Converted)
         assert all(cv[0] == cv.titrant_mass)
         assert all(cv[1] == cv.measurement)
         assert all(cv[2] == cv.temperature)
         assert cv[3] == cv.analyte_mass
 
 
-def test_tt_calibrate_solve():
+def test_calibrate_solve_emf():
     alkalinity_certified = 2220.62
+    salinity = 33.231
     for filename in filenames:
-        dd = calk.read_dat(filepath + filename, file_type="tiamo_de")
-        cv = calk.titration.convert_amount_units(dd, 33.231, analyte_volume=25)
-        totals, k_constants = calk.titration.get_totals_k_constants(cv, 33.231)
-        titrant_molinity = calk.titration.calibrate(
+        dd = calk.read_dat(
+            os.path.join(filepath, filename),
+            file_type="tiamo_de",
+        )
+        cv = calk.convert.amount_units(dd, salinity, analyte_volume=25)
+        emf = calk.convert.pH_to_emf(cv.measurement, 0, cv.temperature)
+        totals, k_constants = calk.core.totals_ks(cv)
+        cal = calk.core.calibrate_emf(
             alkalinity_certified,
-            cv,
+            cv.titrant_mass,
+            emf,
+            cv.temperature,
+            cv.analyte_mass,
             totals,
             k_constants,
-            measurement_type="pH",
-            titrant_molinity_guess=0.01,
+            emf0_initial=0,
+            titrant_molinity_initial=0.01,
         )
+        titrant_molinity = cal["x"][0]
         assert isinstance(titrant_molinity, float)
         assert 0.0095 < titrant_molinity < 0.0100
-        sr = calk.titration.solve(
+        sr = calk.core.solve_emf(
             titrant_molinity,
-            cv,
+            cv.titrant_mass,
+            emf,
+            cv.temperature,
+            cv.analyte_mass,
             totals,
             k_constants,
-            measurement_type="pH",
+            emf0_initial=0,
         )
-        assert np.isclose(sr.alkalinity, alkalinity_certified)
         assert np.abs(sr.emf0) < 3
+        assert np.isclose(sr.alkalinity, alkalinity_certified)
+
+
+def test_calibrate_solve_pH():
+    alkalinity_certified = 2220.62
+    salinity = 33.231
+    for filename in filenames:
+        dd = calk.read_dat(
+            os.path.join(filepath, filename),
+            file_type="tiamo_de",
+        )
+        cv = calk.convert.amount_units(dd, salinity, analyte_volume=25)
+        totals, k_constants = calk.core.totals_ks(cv, opt_pH_scale=3)
+        cal = calk.core.calibrate_pH(
+            alkalinity_certified,
+            cv.titrant_mass,
+            cv.measurement,
+            cv.temperature,
+            cv.analyte_mass,
+            totals,
+            k_constants,
+            pH_min=3,
+            pH_max=4,
+            titrant_molinity_initial=0.1,
+            titrant_normality=1,
+        )
+        titrant_molinity = cal["x"][0]
+        assert isinstance(titrant_molinity, float)
+        assert 0.0095 < titrant_molinity < 0.0100
+        spr = calk.core.solve_pH(
+            titrant_molinity,
+            cv.titrant_mass,
+            cv.measurement,
+            cv.temperature,
+            cv.analyte_mass,
+            totals,
+            k_constants,
+            pH_min=3,
+            pH_max=4,
+            titrant_normality=1,
+        )
+        assert np.isclose(spr.alkalinity, alkalinity_certified)
 
 
 # test_read_dat()
 # test_get_dat_data()
 # test_cau()
-# test_tt_calibrate_solve()
+# test_calibrate_solve_emf()
+# test_calibrate_solve_pH()

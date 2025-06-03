@@ -2,10 +2,19 @@
 # Copyright (C) 2019--2025  Matthew P. Humphreys  (GNU GPLv3)
 """Convert between various properties."""
 
+from collections import namedtuple
+
 import numpy as np
+import pandas as pd
 
-from . import constants, interface
+from . import constants, density, interface
+from .meta import _get_kwarg_keys
 
+
+Converted = namedtuple(
+    "ConvertResult",
+    ("titrant_mass", "measurement", "temperature", "analyte_mass", "salinity"),
+)
 
 # For convenience
 F = constants.faraday
@@ -133,3 +142,115 @@ def f_to_demf0(f, temperature):
     """Convert Dickson's f factor into del-EMF0."""
     temperature_K = temperature + constants.absolute_zero
     return np.log(f) * R * temperature_K / F
+
+
+def amount_units(
+    dat_data,
+    salinity,
+    analyte_mass=None,
+    analyte_volume=None,
+    molinity_H2SO4=0.1,
+    molinity_HCl=0.1,
+    molinity_NaCl=0.6,
+    temperature_override=None,
+    titrant_amount_unit="ml",
+    titrant_density=None,
+    titrant="HCl",
+):
+    """Convert titrant and analyte units to mass in kg.
+
+    Parameters
+    ----------
+    dat_data : DatData
+        Data from a titration file imported with `read.read_dat`.
+    salinity : float
+        Practical salinity of the analyte.
+    analyte_mass : float, optional
+        Analyte mass in kg.  Either this or `analyte_volume` must be given.
+    analyte_volume : float, optional
+        Analyte volume in ml, which is converted to kg assuming analyte is
+        seawater.  Either this or `analyte_mass` must be given.
+    molinity_H2SO4 : float, optional
+        H2SO4 titrant molinity in mol/kg-sol for density calculation, by
+        default 0.1.
+    molinity_HCl : float, optional
+        HCl titrant molinity in mol/kg-sol for density calculation, by
+        default 0.1.
+    molinity_NaCl : float, optional
+        NaCl molinity in mol/kg-sol in the titrant where it is an HCl-NaCl
+        mixture, for density calculation, by default 0.6.
+    temperature_override : float, optional
+        A temperature in °C to use instead of the temperature data in the
+        titration file, by default `None`.
+    titrant_amount_unit : str, optional
+        Units for the titrant amount in the file, one of "ml" (default), "g" or
+        "kg".
+    titrant_density : float, optional
+        Titrant density in g/ml, by default `None`, in which case it is
+        calculated from the molinities provided.
+    titrant : str, optional
+        Which titrant was used, "HCl" (default) or "H2SO4".
+
+    Returns
+    -------
+    Converted - namedtuple containing the fields
+        titrant_mass : array-like float
+            Titrant mass through the titration in kg.
+        measurement : array-like float
+            EMF through the titration in mV, or pH.
+        temperature : array-like float
+            Temperature through the titration in °C.
+        analyte_mass : float
+            Mass of the analyte in kg.
+    """
+    dd = dat_data
+    # Overwrite temperature, if requested
+    if temperature_override is not None:
+        temperature = np.full_like(dd.temperature, temperature_override)
+    else:
+        temperature = dd.temperature
+    # Get titrant mass
+    assert titrant_amount_unit.lower() in ["ml", "g", "kg"]
+    if titrant_amount_unit.lower() == "ml":
+        if titrant_density is None:
+            assert titrant.upper() in ["H2SO4", "HCL"]
+            if titrant.upper() == "H2SO4":
+                titrant_mass = (
+                    dd.titrant_amount
+                    * density.H2SO4_25C_EAIM(molinity_H2SO4)
+                    * 1e-3
+                )
+            else:
+                titrant_mass = (
+                    dd.titrant_amount
+                    * density.HCl_NaCl_25C_DSC07(
+                        molinity_HCl=molinity_HCl,
+                        molinity_NaCl=molinity_NaCl,
+                    )
+                    * 1e-3
+                )
+        else:
+            titrant_mass = dd.titrant_amount * titrant_density * 1e-3
+    elif titrant_amount_unit.lower() == "g":
+        titrant_mass = dd.titrant_amount * 1e-3
+    elif titrant_amount_unit.lower() == "kg":
+        titrant_mass = dd.titrant_amount
+    # Convert analyte_mass to analyte_volume if necessary
+    if pd.isnull(analyte_mass):
+        assert not pd.isnull(analyte_volume), (
+            "Either `analyte_mass` or `analyte_volume` must be provided"
+        )
+        analyte_mass = (
+            analyte_volume
+            * density.seawater_1atm_MP81(
+                temperature=temperature[0],
+                salinity=salinity,
+            )
+            * 1e-3
+        )
+    return Converted(
+        titrant_mass, dd.measurement, temperature, analyte_mass, salinity
+    )
+
+
+keys_cau = _get_kwarg_keys(amount_units)

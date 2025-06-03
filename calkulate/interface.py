@@ -59,7 +59,7 @@ def get_totals(
 ):
     """Get dict of total substance contents (undiluted) from inputs and PyCO2SYS.
 
-    Inputs in micromol/kg-solution, outputs in mol/kg-solution.
+    Inputs in µmol/kg-sol, outputs in mol/kg-sol.
     """
     # Create raw totals dict using PyCO2SYS
     totals_pyco2 = {}
@@ -83,7 +83,7 @@ def get_totals(
         opt_total_borate,
         totals=totals_pyco2,
     )
-    # Reorganise totals dict for Calkulate, all in mol/kg-solution
+    # Reorganise totals dict for Calkulate, all in mol/kg-sol
     totals = {}
     totals["dic"] = dic * 1e-6
     if total_alpha > 0:

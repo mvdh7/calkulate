@@ -1,6 +1,9 @@
 # Calkulate: seawater total alkalinity from titration data
 # Copyright (C) 2019--2025  Matthew P. Humphreys  (GNU GPLv3)
-"""Package metadata."""
+"""Package metadata and metafunctions."""
+
+import inspect
+
 
 _authorlist = ["Humphreys, Matthew P.", "Matthews, Ruth S."]
 __author__ = " and ".join(_authorlist)
@@ -23,3 +26,8 @@ def hello():
            Version {} ({})
 """.format(__version__, __year__)
     )
+
+
+def _get_kwarg_keys(func):
+    params = inspect.signature(func).parameters
+    return {p for p in params if params[p].default != inspect.Parameter.empty}

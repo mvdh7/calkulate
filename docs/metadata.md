@@ -34,21 +34,21 @@ Extra columns will be ignored by Calkulate and should not cause any problems.
 Not strictly essential, but you'll need these most of the time.  If values are only needed for some of your titrations, just use `np.nan` in rows where they are not required.
 
 ??? tip "`alkalinity_certified` : *known alkalinity value (e.g. for a reference material)*"
-    Must be in μmol/kg-solution.
+    Must be in µmol/kg-sol.
 
 ??? tip "`analysis_batch` : *identifies subsets that can be calibrated together*"
     A list of analysis batch names or numbers.  It is assumed that all titrations with the same `analysis_batch` value have a common titrant.  If nothing is provided, all titrations are assumed to have a common titrant.
 
-??? tip "`dic` : *dissolved inorganic carbon (μmol/kg-solution)*"
-    In μmol/kg-solution.
+??? tip "`dic` : *dissolved inorganic carbon (µmol/kg-sol)*"
+    In µmol/kg-sol.
 
     Defaults to zero if not provided.
 
 ??? tip "`file_path` : *path to the titration file*"
     This is prefixed to `file_name`.
 
-??? tip "`total_*` : *total salt concentrations (μmol/kg-solution)*"
-    These must all be in μmol/kg-solution.
+??? tip "`total_*` : *total salt concentrations (µmol/kg-sol)*"
+    These must all be in µmol/kg-sol.
 
     Some default to zero if not provided:
 
@@ -85,13 +85,13 @@ Like for the recommended columns, if optional column values are only needed for 
     * `k_water` : water equilibrium constant.
 
 ??? info "`molinity_HCl` : *approximate HCl molinity in the HCl titrant*"
-    In mol/kg-solution.  Defaults to 0.1 mol/kg-solution if not provided.  Used only to estimate titrant density, not for calibration.
+    In mol/kg-sol.  Defaults to 0.1 mol/kg-sol if not provided.  Used only to estimate titrant density, not for calibration.
 
 ??? info "`molinity_NaCl` : *approximate NaCl molinity in the HCl titrant*"
-    In mol/kg-solution.  Defaults to 0.6 mol/kg-solution if not provided.  Used only to estimate titrant density.
+    In mol/kg-sol.  Defaults to 0.6 mol/kg-sol if not provided.  Used only to estimate titrant density.
 
 ??? info "`molinity_H2SO4` : *approximate NaCl molinity in the H<sub>2</sub>SO<sub>4</sub> titrant*"
-    In mol/kg-solution.  Defaults to 0.1 mol/kg-solution if not provided.  Used only to estimate titrant density, not for calibration.
+    In mol/kg-sol.  Defaults to 0.1 mol/kg-sol if not provided.  Used only to estimate titrant density, not for calibration.
 
 ??? info "`opt_k_bisulfate` : *which bisulfate dissociation constant to use*"
     Sets whether the bisulfate dissociation constant is estimated from salinity and temperature by [PyCO2SYS](https://PyCO2SYS.rtfd.io) following:
@@ -142,4 +142,4 @@ Like for the recommended columns, if optional column values are only needed for 
     Titrant density in kg/dm<sup>3</sup>.  If provided, this is used only when `titrant_amount_unit="ml"`, and it takes precedence over density calculated from the equations described in that section.
 
 ??? info "`titrant_molinity` : *molinity of the titrant*"
-    Must be in mol/kg-solution.
+    Must be in mol/kg-sol.

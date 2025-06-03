@@ -5,15 +5,10 @@ import pandas as pd
 import PyCO2SYS as pyco2
 
 from . import core
-from .convert import emf_to_pH, get_dilution_factor
+from .convert import amount_units, emf_to_pH, get_dilution_factor, keys_cau
+from .core import keys_totals_ks, totals_ks
 from .dataset import _backcompat, _get_kwargs_for, _solve_row, calibrate_row
 from .read.titrations import keys_read_dat, read_dat
-from .titration import (
-    convert_amount_units,
-    get_totals_k_constants,
-    keys_cau,
-    keys_totals_ks,
-)
 
 
 class Dataset(pd.DataFrame):
@@ -223,16 +218,14 @@ class Titration:
             self.row["titrant"] = "HCl"
             self.row["titrant_normality"] = 1
         # STEP 2: CONVERT AMOUNT UNITS
-        # Get kwargs for convert_amount_units
+        # Get kwargs for convert.amount_units
         kwargs_cau = _get_kwargs_for(keys_cau, self.kwargs, self.row)
         # If there is analyte_mass, use it, otherwise use analyte_volume
         if "analyte_volume" in kwargs_cau and "analyte_mass" in kwargs_cau:
             kwargs_cau["analyte_volume"] = None
         # Prepare titration file, totals and k_constants
         try:
-            converted = convert_amount_units(
-                dat_data, self.row.salinity, **kwargs_cau
-            )
+            converted = amount_units(dat_data, self.row.salinity, **kwargs_cau)
             self.row["analyte_mass"] = converted.analyte_mass
         except Exception as e:
             print(f'Error converting units for "{file_name}":')
@@ -244,7 +237,7 @@ class Titration:
             keys_totals_ks, self.kwargs, self.row
         )
         try:
-            totals, k_constants = get_totals_k_constants(
+            totals, k_constants = totals_ks(
                 converted, self.row.salinity, **kwargs_totals_ks
             )
         except Exception as e:
@@ -290,9 +283,8 @@ class Titration:
     def gran_guesses(self, emf0_guess=None):
         # Get simple Gran-plot estimator
         st = self.titration
-        st["mixture_mass"] = st.titrant_mass + self.analyte_mass
-        st["gran_estimates"] = core.gran_estimator(
-            st.mixture_mass, st.emf, st.temperature
+        st["gran_estimates"] = core.gran_estimate(
+            st.titrant_mass, st.emf, st.temperature, self.analyte_mass
         )
         # Make first guesses
         alkalinity_gran = core.gran_guess_alkalinity(
