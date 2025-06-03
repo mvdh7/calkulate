@@ -56,7 +56,7 @@ from .read.titrations import read_dat, write_dat
 #     read_table,
 #     write_dat,
 # )
-# from .titration import Titration
+# from .files import Titration
 
 
 # For backwards-compatibility

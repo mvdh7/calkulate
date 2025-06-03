@@ -10,13 +10,13 @@ import PyCO2SYS as pyco2
 
 from .convert import amount_units, keys_cau
 from .core import keys_totals_ks, totals_ks
-from .read.titrations import keys_read_dat, read_dat
-from .titration import (
+from .files import (
     calibrate as t_calibrate,
     keys_calibrate,
     keys_solve,
     solve as t_solve,
 )
+from .read.titrations import keys_read_dat, read_dat
 
 
 def get_total_salts(ds):
