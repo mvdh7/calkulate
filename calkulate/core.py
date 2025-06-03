@@ -505,6 +505,7 @@ def solve_emf(
     totals,
     k_constants,
     alkalinity_initial=None,
+    double=True,
     emf0_initial=None,
     pH_min=3,
     pH_max=4,
@@ -534,6 +535,8 @@ def solve_emf(
         An alkalinity value in µmol/kg-sol to use to initialise the
         solver.  By default None, in which case this is estimated using the
         Gran approach (see `gran_guesses`).
+    double : bool, optional
+        Whether to solve twice, by default True.
     emf0_initial : float, optional
         An EMF0 value to use to calculate the initial pH estimates from EMF,
         which are used with pH_min and pH_max to find the data points to use
@@ -624,7 +627,7 @@ def solve_emf(
         )
         / convert.get_dilution_factor(titrant_mass, analyte_mass)
     )
-    return SolveEmfResult(
+    sr = SolveEmfResult(
         alkalinity,
         emf0,
         used,
@@ -634,6 +637,26 @@ def solve_emf(
         opt_result,
         ggr,
     )
+    if double:
+        # Solve again, but this time starting from the previously solved-for
+        # alkalinity and emf0, so that the used data points more accurately
+        # obey the pH_min and pH_max values
+        sr = solve_emf(
+            titrant_molinity,
+            titrant_mass,
+            emf,
+            temperature,
+            analyte_mass,
+            totals,
+            k_constants,
+            alkalinity_initial=sr.alkalinity,
+            double=False,  # if True this becomes an infinite loop, so don't
+            emf0_initial=sr.emf0,
+            pH_min=pH_min,
+            pH_max=pH_max,
+            titrant_normality=titrant_normality,
+        )
+    return sr
 
 
 def solve_pH(
@@ -714,6 +737,7 @@ def _lsqfun_calibrate_emf(
     totals,
     k_constants,
     alkalinity_initial,
+    double,
     emf0_initial,
     pH_min,
     pH_max,
@@ -740,6 +764,7 @@ def _lsqfun_calibrate_emf(
         totals,
         k_constants,
         alkalinity_initial=alkalinity_initial,
+        double=double,
         emf0_initial=emf0_initial,
         pH_min=pH_min,
         pH_max=pH_max,
@@ -767,6 +792,7 @@ def calibrate_emf(
     k_constants,
     alkalinity_initial=None,
     emf0_initial=None,
+    double=True,
     pH_min=3,
     pH_max=4,
     titrant_molinity_initial=0.1,
@@ -798,6 +824,8 @@ def calibrate_emf(
         An alkalinity value in µmol/kg-sol to use to initialise the
         solver.  By default None, in which case this is estimated using the
         Gran approach (see `gran_guesses`).
+    double : bool, optional
+        Whether to solve twice, by default True.
     emf0_initial : float, optional
         An EMF0 value to use to calculate the initial pH estimates from EMF,
         which are used with pH_min and pH_max to find the data points to use
@@ -831,6 +859,7 @@ def calibrate_emf(
             totals,
             k_constants,
             alkalinity_initial,
+            double,
             emf0_initial,
             pH_min,
             pH_max,
