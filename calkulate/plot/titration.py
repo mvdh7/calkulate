@@ -67,26 +67,26 @@ def pH(tt, ax=None, show_gran=True):
         fig, ax = plt.subplots()
     if show_gran:
         ax.scatter(
-            ttt.titrant_mass[~ttt.data_used_guess] * 1e3,
-            ttt.pH_guess[~ttt.data_used_guess],
+            ttt.titrant_mass[~ttt.gran_used] * 1e3,
+            ttt.gran_pH[~ttt.gran_used],
             label="First guess, unused",
             **gran_styler.scatter(False),
         )
         ax.scatter(
-            ttt.titrant_mass[ttt.data_used_guess] * 1e3,
-            ttt.pH_guess[ttt.data_used_guess],
+            ttt.titrant_mass[ttt.gran_used] * 1e3,
+            ttt.gran_pH[ttt.gran_used],
             label="First guess, used",
             **gran_styler.scatter(),
         )
     ax.scatter(
-        ttt.titrant_mass[~ttt.data_used] * 1e3,
-        ttt.pH[~ttt.data_used],
+        ttt.titrant_mass[~ttt.used] * 1e3,
+        ttt.pH[~ttt.used],
         label="Final, unused",
         **final_styler.scatter(False),
     )
     ax.scatter(
-        ttt.titrant_mass[ttt.data_used] * 1e3,
-        ttt.pH[ttt.data_used],
+        ttt.titrant_mass[ttt.used] * 1e3,
+        ttt.pH[ttt.used],
         label="Final, used",
         **final_styler.scatter(),
     )
@@ -111,68 +111,64 @@ def pH(tt, ax=None, show_gran=True):
 
 def gran_emf0(tt, ax=None):
     """Plot Gran estimate of EMF0."""
-    if "gran_estimates" not in tt.titration:
-        tt.gran_guesses()
     ttt = tt.titration
     if ax is None:
         fig, ax = plt.subplots()
     ax.scatter(
-        ttt.titrant_mass[~ttt.data_used_guess] * 1e3,
-        ttt.emf0_gran[~ttt.data_used_guess],
+        ttt.titrant_mass[~ttt.gran_used] * 1e3,
+        ttt.gran_emf0[~ttt.gran_used],
         label="Unused",
         **gran_styler.scatter(False),
     )
     ax.scatter(
-        ttt.titrant_mass[ttt.data_used_guess] * 1e3,
-        ttt.emf0_gran[ttt.data_used_guess],
+        ttt.titrant_mass[ttt.gran_used] * 1e3,
+        ttt.gran_emf0[ttt.gran_used],
         label="Used",
         **gran_styler.scatter(),
     )
     ax.set_xlabel("Titrant mass / g")
     ax.set_ylabel("EMF° estimate / mV")
-    ax.axhline(tt.emf0_gran, **gran_styler.plot(), label="Gran EMF°")
+    ax.axhline(tt.gran_emf0, **gran_styler.plot(), label="Gran EMF°")
     ax.legend()
-    ax.set_title("Gran EMF° = {:.2f} mV".format(tt.emf0_gran))
+    ax.set_title("Gran EMF° = {:.2f} mV".format(tt.gran_emf0))
     add_credit(ax)
     return ax
 
 
 def gran_alkalinity(tt, ax=None):
     """Plot Gran estimate of alkalinity."""
-    if "gran_estimates" not in tt.titration:
-        tt.gran_guesses()
     ttt = tt.titration
     if ax is None:
         fig, ax = plt.subplots()
     ax.scatter(
-        ttt.titrant_mass[~ttt.data_used_guess] * 1e3,
-        ttt.gran_estimates[~ttt.data_used_guess],
+        ttt.titrant_mass[~ttt.gran_used] * 1e3,
+        ttt.gran_func[~ttt.gran_used],
         label="Unused",
         **gran_styler.scatter(False),
     )
     ax.scatter(
-        ttt.titrant_mass[ttt.data_used_guess] * 1e3,
-        ttt.gran_estimates[ttt.data_used_guess],
+        ttt.titrant_mass[ttt.gran_used] * 1e3,
+        ttt.gran_func[ttt.gran_used],
         label="Used",
         **gran_styler.scatter(),
     )
     ax.axhline(0, c="k", lw=0.8, zorder=-1)
-    # x_line = np.array(
-    #     [-tt.gran_intercept / tt.gran_slope, ttt.titrant_mass.max()]
-    # )
-    # y_line = x_line * tt.gran_slope + tt.gran_intercept
-    # ax.plot(x_line * 1e3, y_line, **gran_styler.plot(), label="Fit")
-    # ax.axvline(
-    #     x_line[0] * 1e3,
-    #     **gran_styler.plot(),
-    #     lw=1,
-    #     dashes=[3, 3],
-    #     label="Intercept",
-    # )
+    # Plot regression
+    lr = tt.sr.ggr.lr
+    x_line = np.array([-lr.intercept / lr.slope, ttt.titrant_mass.max()])
+    y_line = x_line * lr.slope + lr.intercept
+    ax.plot(x_line * 1e3, y_line, c="xkcd:dark", label="Fit")
+    ax.axvline(
+        x_line[0] * 1e3,
+        c="xkcd:dark",
+        lw=1,
+        dashes=[3, 3],
+        label="Intercept",
+    )
     ax.set_xlabel("Titrant mass / g")
     ax.set_ylabel("Gran function")
     ax.set_title(
-        "Gran alkalinity = {:.1f} μmol/kg-sw".format(tt.alkalinity_guess)
+        "Gran alkalinity = {:.1f} μmol/kg-sw".format(tt.gran_alkalinity)
     )
     ax.legend()
     add_credit(ax)
@@ -185,14 +181,14 @@ def alkalinity(tt, ax=None):
     if ax is None:
         fig, ax = plt.subplots()
     ax.scatter(
-        ttt.titrant_mass[~ttt.data_used] * 1e3,
-        ttt.alkalinity_estimate[~ttt.data_used] * 1e6,
+        ttt.titrant_mass[~ttt.used] * 1e3,
+        ttt.alkalinity_estimate[~ttt.used] * 1e6,
         label="Unused",
         **final_styler.scatter(False),
     )
     ax.scatter(
-        ttt.titrant_mass[ttt.data_used] * 1e3,
-        ttt.alkalinity_estimate[ttt.data_used] * 1e6,
+        ttt.titrant_mass[ttt.used] * 1e3,
+        ttt.alkalinity_estimate[ttt.used] * 1e6,
         label="Used",
         **final_styler.scatter(),
     )
@@ -204,8 +200,8 @@ def alkalinity(tt, ax=None):
     ax.set_title(
         "Total alkalinity = {:.1f} ± {:.1f} μmol/kg-sw; $n$ = {}".format(
             tt.alkalinity,
-            ttt.alkalinity_estimate[ttt.data_used].std() * 1e6,
-            ttt.data_used.sum(),
+            ttt.alkalinity_estimate[ttt.used].std() * 1e6,
+            ttt.used.sum(),
         )
     )
     ax.legend()
@@ -367,6 +363,12 @@ def components(tt, ax=None, log_scale=True):
     x_line = np.linspace(
         ttt.titrant_mass.min(), ttt.titrant_mass.max(), num=500
     )
+    tttu = (
+        ttt[["titrant_mass", *component_stylers]]
+        .groupby("titrant_mass")
+        .mean()
+    )
+    tttu["titrant_mass"] = tttu.index
     for var, styler in component_stylers.items():
         if var in ttt:
             if (ttt[var] > 0).all():
@@ -374,13 +376,17 @@ def components(tt, ax=None, log_scale=True):
                     yvar = -np.log10(
                         ttt[var] * np.abs(component_multipliers[var])
                     )
+                    yvaru = -np.log10(
+                        tttu[var] * np.abs(component_multipliers[var])
+                    )
                 else:
                     yvar = ttt[var] * component_multipliers[var] * 1e6
+                    yvaru = tttu[var] * component_multipliers[var] * 1e6
                 ax.plot(
                     x_line * 1e3,
                     pchip_interpolate(
-                        ttt.titrant_mass.to_numpy(),
-                        yvar.to_numpy(),
+                        tttu.titrant_mass.to_numpy(),
+                        yvaru.to_numpy(),
                         x_line,
                     ),
                     **styler.plot(),
@@ -392,7 +398,7 @@ def components(tt, ax=None, log_scale=True):
                     ax,
                     ttt.titrant_mass * 1e3,
                     yvar,
-                    ttt.data_used,
+                    ttt.used,
                     styler,
                     label_used=None,
                     label_unused=None,

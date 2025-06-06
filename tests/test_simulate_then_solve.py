@@ -109,6 +109,47 @@ calk.write_dat(
     **pyco2sys_kwargs,
 )
 
+
+def test_manual_solve():
+    # Solve manually
+    cv = calk.convert.Converted(
+        titrant_mass, emf, temperature, analyte_mass, salinity
+    )
+    totals, k_constants = calk.core.totals_ks(
+        cv,
+        dic=dic,
+        **pyco2sys_kwargs,
+        dilute_totals_for_ks=True,
+    )
+    sr = calk.core.solve_emf(
+        titrant_molinity,
+        titrant_mass,
+        emf,
+        np.full_like(emf, temperature),
+        analyte_mass,
+        totals,
+        k_constants,
+        alkalinity_init=None,
+        double=True,
+        emf0_init=None,
+        pH_min=0,
+        pH_max=14,
+        titrant_normality=1,
+    )
+    for k, v in totals.items():
+        if k in totals__simfunc:
+            assert np.allclose(totals__simfunc[k], v), k
+    for k, v in k_constants.items():
+        if k in k_constants__simfunc:
+            assert np.allclose(k_constants__simfunc[k], v), k
+    assert np.isclose(alkalinity_core[0], sr.alkalinity)
+    # NOTE The problem was that we've switched to not allowing equilibrium
+    # constants to change through the titration due to the pH scale correction
+    # changing as sulfate gets diluted!  But only in the solver, and not in the
+    # simulations here!  Now fixed with the kwarg dilute_totals_for_ks=True,
+    # but that is NOT default behaviour from v23.7
+
+
 # Import as a Calkulate Dataset
 ds = pd.DataFrame({"file_name": [file_name]})
 ds["salinity"] = co2sys_core["salinity"]
@@ -119,6 +160,7 @@ ds["opt_total_borate"] = 1
 ds["opt_k_carbonic"] = 10
 ds["dic"] = co2sys_core["dic"]
 ds = calk.Dataset(ds)
+ds["dilute_totals_for_ks"] = True
 ds.solve()
 co2sys_core["alkalinity_titration"] = alkalinity_solved = (
     ds.alkalinity.to_numpy()[0]
@@ -140,5 +182,6 @@ def test_simulate_titration_function():
     assert np.allclose(temperature, temperature__simfunc)
 
 
-test_simulate_then_solve()
+# test_manual_solve()
+# test_simulate_then_solve()
 # test_simulate_titration_function()
