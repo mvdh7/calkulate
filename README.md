@@ -14,6 +14,7 @@ Calkulate is a Python package for finding total alkalinity from titration data u
 ## Installation
 
     pip install calkulate
+    conda install conda-forge :: calkulate
 
 ## Use
 

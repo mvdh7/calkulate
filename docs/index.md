@@ -5,6 +5,7 @@ Calkulate is a Python package for finding total alkalinity [[D91](references/#d)
 ## Installation
 
     pip install calkulate
+    conda install conda-forge::calkulate
 
 ## Basic use
 
