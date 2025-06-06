@@ -3,13 +3,14 @@
 """Work with datasets containing multiple titrations."""
 
 import os
+from warnings import warn
 
 import numpy as np
 import pandas as pd
 import PyCO2SYS as pyco2
 
 from . import files
-from .core import SolveEmfResult, SolvePhResult
+from .core import SolveEmfResult, SolvePhGranResult, SolvePhResult
 from .meta import _get_kwargs_for
 
 
@@ -69,14 +70,8 @@ def calibrate_row(row, verbose=False, **kwargs):
         try:
             kwargs = _backcompat(kwargs, row)
             kwargs = _get_kwargs_for(files.keys_calibrate, kwargs, row)
-            if "file_path" in row and pd.notnull(row.file_path):
-                file_name = os.path.join(row.file_path, row.file_name)
-            elif "file_path" in kwargs and pd.notnull(kwargs["file_path"]):
-                file_name = os.path.join(kwargs["file_path"], row.file_name)
-            else:
-                file_name = row.file_name
             cal = files.calibrate(
-                file_name,
+                row.file_name,
                 row.alkalinity_certified,
                 row.salinity,
                 **kwargs,
@@ -108,7 +103,7 @@ def get_batches(ds):
     batches = (
         ds[["analysis_batch", "titrant_molinity_here", "reference_good"]]
         .groupby(by="analysis_batch")
-        .apply(get_group_calibration)
+        .apply(get_group_calibration, include_groups=False)
     )
     return batches
 
@@ -169,7 +164,32 @@ def calibrate(ds, verbose=False, **kwargs):
         ds.analysis_batch, "titrant_molinity"
     ].to_numpy()
     print("Calkulate: calibration complete!")
+    ds = solve(ds, verbose=verbose, **kwargs)
     return ds
+
+
+def add_solve_results(solved, sr):
+    if isinstance(sr, SolveEmfResult):
+        solved["alkalinity_npts"] = sr.used.sum()
+        solved["alkalinity_std"] = sr.alkalinity_all[sr.used].std()
+        solved["alkalinity"] = sr.alkalinity
+        solved["emf0"] = sr.emf0
+        solved["gran_alkalinity"] = sr.ggr.alkalinity * 1e6
+        solved["gran_emf0"] = sr.ggr.emf0
+        solved["pH_init"] = sr.pH[0]
+        solved["temperature_init"] = sr.temperature[0]
+    elif isinstance(sr, SolvePhResult):
+        solved["alkalinity_npts"] = sr.used.sum()
+        solved["alkalinity_std"] = sr.alkalinity_all[sr.used].std()
+        solved["alkalinity"] = sr.alkalinity
+        solved["pH_init"] = sr.pH[0]
+        solved["temperature_init"] = sr.temperature[0]
+    elif isinstance(sr, SolvePhGranResult):
+        solved["alkalinity_npts"] = sr.used.sum()
+        solved["alkalinity"] = sr.alkalinity
+        solved["pH_init"] = sr.pH[0]
+        solved["temperature_init"] = sr.temperature[0]
+    return solved
 
 
 def solve_row(row, verbose=False, **kwargs):
@@ -194,35 +214,15 @@ def solve_row(row, verbose=False, **kwargs):
         try:
             kwargs = _backcompat(kwargs, row)
             kwargs_solve = _get_kwargs_for(files.keys_solve, kwargs, row)
-            if "file_path" in row and pd.notnull(row.file_path):
-                file_name = os.path.join(row.file_path, row.file_name)
-            elif "file_path" in kwargs and pd.notnull(kwargs["file_path"]):
-                file_name = os.path.join(kwargs["file_path"], row.file_name)
-            else:
-                file_name = row.file_name
             sr = files.solve(
-                file_name,
+                row.file_name,
                 row.titrant_molinity,
                 row.salinity,
                 **kwargs_solve,
             )
-            if isinstance(sr, SolveEmfResult):
-                solved["alkalinity_npts"] = sr.used.sum()
-                solved["alkalinity_std"] = sr.alkalinity_all[sr.used].std()
-                solved["alkalinity"] = sr.alkalinity
-                solved["emf0"] = sr.emf0
-                solved["gran_alkalinity"] = sr.ggr.alkalinity * 1e6
-                solved["gran_emf0"] = sr.ggr.emf0
-                solved["pH_init"] = sr.pH[0]
-                solved["temperature_init"] = sr.temperature[0]
-            elif isinstance(sr, SolvePhResult):
-                solved["alkalinity_npts"] = sr.used.sum()
-                solved["alkalinity_std"] = sr.alkalinity_all[sr.used].std()
-                solved["alkalinity"] = sr.alkalinity
-                solved["pH_init"] = sr.pH[0]
-                solved["temperature_init"] = sr.temperature[0]
+            solved = add_solve_results(solved, sr)
         except Exception as e:
-            print(f'Error solving "{file_name}":')
+            print(f'Error solving "{row.file_name}":')
             print(f"{e}")
             return solved
     return solved
@@ -245,6 +245,16 @@ def solve(ds, verbose=False, **kwargs):
         The titration metadataset with additional columns found by the solver.
     """
     print("Calkulate: solving alkalinity...")
+    # Check for bad kwargs, but don't break on them
+    kwargs_ignored = []
+    for k in _backcompat(kwargs.copy(), []):
+        if k not in files.keys_calibrate | {"pH_range", "read_dat_kwargs"}:
+            kwargs_ignored.append(k)
+    if len(kwargs_ignored) > 0:
+        warn(
+            "kwargs not recognised, being ignored: "
+            + ("{} " * len(kwargs_ignored)).format(*kwargs_ignored)
+        )
     prepare(ds)
     assert "titrant_molinity" in ds, (
         'ds must contain an "titrant_molinity" column!'

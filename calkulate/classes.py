@@ -4,8 +4,8 @@ import pandas as pd
 import PyCO2SYS as pyco2
 
 from .convert import get_dilution_factor
-from .core import SolveEmfResult
-from .dataset import _backcompat
+from .core import SolveEmfResult, SolvePhGranResult, SolvePhResult
+from .dataset import _backcompat, add_solve_results
 from .files import solve
 
 
@@ -173,23 +173,15 @@ class Titration:
         self.kwargs = _backcompat(kwargs, row)
         for k, v in kwargs.items():
             self.row[k] = v
-        self.sr = solve(**row)
+        self.sr = solve(**self.row)
         self.t = {
             "titrant_mass": self.sr.titrant_mass,
             "temperature": self.sr.temperature,
             "pH": self.sr.pH,
             "used": self.sr.used,
         }
-        self.row["analyte_mass"] = self.sr.analyte_mass
-        self.row["alkalinity"] = self.sr.alkalinity
-        self.row["alkalinity_npts"] = self.sr.used.sum()
-        self.row["alkalinity_std"] = self.sr.alkalinity_all[self.sr.used].std()
-        self.row["pH_init"] = self.sr.pH[0]
-        self.row["temperature_init"] = self.sr.temperature[0]
+        self.row = add_solve_results(self.row, self.sr)
         if isinstance(self.sr, SolveEmfResult):
-            self.row["gran_alkalinity"] = self.sr.ggr.alkalinity * 1e6
-            self.row["gran_emf0"] = self.sr.ggr.emf0
-            self.row["emf0"] = self.sr.emf0
             self.t.update(
                 {
                     "emf": self.sr.emf,
@@ -197,6 +189,13 @@ class Titration:
                     "gran_emf0": self.sr.ggr.emf0s,
                     "gran_pH": self.sr.ggr.pH,
                     "gran_used": self.sr.ggr.used,
+                }
+            )
+        elif isinstance(self.sr, SolvePhGranResult):
+            self.t.update(
+                {
+                    "gran_func": self.sr.gfunc,
+                    "gran_used": self.sr.used,
                 }
             )
         self.t.update({**self.sr.totals, **self.sr.k_constants})

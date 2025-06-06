@@ -89,6 +89,22 @@ SolvePhResult = namedtuple(
         "k_constants",
     ),
 )
+SolvePhGranResult = namedtuple(
+    "SolvePhGranResult",
+    (
+        "alkalinity",
+        "used",
+        "gfunc",
+        "lr",
+        "titrant_molinity",
+        "titrant_mass",
+        "pH",
+        "temperature",
+        "analyte_mass",
+        "totals",
+        "k_constants",
+    ),
+)
 # These are the kwargs that can be passed to `totals_ks`
 keys_totals_ks = {
     "dic",
@@ -192,7 +208,6 @@ def gran_alkalinity(
     # Calculate Gran estimates and determine which to use for fitting
     gfunc = gran_function(titrant_mass, emf, temperature, analyte_mass)
     used = np.full(gfunc.shape, False)
-    # use_logic = np.diff(gfunc) > np.max(np.diff(gfunc)) * 0.9
     use_logic = gfunc > 0.1 * np.max(gfunc)
     use_from = use_logic.nonzero()[0][0]
     used[use_from:] = True
@@ -533,8 +548,8 @@ def solve_emf(
     pH_max=4,
     titrant_normality=1,
 ):
-    """Solve for alkalinity and EMF0 using the complete-calculation method,
-    assuming a titrant normality of 1 (e.g., HCl), when EMF is known.
+    """Solve for alkalinity and EMF0 using the complete-calculation method
+    when EMF is known.
 
     Parameters
     ----------
@@ -700,8 +715,8 @@ def solve_pH(
     pH_max=4,
     titrant_normality=1,
 ):
-    """Solve for alkalinity and EMF0 using the complete-calculation method,
-    assuming a titrant normality of 1 (e.g., HCl), when pH is known.
+    """Solve for alkalinity using the complete-calculation method when pH is
+    known.
 
     Parameters
     ----------
@@ -758,6 +773,76 @@ def solve_pH(
         used,
         alkalinity_std,
         alkalinity_all,
+        titrant_molinity,
+        titrant_mass,
+        pH,
+        temperature,
+        analyte_mass,
+        totals,
+        k_constants,
+    )
+
+
+def solve_pH_gran(
+    titrant_molinity,
+    titrant_mass,
+    pH,
+    temperature,
+    analyte_mass,
+    totals,
+    k_constants,
+    pH_min=3,
+    pH_max=4,
+    titrant_normality=1,
+):
+    """Solve for alkalinity using the Gran-plot method when pH is known.
+
+    Parameters
+    ----------
+    titrant_molinity : float
+        Molinity of titrant in mol/kg-sol.
+    titrant_mass : array-like float
+        Mass of titrant in kg.
+    pH : array-like float
+        pH in the titrant-analyte mixture on the same scale as `k_constants`.
+    temperature : array-like float
+        Temperature of titrant-analyte mixture in °C.
+    analyte_mass : float
+        Mass of analyte in kg.
+    totals : dict of array-like floats
+        Total salt contents through the titration, created with `totals_ks` and
+        with any additions from the titrant included with `add_titrant_totals`.
+    k_constants : dict of array-like floats
+        Equilibrium constants through the titration, created with `totals_ks`,
+        and on the same scale as the `pH`.
+    pH_min : float, optional
+        Minimum pH to use from the titration data, by default 3.
+    pH_max : float, optional
+        Maximum pH to use from the titration data, by default 4.
+    titrant_normality : float, optional
+        Titrant normality, by default 1 (e.g., for HCl).
+
+    Returns
+    -------
+    SolvePhGranResult : namedtuple with the fields
+        alkalinity : float
+            Total alkalinity in µmol/kg-sol.
+        used : array-like bool
+            Which data points were used.
+    """
+    assert pH_min < pH_max
+    used = (pH >= pH_min) & (pH <= pH_max)
+    gfunc = (titrant_mass + analyte_mass) * 10**-pH
+    lr = linregress(titrant_mass[used], gfunc[used])
+    intercept_x = -lr.intercept / lr.slope
+    alkalinity = 1e6 * (
+        intercept_x * titrant_molinity * titrant_normality / analyte_mass
+    )
+    return SolvePhGranResult(
+        alkalinity,
+        used,
+        gfunc,
+        lr,
         titrant_molinity,
         titrant_mass,
         pH,
@@ -1031,9 +1116,130 @@ def calibrate_pH(
     )
 
 
+def _lsqfun_calibrate_pH_gran(
+    titrant_molinity,
+    alkalinity_certified,
+    titrant_mass,
+    pH,
+    temperature,
+    analyte_mass,
+    totals,
+    k_constants,
+    pH_min,
+    pH_max,
+    titrant_normality,
+    **titrant_totals,
+):
+    """Calculate residuals for the calibrator."""
+    # Add titrant to totals (only relevant for H2SO4 etc. titrant)
+    totals = add_titrant_totals(
+        totals,
+        titrant_mass,
+        analyte_mass,
+        titrant_molinity,
+        titrant_molinity_prev=0,
+        **titrant_totals,
+    )
+    # Solve for alkalinity
+    sr = solve_pH_gran(
+        titrant_molinity[0],
+        titrant_mass,
+        pH,
+        temperature,
+        analyte_mass,
+        totals,
+        k_constants,
+        pH_min=pH_min,
+        pH_max=pH_max,
+        titrant_normality=titrant_normality,
+    )
+    # Revert to original totals
+    totals = add_titrant_totals(
+        totals,
+        titrant_mass,
+        analyte_mass,
+        0,
+        titrant_molinity_prev=titrant_molinity,
+        **titrant_totals,
+    )
+    return sr.alkalinity - alkalinity_certified
+
+
+def calibrate_pH_gran(
+    alkalinity_certified,
+    titrant_mass,
+    pH,
+    temperature,
+    analyte_mass,
+    totals,
+    k_constants,
+    pH_min=3,
+    pH_max=4,
+    titrant_molinity_init=0.1,
+    titrant_normality=1,
+    **titrant_totals,
+):
+    """Solve for `titrant_molinity` given `alkalinity_certified`.
+
+    Parameters
+    ----------
+    alkalinity_certified : float
+        The target total alkalinity in µmol/kg-sol.
+    titrant_mass : array-like
+        Mass of titrant in kg.
+    pH : array-like
+        pH in the titrant-analyte mixture on the same scale as `k_constants`.
+    temperature : array-like
+        Temperature of titrant-analyte mixture in °C.
+    analyte_mass : float
+        Mass of analyte in kg.
+    totals : dict
+        Total salt contents through the titration, created with
+        `totals_ks`.  Any additional totals added by the titrant should
+        NOT have been added here yet (unlike for `solve`).
+    k_constants : dict
+        Equilibrium constants through the titration, created with
+        `totals_ks`, and on the same pH scale as the `pH`.
+    pH_min : float, optional
+        Minimum pH to use from the titration data, by default 3.
+    pH_max : float, optional
+        Maximum pH to use from the titration data, by default 4.
+    titrant_molinity_init : float, optional
+        First guess for the molinity of titrant in mol/kg-sol, by default
+        0.1.
+    titrant_normality : float, optional
+        Titrant normality, by default 1 (e.g., for HCl).
+
+    Returns
+    -------
+    opt_result : scipy.optimize.OptimizeResult
+        Output from `scipy.optimize.least_squares`, where the solved value is
+        `titrant_molinity = opt_result["x"][0]`.
+    """
+    return least_squares(
+        _lsqfun_calibrate_pH_gran,
+        [titrant_molinity_init],
+        args=(
+            alkalinity_certified,
+            titrant_mass,
+            pH,
+            temperature,
+            analyte_mass,
+            totals,
+            k_constants,
+            pH_min,
+            pH_max,
+            titrant_normality,
+        ),
+        kwargs=titrant_totals,
+        **kwargs_least_squares,
+    )
+
+
 # Get kwarg key sets
 keys_solve_emf = _get_kwarg_keys(solve_emf)
 keys_solve_pH = _get_kwarg_keys(solve_pH)
+keys_solve_pH_gran = _get_kwarg_keys(solve_pH_gran)
 keys_titrant_totals = {
     f"titrant_total_{k}" for k in ["sulfate", "phosphate", "fluoride"]
 }
@@ -1041,3 +1247,5 @@ keys_calibrate_emf = _get_kwarg_keys(calibrate_emf)
 keys_calibrate_emf.update(keys_titrant_totals)
 keys_calibrate_pH = _get_kwarg_keys(calibrate_pH)
 keys_calibrate_pH.update(keys_titrant_totals)
+keys_calibrate_pH_gran = _get_kwarg_keys(calibrate_pH_gran)
+keys_calibrate_pH_gran.update(keys_titrant_totals)

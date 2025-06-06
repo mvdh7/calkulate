@@ -18,6 +18,7 @@ The processing steps are
 """
 
 import os
+from warnings import warn
 
 from . import core
 from .convert import amount_units, keys_cau, pH_to_emf
@@ -25,8 +26,10 @@ from .core import (
     add_titrant_totals,
     keys_calibrate_emf,
     keys_calibrate_pH,
+    keys_calibrate_pH_gran,
     keys_solve_emf,
     keys_solve_pH,
+    keys_solve_pH_gran,
     keys_titrant_totals,
     keys_totals_ks,
     totals_ks,
@@ -41,7 +44,8 @@ keys_calibrate = (
     | keys_totals_ks
     | keys_calibrate_emf
     | keys_calibrate_pH
-    | {"solve_mode"}
+    | keys_calibrate_pH_gran
+    | {"solve_mode", "file_path"}
 )
 keys_solve = (
     keys_read_dat
@@ -50,7 +54,8 @@ keys_solve = (
     | keys_titrant_totals
     | keys_solve_emf
     | keys_solve_pH
-    | {"solve_mode"}
+    | keys_solve_pH_gran
+    | {"solve_mode", "file_path"}
 )
 
 
@@ -76,6 +81,7 @@ def calibrate(
             "emf" (default) - measurements are EMF in mV
             "pH_adjust" - measurements are pH but their EMF0 can be adjusted
             "pH" - measurements are pH and cannot be adjusted
+            "pH_gran" - measurements are pH, use Gran-plot solver
     kwargs
         Any keyword arguments that need passing to lower-level functions
         (`read_dat`, `amount_units`, `totals_ks` and `calibrate_*`).
@@ -86,6 +92,16 @@ def calibrate(
         Output from `scipy.optimize.least_squares`, where the solved value is
         `titrant_molinity = opt_result["x"][0]`.
     """
+    # Check for bad kwargs, but don't break on them
+    kwargs_ignored = []
+    for k in kwargs:
+        if k not in keys_calibrate:
+            kwargs_ignored.append(k)
+    if len(kwargs_ignored) > 0:
+        warn(
+            "kwargs not recognised, being ignored: "
+            + ("{} " * len(kwargs_ignored)).format(*kwargs_ignored)
+        )
     # Import the titration data file
     if "file_path" in kwargs:
         file_name = os.path.join(kwargs["file_path"], file_name)
@@ -139,6 +155,21 @@ def calibrate(
             totals,
             k_constants,
             **kwargs_calibrate_pH,
+        )
+    elif solve_mode.lower() == "ph_gran":
+        # Titration data are pHs and cannot be adjusted
+        kwargs_calibrate_pH_gran = _get_kwargs_for(
+            keys_calibrate_pH_gran, kwargs
+        )
+        cal = core.calibrate_pH_gran(
+            alkalinity_certified,
+            cv.titrant_mass,
+            cv.measurement,
+            cv.temperature,
+            cv.analyte_mass,
+            totals,
+            k_constants,
+            **kwargs_calibrate_pH_gran,
         )
     else:
         raise Exception("`solve_mode` not valid")
@@ -239,6 +270,19 @@ def solve(
             totals,
             k_constants,
             **kwargs_solve_pH,
+        )
+    elif solve_mode.lower() == "ph_gran":
+        # Titration data are pHs and cannot be adjusted
+        kwargs_solve_pH_gran = _get_kwargs_for(keys_solve_pH_gran, kwargs)
+        sr = core.solve_pH_gran(
+            titrant_molinity,
+            cv.titrant_mass,
+            cv.measurement,
+            cv.temperature,
+            cv.analyte_mass,
+            totals,
+            k_constants,
+            **kwargs_solve_pH_gran,
         )
     else:
         raise Exception("`solve_mode` not valid")

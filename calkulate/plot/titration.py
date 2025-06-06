@@ -2,6 +2,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from scipy.interpolate import pchip_interpolate
 
+from ..core import SolveEmfResult, SolvePhGranResult
 from ..simulate import component_multipliers
 from .misc import add_credit
 
@@ -66,18 +67,21 @@ def pH(tt, ax=None, show_gran=True):
     if ax is None:
         fig, ax = plt.subplots()
     if show_gran:
-        ax.scatter(
-            ttt.titrant_mass[~ttt.gran_used] * 1e3,
-            ttt.gran_pH[~ttt.gran_used],
-            label="First guess, unused",
-            **gran_styler.scatter(False),
-        )
-        ax.scatter(
-            ttt.titrant_mass[ttt.gran_used] * 1e3,
-            ttt.gran_pH[ttt.gran_used],
-            label="First guess, used",
-            **gran_styler.scatter(),
-        )
+        try:
+            ax.scatter(
+                ttt.titrant_mass[~ttt.gran_used] * 1e3,
+                ttt.gran_pH[~ttt.gran_used],
+                label="First guess, unused",
+                **gran_styler.scatter(False),
+            )
+            ax.scatter(
+                ttt.titrant_mass[ttt.gran_used] * 1e3,
+                ttt.gran_pH[ttt.gran_used],
+                label="First guess, used",
+                **gran_styler.scatter(),
+            )
+        except AttributeError:
+            pass
     ax.scatter(
         ttt.titrant_mass[~ttt.used] * 1e3,
         ttt.pH[~ttt.used],
@@ -154,7 +158,12 @@ def gran_alkalinity(tt, ax=None):
     )
     ax.axhline(0, c="k", lw=0.8, zorder=-1)
     # Plot regression
-    lr = tt.sr.ggr.lr
+    if isinstance(tt.sr, SolveEmfResult):
+        lr = tt.sr.ggr.lr
+        alkalinity = tt.gran_alkalinity
+    elif isinstance(tt.sr, SolvePhGranResult):
+        lr = tt.sr.lr
+        alkalinity = tt.alkalinity
     x_line = np.array([-lr.intercept / lr.slope, ttt.titrant_mass.max()])
     y_line = x_line * lr.slope + lr.intercept
     ax.plot(x_line * 1e3, y_line, c="xkcd:dark", label="Fit")
@@ -167,9 +176,7 @@ def gran_alkalinity(tt, ax=None):
     )
     ax.set_xlabel("Titrant mass / g")
     ax.set_ylabel("Gran function")
-    ax.set_title(
-        "Gran alkalinity = {:.1f} μmol/kg-sw".format(tt.gran_alkalinity)
-    )
+    ax.set_title("Gran alkalinity = {:.1f} μmol/kg-sw".format(alkalinity))
     ax.legend()
     add_credit(ax)
     return ax
