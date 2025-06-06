@@ -2,7 +2,6 @@
 # Copyright (C) 2019--2025  Matthew P. Humphreys  (GNU GPLv3)
 """Work with datasets containing multiple titrations."""
 
-import os
 from warnings import warn
 
 import numpy as np
