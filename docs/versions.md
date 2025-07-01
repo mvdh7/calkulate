@@ -20,6 +20,7 @@ Calkulate v3 went too far overboard with the OO approach and ended up being very
     * Equilibrium constants now vary through titrations with temperature only, not also with changing total sulfate and fluoride concentrations as in previous versions.  To revert to the old behaviour, use `dilute_totals_for_ks=True`.
     * More points used for the Gran-plot initial estimate of alkalinity and EMF<sup>0</sup>.  To revert to the old behaviour, use `gran_logic="legacy"`.
     * `pH_range` kwarg replaced with separate `pH_min` and `pH_max` kwargs, which can also be used as [metadata table columns](metadata.md/#optional-columns).
+    * Added support for VINDTA .dbs files where the CRM button was used to run reference materials.
     * Added support for German-language Tiamo titration files (use `file_type="tiamo_de"`).
     * Major revisions to streamline the backend processing.
 

@@ -39,6 +39,9 @@ ds = calk.read_dbs("path/to/medatadata_file.dbs")
 
 `read_dbs` also renames several columns from their defaults to the names expected by Calkulate, parses analysis dates and times, and predicts the file names based on the data in the file.
 
+!!! tip "`read_dbs` kwargs"
+    * `filename_format`: `read_dbs` assumes that the .dat filenames have the format `"{s}-{c}  {n}  ({d}){b}.dat"`, where `s` comes from the "station" column in the .dbs, `c` from "cast", `n` from "niskin", `d` from "depth" and `b` from "bottle".  If the format is different, provide the correct format here.
+
 The columns in the Dataset [must be named in a specific way](../metadata/#dataset-column-names) for Calkulate to be able to use their data.
 
 ## Individual titration data files

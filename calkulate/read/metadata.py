@@ -53,27 +53,73 @@ def dbs_datetime(dbs_row):
     )
 
 
-def get_VINDTA_filenames(dbs):
+def get_VINDTA_filenames(dbs, filename_format="{s}-{c}  {n}  ({d}){b}.dat"):
     """Determine VINDTA filenames, assuming defaults were used, based on the
     dbs.
     """
-    dbs["file_name"] = dbs.apply(
-        lambda x: "{}-{}  {}  ({}){}.dat".format(
-            int(x.station), int(x.cast), int(x.niskin), x.depth, x.bottle
-        ),
-        axis=1,
-    )
+    dbs["file_name"] = ""
+    if "file_good" not in dbs:
+        dbs["file_good"] = True
+    for i, row in dbs.iterrows():
+        if row.run_type == "bottle":
+            dbs.loc[i, "file_name"] = filename_format.format(
+                s=int(row.station),
+                c=int(row.cast),
+                n=int(row.niskin),
+                d=int(row.depth),
+                b=row.bottle,
+            )
+        elif row.run_type == "CRM":
+            dbs.loc[i, "file_name"] = f"CRM{row.batch}{row.bottle}.dat"
+            dbs.loc[i, "alkalinity_certified"] = row["cert. CRM AT"]
+        else:
+            dbs.loc[i, "file_good"] = False
     return dbs
 
 
-def read_dbs(fname, analyte_volume=100.0, analyte_mass=None, file_path=None):
-    """Import one .dbs file from a VINDTA as single DataFrame."""
+def read_dbs(
+    fname,
+    analyte_volume=100.0,
+    analyte_mass=None,
+    file_path=None,
+    filename_format="{s}-{c}  {n}  ({d}){b}.dat",
+):
+    """Import one .dbs file from a VINDTA as single DataFrame.
+
+    Parameters
+    ----------
+    fname : str
+        The .dbs file name and the path to it.
+    analyte_volume : float, optional
+        The volume of analyte used in the titrations in ml, by default 100.
+    analyte_mass : float, optional
+        The mass of analyte used in the titrations in kg, by default None, in
+        which case it is calculated from `analyte_volume`.
+    file_path : str, optional
+        The path to the .dat files (not to the .dbs!).
+    filename_format : str, optional
+        The format of the .dat filenames written as a format string, with the
+        keys corresponding to `dbs` columns:
+            s for station
+            c for cast
+            n for niskin
+            d for depth
+            b for bottle
+        By default "{s}-{c}  {n}  ({d}){b}.dat".
+
+    Returns
+    -------
+    pd.DataFrame
+        The imported .dbs file ready to use with Calkulate.
+    """
     headers = np.genfromtxt(fname, delimiter="\t", dtype=str, max_rows=1)
-    dbs = pd.read_table(fname, header=0, names=headers, usecols=headers)
+    dbs = pd.read_table(
+        fname, header=0, names=headers, usecols=headers
+    ).rename(columns={"run type": "run_type"})
     dbs["dbs_fname"] = fname
     dbs = add_func_cols(dbs, dbs_datetime)
     dbs["analysis_datenum"] = mdates.date2num(dbs.analysis_datetime)
-    dbs = get_VINDTA_filenames(dbs)
+    dbs = get_VINDTA_filenames(dbs, filename_format=filename_format)
     if analyte_mass is None:
         dbs["analyte_volume"] = analyte_volume
     else:
