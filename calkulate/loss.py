@@ -1,10 +1,11 @@
 # Calkulate: seawater total alkalinity from titration data
-# Copyright (C) 2019--2024  Matthew P. Humphreys  (GNU GPLv3)
+# Copyright (C) 2019--2025  Matthew P. Humphreys  (GNU GPLv3)
 """Model DIC loss during titrations."""
 
 import numpy as np
 from scipy import interpolate, optimize
-from .. import convert, default
+
+from . import convert, default
 
 
 def dic_loss_model_fitted(
@@ -14,8 +15,12 @@ def dic_loss_model_fitted(
     i_dic = np.full_like(i_delta_fCO2, np.nan)
     i_dic[0] = dic_start * 1e6
     for i in range(len(i_dic) - 1):
-        dilute = convert.get_dilution_factor(step_tm, analyte_mass + i_titrant_mass[i])
-        i_dic[i + 1] = i_dic[i] * dilute - k_dic_loss * i_delta_fCO2[i] * step_tm
+        dilute = convert.get_dilution_factor(
+            step_tm, analyte_mass + i_titrant_mass[i]
+        )
+        i_dic[i + 1] = (
+            i_dic[i] * dilute - k_dic_loss * i_delta_fCO2[i] * step_tm
+        )
     return i_dic
 
 
@@ -30,7 +35,12 @@ def _lsqfun_dic_loss_model(
 ):
     return (
         dic_loss_model_fitted(
-            k_dic_loss, i_titrant_mass, i_delta_fCO2, dic_start, analyte_mass, step_tm
+            k_dic_loss,
+            i_titrant_mass,
+            i_delta_fCO2,
+            dic_start,
+            analyte_mass,
+            step_tm,
         )
         - i_dic_loss
     )
@@ -76,11 +86,19 @@ def dic_loss_model_future(
     )
     # Forecast future DIC loss
     for i in range(len(f_dic) - 1):
-        dilute = convert.get_dilution_factor(step_tm, analyte_mass + f_titrant_mass[i])
-        f_dic[i + 1] = f_dic[i] * dilute - k_dic_loss * f_delta_fCO2[i] * step_tm
+        dilute = convert.get_dilution_factor(
+            step_tm, analyte_mass + f_titrant_mass[i]
+        )
+        f_dic[i + 1] = (
+            f_dic[i] * dilute - k_dic_loss * f_delta_fCO2[i] * step_tm
+        )
         f_delta_fCO2[i + 1] = (
             get_fCO2_from_dic_pH(
-                f_dic[i + 1], f_pH[i + 1], f_k0[i + 1], f_k1[i + 1], f_k2[i + 1]
+                f_dic[i + 1],
+                f_pH[i + 1],
+                f_k0[i + 1],
+                f_k1[i + 1],
+                f_k2[i + 1],
             )
             - fCO2_air
         )
@@ -116,17 +134,27 @@ def get_dic_loss_hires(
     i_titrant_mass = a_titrant_mass[a_pH >= split_pH]
     f_titrant_mass = a_titrant_mass[a_pH < split_pH]
     # Interpolate other properties to the high-resolution titrant_mass
-    i_dic_loss = interpolate.pchip_interpolate(titrant_mass, dic_loss, i_titrant_mass)
+    i_dic_loss = interpolate.pchip_interpolate(
+        titrant_mass, dic_loss, i_titrant_mass
+    )
     i_delta_fCO2 = interpolate.pchip_interpolate(
         titrant_mass, delta_fCO2_loss, i_titrant_mass
     )
     f_pH = interpolate.pchip_interpolate(titrant_mass, pH, f_titrant_mass)
     f_k0 = interpolate.pchip_interpolate(titrant_mass, k_CO2, f_titrant_mass)
-    f_k1 = interpolate.pchip_interpolate(titrant_mass, k_carbonic_1, f_titrant_mass)
-    f_k2 = interpolate.pchip_interpolate(titrant_mass, k_carbonic_2, f_titrant_mass)
+    f_k1 = interpolate.pchip_interpolate(
+        titrant_mass, k_carbonic_1, f_titrant_mass
+    )
+    f_k2 = interpolate.pchip_interpolate(
+        titrant_mass, k_carbonic_2, f_titrant_mass
+    )
     # Get mid-way start-points for forecasting
-    pH_start = interpolate.pchip_interpolate(titrant_mass, pH, i_titrant_mass[-1])
-    k0_start = interpolate.pchip_interpolate(titrant_mass, k_CO2, i_titrant_mass[-1])
+    pH_start = interpolate.pchip_interpolate(
+        titrant_mass, pH, i_titrant_mass[-1]
+    )
+    k0_start = interpolate.pchip_interpolate(
+        titrant_mass, k_CO2, i_titrant_mass[-1]
+    )
     k1_start = interpolate.pchip_interpolate(
         titrant_mass, k_carbonic_1, i_titrant_mass[-1]
     )
@@ -149,7 +177,12 @@ def get_dic_loss_hires(
     k_dic_loss = k_dic_loss_opt_result["x"]
     # Calculate DIC from k_dic_loss in the fitted region
     i_dic = dic_loss_model_fitted(
-        k_dic_loss, i_titrant_mass, i_delta_fCO2, dic_start, analyte_mass, step_tm
+        k_dic_loss,
+        i_titrant_mass,
+        i_delta_fCO2,
+        dic_start,
+        analyte_mass,
+        step_tm,
     )
     # Forecast future DIC loss
     f_dic, f_delta_fCO2 = dic_loss_model_future(

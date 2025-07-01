@@ -1,7 +1,11 @@
+# %%
 import calkulate as calk
 
-# Say hello
-calk.hello()
+
+def test_hello():
+    # Say hello
+    calk.hello()
+    calk.say_hello()
 
 
 def test_metadata():
@@ -10,4 +14,5 @@ def test_metadata():
     assert isinstance(calk.__author__, str)
 
 
+# test_hello()
 # test_metadata()

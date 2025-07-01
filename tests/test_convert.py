@@ -1,4 +1,8 @@
-import calkulate as calk, numpy as np
+# %%
+import numpy as np
+
+import calkulate as calk
+
 
 # Set up random number generator for repeatability
 rng = np.random.default_rng(7)

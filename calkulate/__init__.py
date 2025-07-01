@@ -1,5 +1,5 @@
 # Calkulate: seawater total alkalinity from titration data
-# Copyright (C) 2019--2024  Matthew P. Humphreys  (GNU GPLv3)
+# Copyright (C) 2019--2025  Matthew P. Humphreys  (GNU GPLv3)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,33 +15,38 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """Determine (sea)water total alkalinity from titration data."""
 
-from . import (
-    constants,
-    convert,
-    core,
-    dataset,
-    default,
-    density,
-    interface,
-    read,
-    meta,
-    plot,
-    simulate,
-    titration,
-)
-from .dataset import Dataset, get_batches
-from .read import (
-    read_dat,
+from .classes import Dataset, Titration, to_Titration
+from .dataset import calibrate, solve
+from .meta import __author__, __version__, hello
+from .read.metadata import (
     read_clipboard,
     read_csv,
+    read_dbs,
     read_excel,
     read_fwf,
     read_table,
-    read_dbs,
-    write_dat,
 )
-from .meta import __author__, __version__, hello
-from .titration import Titration
+from .read.titrations import read_dat, write_dat
+
 
 # For backwards-compatibility
 say_hello = hello
+__all__ = [
+    "__author__",
+    "__version__",
+    "hello",
+    "say_hello",
+    "Dataset",
+    "calibrate",
+    "solve",
+    "read_dat",
+    "read_clipboard",
+    "read_csv",
+    "read_dbs",
+    "read_excel",
+    "read_fwf",
+    "read_table",
+    "write_dat",
+    "Titration",
+    "to_Titration",
+]

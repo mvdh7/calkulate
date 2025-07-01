@@ -39,6 +39,9 @@ ds = calk.read_dbs("path/to/medatadata_file.dbs")
 
 `read_dbs` also renames several columns from their defaults to the names expected by Calkulate, parses analysis dates and times, and predicts the file names based on the data in the file.
 
+!!! tip "`read_dbs` kwargs"
+    * `filename_format`: `read_dbs` assumes that the .dat filenames have the format `"{s}-{c}  {n}  ({d}){b}.dat"`, where `s` comes from the "station" column in the .dbs, `c` from "cast", `n` from "niskin", `d` from "depth" and `b` from "bottle".  If the format is different, provide the correct format here.
+
 The columns in the Dataset [must be named in a specific way](../metadata/#dataset-column-names) for Calkulate to be able to use their data.
 
 ## Individual titration data files
@@ -75,6 +78,6 @@ For example, a file could contain the following:
 
 ### Other formats
 
-Alternatively, you may have files in a different format, for example generated directly by a Metrohm Titrino unit.  These .txt files typically have names beginning with *PC_LIMS_Report_* and the titration data is found in six columns somewhere in the middle of the file.  These files can be imported by Calkulate too: when you run the `calibrate`, `solve` or `calkulate` functions, you just need to include `read_dat_method="pclims"` as a kwarg (or if using the dataset approach, add a `read_dat_method` column to your [metadata table](../metadata/#optional-columns)).
+Alternatively, you may have files in a different format, for example generated directly by a Metrohm Titrino unit.  These .txt files typically have names beginning with *PC_LIMS_Report_* and the titration data is found in six columns somewhere in the middle of the file.  These files can be imported by Calkulate too: when you run the `calibrate`, `solve` or `calkulate` functions, you just need to include `file_type="pclims"` as a kwarg (or if using the dataset approach, add a `file_type` column to your [metadata table](../metadata/#optional-columns)).
 
-If your titration data files arrive in some other format, it's quite straightforward to add a new `read_dat_method` option that will allow them to be imported directly.  If this applies to you, please just [create an Issue on the GitHub repo](https://github.com/mvdh7/calkulate/issues/new), attaching an example of the file you need to import.
+If your titration data files arrive in some other format, it's quite straightforward to add a new `file_type` option that will allow them to be imported directly.  If this applies to you, please just [create an Issue on the GitHub repo](https://github.com/mvdh7/calkulate/issues/new), attaching an example of the file you need to import.

@@ -1,9 +1,10 @@
 # Calkulate: seawater total alkalinity from titration data
-# Copyright (C) 2019--2024  Matthew P. Humphreys  (GNU GPLv3)
+# Copyright (C) 2019--2025  Matthew P. Humphreys  (GNU GPLv3)
 """Interfaces with external packages."""
 
 import pandas as pd
 import PyCO2SYS as pyco2
+
 from . import default
 
 
@@ -36,7 +37,9 @@ calk_to_pyco2__k_constants = {
     "k_water": "KW",
 }
 pyco2_to_calk__totals = {v: k for k, v in calk_to_pyco2__totals.items()}
-pyco2_to_calk__k_constants = {v: k for k, v in calk_to_pyco2__k_constants.items()}
+pyco2_to_calk__k_constants = {
+    v: k for k, v in calk_to_pyco2__k_constants.items()
+}
 
 
 def get_totals(
@@ -51,12 +54,12 @@ def get_totals(
     total_borate=None,
     total_fluoride=None,
     total_sulfate=None,
-    opt_k_carbonic=default.opt_k_carbonic,
-    opt_total_borate=default.opt_total_borate,
+    opt_k_carbonic=10,
+    opt_total_borate=1,
 ):
     """Get dict of total substance contents (undiluted) from inputs and PyCO2SYS.
 
-    Inputs in micromol/kg-solution, outputs in mol/kg-solution.
+    Inputs in µmol/kg-sol, outputs in mol/kg-sol.
     """
     # Create raw totals dict using PyCO2SYS
     totals_pyco2 = {}
@@ -80,7 +83,7 @@ def get_totals(
         opt_total_borate,
         totals=totals_pyco2,
     )
-    # Reorganise totals dict for Calkulate, all in mol/kg-solution
+    # Reorganise totals dict for Calkulate, all in mol/kg-sol
     totals = {}
     totals["dic"] = dic * 1e-6
     if total_alpha > 0:
@@ -118,11 +121,11 @@ def get_k_constants(
     k_silicate=None,
     k_sulfide=None,
     k_water=None,
-    opt_k_bisulfate=default.opt_k_bisulfate,
-    opt_k_carbonic=default.opt_k_carbonic,
-    opt_k_fluoride=default.opt_k_fluoride,
-    opt_pH_scale=default.opt_pH_scale,
-    opt_total_borate=default.opt_total_borate,
+    opt_k_bisulfate=1,
+    opt_k_carbonic=10,
+    opt_k_fluoride=1,
+    opt_pH_scale=3,
+    opt_total_borate=1,
 ):
     """Get dict of equilibrium constants from inputs and PyCO2SYS."""
     # Create raw k_constants dict using PyCO2SYS
@@ -174,6 +177,10 @@ def get_k_constants(
     }
     # Convert k_fluoride to the Total scale if needed
     if (opt_pH_scale == 1) and "TSO4" in totals_pyco2:
-        pH_free_to_total = 1 + totals_pyco2["TSO4"] / k_constants["k_bisulfate"]
-        k_constants["k_fluoride"] = k_constants["k_fluoride"] * pH_free_to_total
+        pH_free_to_total = (
+            1 + totals_pyco2["TSO4"] / k_constants["k_bisulfate"]
+        )
+        k_constants["k_fluoride"] = (
+            k_constants["k_fluoride"] * pH_free_to_total
+        )
     return k_constants

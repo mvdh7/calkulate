@@ -1,6 +1,10 @@
+# %%
 import copy
+
 import numpy as np
-import PyCO2SYS as pyco2, calkulate as calk
+import PyCO2SYS as pyco2
+
+import calkulate as calk
 
 
 # Function inputs
@@ -69,7 +73,9 @@ co2sys_titrations = pyco2.sys(
 pH_titrations = co2sys_titrations["pH_free"]
 
 # Export .dat file(s) for Calkulate
-emf = calk.convert.pH_to_emf(pH_titrations, emf0, kwargs_titration["temperature"])
+emf = calk.convert.pH_to_emf(
+    pH_titrations, emf0, kwargs_titration["temperature"]
+)
 file_name = "tests/data/test_simulate_sulfate.dat"
 calk.write_dat(
     file_name,
@@ -153,7 +159,7 @@ titrant_molinity_tcal = calk.titration.calibrate(
     alkalinity_core,
     **prepare_kwargs,
 )[0]
-alkalinity_tcal, emf0_tcal, pH_initial_tcal = calk.titration.solve(
+alkalinity_tcal, emf0_tcal, pH_init_tcal = calk.titration.solve(
     file_name,
     salinity,
     titrant_molinity_tcal,
@@ -175,7 +181,7 @@ titrant_molinity_tcal_v = calk.titration.calibrate(
     alkalinity_core,
     **prepare_kwargs_v,
 )[0]
-alkalinity_tcal_v, emf0_tcal_v, pH_initial_tcal_v = calk.titration.solve(
+alkalinity_tcal_v, emf0_tcal_v, pH_init_tcal_v = calk.titration.solve(
     file_name_v,
     salinity,
     titrant_molinity_tcal_v,
@@ -214,18 +220,30 @@ def test_calibrate_H2SO4():
     """Do the H2SO4 calibrators find the correct titrant_molinity for a simulated
     titration?
     """
-    assert np.isclose(titrant_molinity, titrant_molinity_calibrated, rtol=0, atol=1e-12)
+    assert np.isclose(
+        titrant_molinity, titrant_molinity_calibrated, rtol=0, atol=1e-12
+    )
     # These are negligibly worse due to rounding errors when data are saved to file:
-    assert np.isclose(titrant_molinity, titrant_molinity_tcal, rtol=0, atol=1e-6)
-    assert np.isclose(titrant_molinity, titrant_molinity_tcal_v, rtol=0, atol=1e-6)
-    assert np.isclose(titrant_molinity, ds.titrant_molinity_here, rtol=0, atol=1e-6)
-    assert np.isclose(titrant_molinity, ds_v.titrant_molinity_here, rtol=0, atol=1e-6)
+    assert np.isclose(
+        titrant_molinity, titrant_molinity_tcal, rtol=0, atol=1e-6
+    )
+    assert np.isclose(
+        titrant_molinity, titrant_molinity_tcal_v, rtol=0, atol=1e-6
+    )
+    assert np.isclose(
+        titrant_molinity, ds.titrant_molinity_here, rtol=0, atol=1e-6
+    )
+    assert np.isclose(
+        titrant_molinity, ds_v.titrant_molinity_here, rtol=0, atol=1e-6
+    )
 
 
 def test_solve_H2SO4():
     """Do the H2SO4 solvers correctly solve a simulated titration?"""
     assert np.isclose(alkalinity_core, alkalinity_solved, rtol=0, atol=1e-12)
-    assert np.isclose(alkalinity_core, alkalinity_cal_solved, rtol=0, atol=1e-12)
+    assert np.isclose(
+        alkalinity_core, alkalinity_cal_solved, rtol=0, atol=1e-12
+    )
     assert np.isclose(alkalinity_core, alkalinity_tcal, rtol=0, atol=1e-10)
     assert np.isclose(alkalinity_core, alkalinity_tcal_v, rtol=0, atol=1e-10)
     assert np.isclose(alkalinity_core, ds.alkalinity, rtol=0, atol=1e-10)
@@ -237,10 +255,10 @@ def test_solve_H2SO4():
     assert np.isclose(emf0, emf0_tcal_v, rtol=0, atol=1e-4)
     assert np.isclose(emf0, ds.emf0, rtol=0, atol=1e-4)
     assert np.isclose(emf0, ds_v.emf0, rtol=0, atol=1e-4)
-    assert np.isclose(pH_free[0], pH_initial_tcal, rtol=0, atol=1e-6)
-    assert np.isclose(pH_free[0], pH_initial_tcal_v, rtol=0, atol=1e-6)
-    assert np.isclose(pH_free[0], ds.pH_initial, rtol=0, atol=1e-6)
-    assert np.isclose(pH_free[0], ds_v.pH_initial, rtol=0, atol=1e-6)
+    assert np.isclose(pH_free[0], pH_init_tcal, rtol=0, atol=1e-6)
+    assert np.isclose(pH_free[0], pH_init_tcal_v, rtol=0, atol=1e-6)
+    assert np.isclose(pH_free[0], ds.pH_init, rtol=0, atol=1e-6)
+    assert np.isclose(pH_free[0], ds_v.pH_init, rtol=0, atol=1e-6)
     assert np.isclose(0, ds.alkalinity_offset, rtol=0, atol=1e-10)
     assert np.isclose(0, ds_v.alkalinity_offset, rtol=0, atol=1e-10)
 

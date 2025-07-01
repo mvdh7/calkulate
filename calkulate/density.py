@@ -1,8 +1,11 @@
 # Calkulate: seawater total alkalinity from titration data
-# Copyright (C) 2019--2024  Matthew P. Humphreys  (GNU GPLv3)
+# Copyright (C) 2019--2025  Matthew P. Humphreys  (GNU GPLv3)
 """Calculate the density of various solutions."""
 
+from warnings import warn
+
 import numpy as np
+
 from . import default
 
 
@@ -14,11 +17,15 @@ def seawater_1atm_MP81(temperature=25, salinity=35):
       *  0.5 < salinity < 43
     """
     if np.any(temperature < 0) or np.any(temperature > 40):
-        print("Warning: some temperature values fall outside the valid range")
-        print("of the MP81 density equation (0–40 °C).")
+        warn(
+            "Some `temperature` values fall outside the valid range"
+            + "of the MP81 density equation (0-40 °C)."
+        )
     if np.any(salinity < 0.5) or np.any(salinity > 43):
-        print("Warning: some salinity values fall outside the valid range")
-        print("of the MP81 density equation (0.5–43).")
+        warn(
+            "Some `salinity` values fall outside the valid range"
+            + "of the MP81 density equation (0.5-43)."
+        )
     return (
         999.842594
         + 6.793952e-2 * temperature
@@ -40,10 +47,25 @@ def seawater_1atm_MP81(temperature=25, salinity=35):
     ) * 1e-3
 
 
-def HCl_NaCl_25C_DSC07(
-    molinity_HCl=default.molinity_HCl, molinity_NaCl=default.molinity_NaCl
-):
-    """Density of a mixture of HCl and NaCl at 25 °C and 1 atm following DSC07."""
+def HCl_NaCl_25C_DSC07(molinity_HCl=None, molinity_NaCl=None):
+    """Density of a mixture of HCl and NaCl at 25 °C and 1 atm following DSC07.
+
+    Parameters
+    ----------
+    molinity_HCl : float
+        Substance content of HCl in mol / kg-solution.
+    molinity_NaCl : float
+        Substance content of NaCl in mol / kg-solution.
+
+    Returns
+    -------
+    float
+        Density of the HCl-NaCl mixture in g / ml.
+    """
+    if molinity_HCl is None:
+        molinity_HCl = default.molinity_HCl
+    if molinity_NaCl is None:
+        molinity_NaCl = default.molinity_NaCl
     rhow25 = 0.99704  # g / cm**3
     # For convenience:
     mHCl = molinity_HCl
@@ -57,7 +79,9 @@ def HCl_NaCl_25C_DSC07(
     phi_mix = (mHCl * phiHCl + mNaCl * phiNaCl) / (mHCl + mNaCl)
     # DSC07 eq. 13:
     rho25 = (
-        rhow25 * (1e3 + mT * (mHCl + mNaCl)) / (1e3 + phi_mix * (mHCl + mNaCl) * rhow25)
+        rhow25
+        * (1e3 + mT * (mHCl + mNaCl))
+        / (1e3 + phi_mix * (mHCl + mNaCl) * rhow25)
     )
     return rho25
 
@@ -67,5 +91,9 @@ def H2SO4_25C_EAIM(titrant_molinity):
     calculated with E-AIM: http://www.aim.env.uea.ac.uk/aim/model1/model1c.php
     """
     if (titrant_molinity < 0.05) or (titrant_molinity > 3):
-        print("Warning: titrant_molinity out of parameterisation range!")
-    return 0.99750018 + 0.06181819 * titrant_molinity - 0.00285491 * titrant_molinity**2
+        warn("H2SO4 `titrant_molinity` out of parameterisation range")
+    return (
+        0.99750018
+        + 0.06181819 * titrant_molinity
+        - 0.00285491 * titrant_molinity**2
+    )

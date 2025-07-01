@@ -1,6 +1,11 @@
+# %%
 import copy
-import numpy as np, pandas as pd
-import PyCO2SYS as pyco2, calkulate as calk
+
+import numpy as np
+import pandas as pd
+import PyCO2SYS as pyco2
+
+import calkulate as calk
 
 
 # Function inputs
@@ -60,7 +65,9 @@ pH_titrations = co2sys_titrations["pH_free"]
 # Export .dat file(s) for Calkulate
 file_path = "tests/data/"
 file_name = "test_pH_scales_simulated_titration.dat"
-emf = calk.convert.pH_to_emf(pH_titrations, emf0, kwargs_titration["temperature"])
+emf = calk.convert.pH_to_emf(
+    pH_titrations, emf0, kwargs_titration["temperature"]
+)
 calk.write_dat(
     file_path + file_name,
     titrant_mass * 1000,  # g

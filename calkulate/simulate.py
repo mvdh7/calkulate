@@ -1,17 +1,19 @@
 # Calkulate: seawater total alkalinity from titration data
-# Copyright (C) 2019--2024  Matthew P. Humphreys  (GNU GPLv3)
+# Copyright (C) 2019--2025  Matthew P. Humphreys  (GNU GPLv3)
 """Simulate solution properties during a titration."""
 
 import numpy as np
 import PyCO2SYS as pyco2
+
 from . import convert, default
-from .titration import Titration
 
 
-def alkalinity_components(pH, totals, k_constants, opt_pH_scale=default.opt_pH_scale):
+def alkalinity_components(
+    pH, totals, k_constants, opt_pH_scale=default.opt_pH_scale
+):
     """Calculate chemical speciation from pH.
 
-    totals should include dilution correction and be in mol/kg-solution.
+    totals should include dilution correction and be in mol/kg-sol.
 
     k_constants should be on the scale specified by opt_pH_scale, with:
         1 = Total                pH = -log10([H+] + [HSO4-])
@@ -20,13 +22,13 @@ def alkalinity_components(pH, totals, k_constants, opt_pH_scale=default.opt_pH_s
     Note that when using the Total scale, k_fluoride must also be on the Total scale
     (this does not happen by default in PyCO2SYS!).
 
-    Outputs are substance contents in mol/kg-solution.
+    Outputs are substance contents in mol/kg-sol.
     """
     # Check opt_pH_scale is valid
     opt_pH_scales = [1, 2, 3]
-    assert (
-        opt_pH_scale in opt_pH_scales
-    ), "opt_pH_scale must be 1 (Total), 2 (Seawater) or 3 (Free)."
+    assert opt_pH_scale in opt_pH_scales, (
+        "opt_pH_scale must be 1 (Total), 2 (Seawater) or 3 (Free)."
+    )
     # Build up dict of solution components
     components = {}
     h = components["H"] = 10.0**-pH
@@ -118,11 +120,13 @@ component_multipliers = {
 
 
 def alkalinity(pH, totals, k_constants, opt_pH_scale=default.opt_pH_scale):
-    """Estimate total alkalinity from pH and total salts in mol/kg-solution."""
+    """Estimate total alkalinity from pH and total salts in mol/kg-sol."""
     components = alkalinity_components(
         pH, totals, k_constants, opt_pH_scale=opt_pH_scale
     )
-    return np.sum([v * component_multipliers[k] for k, v in components.items()], axis=0)
+    return np.sum(
+        [v * component_multipliers[k] for k, v in components.items()], axis=0
+    )
 
 
 def _titration(
@@ -183,7 +187,9 @@ def _titration(
         Stoichiometric equilibrium constants through the titration.
     """
     # Create arrays of titrant_mass in kg and temperature in °C
-    titrant_mass = np.arange(titrant_mass_start, titrant_mass_stop, titrant_mass_step)
+    titrant_mass = np.arange(
+        titrant_mass_start, titrant_mass_stop, titrant_mass_step
+    )
     if np.isscalar(temperature):
         temperature = np.full_like(titrant_mass, temperature)
     # Ensure we use Calkulate's default PyCO2SYS options if they're not provided
@@ -232,7 +238,8 @@ def _titration(
         dic_titration[0] = dic
         for i in range(len(dic_titration) - 1):
             kwargs_i = {
-                k: v if np.isscalar(v) else v[i] for k, v in kwargs_titration.items()
+                k: v if np.isscalar(v) else v[i]
+                for k, v in kwargs_titration.items()
             }
             fCO2 = pyco2.sys(
                 par1=alkalinity_titration[i],
@@ -260,10 +267,14 @@ def _titration(
     emf = convert.pH_to_emf(pH_titration, emf0, temperature)
     # Get totals (in mol/kg) and k_constants dicts for other Calkulate functions
     totals = {
-        k: v * 1e-6 for k, v in co2sys_titration.items() if k.startswith("total_")
+        k: v * 1e-6
+        for k, v in co2sys_titration.items()
+        if k.startswith("total_")
     }
     totals["dic"] = co2sys_titration["dic"] * 1e-6
-    k_constants = {k: v for k, v in co2sys_titration.items() if k.startswith("k_")}
+    k_constants = {
+        k: v for k, v in co2sys_titration.items() if k.startswith("k_")
+    }
     return titrant_mass, emf, temperature, analyte_mass, totals, k_constants
 
 
@@ -284,7 +295,7 @@ def titration(
     pH_range=default.pH_range,
     **pyco2sys_kwargs,
 ):
-    """Simulate a titration and return a calibrated and solved ``Titration``.
+    """Simulate a titration and return a calibrated and solved `Titration`.
 
     Parameters
     ----------

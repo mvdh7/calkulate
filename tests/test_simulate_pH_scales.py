@@ -1,12 +1,15 @@
+# %%
 import numpy as np
 import PyCO2SYS as pyco2
+
 import calkulate as calk
+
 
 # Set conditions
 salinity = 35
 temperature = 25
 dic = 2100
-alkalinity_initial = -500
+alkalinity_init = -500
 
 # Create empty dicts
 pH = {}
@@ -17,7 +20,7 @@ all_H = {}
 
 # Get pH on all scales
 res = pyco2.sys(
-    par1=alkalinity_initial,
+    par1=alkalinity_init,
     par1_type=1,
     par2=dic,
     par2_type=2,
@@ -47,7 +50,8 @@ for i in pH.keys():
         pH[i], totals, k_constants[i], opt_pH_scale=i
     )
     alkalinity[i] = (
-        calk.simulate.alkalinity(pH[i], totals, k_constants[i], opt_pH_scale=i) * 1e6
+        calk.simulate.alkalinity(pH[i], totals, k_constants[i], opt_pH_scale=i)
+        * 1e6
     )
     all_H[i] = components[i]["H"]
     if "HSO4" in components[i]:
@@ -77,7 +81,7 @@ def test_alkalinity():
     """Is the alkalinity consistent across the different pH scales?"""
     tol = dict(atol=0, rtol=0.005)
     for i in [1, 2, 3]:
-        assert np.isclose(alkalinity[i], alkalinity_initial, **tol)
+        assert np.isclose(alkalinity[i], alkalinity_init, **tol)
 
 
 # test_nonH_components()
