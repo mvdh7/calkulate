@@ -8,11 +8,19 @@ Calkulate v3 went too far overboard with the OO approach and ended up being very
 
 ### 23.7 (1 July 2025)
 
+!!! warning "Different results in v23.7"
+
+    A few default settings changed in v23.7, which means that calculated results will be slightly different.  Changes should be at most on the order of 1 µmol/kg, and the new results should be more accurate.
+
+    To revert to the old behaviours, use the following kwargs or [metadata table columns](metadata.md/#optional-columns): `dilute_totals_for_ks=True, double=False, gran_logic="legacy"`.
+
 !!! info "Changes in v23.7"
 
     * All EMF solvers now do a double-solve by default, in order to improve the range of pH data that are used.  This does mean that results may change as a different set of data points will sometimes be used to solve each titration.  To revert to the old behaviour, use `double=False`.
     * Equilibrium constants now vary through titrations with temperature only, not also with changing total sulfate and fluoride concentrations as in previous versions.  To revert to the old behaviour, use `dilute_totals_for_ks=True`.
-    * Added support for German-language Tiamo titration files.
+    * More points used for the Gran-plot initial estimate of alkalinity and EMF<sup>0</sup>.  To revert to the old behaviour, use `gran_logic="legacy"`.
+    * `pH_range` kwarg replaced with separate `pH_min` and `pH_max` kwargs, which can also be used as [metadata table columns](metadata.md/#optional-columns).
+    * Added support for German-language Tiamo titration files (use `file_type="tiamo_de"`).
     * Major revisions to streamline the backend processing.
 
 ### 23.6 (19 February 2024)

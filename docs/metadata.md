@@ -89,6 +89,12 @@ Like for the recommended columns, if optional column values are only needed for 
 
     *Alias for `read_dat_method`, added in v23.7.*
 
+??? info "`gran_logic` : *which points to use for Gran-plot estimates*"
+    Prior to v23.7, Gran-plot initial estimates of alkalinity and EMF<sup>0</sup> were determined using data points that were above 10% and below 90% of the maximum value of the Gran function.  From v23.7, the 90% upper cutoff was removed.
+
+    * `"v23.7+"` : use the new behaviour without upper cutoff (default).
+    * `"legacy"` : use the original approach with upper and lower cutoffs.
+
 ??? info "`k_*` : *stoichiometric equilibrium constants*"
     If not provided, then these are calculated from temperature and salinity by [PyCO2SYS](https://pyco2sys.readthedocs.io/en/latest/co2sys_nd/#equilibrium-constants).
 
