@@ -1,6 +1,11 @@
 name: Tests
-
-on: [push]
+on:
+  push:
+    paths:
+      - calkulate/**
+      - tests/**
+      - pyproject.toml
+      - pytest.ini
 
 jobs:
   build:
