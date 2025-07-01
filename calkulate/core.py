@@ -173,6 +173,7 @@ def gran_alkalinity(
     analyte_mass,
     titrant_molinity,
     titrant_normality=1,
+    gran_logic="v23.7+",
 ):
     """Gran-plot first estimate of total alkalinity.
 
@@ -208,9 +209,14 @@ def gran_alkalinity(
     # Calculate Gran estimates and determine which to use for fitting
     gfunc = gran_function(titrant_mass, emf, temperature, analyte_mass)
     used = np.full(gfunc.shape, False)
-    use_logic = gfunc > 0.1 * np.max(gfunc)
-    use_from = use_logic.nonzero()[0][0]
-    used[use_from:] = True
+    if gran_logic == "v23.7+":
+        use_logic = gfunc > 0.1 * np.max(gfunc)
+        use_from = use_logic.nonzero()[0][0]
+        used[use_from:] = True
+    elif gran_logic == "legacy":
+        used = (gfunc > 0.1 * np.max(gfunc)) & (gfunc < 0.9 * np.max(gfunc))
+    else:
+        raise Exception('gran_logic must be "v23.7+" (default) or "legacy"')
     if used.sum() < 3:
         warn("Fewer than 3 data points available for linear regression")
     # Do linear regression
@@ -284,6 +290,7 @@ def gran_guesses(
     analyte_mass,
     titrant_molinity,
     titrant_normality=1,
+    gran_logic="v23.7+",
 ):
     """Calculate Gran-plot first guesses for alkalinity, EMF0 and pH.
 
@@ -329,6 +336,7 @@ def gran_guesses(
         analyte_mass,
         titrant_molinity,
         titrant_normality=titrant_normality,
+        gran_logic=gran_logic,
     )
     emf0s = gran_emf0s(
         titrant_mass,
@@ -544,6 +552,7 @@ def solve_emf(
     alkalinity_init=None,
     double=True,
     emf0_init=None,
+    gran_logic="v23.7+",
     pH_min=3,
     pH_max=4,
     titrant_normality=1,
@@ -614,6 +623,7 @@ def solve_emf(
         analyte_mass,
         titrant_molinity,
         titrant_normality=titrant_normality,
+        gran_logic=gran_logic,
     )
     if alkalinity_init is None:
         alkalinity = ggr.alkalinity

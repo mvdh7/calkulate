@@ -6,13 +6,13 @@ Calkulate v3 went too far overboard with the OO approach and ended up being very
 
 <!-- Added support for VINDTA titration files where the CRM button was used for running reference materials. -->
 
-### 23.7 (forthcoming)
+### 23.7 (1 July 2025)
 
- !!! info "Changes in v23.7"
+!!! info "Changes in v23.7"
 
     * All EMF solvers now do a double-solve by default, in order to improve the range of pH data that are used.  This does mean that results may change as a different set of data points will sometimes be used to solve each titration.  To revert to the old behaviour, use `double=False`.
     * Equilibrium constants now vary through titrations with temperature only, not also with changing total sulfate and fluoride concentrations as in previous versions.  To revert to the old behaviour, use `dilute_totals_for_ks=True`.
-    * Added support for Tiamo titration files.
+    * Added support for German-language Tiamo titration files.
     * Major revisions to streamline the backend processing.
 
 ### 23.6 (19 February 2024)

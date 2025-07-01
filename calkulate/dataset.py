@@ -196,13 +196,13 @@ def solve_row(row, verbose=False, **kwargs):
     # Define blank output
     solved = pd.Series(
         {
-            "alkalinity_gran": np.nan,
             "alkalinity_npts": 0,
             "alkalinity_std": np.nan,
             "alkalinity": np.nan,
             "analyte_mass": row.analyte_mass,
-            "emf0_gran": np.nan,
             "emf0": np.nan,
+            "gran_alkalinity": np.nan,
+            "gran_emf0": np.nan,
             "pH_init": np.nan,
             "temperature_init": np.nan,
         }

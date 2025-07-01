@@ -24,7 +24,7 @@ def test_tiamo_ds():
     # Calibrate and solve
     # kwargs_tiamo could alternatively be added as columns to the ds
     kwargs_tiamo = dict(
-        titrant_molinity_init=0.01,
+        titrant_molinity_init=0.01,  # first-guess acid concentration
         file_type="tiamo_de",
         solve_mode="pH_gran",  # can try "pH" or "pH_adjust" or "pH_gran"
     )
