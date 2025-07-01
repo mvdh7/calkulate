@@ -4,8 +4,6 @@
 
 Calkulate v3 went too far overboard with the OO approach and ended up being very slow and too complicated behind the scenes as a result.  Calkulate v23 therefore mashes together the best bits of v2 and v3 for the ultimate alkalinity solving experience.
 
-<!-- Added support for VINDTA titration files where the CRM button was used for running reference materials. -->
-
 ### 23.7 (1 July 2025)
 
 !!! warning "Different results in v23.7"
