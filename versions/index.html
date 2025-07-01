@@ -1,0 +1,1256 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Total alkalinity from titration data.">
+      
+      
+        <meta name="author" content="Matthew P. Humphreys">
+      
+      
+        <link rel="canonical" href="https://mvdh.xyz/calkulate/versions/">
+      
+      
+        <link rel="prev" href="../references/">
+      
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.15">
+    
+    
+      
+        <title>Version history - Calkulate</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.342714a4.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,700,700i%7CNoto+Sans+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Open Sans";--md-code-font:"Noto Sans Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="cyan" data-md-color-accent="yellow">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#version-history" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Calkulate" class="md-header__button md-logo" aria-label="Calkulate" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Calkulate
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Version history
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/mvdh7/calkulate" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    mvdh7/calkulate
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Calkulate" class="md-nav__button md-logo" aria-label="Calkulate" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Calkulate
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/mvdh7/calkulate" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    mvdh7/calkulate
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../read/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Import data
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../metadata/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Metadata contents and format
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../methods/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dataset methods
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plot/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Visualisation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../validate/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Validation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../references/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    References
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Version history
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Version history
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#version-23-best-of-v2-and-v3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 23: best of v2 and v3
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Version 23: best of v2 and v3">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#237-1-july-2025" class="md-nav__link">
+    <span class="md-ellipsis">
+      23.7 (1 July 2025)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#236-19-february-2024" class="md-nav__link">
+    <span class="md-ellipsis">
+      23.6 (19 February 2024)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#235-4-july-2023" class="md-nav__link">
+    <span class="md-ellipsis">
+      23.5 (4 July 2023)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#234-13-june-2023" class="md-nav__link">
+    <span class="md-ellipsis">
+      23.4 (13 June 2023)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#233-22-june-2022" class="md-nav__link">
+    <span class="md-ellipsis">
+      23.3 (22 June 2022)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#232" class="md-nav__link">
+    <span class="md-ellipsis">
+      23.2
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="23.2">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#2322-4-february-2022" class="md-nav__link">
+    <span class="md-ellipsis">
+      23.2.2 (4 February 2022)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2321-13-august-2021" class="md-nav__link">
+    <span class="md-ellipsis">
+      23.2.1 (13 August 2021)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2320-6-july-2021" class="md-nav__link">
+    <span class="md-ellipsis">
+      23.2.0 (6 July 2021)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#231" class="md-nav__link">
+    <span class="md-ellipsis">
+      23.1
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="23.1">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#2311-7-june-2021" class="md-nav__link">
+    <span class="md-ellipsis">
+      23.1.1 (7 June 2021)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2310-29-march-2021" class="md-nav__link">
+    <span class="md-ellipsis">
+      23.1.0 (29 March 2021)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#230" class="md-nav__link">
+    <span class="md-ellipsis">
+      23.0
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="23.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#2302-15-march-2021" class="md-nav__link">
+    <span class="md-ellipsis">
+      23.0.2 (15 March 2021)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2301-25-february-2021" class="md-nav__link">
+    <span class="md-ellipsis">
+      23.0.1 (25 February 2021)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2300-22-february-2021" class="md-nav__link">
+    <span class="md-ellipsis">
+      23.0.0 (22 February 2021)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-3-poorly-pythonic" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 3: poorly Pythonic
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Version 3: poorly Pythonic">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.1
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.1">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#310-27-october-2020" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.1.0 (27 October 2020)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#30" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.0
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#301-23-september-2020" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.0.1 (23 September 2020)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#300-15-september-2020" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.0.0 (15 September 2020)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-2-python" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 2: Python
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-1-matlab" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 1: MATLAB
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#version-23-best-of-v2-and-v3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 23: best of v2 and v3
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Version 23: best of v2 and v3">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#237-1-july-2025" class="md-nav__link">
+    <span class="md-ellipsis">
+      23.7 (1 July 2025)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#236-19-february-2024" class="md-nav__link">
+    <span class="md-ellipsis">
+      23.6 (19 February 2024)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#235-4-july-2023" class="md-nav__link">
+    <span class="md-ellipsis">
+      23.5 (4 July 2023)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#234-13-june-2023" class="md-nav__link">
+    <span class="md-ellipsis">
+      23.4 (13 June 2023)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#233-22-june-2022" class="md-nav__link">
+    <span class="md-ellipsis">
+      23.3 (22 June 2022)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#232" class="md-nav__link">
+    <span class="md-ellipsis">
+      23.2
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="23.2">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#2322-4-february-2022" class="md-nav__link">
+    <span class="md-ellipsis">
+      23.2.2 (4 February 2022)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2321-13-august-2021" class="md-nav__link">
+    <span class="md-ellipsis">
+      23.2.1 (13 August 2021)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2320-6-july-2021" class="md-nav__link">
+    <span class="md-ellipsis">
+      23.2.0 (6 July 2021)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#231" class="md-nav__link">
+    <span class="md-ellipsis">
+      23.1
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="23.1">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#2311-7-june-2021" class="md-nav__link">
+    <span class="md-ellipsis">
+      23.1.1 (7 June 2021)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2310-29-march-2021" class="md-nav__link">
+    <span class="md-ellipsis">
+      23.1.0 (29 March 2021)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#230" class="md-nav__link">
+    <span class="md-ellipsis">
+      23.0
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="23.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#2302-15-march-2021" class="md-nav__link">
+    <span class="md-ellipsis">
+      23.0.2 (15 March 2021)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2301-25-february-2021" class="md-nav__link">
+    <span class="md-ellipsis">
+      23.0.1 (25 February 2021)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2300-22-february-2021" class="md-nav__link">
+    <span class="md-ellipsis">
+      23.0.0 (22 February 2021)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-3-poorly-pythonic" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 3: poorly Pythonic
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Version 3: poorly Pythonic">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.1
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.1">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#310-27-october-2020" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.1.0 (27 October 2020)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#30" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.0
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#301-23-september-2020" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.0.1 (23 September 2020)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#300-15-september-2020" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.0.0 (15 September 2020)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-2-python" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 2: Python
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-1-matlab" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version 1: MATLAB
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="version-history">Version history<a class="headerlink" href="#version-history" title="Permanent link">&para;</a></h1>
+<h2 id="version-23-best-of-v2-and-v3">Version 23: best of v2 and v3<a class="headerlink" href="#version-23-best-of-v2-and-v3" title="Permanent link">&para;</a></h2>
+<p>Calkulate v3 went too far overboard with the OO approach and ended up being very slow and too complicated behind the scenes as a result.  Calkulate v23 therefore mashes together the best bits of v2 and v3 for the ultimate alkalinity solving experience.</p>
+<h3 id="237-1-july-2025">23.7 (1 July 2025)<a class="headerlink" href="#237-1-july-2025" title="Permanent link">&para;</a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Different results in v23.7</p>
+<p>A few default settings changed in v23.7, which means that calculated results will be slightly different.  Changes should be at most on the order of 1 µmol/kg, and the new results should be more accurate.</p>
+<p>To revert to the old behaviours, use the following kwargs or <a href="../metadata/#optional-columns">metadata table columns</a>: <code>dilute_totals_for_ks=True, double=False, gran_logic="legacy"</code>.</p>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Changes in v23.7</p>
+<ul>
+<li>All EMF solvers now do a double-solve by default, in order to improve the range of pH data that are used.  This does mean that results may change as a different set of data points will sometimes be used to solve each titration.  To revert to the old behaviour, use <code>double=False</code>.</li>
+<li>Equilibrium constants now vary through titrations with temperature only, not also with changing total sulfate and fluoride concentrations as in previous versions.  To revert to the old behaviour, use <code>dilute_totals_for_ks=True</code>.</li>
+<li>More points used for the Gran-plot initial estimate of alkalinity and EMF<sup>0</sup>.  To revert to the old behaviour, use <code>gran_logic="legacy"</code>.</li>
+<li><code>pH_range</code> kwarg replaced with separate <code>pH_min</code> and <code>pH_max</code> kwargs, which can also be used as <a href="../metadata/#optional-columns">metadata table columns</a>.</li>
+<li>Added support for VINDTA .dbs files where the CRM button was used to run reference materials.</li>
+<li>Added support for German-language Tiamo titration files (use <code>file_type="tiamo_de"</code>).</li>
+<li>Major revisions to streamline the backend processing.</li>
+</ul>
+</div>
+<h3 id="236-19-february-2024">23.6 (19 February 2024)<a class="headerlink" href="#236-19-february-2024" title="Permanent link">&para;</a></h3>
+<div class="admonition info">
+<p class="admonition-title">Changes in v23.6</p>
+<ul>
+<li>Added missing components to titration table in a <code>Titration</code>.</li>
+</ul>
+<p><strong><em>v23.6.2 changes (29 October 2024)</em></strong></p>
+<ul>
+<li>Fix <code>FutureWarning</code> in <code>calk.dataset.get_total_salts</code>.</li>
+</ul>
+<p><strong><em>v23.6.1 changes (20 April 2024)</em></strong></p>
+<ul>
+<li>Removed excessive <code>print</code> statements from debugging.</li>
+</ul>
+</div>
+<h3 id="235-4-july-2023">23.5 (4 July 2023)<a class="headerlink" href="#235-4-july-2023" title="Permanent link">&para;</a></h3>
+<div class="admonition info">
+<p class="admonition-title">Changes in v23.5</p>
+<ul>
+<li>Added <code>to_pandas</code> method to <code>Dataset</code> for a more convenient downgrade to a pandas <code>DataFrame</code>.</li>
+<li>Improved docstrings for several key functions and classes.</li>
+<li>Fixed bugs in logicals in various <code>calk.dataset</code> functions which had meant that NaN values in the metadata file were not always being ignored.</li>
+<li>Fixed bug in the <code>Dataset.solve</code> method such that the <code>analyte_mass</code> is now automatically calculated from <code>analyte_volume</code>.</li>
+<li>Switched to using pyproject.toml instead of setup.py for building the package.</li>
+<li>Renamed module <code>io</code> as <code>read</code>.</li>
+</ul>
+</div>
+<h3 id="234-13-june-2023">23.4 (13 June 2023)<a class="headerlink" href="#234-13-june-2023" title="Permanent link">&para;</a></h3>
+<div class="admonition info">
+<p class="admonition-title">Changes in v23.4</p>
+<ul>
+<li>Swapped deprecated pandas <code>.iteritems</code> for <code>.items</code>.</li>
+<li>Improvements to <code>Titration</code> class.</li>
+</ul>
+</div>
+<h3 id="233-22-june-2022">23.3 (22 June 2022)<a class="headerlink" href="#233-22-june-2022" title="Permanent link">&para;</a></h3>
+<div class="admonition info">
+<p class="admonition-title">Changes in v23.3</p>
+<ul>
+<li>Added a test of the <a href="../references/#d">DSC07</a> SOP 3b example dataset.</li>
+<li>Updated for compatibility with PyCO2SYS v1.8.1 (but no longer with v1.8.0).</li>
+</ul>
+</div>
+<h3 id="232">23.2<a class="headerlink" href="#232" title="Permanent link">&para;</a></h3>
+<p>Adds <code>Titration</code> class for investigating single titrations.</p>
+<h4 id="2322-4-february-2022">23.2.2 (4 February 2022)<a class="headerlink" href="#2322-4-february-2022" title="Permanent link">&para;</a></h4>
+<div class="admonition info">
+<p class="admonition-title">Changes in v23.2.2</p>
+<ul>
+<li>More properties calculated during titrations.</li>
+</ul>
+</div>
+<h4 id="2321-13-august-2021">23.2.1 (13 August 2021)<a class="headerlink" href="#2321-13-august-2021" title="Permanent link">&para;</a></h4>
+<div class="admonition info">
+<p class="admonition-title">Changes in v23.2.1</p>
+<ul>
+<li>Solver functions return additional diagnostic information about each titration.</li>
+</ul>
+</div>
+<h4 id="2320-6-july-2021">23.2.0 (6 July 2021)<a class="headerlink" href="#2320-6-july-2021" title="Permanent link">&para;</a></h4>
+<div class="admonition info">
+<p class="admonition-title">Changes in v23.2.0</p>
+<ul>
+<li>Adds (as yet undocumented) <code>Titration</code> class for investigating single titrations.</li>
+<li>Adds (as yet undocumented) plotting functions for <code>Titration</code> objects.</li>
+</ul>
+</div>
+<h3 id="231">23.1<a class="headerlink" href="#231" title="Permanent link">&para;</a></h3>
+<p>Adds solvers for titrations with an H<sub>2</sub>SO<sub>4</sub> titrant.</p>
+<h4 id="2311-7-june-2021">23.1.1 (7 June 2021)<a class="headerlink" href="#2311-7-june-2021" title="Permanent link">&para;</a></h4>
+<div class="admonition info">
+<p class="admonition-title">Changes in v23.1.1</p>
+</div>
+<ul>
+<li>Now compatible with PyCO2SYS v1.7.0.</li>
+</ul>
+<h4 id="2310-29-march-2021">23.1.0 (29 March 2021)<a class="headerlink" href="#2310-29-march-2021" title="Permanent link">&para;</a></h4>
+<div class="admonition info">
+<p class="admonition-title">Changes in v23.1.0</p>
+<ul>
+<li>Adds solvers for titrations with an H<sub>2</sub>SO<sub>4</sub> titrant (see optional <code>titrant</code> column in the <a href="../metadata/#optional-columns">metadata contents</a>).</li>
+<li>Adds optional <code>titrant_density</code> column to overwrite the internally calculated titrant density with a user-specified value.</li>
+</ul>
+</div>
+<h3 id="230">23.0<a class="headerlink" href="#230" title="Permanent link">&para;</a></h3>
+<h4 id="2302-15-march-2021">23.0.2 (15 March 2021)<a class="headerlink" href="#2302-15-march-2021" title="Permanent link">&para;</a></h4>
+<div class="admonition info">
+<p class="admonition-title">Changes in v23.0.2</p>
+<ul>
+<li>Better handling of missing dates in files imported with <code>read_dbs</code>.</li>
+<li>Minor adjustments and bug fixes in a few internal functions.</li>
+</ul>
+</div>
+<h4 id="2301-25-february-2021">23.0.1 (25 February 2021)<a class="headerlink" href="#2301-25-february-2021" title="Permanent link">&para;</a></h4>
+<div class="admonition info">
+<p class="admonition-title">Changes in v23.0.1</p>
+<ul>
+<li>Print more informative error messages when titration data files cannot be found.</li>
+<li>Use <code>read_dat_genfromtxt</code> by default if <code>read_dat_method</code> not recognised, instead of throwing an error.</li>
+</ul>
+</div>
+<h4 id="2300-22-february-2021">23.0.0 (22 February 2021)<a class="headerlink" href="#2300-22-february-2021" title="Permanent link">&para;</a></h4>
+<div class="admonition info">
+<p class="admonition-title">Introduction of v23.0.0</p>
+<ul>
+<li>Object-oriented syntax from v3 is available to quickly work with datasets of many titrations at once.</li>
+<li>Underlying functions work much faster with raw NumPy arrays as in v2.</li>
+<li>Some basic plotting functions added.</li>
+</ul>
+</div>
+<h2 id="version-3-poorly-pythonic">Version 3: poorly Pythonic<a class="headerlink" href="#version-3-poorly-pythonic" title="Permanent link">&para;</a></h2>
+<p>Calkulate v3 switches to an object-oriented approach.  This makes working with individual titrations and handling large collections of them much less cumbersome.</p>
+<p><a href="https://PyCO2SYS.rtfd.io">PyCO2SYS</a> is now used to determine equilibrium constants and estimate total salt concentrations from salinity, instead of replicating those functions in Calkulate.</p>
+<h3 id="31">3.1<a class="headerlink" href="#31" title="Permanent link">&para;</a></h3>
+<h4 id="310-27-october-2020">3.1.0 (27 October 2020)<a class="headerlink" href="#310-27-october-2020" title="Permanent link">&para;</a></h4>
+<div class="admonition info">
+<p class="admonition-title">Changes in v3.1.0</p>
+<p><strong><em>Major bug fix</em></strong></p>
+<ul>
+<li>Fixed unit conversion bug when evaluating equilibrium constants in PyCO2SYS.  <strong>All results calculated using v3.0.X should be redetermined!</strong></li>
+</ul>
+<p><strong><em>Better consistency with PyCO2SYS</em></strong></p>
+<ul>
+<li>Updated for compatability with PyCO2SYS v1.6.0.</li>
+<li>Added two optional extra alkalinity components.</li>
+<li>Renamed various internal variables for better consistency.</li>
+</ul>
+</div>
+<h3 id="30">3.0<a class="headerlink" href="#30" title="Permanent link">&para;</a></h3>
+<h4 id="301-23-september-2020">3.0.1 (23 September 2020)<a class="headerlink" href="#301-23-september-2020" title="Permanent link">&para;</a></h4>
+<div class="admonition info">
+<p class="admonition-title">Changes in v3.0.1</p>
+<p><strong><em>Bug fixes</em></strong></p>
+<ul>
+<li>Fix bug in handling <code>data["file_good"] = False</code> cases.</li>
+<li>Set DIC to zero where its value is NaN.</li>
+<li>Skip over errors in titration files with a warning rather than throw a breaking error.</li>
+</ul>
+</div>
+<h4 id="300-15-september-2020">3.0.0 (15 September 2020)<a class="headerlink" href="#300-15-september-2020" title="Permanent link">&para;</a></h4>
+<div class="admonition info">
+<p class="admonition-title">Release notes for v3.0.0</p>
+<ul>
+<li>Introduces object-oriented approach in which most Calkulate functions are extensions to pandas DataFrames.</li>
+<li>Uses PyCO2SYS to evaluate all equilibrium constants and salt concentrations from salinity and temperature.</li>
+</ul>
+</div>
+<h2 id="version-2-python">Version 2: Python<a class="headerlink" href="#version-2-python" title="Permanent link">&para;</a></h2>
+<p>Calkulate v2 transitioned from MATLAB to Python and added several additional alkalinity solvers.  Despite being implemented in Python, the style was still rather MATLAB-esque.</p>
+<h2 id="version-1-matlab">Version 1: MATLAB<a class="headerlink" href="#version-1-matlab" title="Permanent link">&para;</a></h2>
+<p>The original Calkulate v1 was a MATLAB implementation of the "half-Gran" alkalinity solver described by <a href="../references/#h">H15</a>. The final version (v1.0.2) remains <a href="https://github.com/mvdh7/calkulate/tree/1.0.2">freely available</a>.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2019—2025  Matthew P. Humphreys  (GNU GPLv3)
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.56ea9cef.min.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+      
+    
+  </body>
+</html>
