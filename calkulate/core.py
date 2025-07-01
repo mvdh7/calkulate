@@ -521,7 +521,7 @@ def _lsqfun_solve_emf(
     k_constants,
     titrant_normality,
 ):
-    """Calculate residuals for the solver."""
+    # Calculate residuals for the solver
     alkalinity, emf0 = alkalinity_emf0
     pH = convert.emf_to_pH(emf, emf0, temperature)
     mixture_mass = titrant_mass + analyte_mass
