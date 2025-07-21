@@ -247,7 +247,7 @@ def solve(ds, verbose=False, **kwargs):
     # Check for bad kwargs, but don't break on them
     kwargs_ignored = []
     for k in _backcompat(kwargs.copy(), []):
-        if k not in files.keys_calibrate | {"pH_range", "read_dat_kwargs"}:
+        if k not in files.keys_solve | {"pH_range", "read_dat_kwargs"}:
             kwargs_ignored.append(k)
     if len(kwargs_ignored) > 0:
         warn(
