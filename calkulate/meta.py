@@ -9,7 +9,7 @@ import pandas as pd
 
 _authorlist = ["Humphreys, Matthew P.", "Matthews, Ruth S."]
 __author__ = " and ".join(_authorlist)
-__version__ = "23.7.0"
+__version__ = "23.7.1"
 __year__ = 2025
 
 
