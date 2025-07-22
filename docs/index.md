@@ -43,3 +43,25 @@ calk.hello()
 ## License
 
 Calkulate is licensed under the [GNU General Public License version 3 (GPLv3)](https://www.gnu.org/licenses/gpl-3.0.en.html).
+
+## Users
+
+Calkulate is or has been used by researchers from (at least) the following institutes/companies - please get in touch if you're also using it and don't mind being added here!
+
+<div style='background-color:#fff; text-align:center; border-radius:10px 10px 0 0'>
+<a href='https://www.nioz.nl/' target='_blank'><img src='img/NIOZ_logo_ENG_RGB.png' style='width:29%; margin:3% 2%; vertical-align:middle' /></a>
+<a href='https://www.geomar.de/en/' target='_blank'><img src='img/GEOMAR.jpg' style='width:29%; margin:1% 2%; vertical-align:middle' /></a>
+<a href='https://www.seao2.com/' target='_blank'><img src='img/SeaO2.png' style='width:24%; margin:1% 2%; vertical-align:middle' /></a>
+</div><div style='background-color:#fff; text-align:center'>
+<a href='https://www.southampton.ac.uk/' target='_blank'><img src='img/Soton.png' style='width:30%; margin:1% 2%; vertical-align:middle' /></a>
+<a href='https://uol.de/' target='_blank'><img src='img/Oldenburg.svg' style='width:25%; margin:1% 2%; vertical-align:middle' /></a>
+<a href='https://www.mit.edu/' target='_blank'><img src='img/MIT.png' style='width:30%; margin:1% 2%; vertical-align:middle' /></a>
+</div><div style='background-color:#fff; text-align:center'>
+<a href='https://noc.ac.uk/' target='_blank'><img src='img/NOC.png' style='width:16%; margin:1% 2% 3% 2%; vertical-align:middle' /></a>
+<a href='https://www.uea.ac.uk/' target='_blank'><img src='img/UEA.png' style='width:30%; margin:1% 2% 3% 2%; vertical-align:middle' /></a>
+<a href='https://www.leibniz-zmt.de/' target='_blank'><img src='img/Leibniz.png' style='width:30%; margin:1% 2% 3% 2%; vertical-align:middle' /></a>
+</div><div style='background-color:#fff; text-align:center; border-radius:0 0 10px 10px'>
+<a href='https://www.oberlin.edu/' target='_blank'><img src='img/Oberlin.png' style='width:29%; margin:1% 2%; vertical-align:middle' /></a>
+<a href='https://www.utas.edu.au/' target='_blank'><img src='img/UTas.png' style='width:20%; margin:1% 2%; vertical-align:middle' /></a>
+<a href='https://www.fau.edu/' target='_blank'><img src='img/FAU.png' style='width:16%; margin:1% 2%; vertical-align:middle' /></a>
+</div>
