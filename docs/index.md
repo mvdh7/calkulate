@@ -58,8 +58,8 @@ Calkulate is or has been used by researchers from (at least) the following insti
 <a href='https://www.mit.edu/' target='_blank'><img src='img/MIT.png' style='width:30%; margin:1% 2%; vertical-align:middle' /></a>
 </div><div style='background-color:#fff; text-align:center'>
 <a href='https://noc.ac.uk/' target='_blank'><img src='img/NOC.png' style='width:16%; margin:1% 2% 3% 2%; vertical-align:middle' /></a>
-<a href='https://www.uea.ac.uk/' target='_blank'><img src='img/UEA.png' style='width:30%; margin:1% 2% 3% 2%; vertical-align:middle' /></a>
 <a href='https://www.leibniz-zmt.de/' target='_blank'><img src='img/Leibniz.png' style='width:30%; margin:1% 2% 3% 2%; vertical-align:middle' /></a>
+<a href='https://www.uea.ac.uk/' target='_blank'><img src='img/UEA.png' style='width:30%; margin:1% 2% 3% 2%; vertical-align:middle' /></a>
 </div><div style='background-color:#fff; text-align:center; border-radius:0 0 10px 10px'>
 <a href='https://www.oberlin.edu/' target='_blank'><img src='img/Oberlin.png' style='width:29%; margin:1% 2%; vertical-align:middle' /></a>
 <a href='https://www.utas.edu.au/' target='_blank'><img src='img/UTas.png' style='width:20%; margin:1% 2%; vertical-align:middle' /></a>
