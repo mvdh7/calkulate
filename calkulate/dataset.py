@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 import PyCO2SYS as pyco2
 
-from . import files
+from . import convert, files
 from .core import SolveEmfResult, SolvePhGranResult, SolvePhResult
 from .meta import _get_kwargs_for
 
@@ -127,7 +127,7 @@ def prepare(ds):
         ds["file_good"] = True
 
 
-def calibrate(ds, verbose=False, **kwargs):
+def calibrate(ds, then_solve=True, verbose=False, **kwargs):
     """Calibrate `titrant_molinity` for all titrations with an
     `alkalinity_certified` value and assign means based on `analysis_batch`.
 
@@ -136,8 +136,10 @@ def calibrate(ds, verbose=False, **kwargs):
     ds : pandas.DataFrame
         A table containing metadata for each titration (not used if running as
         a method).
+    then_solve : bool, optional
+        Whether to solve after calibrating, by default `True`.
     verbose : bool, optional
-        Whether to print progress, by default `calk.default.verbose`.
+        Whether to print progress, by default `False`.
 
     Returns
     -------
@@ -163,7 +165,8 @@ def calibrate(ds, verbose=False, **kwargs):
         ds.analysis_batch, "titrant_molinity"
     ].to_numpy()
     print("Calkulate: calibration complete!")
-    ds = solve(ds, verbose=verbose, **kwargs)
+    if then_solve:
+        ds = solve(ds, verbose=verbose, **kwargs)
     return ds
 
 
@@ -220,6 +223,12 @@ def solve_row(row, verbose=False, **kwargs):
                 **kwargs_solve,
             )
             solved = add_solve_results(solved, sr)
+            if pd.isnull(row.analyte_mass):
+                solved["analyte_mass"] = convert.analyte_volume_to_mass(
+                    row.analyte_volume,
+                    solved["temperature_init"],
+                    row.salinity,
+                )
         except Exception as e:
             print(f'Error solving "{row.file_name}":')
             print(f"{e}")
@@ -247,7 +256,7 @@ def solve(ds, verbose=False, **kwargs):
     # Check for bad kwargs, but don't break on them
     kwargs_ignored = []
     for k in _backcompat(kwargs.copy(), []):
-        if k not in files.keys_calibrate | {"pH_range", "read_dat_kwargs"}:
+        if k not in files.keys_solve | {"pH_range", "read_dat_kwargs"}:
             kwargs_ignored.append(k)
     if len(kwargs_ignored) > 0:
         warn(
@@ -283,6 +292,5 @@ def calkulate(ds, verbose=False, **kwargs):
     pd.DataFrame
         The titration metadataset with additional columns found by the solver.
     """
-    calibrate(ds, verbose=verbose, **kwargs)
-    solve(ds, verbose=verbose, **kwargs)
+    calibrate(ds, then_solve=True, verbose=verbose, **kwargs)
     return ds

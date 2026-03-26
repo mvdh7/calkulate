@@ -1,0 +1,3 @@
+filename	date	time	calc. ID	constants used	comment	temperature	salinity	phosphate	silicate	temp. used	density	sample(g)	acid dens.	acid conc.	AT(mGP)	CT(mGP)	E0(mGP)	K1(mGP)	rms(mGP)	AT(CF)	CT(CF)	E0(CF)	K1(CF)	mse(CF)
+0-0  0  (0)junk-250916-01.dat	16-Sep-25	10:34 AM	01	Prieto and Millero		0.000000	35.000000	0.000000	0.000000	25.000000	1.023343	102.334283	1.022700	0.100000	NaN	NaN	NaN	NaN	NaN	NaN
+0-0  0  (0)junk-250916-02.dat	16-Sep-25	11:05 AM	01	Prieto and Millero		0.000000	35.000000	0.000000	0.000000	25.000000	1.023343	102.334283	1.022700	0.100000	NaN	NaN	NaN	NaN	NaN	NaN

@@ -278,83 +278,83 @@ def _titration(
     return titrant_mass, emf, temperature, analyte_mass, totals, k_constants
 
 
-def titration(
-    alkalinity,
-    analyte_mass=0.1,
-    dic=0,
-    emf0=600,
-    fCO2_air=default.fCO2_air,
-    k_dic_loss=None,
-    salinity=35,
-    temperature=25,
-    titrant_mass_start=0,
-    titrant_mass_step=0.15e-3,
-    titrant_mass_stop=4.2e-3,
-    titrant_molinity=0.1,
-    least_squares_kwargs=default.least_squares_kwargs,
-    pH_range=default.pH_range,
-    **pyco2sys_kwargs,
-):
-    """Simulate a titration and return a calibrated and solved `Titration`.
+# def titration(
+#     alkalinity,
+#     analyte_mass=0.1,
+#     dic=0,
+#     emf0=600,
+#     fCO2_air=default.fCO2_air,
+#     k_dic_loss=None,
+#     salinity=35,
+#     temperature=25,
+#     titrant_mass_start=0,
+#     titrant_mass_step=0.15e-3,
+#     titrant_mass_stop=4.2e-3,
+#     titrant_molinity=0.1,
+#     least_squares_kwargs=default.least_squares_kwargs,
+#     pH_range=default.pH_range,
+#     **pyco2sys_kwargs,
+# ):
+#     """Simulate a titration and return a calibrated and solved `Titration`.
 
-    Parameters
-    ----------
-    alkalinity : float
-        Total alkalinity content of the analyte in µmol/kg.
-    analyte_mass : float, optional
-        Mass of the analyte in kg, by default 0.1 kg.
-    dic : float, optional
-        Dissolved inorganic carbon of the analyte in µmol/kg, by default 0 µmol/kg.
-    emf0 : float, optional
-        EMF0 of the electrode in mV, by default 600 mV.
-    salinity : float, optional
-        Practical salinity of the analyte, by default 35.
-    temperature : float, optional
-        Temperature of the analyte in °C, by default 25 °C.
-    titrant_mass_start : float, optional
-        Mass of titrant at the start of the titration in kg, by default 0 kg.
-    titrant_mass_step : float, optional
-        Mass of each titrant addition step in kg, by default 0.15e-3 kg.
-    titrant_mass_stop : float, optional
-        Mass at which to stop the titration (exclusive) in kg, by default 4.2e-3 kg.
-    titrant_molinity : float, optional
-        Molinity of the titrant in mol/kg, by default 0.1 mol/kg.
-    least_squares_kwargs : dict, optional
-        Additional kwargs passed on to the least-squares solver.
-    pH_range : tuple, optional
-        Range of pH values to determine alkalinity within, by default (3, 4).
-    **pyco2sys_kwargs
-        Additional kwargs passed on to PyCO2SYS.
+#     Parameters
+#     ----------
+#     alkalinity : float
+#         Total alkalinity content of the analyte in µmol/kg.
+#     analyte_mass : float, optional
+#         Mass of the analyte in kg, by default 0.1 kg.
+#     dic : float, optional
+#         Dissolved inorganic carbon of the analyte in µmol/kg, by default 0 µmol/kg.
+#     emf0 : float, optional
+#         EMF0 of the electrode in mV, by default 600 mV.
+#     salinity : float, optional
+#         Practical salinity of the analyte, by default 35.
+#     temperature : float, optional
+#         Temperature of the analyte in °C, by default 25 °C.
+#     titrant_mass_start : float, optional
+#         Mass of titrant at the start of the titration in kg, by default 0 kg.
+#     titrant_mass_step : float, optional
+#         Mass of each titrant addition step in kg, by default 0.15e-3 kg.
+#     titrant_mass_stop : float, optional
+#         Mass at which to stop the titration (exclusive) in kg, by default 4.2e-3 kg.
+#     titrant_molinity : float, optional
+#         Molinity of the titrant in mol/kg, by default 0.1 mol/kg.
+#     least_squares_kwargs : dict, optional
+#         Additional kwargs passed on to the least-squares solver.
+#     pH_range : tuple, optional
+#         Range of pH values to determine alkalinity within, by default (3, 4).
+#     **pyco2sys_kwargs
+#         Additional kwargs passed on to PyCO2SYS.
 
-    Returns
-    -------
-    calkulate.Titration
-        A self-calibrated and solved titration dataset.
-    """
-    tt = Titration(
-        salinity=salinity,
-        analyte_mass=analyte_mass,
-        simulate_alkalinity=alkalinity,
-        simulate_kwargs=dict(
-            dic=dic,
-            emf0=emf0,
-            fCO2_air=fCO2_air,
-            k_dic_loss=k_dic_loss,
-            salinity=salinity,
-            temperature=temperature,
-            titrant_mass_start=titrant_mass_start,
-            titrant_mass_step=titrant_mass_step,
-            titrant_mass_stop=titrant_mass_stop,
-            titrant_molinity=titrant_molinity,
-            **pyco2sys_kwargs,
-        ),
-    )
-    tt.calkulate(
-        alkalinity,
-        analyte_total_sulfate=None,  # H2SO4 simulations not implemented yet
-        least_squares_kwargs=least_squares_kwargs,
-        pH_range=pH_range,
-        titrant_molinity_guess=titrant_molinity,
-        titrant="HCl",  # H2SO4 simulations not implemented yet
-    )
-    return tt
+#     Returns
+#     -------
+#     calkulate.Titration
+#         A self-calibrated and solved titration dataset.
+#     """
+#     tt = Titration(
+#         salinity=salinity,
+#         analyte_mass=analyte_mass,
+#         simulate_alkalinity=alkalinity,
+#         simulate_kwargs=dict(
+#             dic=dic,
+#             emf0=emf0,
+#             fCO2_air=fCO2_air,
+#             k_dic_loss=k_dic_loss,
+#             salinity=salinity,
+#             temperature=temperature,
+#             titrant_mass_start=titrant_mass_start,
+#             titrant_mass_step=titrant_mass_step,
+#             titrant_mass_stop=titrant_mass_stop,
+#             titrant_molinity=titrant_molinity,
+#             **pyco2sys_kwargs,
+#         ),
+#     )
+#     tt.calkulate(
+#         alkalinity,
+#         analyte_total_sulfate=None,  # H2SO4 simulations not implemented yet
+#         least_squares_kwargs=least_squares_kwargs,
+#         pH_range=pH_range,
+#         titrant_molinity_guess=titrant_molinity,
+#         titrant="HCl",  # H2SO4 simulations not implemented yet
+#     )
+#     return tt

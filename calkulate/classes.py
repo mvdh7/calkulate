@@ -4,7 +4,7 @@ import pandas as pd
 import PyCO2SYS as pyco2
 
 from .convert import get_dilution_factor
-from .core import SolveEmfResult, SolvePhGranResult, SolvePhResult
+from .core import SolveEmfResult, SolvePhGranResult
 from .dataset import _backcompat, add_solve_results
 from .files import solve
 

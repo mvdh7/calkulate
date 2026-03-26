@@ -14,6 +14,12 @@ Calkulate v3 went too far overboard with the OO approach and ended up being very
 
 !!! info "Changes in v23.7"
 
+    ***v23.7.1 (26 March 2026)***
+
+    * Fixed bug in saving calculated `analyte_mass` value.
+
+    ***v23.7.0 (1 July 2025)***
+
     * All EMF solvers now do a double-solve by default, in order to improve the range of pH data that are used.  This does mean that results may change as a different set of data points will sometimes be used to solve each titration.  To revert to the old behaviour, use `double=False`.
     * Equilibrium constants now vary through titrations with temperature only, not also with changing total sulfate and fluoride concentrations as in previous versions.  To revert to the old behaviour, use `dilute_totals_for_ks=True`.
     * More points used for the Gran-plot initial estimate of alkalinity and EMF<sup>0</sup>.  To revert to the old behaviour, use `gran_logic="legacy"`.
