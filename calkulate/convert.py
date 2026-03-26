@@ -144,6 +144,34 @@ def f_to_demf0(f, temperature):
     return np.log(f) * R * temperature_K / F
 
 
+def analyte_volume_to_mass(analyte_volume, temperature, salinity):
+    """Convert analyte volume to mass with MP81's 1-atm seawater density.
+
+    Parameters
+    ----------
+    analyte_volume : float
+        Volume of the analyte in ml.
+    temperature : float
+        Temperature in °C.
+    salinity : float
+        Practical salinity.
+
+    Returns
+    -------
+    float
+        Mass of the analyte in kg.
+    """
+    analyte_mass = (
+        analyte_volume
+        * density.seawater_1atm_MP81(
+            temperature=temperature,
+            salinity=salinity,
+        )
+        * 1e-3
+    )
+    return analyte_mass
+
+
 def amount_units(
     dat_data,
     salinity,
@@ -235,18 +263,13 @@ def amount_units(
         titrant_mass = dd.titrant_amount * 1e-3
     elif titrant_amount_unit.lower() == "kg":
         titrant_mass = dd.titrant_amount
-    # Convert analyte_mass to analyte_volume if necessary
+    # Convert analyte_volume to analyte_mass if necessary
     if pd.isnull(analyte_mass):
         assert not pd.isnull(analyte_volume), (
             "Either `analyte_mass` or `analyte_volume` must be provided"
         )
-        analyte_mass = (
-            analyte_volume
-            * density.seawater_1atm_MP81(
-                temperature=temperature[0],
-                salinity=salinity,
-            )
-            * 1e-3
+        analyte_mass = analyte_volume_to_mass(
+            analyte_volume, temperature[0], salinity
         )
     return Converted(
         titrant_mass, dd.measurement, temperature, analyte_mass, salinity

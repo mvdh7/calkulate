@@ -205,7 +205,8 @@ def alkalinity(tt, ax=None):
     ax.set_xlabel("Titrant mass / g")
     ax.set_ylabel("Alkalinity / μmol/kg-sw")
     ax.set_title(
-        "Total alkalinity = {:.1f} ± {:.1f} μmol/kg-sw; $n$ = {}".format(
+        "{} (TA = {:.1f} ± {:.1f} μmol/kg-sw; $n$ = {})".format(
+            tt.bottle,
             tt.alkalinity,
             ttt.alkalinity_estimate[ttt.used].std() * 1e6,
             ttt.used.sum(),

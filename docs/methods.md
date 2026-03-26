@@ -38,6 +38,8 @@ For each titration (i.e. row in the Dataset) that has an [`alkalinity_certified`
 
 Then, the `titrant_molinity_here` values are averaged — [by `analysis_batch`](../metadata/#recommended-columns) if provided, or over the entire Dataset if not — and stored in a new column called `titrant_molinity`.
 
+> `ds.calibrate()` automatically runs `ds.solve()` at the end by default - if you don't want it to do so, then set the kwarg `then_solve=False`.
+
 ### Solve samples for alkalinity
 
 ```python
