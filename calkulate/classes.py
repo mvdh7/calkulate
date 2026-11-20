@@ -224,14 +224,14 @@ class Titration:
         if "file_path" in self.row:
             f = os.path.join(self.row.file_path, self.row.file_name)
         else:
-            f = self.ro.file_name
+            f = self.row.file_name
         return f'calkulate.Titration for file "{f}"'
 
     def __repr__(self):
         if "file_path" in self.row:
             f = os.path.join(self.row.file_path, self.row.file_name)
         else:
-            f = self.ro.file_name
+            f = self.row.file_name
         return f'calkulate.Titration for file "{f}"'
 
     def get_alkalinity_from_acid(self):
