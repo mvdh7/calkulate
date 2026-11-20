@@ -1,4 +1,5 @@
 *.zip
+*.code-workspace
 
 # Student help
 laura/
