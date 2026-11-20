@@ -26,7 +26,7 @@ def hello():
     Humphreys, M.P. & Matthews, R.S.
        doi:10.5281/zenodo.2634304
            Version {} ({})
-""".format(__version__, __year__)
+""".format(__version__, __year__)  # noqa: UP032
     )
 
 
