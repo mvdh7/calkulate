@@ -1,5 +1,5 @@
 # Calkulate: seawater total alkalinity from titration data
-# Copyright (C) 2019--2025  Matthew P. Humphreys  (GNU GPLv3)
+# Copyright (C) 2019--2026  Matthew P. Humphreys  (GNU GPLv3)
 """Calibrate and solve titration datasets.
 
 This is the lowest level of the three layers of processing functions.
